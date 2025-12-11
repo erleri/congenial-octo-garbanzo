@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRM 시뮬레이터 - Marimekko Chart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-card h3 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .metric-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-card .change {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            min-height: 400px;
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        #marimekkoChart {
+            display: flex;
+            height: 300px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        .segment {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .segment:hover {
+            opacity: 0.8;
+        }
+
+        .segment-part {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .segment-label {
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .controls-panel {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider-value {
+            min-width: 60px;
+            text-align: right;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .optimization-tips {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .optimization-tips h4 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .optimization-tips ul {
+            list-style-position: inside;
+            color: #333;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .product-card {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .product-card h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 PRM 시뮬레이터</h1>
+        <p class="subtitle">Marimekko 차트 기반 매출/시장점유율/손익 최적화</p>
+
+        <!-- 주요 지표 -->
+        <div class="metrics-panel">
+            <div class="metric-card">
+                <h3>💰 총 매출</h3>
+                <div class="value" id="totalRevenue">₩0</div>
+                <div class="change" id="revenueChange">-</div>
+            </div>
+            <div class="metric-card">
+                <h3>📊 시장 점유율</h3>
+                <div class="value" id="marketShare">0%</div>
+                <div class="change" id="marketShareChange">-</div>
+            </div>
+            <div class="metric-card">
+                <h3>💵 영업이익</h3>
+                <div class="value" id="operatingProfit">₩0</div>
+                <div class="change" id="profitChange">-</div>
+            </div>
+        </div>
+
+        <!-- Marimekko 차트 -->
+        <div class="chart-container">
+            <div class="chart-title">📈 제품별 매출 구성 (Marimekko Chart)</div>
+            <div id="marimekkoChart"></div>
+        </div>
+
+        <!-- 제품별 상세 설정 -->
+        <div class="controls-panel">
+            <h3 style="margin-bottom: 20px; color: #333;">제품 설정</h3>
+            <div class="product-grid" id="productControls"></div>
+        </div>
+
+        <!-- 시장 설정 -->
+        <div class="controls-panel">
+            <h3 style="margin-bottom: 20px; color: #333;">시장 환경 설정</h3>
+            <div class="control-group">
+                <label for="marketSize">총 시장 규모 (억원)</label>
+                <div class="slider-container">
+                    <input type="range" id="marketSize" min="1000" max="10000" value="5000" step="100">
+                    <span class="slider-value" id="marketSizeValue">5000억</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <label for="competitionLevel">경쟁 강도</label>
+                <div class="slider-container">
+                    <input type="range" id="competitionLevel" min="1" max="10" value="5" step="1">
+                    <span class="slider-value" id="competitionLevelValue">5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="button-group">
+            <button class="btn-primary" onclick="optimizeStrategy()">🚀 자동 최적화</button>
+            <button class="btn-secondary" onclick="resetSimulator()">🔄 초기화</button>
+        </div>
+
+        <!-- 최적화 제안 -->
+        <div class="optimization-tips" id="optimizationTips">
+            <h4>💡 최적화 제안</h4>
+            <ul id="tipsList">
+                <li>제품 설정을 조정하여 시뮬레이션을 시작하세요.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 제품 데이터 구조
+        const products = [
+            {
+                id: 'productA',
+                name: '제품 A',
+                marketShare: 25,
+                price: 100,
+                cost: 60,
+                segments: [
+                    { name: '프리미엄', share: 60, color: '#FF6B6B' },
+                    { name: '일반', share: 40, color: '#FF8E8E' }
+                ]
+            },
+            {
+                id: 'productB',
+                name: '제품 B',
+                marketShare: 30,
+                price: 80,
+                cost: 45,
+                segments: [
+                    { name: '프리미엄', share: 40, color: '#4ECDC4' },
+                    { name: '일반', share: 60, color: '#7EDDD6' }
+                ]
+            },
+            {
+                id: 'productC',
+                name: '제품 C',
+                marketShare: 20,
+                price: 120,
+                cost: 70,
+                segments: [
+                    { name: '프리미엄', share: 80, color: '#FFE66D' },
+                    { name: '일반', share: 20, color: '#FFF0A0' }
+                ]
+            },
+            {
+                id: 'productD',
+                name: '제품 D',
+                marketShare: 25,
+                price: 90,
+                cost: 50,
+                segments: [
+                    { name: '프리미엄', share: 50, color: '#95E1D3' },
+                    { name: '일반', share: 50, color: '#B8F1E5' }
+                ]
+            }
+        ];
+
+        // 시장 환경
+        let marketSize = 5000; // 억원
+        let competitionLevel = 5;
+
+        // 초기값 저장
+        const initialProducts = JSON.parse(JSON.stringify(products));
+
+        // 초기화
+        function init() {
+            createProductControls();
+            updateChart();
+            updateMetrics();
+            
+            // 이벤트 리스너
+            document.getElementById('marketSize').addEventListener('input', (e) => {
+                marketSize = parseInt(e.target.value);
+                document.getElementById('marketSizeValue').textContent = marketSize + '억';
+                updateMetrics();
+                updateOptimizationTips();
+            });
+
+            document.getElementById('competitionLevel').addEventListener('input', (e) => {
+                competitionLevel = parseInt(e.target.value);
+                document.getElementById('competitionLevelValue').textContent = competitionLevel;
+                updateMetrics();
+                updateOptimizationTips();
+            });
+        }
+
+        // 제품 컨트롤 생성
+        function createProductControls() {
+            const container = document.getElementById('productControls');
+            container.innerHTML = '';
+
+            products.forEach((product, index) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <h4>${product.name}</h4>
+                    <div class="control-group">
+                        <label>시장 점유율: <span id="${product.id}_shareValue">${product.marketShare}%</span></label>
+                        <input type="range" id="${product.id}_share" min="0" max="50" value="${product.marketShare}" step="1">
+                    </div>
+                    <div class="control-group">
+                        <label>가격: <span id="${product.id}_priceValue">₩${product.price}</span></label>
+                        <input type="range" id="${product.id}_price" min="50" max="200" value="${product.price}" step="5">
+                    </div>
+                    <div class="control-group">
+                        <label>원가: <span id="${product.id}_costValue">₩${product.cost}</span></label>
+                        <input type="range" id="${product.id}_cost" min="30" max="150" value="${product.cost}" step="5">
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // 이벤트 리스너
+                document.getElementById(`${product.id}_share`).addEventListener('input', (e) => {
+                    product.marketShare = parseInt(e.target.value);
+                    document.getElementById(`${product.id}_shareValue`).textContent = product.marketShare + '%';
+                    updateChart();
+                    updateMetrics();
+                    updateOptimizationTips();
+                });
+
+                document.getElementById(`${product.id}_price`).addEventListener('input', (e) => {
+                    product.price = parseInt(e.target.value);
+                    document.getElementById(`${product.id}_priceValue`).textContent = '₩' + product.price;
+                    updateMetrics();
+                    updateOptimizationTips();
+                });
+
+                document.getElementById(`${product.id}_cost`).addEventListener('input', (e) => {
+                    product.cost = parseInt(e.target.value);
+                    document.getElementById(`${product.id}_costValue`).textContent = '₩' + product.cost;
+                    updateMetrics();
+                    updateOptimizationTips();
+                });
+            });
+        }
+
+        // Marimekko 차트 업데이트
+        function updateChart() {
+            const chart = document.getElementById('marimekkoChart');
+            chart.innerHTML = '';
+
+            const totalShare = products.reduce((sum, p) => sum + p.marketShare, 0);
+
+            products.forEach(product => {
+                const segment = document.createElement('div');
+                segment.className = 'segment';
+                segment.style.width = (product.marketShare / totalShare * 100) + '%';
+
+                product.segments.forEach(seg => {
+                    const part = document.createElement('div');
+                    part.className = 'segment-part';
+                    part.style.height = seg.share + '%';
+                    part.style.backgroundColor = seg.color;
+                    part.innerHTML = `
+                        <div class="segment-label">
+                            ${product.name}<br>
+                            ${seg.name}<br>
+                            ${seg.share}%
+                        </div>
+                    `;
+                    segment.appendChild(part);
+                });
+
+                chart.appendChild(segment);
+            });
+        }
+
+        // 지표 계산 및 업데이트
+        function updateMetrics() {
+            // 총 매출 계산
+            let totalRevenue = 0;
+            products.forEach(product => {
+                const productRevenue = (marketSize * product.marketShare / 100) * product.price;
+                totalRevenue += productRevenue;
+            });
+
+            // 시장 점유율 계산
+            const totalMarketShare = products.reduce((sum, p) => sum + p.marketShare, 0);
+
+            // 영업이익 계산
+            let operatingProfit = 0;
+            products.forEach(product => {
+                const productRevenue = (marketSize * product.marketShare / 100) * product.price;
+                const productCost = (marketSize * product.marketShare / 100) * product.cost;
+                operatingProfit += (productRevenue - productCost);
+            });
+
+            // 경쟁 영향 반영
+            const competitionFactor = 1 - (competitionLevel - 1) * 0.05;
+            totalRevenue *= competitionFactor;
+            operatingProfit *= competitionFactor;
+
+            // UI 업데이트
+            document.getElementById('totalRevenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('marketShare').textContent = totalMarketShare.toFixed(1) + '%';
+            document.getElementById('operatingProfit').textContent = formatCurrency(operatingProfit);
+
+            // 변화율 계산 (간단한 예시)
+            const profitMargin = (operatingProfit / totalRevenue * 100).toFixed(1);
+            document.getElementById('revenueChange').textContent = `경쟁지수: ${competitionLevel}`;
+            document.getElementById('marketShareChange').textContent = `총 ${totalMarketShare}%`;
+            document.getElementById('profitChange').textContent = `이익률: ${profitMargin}%`;
+        }
+
+        // 통화 포맷
+        function formatCurrency(value) {
+            if (value >= 10000) {
+                return '₩' + (value / 10000).toFixed(0) + '억';
+            } else if (value >= 1) {
+                return '₩' + value.toFixed(0) + '억';
+            } else {
+                return '₩' + (value * 100).toFixed(0) + '백만';
+            }
+        }
+
+        // 최적화 제안 업데이트
+        function updateOptimizationTips() {
+            const tips = [];
+
+            products.forEach(product => {
+                const margin = ((product.price - product.cost) / product.price * 100);
+                
+                if (margin < 20) {
+                    tips.push(`${product.name}: 이익률이 낮습니다 (${margin.toFixed(1)}%). 가격 인상 또는 원가 절감을 고려하세요.`);
+                }
+                
+                if (product.price < product.cost) {
+                    tips.push(`${product.name}: 가격이 원가보다 낮습니다! 즉시 조정이 필요합니다.`);
+                }
+
+                if (product.marketShare < 10) {
+                    tips.push(`${product.name}: 시장 점유율이 낮습니다 (${product.marketShare}%). 마케팅 투자를 고려하세요.`);
+                }
+            });
+
+            const totalShare = products.reduce((sum, p) => sum + p.marketShare, 0);
+            if (totalShare > 100) {
+                tips.push(`⚠️ 총 시장 점유율이 100%를 초과했습니다 (${totalShare}%). 조정이 필요합니다.`);
+            } else if (totalShare < 50) {
+                tips.push(`💡 시장 점유율 확대 기회가 있습니다 (현재 ${totalShare}%).`);
+            }
+
+            if (competitionLevel > 7) {
+                tips.push('경쟁이 매우 치열합니다. 차별화 전략이 필요합니다.');
+            }
+
+            const tipsList = document.getElementById('tipsList');
+            if (tips.length === 0) {
+                tipsList.innerHTML = '<li>✅ 현재 설정이 양호합니다. 계속 최적화를 진행하세요.</li>';
+            } else {
+                tipsList.innerHTML = tips.map(tip => `<li>${tip}</li>`).join('');
+            }
+        }
+
+        // 자동 최적화
+        function optimizeStrategy() {
+            // 각 제품의 이익률을 기준으로 최적화
+            let totalOptimalShare = 0;
+            
+            products.forEach(product => {
+                // 이익률이 높은 제품에 더 많은 점유율 할당
+                const margin = product.price - product.cost;
+                const optimalPrice = product.cost * 1.5; // 50% 마진 목표
+                
+                product.price = Math.round(optimalPrice);
+                
+                // 이익률이 높은 제품 우선 배분
+                if (margin > 40) {
+                    product.marketShare = Math.min(30, product.marketShare + 5);
+                } else if (margin > 20) {
+                    product.marketShare = Math.min(25, product.marketShare + 2);
+                }
+                
+                totalOptimalShare += product.marketShare;
+            });
+
+            // 총 점유율을 100% 이하로 조정
+            if (totalOptimalShare > 100) {
+                const scaleFactor = 100 / totalOptimalShare;
+                products.forEach(product => {
+                    product.marketShare = Math.round(product.marketShare * scaleFactor);
+                });
+            }
+
+            // UI 업데이트
+            createProductControls();
+            updateChart();
+            updateMetrics();
+            updateOptimizationTips();
+
+            alert('✅ 최적화가 완료되었습니다!\n이익률과 시장 점유율을 기준으로 자동 조정되었습니다.');
+        }
+
+        // 초기화
+        function resetSimulator() {
+            if (confirm('모든 설정을 초기화하시겠습니까?')) {
+                // 초기값 복원
+                products.forEach((product, index) => {
+                    Object.assign(product, JSON.parse(JSON.stringify(initialProducts[index])));
+                });
+
+                marketSize = 5000;
+                competitionLevel = 5;
+
+                document.getElementById('marketSize').value = marketSize;
+                document.getElementById('marketSizeValue').textContent = marketSize + '억';
+                document.getElementById('competitionLevel').value = competitionLevel;
+                document.getElementById('competitionLevelValue').textContent = competitionLevel;
+
+                createProductControls();
+                updateChart();
+                updateMetrics();
+                updateOptimizationTips();
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
