@@ -490,21 +490,20 @@
         function updateMetrics() {
             // 총 매출 계산
             let totalRevenue = 0;
+            let operatingProfit = 0;
+            
             products.forEach(product => {
-                const productRevenue = (marketSize * product.marketShare / 100) * product.price;
+                // 기본 시장 규모 계산 (중복 제거)
+                const baseMarketSize = (marketSize * product.marketShare / 100);
+                const productRevenue = baseMarketSize * product.price;
+                const productCost = baseMarketSize * product.cost;
+                
                 totalRevenue += productRevenue;
+                operatingProfit += (productRevenue - productCost);
             });
 
             // 시장 점유율 계산
             const totalMarketShare = products.reduce((sum, p) => sum + p.marketShare, 0);
-
-            // 영업이익 계산
-            let operatingProfit = 0;
-            products.forEach(product => {
-                const productRevenue = (marketSize * product.marketShare / 100) * product.price;
-                const productCost = (marketSize * product.marketShare / 100) * product.cost;
-                operatingProfit += (productRevenue - productCost);
-            });
 
             // 경쟁 영향 반영
             const competitionFactor = 1 - (competitionLevel - 1) * 0.05;
@@ -516,8 +515,8 @@
             document.getElementById('marketShare').textContent = totalMarketShare.toFixed(1) + '%';
             document.getElementById('operatingProfit').textContent = formatCurrency(operatingProfit);
 
-            // 변화율 계산 (간단한 예시)
-            const profitMargin = (operatingProfit / totalRevenue * 100).toFixed(1);
+            // 변화율 계산 (Division by zero 방지)
+            const profitMargin = totalRevenue > 0 ? (operatingProfit / totalRevenue * 100).toFixed(1) : '0.0';
             document.getElementById('revenueChange').textContent = `경쟁지수: ${competitionLevel}`;
             document.getElementById('marketShareChange').textContent = `총 ${totalMarketShare}%`;
             document.getElementById('profitChange').textContent = `이익률: ${profitMargin}%`;
@@ -526,11 +525,13 @@
         // 통화 포맷
         function formatCurrency(value) {
             if (value >= 10000) {
-                return '₩' + (value / 10000).toFixed(0) + '억';
+                return '₩' + (value / 10000).toFixed(0) + '조';
             } else if (value >= 1) {
                 return '₩' + value.toFixed(0) + '억';
+            } else if (value > 0) {
+                return '₩' + (value * 10).toFixed(1) + '천만';
             } else {
-                return '₩' + (value * 100).toFixed(0) + '백만';
+                return '₩0';
             }
         }
 
