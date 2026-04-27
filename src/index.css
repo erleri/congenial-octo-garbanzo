@@ -1,0 +1,21 @@
+:root {
+  font-family: 'Noto Sans KR', 'Pretendard', 'Segoe UI', sans-serif;
+  color: #243249;
+  background: #eef3fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(77, 120, 180, 0.15), transparent 30%),
+    radial-gradient(circle at 85% 0%, rgba(46, 80, 126, 0.12), transparent 25%),
+    #eef3fa;
+}
+
+#root {
+  min-height: 100vh;
+}
