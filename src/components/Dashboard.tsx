@@ -13,6 +13,8 @@ import {
 } from 'recharts'
 import { formatCellValue, monthLabel } from '../lib/formatters'
 import type {
+  CellStatus,
+  DailyRate,
   DashboardFilters,
   ExchangeRateDataset,
   MonthlyRate,
@@ -23,10 +25,9 @@ interface DashboardProps {
   filters: DashboardFilters
 }
 
-const KPI_CURRENCIES = ['USD', 'BRL', 'MXN', 'CLP', 'COP', 'PEN'] as const
+const KPI_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'PEN'] as const
 
 const SERIES_COLORS = {
-  USD: '#1f3c88',
   BRL: '#26734d',
   MXN: '#5b7f2b',
   CLP: '#a86d00',
@@ -39,7 +40,7 @@ function getMonthly(
   currency: (typeof KPI_CURRENCIES)[number],
   year: number,
   month: number,
-  rateType: 'LOCAL_PER_USD' | 'KRW',
+  rateType: 'LOCAL_PER_USD',
 ): MonthlyRate | undefined {
   return rows.find(
     (row) =>
@@ -50,32 +51,62 @@ function getMonthly(
   )
 }
 
-function Dashboard({ data, filters }: DashboardProps) {
+function average(values: number[]): number | null {
+  if (!values.length) {
+    return null
+  }
+
+  const sum = values.reduce((acc, cur) => acc + cur, 0)
+  return sum / values.length
+}
+
+function getDaily(
+  rows: DailyRate[],
+  currency: (typeof KPI_CURRENCIES)[number],
+  date: string,
+): DailyRate | undefined {
+  return rows.find(
+    (row) =>
+      row.currency === currency && row.date === date && row.rateType === 'LOCAL_PER_USD',
+  )
+}
+
+function Dashboard({ data, filters: _filters }: DashboardProps) {
   const baseDate = new Date(data.baseDate)
   const latestYear = baseDate.getFullYear()
   const latestMonth = baseDate.getMonth() + 1
+  const baseDateText = data.baseDate
+  const recentMonths = buildRecentMonths(latestYear, latestMonth, 24)
 
   const previousDate = new Date(latestYear, latestMonth - 2, 1)
 
   const kpis = KPI_CURRENCIES.map((currency) => {
-    const isUsd = currency === 'USD'
-    const rateType = isUsd ? 'KRW' : 'LOCAL_PER_USD'
+    const monthlyValues = data.dailyRates
+      .filter(
+        (row) =>
+          row.currency === currency &&
+          row.rateType === 'LOCAL_PER_USD' &&
+          row.year === latestYear &&
+          row.month === latestMonth &&
+          row.date <= baseDateText &&
+          typeof row.value === 'number',
+      )
+      .map((row) => row.value as number)
 
-    const current = getMonthly(
-      data.monthlyRates,
-      currency,
-      latestYear,
-      latestMonth,
-      rateType,
-    )
+    const cumulativeValue = average(monthlyValues)
+    const cumulativeStatus: CellStatus = cumulativeValue === null ? 'empty' : 'ok'
+
+    const current = getMonthly(data.monthlyRates, currency, latestYear, latestMonth, 'LOCAL_PER_USD')
 
     const previous = getMonthly(
       data.monthlyRates,
       currency,
       previousDate.getFullYear(),
       previousDate.getMonth() + 1,
-      rateType,
+      'LOCAL_PER_USD',
     )
+
+    const today = getDaily(data.dailyRates, currency, baseDateText)
 
     const currentValue = current?.value ?? null
     const previousValue = previous?.value ?? null
@@ -87,29 +118,31 @@ function Dashboard({ data, filters }: DashboardProps) {
 
     return {
       currency,
-      label: currency === 'USD' ? 'USD/KRW 최신 월평균' : `${currency} 최신 월평균`,
-      valueText: formatCellValue(
-        current?.value ?? null,
-        current?.status ?? 'empty',
-        currency === 'USD' ? 'KRW' : currency,
-      ),
+      label: `${currency} 당월 누적 평균`,
+      valueText: formatCellValue(cumulativeValue, cumulativeStatus, currency),
+      todayText: formatCellValue(today?.value ?? null, today?.status ?? 'empty', currency),
+      todayImputed: today?.source === 'IMPUTED' && today?.imputationMethod === 'FFILL',
       diff,
     }
   })
 
   const localSeriesByCurrency = KPI_CURRENCIES.map((currency) => {
-    const points = data.monthlyRates
+    const monthlyMap = new Map<string, number | null>()
+
+    data.monthlyRates
       .filter(
         (row) =>
           row.rateType === 'LOCAL_PER_USD' &&
-          row.currency === currency &&
-          row.year >= filters.year - 2,
+          row.currency === currency,
       )
-      .sort((a, b) => (monthKey(a.year, a.month) > monthKey(b.year, b.month) ? 1 : -1))
-      .map((row) => ({
-        month: monthLabel(row.year, row.month),
-        value: row.value,
-      }))
+      .forEach((row) => {
+        monthlyMap.set(monthKey(row.year, row.month), row.value)
+      })
+
+    const points = recentMonths.map(({ year, month }) => ({
+      month: monthLabel(year, month),
+      value: monthlyMap.get(monthKey(year, month)) ?? null,
+    }))
 
     return {
       currency,
@@ -118,28 +151,7 @@ function Dashboard({ data, filters }: DashboardProps) {
     }
   })
 
-  const krwSeriesByCurrency = KPI_CURRENCIES.map((currency) => {
-    const points = data.monthlyRates
-      .filter(
-        (row) =>
-          row.rateType === 'KRW' &&
-          row.currency === currency &&
-          row.year >= filters.year - 2,
-      )
-      .sort((a, b) => (monthKey(a.year, a.month) > monthKey(b.year, b.month) ? 1 : -1))
-      .map((row) => ({
-        month: monthLabel(row.year, row.month),
-        value: row.value,
-      }))
-
-    return {
-      currency,
-      points,
-      domain: buildDomain(points.map((point) => point.value)),
-    }
-  })
-
-  const focusedCurrencies = ['BRL', 'MXN', 'CLP', 'COP', 'PEN'] as const
+  const focusedCurrencies = KPI_CURRENCIES
 
   const normalizedTrend = focusedCurrencies
     .flatMap((currency) => {
@@ -194,11 +206,20 @@ function Dashboard({ data, filters }: DashboardProps) {
         <h2>Dashboard</h2>
       </div>
 
+      <div className="dashboard-meta">
+        <span>기준일: {baseDateText}</span>
+        <span>카드 기준: 당월 1일~기준일까지 일별 평균(당월 누적)</span>
+      </div>
+
       <div className="kpi-grid">
         {kpis.map((kpi) => (
           <div key={kpi.currency} className="kpi-card">
             <span>{kpi.label}</span>
             <strong>{kpi.valueText}</strong>
+            <p className="kpi-today">
+              오늘 환율 {kpi.todayText}
+              {kpi.todayImputed ? <span className="imputed-badge">휴</span> : null}
+            </p>
             <em className={kpi.diff !== null && kpi.diff < 0 ? 'down' : 'up'}>
               {kpi.diff === null ? '-' : `${(kpi.diff * 100).toFixed(2)}% MoM`}
             </em>
@@ -206,67 +227,37 @@ function Dashboard({ data, filters }: DashboardProps) {
         ))}
       </div>
 
-      <div className="chart-grid chart-grid-2">
-        <article className="chart-card">
-          <h3>통화별 Local per USD 월간 추이 (통화별 독립 스케일)</h3>
-          <div className="small-multiple-grid">
-            {localSeriesByCurrency.map((series) => (
-              <div key={`local-${series.currency}`} className="small-chart-card">
-                <h4>{series.currency}</h4>
-                <ResponsiveContainer width="100%" height={170}>
-                  <LineChart data={series.points}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" hide />
-                    <YAxis
-                      domain={series.domain}
-                      width={64}
-                      tickFormatter={formatAxisTick}
-                    />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke={SERIES_COLORS[series.currency]}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            ))}
-          </div>
-        </article>
+      <article className="chart-card chart-card-full">
+        <h3>통화별 Local per USD 월간 추이</h3>
+        <div className="small-multiple-row">
+          {localSeriesByCurrency.map((series) => (
+            <div key={`local-${series.currency}`} className="small-chart-card">
+              <h4>{series.currency}</h4>
+              <ResponsiveContainer width="100%" height={170}>
+                <LineChart data={series.points}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" hide />
+                  <YAxis
+                    domain={series.domain}
+                    width={64}
+                    tickFormatter={formatAxisTick}
+                  />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke={SERIES_COLORS[series.currency]}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ))}
+        </div>
+      </article>
 
-        <article className="chart-card">
-          <h3>KRW 기준 환산 환율 추이 (통화별 독립 스케일)</h3>
-          <div className="small-multiple-grid">
-            {krwSeriesByCurrency.map((series) => (
-              <div key={`krw-${series.currency}`} className="small-chart-card">
-                <h4>{series.currency}</h4>
-                <ResponsiveContainer width="100%" height={170}>
-                  <LineChart data={series.points}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" hide />
-                    <YAxis
-                      domain={series.domain}
-                      width={64}
-                      tickFormatter={formatAxisTick}
-                    />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke={SERIES_COLORS[series.currency]}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            ))}
-          </div>
-        </article>
-
+      <div className="chart-grid chart-grid-2 dashboard-lower-grid">
         <article className="chart-card">
           <h3>{latestYear}년 기준지수 추이 (1월=100)</h3>
           <ResponsiveContainer width="100%" height={300}>
@@ -318,6 +309,21 @@ function Dashboard({ data, filters }: DashboardProps) {
 
 function monthKey(year: number, month: number): string {
   return `${year}-${String(month).padStart(2, '0')}`
+}
+
+function buildRecentMonths(
+  latestYear: number,
+  latestMonth: number,
+  span: number,
+): Array<{ year: number; month: number }> {
+  return Array.from({ length: span }, (_, idx) => {
+    const offset = span - 1 - idx
+    const date = new Date(latestYear, latestMonth - 1 - offset, 1)
+    return {
+      year: date.getFullYear(),
+      month: date.getMonth() + 1,
+    }
+  })
 }
 
 function buildDomain(values: Array<number | null>): [number, number] {

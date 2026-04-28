@@ -118,32 +118,56 @@ main {
 
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(6, minmax(150px, 1fr));
-  gap: 10px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(5, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .kpi-card {
-  border: 1px solid #d3dfef;
-  border-radius: 10px;
-  padding: 10px;
+  border: 1px solid #cfdced;
+  border-radius: 12px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
 }
 
 .kpi-card span {
   color: #55657e;
   font-size: 12px;
+  font-weight: 600;
 }
 
 .kpi-card strong {
-  font-size: 22px;
+  font-size: 24px;
   color: #1b2c49;
+}
+
+.kpi-today {
+  margin: 0;
+  font-size: 12px;
+  color: #4b5b74;
 }
 
 .kpi-card em {
   font-style: normal;
+  font-size: 12px;
+}
+
+.dashboard-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.dashboard-meta span {
+  background: #f2f6fc;
+  border: 1px solid #d6e1f0;
+  color: #40516a;
+  border-radius: 999px;
+  padding: 4px 10px;
   font-size: 12px;
 }
 
@@ -184,11 +208,23 @@ main {
   gap: 10px;
 }
 
+.small-multiple-row {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
 .small-chart-card {
   border: 1px solid #d3dfef;
   border-radius: 10px;
   padding: 8px;
   background: #fdfefe;
+}
+
+.small-multiple-row .small-chart-card {
+  min-width: 220px;
+  flex: 1 1 220px;
 }
 
 .small-chart-card h4 {
@@ -294,6 +330,14 @@ main {
   color: #4d5c74;
 }
 
+.chart-card-full {
+  margin-top: 12px;
+}
+
+.dashboard-lower-grid {
+  margin-top: 12px;
+}
+
 .refresh-box button {
   border: 1px solid #1f3c88;
   border-radius: 8px;
@@ -329,7 +373,7 @@ main {
 
 @media (max-width: 1200px) {
   .kpi-grid {
-    grid-template-columns: repeat(3, minmax(150px, 1fr));
+    grid-template-columns: repeat(2, minmax(170px, 1fr));
   }
 
   .chart-grid-2 {
@@ -350,6 +394,10 @@ main {
 }
 
 @media (max-width: 760px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
   .small-multiple-grid {
     grid-template-columns: 1fr;
   }
