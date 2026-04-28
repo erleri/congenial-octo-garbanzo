@@ -118,15 +118,26 @@ function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps
             {matrix.map((row) => (
               <tr key={`${rateType}-day-${row.day}`}>
                 <td>{row.day}</td>
-                {row.values.map((item, idx) => (
-                  <td key={`${rateType}-day-${row.day}-month-${idx + 1}`} className={item?.status === 'zero' ? 'cell-zero' : ''}>
-                    {formatCellValue(
-                      item?.value ?? null,
-                      item?.status ?? 'empty',
-                      rateType === 'KRW' ? 'KRW' : currency,
-                    )}
-                  </td>
-                ))}
+                {row.values.map((item, idx) => {
+                  const classes = [item?.status === 'zero' ? 'cell-zero' : '']
+
+                  if (item?.source === 'IMPUTED' && item?.imputationMethod === 'FFILL') {
+                    classes.push('cell-imputed')
+                  }
+
+                  return (
+                    <td key={`${rateType}-day-${row.day}-month-${idx + 1}`} className={classes.filter(Boolean).join(' ')}>
+                      {formatCellValue(
+                        item?.value ?? null,
+                        item?.status ?? 'empty',
+                        rateType === 'KRW' ? 'KRW' : currency,
+                      )}
+                      {item?.source === 'IMPUTED' && item?.imputationMethod === 'FFILL' ? (
+                        <span className="imputed-badge" title="휴일/결측으로 전일값 보정">휴</span>
+                      ) : null}
+                    </td>
+                  )
+                })}
               </tr>
             ))}
             <tr>
@@ -168,6 +179,7 @@ function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps
 
       <article className="table-card">
         <h3>Exchange Rate (1 Dollar Exchange Rate)</h3>
+        <p className="table-help">표시: <span className="imputed-badge">휴</span> = 휴일/결측으로 전일값 보정</p>
         {renderMatrix('LOCAL_PER_USD')}
       </article>
 

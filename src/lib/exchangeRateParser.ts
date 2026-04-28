@@ -10,10 +10,14 @@ import type {
 import { CURRENCIES, MONTHS, YEARS } from '../types/exchangeRate'
 import * as XLSX from 'xlsx'
 
-const CACHE_KEY = 'latam-rate-dashboard-cache-v1'
+const CACHE_KEY = 'latam-rate-dashboard-cache-v2'
 const REMOTE_ENDPOINT = 'https://v6.exchangerate-api.com/v6'
 const HISTORY_ENDPOINT = 'https://api.frankfurter.app'
+const OPEN_ER_API_ENDPOINT = 'https://open.er-api.com/v6'
+const CURRENCY_API_LATEST_ENDPOINT = 'https://latest.currency-api.pages.dev/v1/currencies'
+const CURRENCY_API_SNAPSHOT_ENDPOINT = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api'
 const API_KEY = import.meta.env.VITE_EXCHANGERATE_API_KEY as string | undefined
+const SUPPLEMENTAL_CURRENCIES: CurrencyCode[] = ['CLP', 'COP', 'PEN']
 
 type ExchangeRateHistoryResponse = {
   result: 'success' | 'error'
@@ -21,6 +25,16 @@ type ExchangeRateHistoryResponse = {
   'error-type'?: string
   time_last_update_utc?: string
 }
+
+type OpenErApiLatestResponse = {
+  result?: 'success' | 'error'
+  rates?: Record<string, number>
+  time_last_update_utc?: string
+}
+
+type CurrencyApiLatestResponse = {
+  date?: string
+} & Record<string, unknown>
 
 type FrankfurterRangeResponse = {
   amount: number
@@ -91,6 +105,12 @@ function formatDate(date: Date): string {
   return date.toISOString().slice(0, 10)
 }
 
+function addDays(dateText: string, days: number): string {
+  const date = new Date(`${dateText}T00:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + days)
+  return formatDate(date)
+}
+
 function getStatus(value: number | null): CellStatus {
   if (value === null || Number.isNaN(value)) {
     return 'empty'
@@ -138,6 +158,25 @@ function parseDateParts(dateText: string): { year: number; month: number; day: n
 }
 
 function parseBaseDateFromFilename(fileName: string): string | null {
+  const compactMatched = fileName.match(/(20\d{2})[.\-_]?(0[1-9]|1[0-2])[.\-_]?([0-2]\d|3[0-1])/)
+  if (compactMatched) {
+    const year = Number(compactMatched[1])
+    const month = Number(compactMatched[2])
+    const day = Number(compactMatched[3])
+
+    if (
+      Number.isInteger(year) &&
+      Number.isInteger(month) &&
+      Number.isInteger(day) &&
+      month >= 1 &&
+      month <= 12 &&
+      day >= 1 &&
+      day <= 31
+    ) {
+      return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+    }
+  }
+
   const matched = fileName.match(/(\d{2})[.\-_](\d{2})[.\-_](\d{2})/)
   if (!matched) {
     return null
@@ -183,13 +222,32 @@ function toNumericCell(value: unknown): number | null {
   }
 
   if (typeof value === 'string') {
-    const sanitized = value.replaceAll(',', '').trim()
+    const trimmed = value.trim()
+    if (!trimmed) {
+      return null
+    }
+
+    const isParenNegative = trimmed.startsWith('(') && trimmed.endsWith(')')
+    const stripped = isParenNegative ? trimmed.slice(1, -1) : trimmed
+
+    const sanitized = stripped
+      .replaceAll(',', '')
+      .replaceAll('$', '')
+      .replaceAll('₩', '')
+      .replaceAll('USD', '')
+      .replaceAll('KRW', '')
+      .trim()
+
     if (!sanitized) {
       return null
     }
 
     const parsed = Number(sanitized)
-    return Number.isFinite(parsed) ? parsed : null
+    if (!Number.isFinite(parsed)) {
+      return null
+    }
+
+    return isParenNegative ? -parsed : parsed
   }
 
   return null
@@ -347,6 +405,11 @@ function parseCurrencySheet(
             imputationMethod: 'NONE',
           })
         } else {
+          const maxDay = new Date(ym.year, ym.month, 0).getDate()
+          if (day > maxDay) {
+            continue
+          }
+
           const date = `${ym.year}-${String(ym.month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
           daily.push({
             currency,
@@ -419,7 +482,15 @@ async function parseExcelWorkbook(file: File): Promise<{
   const currencyMonthly = currencyParsed.flatMap((item) => item.monthly)
 
   const monthlyMap = new Map<string, MonthlyRate>()
-  for (const row of [...summaryMonthly, ...currencyMonthly]) {
+  for (const row of currencyMonthly) {
+    if (row.value === null) {
+      continue
+    }
+    monthlyMap.set(`${row.currency}|${row.year}|${row.month}|${row.rateType}`, row)
+  }
+
+  // Summary 시트의 월평균이 존재하면 통화 시트 Avg 계산값보다 우선한다.
+  for (const row of summaryMonthly) {
     if (row.value === null) {
       continue
     }
@@ -509,7 +580,10 @@ function mergeMonthlySeries(
   return [...map.values()]
 }
 
-function applyForwardFillToDaily(rows: ExchangeRateDataset['dailyRates']): ExchangeRateDataset['dailyRates'] {
+function applyForwardFillToDaily(
+  rows: ExchangeRateDataset['dailyRates'],
+  fillUntilDate?: string,
+): ExchangeRateDataset['dailyRates'] {
   const grouped = new Map<string, ExchangeRateDataset['dailyRates']>()
   for (const row of rows) {
     const key = `${row.currency}|${row.rateType}`
@@ -522,9 +596,44 @@ function applyForwardFillToDaily(rows: ExchangeRateDataset['dailyRates']): Excha
   const filled: ExchangeRateDataset['dailyRates'] = []
   for (const list of grouped.values()) {
     const ordered = [...list].sort((a, b) => (a.date < b.date ? -1 : 1))
+    const rowByDate = new Map(ordered.map((row) => [row.date, row]))
+
+    const firstDate = ordered[0]?.date
+    const lastObservedDate = ordered[ordered.length - 1]?.date
+    if (!firstDate || !lastObservedDate) {
+      continue
+    }
+
+    const lastDate =
+      fillUntilDate && fillUntilDate > lastObservedDate ? fillUntilDate : lastObservedDate
+
+    const template = ordered[0]
     let lastValue: number | null = null
 
-    for (const row of ordered) {
+    for (let cursor = firstDate; cursor <= lastDate; cursor = addDays(cursor, 1)) {
+      const row = rowByDate.get(cursor)
+
+      if (!row) {
+        if (lastValue === null) {
+          continue
+        }
+
+        const { year, month, day } = parseDateParts(cursor)
+        filled.push({
+          currency: template.currency,
+          year,
+          month,
+          day,
+          date: cursor,
+          rateType: template.rateType,
+          value: lastValue,
+          status: getStatus(lastValue),
+          source: 'IMPUTED',
+          imputationMethod: 'FFILL',
+        })
+        continue
+      }
+
       if (row.value !== null) {
         lastValue = row.value
         filled.push(row)
@@ -667,6 +776,138 @@ async function fetchLatestRatesFromExchangeApi(
   }
 }
 
+async function fetchLatestRatesFromOpenErApi(
+  baseCurrency: string,
+): Promise<{ date: string; rates: Record<string, number> } | null> {
+  const url = `${OPEN_ER_API_ENDPOINT}/latest/${baseCurrency}`
+
+  let payload: OpenErApiLatestResponse
+  try {
+    payload = await fetchJsonWithFallback<OpenErApiLatestResponse>(url)
+  } catch {
+    return null
+  }
+
+  if (payload.result !== 'success' || !payload.rates) {
+    return null
+  }
+
+  const updateUtc = payload.time_last_update_utc
+  const date = updateUtc
+    ? new Date(updateUtc).toISOString().slice(0, 10)
+    : new Date().toISOString().slice(0, 10)
+
+  return {
+    date,
+    rates: payload.rates,
+  }
+}
+
+async function fetchLatestRatesFromCurrencyApi(
+  baseCurrency: string,
+): Promise<{ date: string; rates: Record<string, number> } | null> {
+  const base = baseCurrency.toLowerCase()
+  const url = `${CURRENCY_API_LATEST_ENDPOINT}/${base}.json`
+
+  let payload: CurrencyApiLatestResponse
+  try {
+    payload = await fetchJsonWithFallback<CurrencyApiLatestResponse>(url)
+  } catch {
+    return null
+  }
+
+  const date = typeof payload.date === 'string' ? payload.date : null
+  const rateNode = payload[base]
+
+  if (!date || typeof rateNode !== 'object' || rateNode === null) {
+    return null
+  }
+
+  const normalized = Object.entries(rateNode as Record<string, unknown>).reduce<Record<string, number>>(
+    (acc, [currency, raw]) => {
+      if (typeof raw !== 'number' || !Number.isFinite(raw)) {
+        return acc
+      }
+
+      acc[currency.toUpperCase()] = raw
+      return acc
+    },
+    {},
+  )
+
+  return {
+    date,
+    rates: normalized,
+  }
+}
+
+async function fetchCurrencyApiSnapshot(
+  baseCurrency: string,
+  date: string,
+): Promise<Record<string, number> | null> {
+  const base = baseCurrency.toLowerCase()
+  const url = `${CURRENCY_API_SNAPSHOT_ENDPOINT}@${date}/v1/currencies/${base}.json`
+
+  let payload: CurrencyApiLatestResponse
+  try {
+    payload = await fetchJsonWithFallback<CurrencyApiLatestResponse>(url)
+  } catch {
+    return null
+  }
+
+  const rateNode = payload[base]
+  if (typeof rateNode !== 'object' || rateNode === null) {
+    return null
+  }
+
+  return Object.entries(rateNode as Record<string, unknown>).reduce<Record<string, number>>(
+    (acc, [currency, raw]) => {
+      if (typeof raw !== 'number' || !Number.isFinite(raw)) {
+        return acc
+      }
+
+      acc[currency.toUpperCase()] = raw
+      return acc
+    },
+    {},
+  )
+}
+
+async function fetchSupplementalHistoryFromCurrencyApi(
+  dates: string[],
+): Promise<Record<string, Record<string, number>>> {
+  const snapshots = await Promise.all(
+    dates.map(async (date) => {
+      const rates = await fetchCurrencyApiSnapshot('USD', date)
+      if (!rates) {
+        return null
+      }
+
+      const picked = [...SUPPLEMENTAL_CURRENCIES, 'KRW' as const].reduce<Record<string, number>>(
+        (acc, currency) => {
+          const value = toNumber(rates[currency])
+          if (value !== null) {
+            acc[currency] = value
+          }
+          return acc
+        },
+        {},
+      )
+
+      return Object.keys(picked).length ? { date, rates: picked } : null
+    }),
+  )
+
+  return snapshots.reduce<Record<string, Record<string, number>>>((acc, item) => {
+    if (!item) {
+      return acc
+    }
+
+    acc[item.date] = item.rates
+    return acc
+  }, {})
+}
+
 function buildMovingComparisonRows(
   dataset: ExchangeRateDataset,
   year: number,
@@ -780,9 +1021,9 @@ function buildMovingComparisonRows(
   })
 
   const leading = asRecord((currency) => {
-    const values = [0, 1, 2]
+    const values = [1, 2, 3]
       .map((offset) => {
-        const targetDate = new Date(year, month - 1 - offset, 1)
+        const targetDate = new Date(year, month - 1 + offset, 1)
         return findMonthly(
           currency,
           targetDate.getFullYear(),
@@ -805,9 +1046,31 @@ function buildMovingComparisonRows(
     return (leadValue - actualValue) / actualValue
   })
 
-  const moving = leading
+  const moving = asRecord((currency) => {
+    const values = [0, 1, 2]
+      .map((offset) => {
+        const targetDate = new Date(year, month - 1 - offset, 1)
+        return findMonthly(
+          currency,
+          targetDate.getFullYear(),
+          targetDate.getMonth() + 1,
+        )
+      })
+      .filter((value): value is number => typeof value === 'number')
 
-  const movingVs = leadingVs
+    return average(values)
+  })
+
+  const movingVs = asRecord((currency) => {
+    const movingValue = moving[currency === 'USD' ? 'KRW' : (currency as MovingColumn)]
+    const actualValue = avgActual[currency === 'USD' ? 'KRW' : (currency as MovingColumn)]
+
+    if (movingValue === null || actualValue === null || actualValue === 0) {
+      return null
+    }
+
+    return (movingValue - actualValue) / actualValue
+  })
 
   const lastYearCumulative = asRecord((currency) => {
     const values = MONTHS.filter((candidateMonth) => candidateMonth <= month)
@@ -976,14 +1239,69 @@ export async function fetchRemoteExchangeData(
   const startDate = '2010-01-01'
 
   const historyPayload = await fetchFrankfurterRange(startDate, endDate)
-  const latestPayload = await fetchLatestRatesFromExchangeApi('USD')
+  const [latestPayload, openErLatestPayload, currencyApiLatestPayload] = await Promise.all([
+    fetchLatestRatesFromExchangeApi('USD'),
+    fetchLatestRatesFromOpenErApi('USD'),
+    fetchLatestRatesFromCurrencyApi('USD'),
+  ])
 
   const mergedRatesByDate: Record<string, Record<string, number>> = {
     ...historyPayload.rates,
   }
 
+  const latestYear = parseDateParts(endDate).year
+  const supplementalHistoryDates = Object.entries(mergedRatesByDate)
+    .filter(([date, rateMap]) => {
+      const { year } = parseDateParts(date)
+      if (year !== latestYear) {
+        return false
+      }
+
+      return SUPPLEMENTAL_CURRENCIES.some((currency) => toNumber(rateMap[currency]) === null)
+    })
+    .map(([date]) => date)
+
+  const supplementalHistory = supplementalHistoryDates.length
+    ? await fetchSupplementalHistoryFromCurrencyApi(supplementalHistoryDates)
+    : {}
+
+  for (const [date, supplementalRates] of Object.entries(supplementalHistory)) {
+    mergedRatesByDate[date] = {
+      ...mergedRatesByDate[date],
+      ...supplementalRates,
+    }
+  }
+
   if (latestPayload?.date) {
     mergedRatesByDate[latestPayload.date] = latestPayload.rates
+  }
+
+  if (openErLatestPayload?.date) {
+    const existing = mergedRatesByDate[openErLatestPayload.date] ?? {}
+    const merged: Record<string, number> = { ...existing }
+
+    for (const currency of SUPPLEMENTAL_CURRENCIES) {
+      const supplemental = toNumber(openErLatestPayload.rates[currency])
+      if (supplemental !== null) {
+        merged[currency] = supplemental
+      }
+    }
+
+    mergedRatesByDate[openErLatestPayload.date] = merged
+  }
+
+  if (currencyApiLatestPayload?.date) {
+    const existing = mergedRatesByDate[currencyApiLatestPayload.date] ?? {}
+    const merged: Record<string, number> = { ...existing }
+
+    for (const currency of [...SUPPLEMENTAL_CURRENCIES, 'KRW' as const]) {
+      const supplemental = toNumber(currencyApiLatestPayload.rates[currency])
+      if (supplemental !== null) {
+        merged[currency] = supplemental
+      }
+    }
+
+    mergedRatesByDate[currencyApiLatestPayload.date] = merged
   }
 
   const dailyRates: ExchangeRateDataset['dailyRates'] = Object.entries(
@@ -1040,12 +1358,19 @@ export async function fetchRemoteExchangeData(
     })
   })
 
-  const monthlyRates = buildMonthlyRates(dailyRates)
+  const dailyRatesWithFill = applyForwardFillToDaily(dailyRates, endDate)
+  const monthlyRates = buildMonthlyRates(dailyRatesWithFill)
+
+  const effectiveBaseDate =
+    latestPayload?.date ??
+    currencyApiLatestPayload?.date ??
+    openErLatestPayload?.date ??
+    historyPayload.end_date
 
   const dataset: ExchangeRateDataset = {
-    baseDate: latestPayload?.date ?? historyPayload.end_date,
+    baseDate: effectiveBaseDate,
     fetchedAt: new Date().toISOString(),
-    dailyRates,
+    dailyRates: dailyRatesWithFill,
     monthlyRates,
     movingComparison: [],
     rawSheets: [],
