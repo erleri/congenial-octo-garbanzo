@@ -9,6 +9,7 @@ import { CURRENCIES, MONTHS, YEARS } from '../types/exchangeRate'
 interface MonthlySummaryProps {
   data: ExchangeRateDataset
   currencyFilter: CurrencyFilter
+  onCurrencyChange: (currency: CurrencyFilter) => void
 }
 
 function pickRows(
@@ -91,7 +92,7 @@ function renderMatrix(
   )
 }
 
-function MonthlySummary({ data, currencyFilter }: MonthlySummaryProps) {
+function MonthlySummary({ data, currencyFilter, onCurrencyChange }: MonthlySummaryProps) {
   const localRows = pickRows(data.monthlyRates, 'LOCAL_PER_USD', currencyFilter)
   const krwRows = pickRows(data.monthlyRates, 'KRW', currencyFilter)
 
@@ -99,8 +100,19 @@ function MonthlySummary({ data, currencyFilter }: MonthlySummaryProps) {
 
   return (
     <section className="panel">
-      <div className="panel-header">
+      <div className="panel-header panel-header-inline">
         <h2>Monthly Summary</h2>
+        <select
+          value={currencyFilter}
+          onChange={(event) => onCurrencyChange(event.target.value as CurrencyFilter)}
+        >
+          <option value="ALL">All</option>
+          {CURRENCIES.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
       </div>
 
       <article className="table-card">

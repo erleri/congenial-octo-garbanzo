@@ -1,9 +1,5 @@
 import {
-  Bar,
-  BarChart,
-  Cell,
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -80,6 +76,8 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
 
   const previousDate = new Date(latestYear, latestMonth - 2, 1)
 
+  const oneYearAgoText = `${latestYear - 1}-${String(latestMonth).padStart(2, '0')}-${String(baseDate.getDate()).padStart(2, '0')}`
+
   const kpis = KPI_CURRENCIES.map((currency) => {
     const monthlyValues = data.dailyRates
       .filter(
@@ -97,7 +95,6 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
     const cumulativeStatus: CellStatus = cumulativeValue === null ? 'empty' : 'ok'
 
     const current = getMonthly(data.monthlyRates, currency, latestYear, latestMonth, 'LOCAL_PER_USD')
-
     const previous = getMonthly(
       data.monthlyRates,
       currency,
@@ -108,12 +105,18 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
 
     const today = getDaily(data.dailyRates, currency, baseDateText)
 
-    const currentValue = current?.value ?? null
-    const previousValue = previous?.value ?? null
+    const lastYearDaily = data.dailyRates
+      .filter(row => row.currency === currency && row.rateType === 'LOCAL_PER_USD' && row.date >= oneYearAgoText && row.date <= baseDateText && typeof row.value === 'number')
+      .map(row => row.value as number)
+    const min52 = lastYearDaily.length ? Math.min(...lastYearDaily) : null
+    const max52 = lastYearDaily.length ? Math.max(...lastYearDaily) : null
+    const gaugePercent = (today?.value !== undefined && today.value !== null && min52 !== null && max52 !== null && max52 > min52)
+      ? Math.max(0, Math.min(100, ((today.value - min52) / (max52 - min52)) * 100))
+      : 50
 
     const diff =
-      currentValue !== null && previousValue !== null && previousValue !== 0
-        ? (currentValue - previousValue) / previousValue
+      current?.value !== undefined && current.value !== null && previous?.value !== undefined && previous.value !== null && previous.value !== 0
+        ? (current.value - previous.value) / previous.value
         : null
 
     return {
@@ -121,8 +124,12 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
       label: `${currency} 당월 누적 평균`,
       valueText: formatCellValue(cumulativeValue, cumulativeStatus, currency),
       todayText: formatCellValue(today?.value ?? null, today?.status ?? 'empty', currency),
-      todayImputed: today?.source === 'IMPUTED' && today?.imputationMethod === 'FFILL',
+      todaySource: today?.source,
+      todayMethod: today?.imputationMethod,
       diff,
+      min52: formatCellValue(min52, min52 !== null ? 'ok' : 'empty', currency),
+      max52: formatCellValue(max52, max52 !== null ? 'ok' : 'empty', currency),
+      gaugePercent
     }
   })
 
@@ -151,52 +158,37 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
     }
   })
 
-  const focusedCurrencies = KPI_CURRENCIES
+  const dailySeriesByCurrency = KPI_CURRENCIES.map((currency) => {
+    const currencyDaily = data.dailyRates
+      .filter((row) => row.rateType === 'LOCAL_PER_USD' && row.currency === currency)
+      .sort((a, b) => a.date.localeCompare(b.date))
 
-  const normalizedTrend = focusedCurrencies
-    .flatMap((currency) => {
-      const rows = data.monthlyRates
-        .filter(
-          (row) =>
-            row.currency === currency &&
-            row.rateType === 'LOCAL_PER_USD' &&
-            row.year === latestYear &&
-            row.month <= latestMonth,
-        )
-        .sort((a, b) => a.month - b.month)
-
-      const baseline = rows.find((row) => typeof row.value === 'number')?.value
-      if (!baseline || baseline === 0) {
-        return []
-      }
-
-      return rows.map((row) => ({
-        month: `${row.month}월`,
-        currency,
-        index: row.value ? (row.value / baseline) * 100 : null,
-      }))
-    })
-
-  const latestMomComparison = focusedCurrencies.map((currency) => {
-    const current = getMonthly(data.monthlyRates, currency, latestYear, latestMonth, 'LOCAL_PER_USD')
-    const previous = getMonthly(
-      data.monthlyRates,
-      currency,
-      previousDate.getFullYear(),
-      previousDate.getMonth() + 1,
-      'LOCAL_PER_USD',
+    const currentMonthRows = currencyDaily.filter(
+      (row) => row.year === latestYear && row.month === latestMonth && row.date <= baseDateText
     )
 
-    const delta =
-      typeof current?.value === 'number' &&
-      typeof previous?.value === 'number' &&
-      previous.value !== 0
-        ? ((current.value - previous.value) / previous.value) * 100
-        : 0
+    const points = currentMonthRows.map((row) => {
+      const currentDate = new Date(row.year, row.month - 1, row.day)
+      const past30Date = new Date(currentDate)
+      past30Date.setDate(past30Date.getDate() - 29)
+      const past30Str = `${past30Date.getFullYear()}-${String(past30Date.getMonth() + 1).padStart(2, '0')}-${String(past30Date.getDate()).padStart(2, '0')}`
 
+      const windowValues = currencyDaily
+        .filter(r => r.date >= past30Str && r.date <= row.date && typeof r.value === 'number')
+        .map(r => r.value as number)
+
+      return {
+        day: `${row.day}일`,
+        value: row.value,
+        ma30: windowValues.length ? average(windowValues) : null,
+      }
+    })
+
+    const allValues = points.flatMap(p => [p.value, p.ma30]).filter((v): v is number => v !== null)
     return {
       currency,
-      delta,
+      points,
+      domain: buildDomain(allValues),
     }
   })
 
@@ -218,11 +210,23 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
             <strong>{kpi.valueText}</strong>
             <p className="kpi-today">
               오늘 환율 {kpi.todayText}
-              {kpi.todayImputed ? <span className="imputed-badge">휴</span> : null}
+              {kpi.todaySource === 'API' && <span className="source-badge badge-api">API</span>}
+              {kpi.todaySource === 'EXCEL' && <span className="source-badge badge-excel">EXCEL</span>}
+              {kpi.todaySource === 'IMPUTED' && <span className="source-badge badge-imputed">보정</span>}
             </p>
             <em className={kpi.diff !== null && kpi.diff < 0 ? 'down' : 'up'}>
               {kpi.diff === null ? '-' : `${(kpi.diff * 100).toFixed(2)}% MoM`}
             </em>
+            <div className="gauge-container">
+              <div className="gauge-labels">
+                <small className="gauge-min" title="52주 최저">L {kpi.min52}</small>
+                <small className="gauge-max" title="52주 최고">H {kpi.max52}</small>
+              </div>
+              <div className="gauge-track">
+                <div className="gauge-fill" style={{ width: `${kpi.gaugePercent}%`, backgroundColor: SERIES_COLORS[kpi.currency] }}></div>
+                <div className="gauge-marker" style={{ left: `${kpi.gaugePercent}%` }}></div>
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -250,6 +254,15 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
                     strokeWidth={2}
                     dot={false}
                   />
+                  <Line
+                    type="monotone"
+                    dataKey="ma30"
+                    stroke="#9ca8b8"
+                    strokeWidth={2}
+                    strokeDasharray="4 4"
+                    dot={false}
+                    name="30일 이평"
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -257,52 +270,35 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
         </div>
       </article>
 
-      <div className="chart-grid chart-grid-2 dashboard-lower-grid">
-        <article className="chart-card">
-          <h3>{latestYear}년 기준지수 추이 (1월=100)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={normalizedTrend}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis domain={['auto', 'auto']} tickFormatter={formatAxisTick} />
-              <Tooltip />
-              <Legend />
-              {focusedCurrencies.map((currency) => (
-                <Line
-                  key={`index-${currency}`}
-                  type="monotone"
-                  dataKey="index"
-                  data={normalizedTrend.filter((row) => row.currency === currency)}
-                  name={currency}
-                  stroke={SERIES_COLORS[currency]}
-                  strokeWidth={2}
-                  dot={false}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </article>
-
-        <article className="chart-card">
-          <h3>최신월 전월 대비 변화율(MoM)</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={latestMomComparison}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="currency" />
-              <YAxis unit="%" tickFormatter={formatAxisTick} />
-              <Tooltip formatter={(value) => `${Number(value).toFixed(2)}%`} />
-              <Bar dataKey="delta">
-                {latestMomComparison.map((row) => (
-                  <Cell
-                    key={`mom-cell-${row.currency}`}
-                    fill={row.delta >= 0 ? '#c43232' : '#1f5ac4'}
+      <article className="chart-card chart-card-full" style={{ marginTop: '20px' }}>
+        <h3>통화별 Local per USD 최신 일간 추이 ({latestMonth}월)</h3>
+        <div className="small-multiple-row">
+          {dailySeriesByCurrency.map((series) => (
+            <div key={`daily-${series.currency}`} className="small-chart-card">
+              <h4>{series.currency}</h4>
+              <ResponsiveContainer width="100%" height={170}>
+                <LineChart data={series.points}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="day" hide />
+                  <YAxis
+                    domain={series.domain}
+                    width={64}
+                    tickFormatter={formatAxisTick}
                   />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </article>
-      </div>
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="value"
+                    stroke={SERIES_COLORS[series.currency]}
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ))}
+        </div>
+      </article>
     </section>
   )
 }

@@ -1,22 +1,13 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import CurrencyDetail from './components/CurrencyDetail'
 import Dashboard from './components/Dashboard'
 import FileUploader from './components/FileUploader'
 import MonthlySummary from './components/MonthlySummary'
 import MovingComparison from './components/MovingComparison'
 import RawSheetViewer from './components/RawSheetViewer'
-import {
-  fetchRemoteExchangeData,
-  fetchRemoteExchangeDataWithExcel,
-  loadDatasetFromCache,
-  saveDatasetToCache,
-} from './lib/exchangeRateParser'
-import type {
-  CurrencyCode,
-  DashboardFilters,
-  ExchangeRateDataset,
-} from './types/exchangeRate'
-import { CURRENCIES, YEARS } from './types/exchangeRate'
+import { useExchangeData } from './hooks/useExchangeData'
+import type { DashboardFilters } from './types/exchangeRate'
+import { YEARS } from './types/exchangeRate'
 import './App.css'
 
 type ScreenKey =
@@ -33,116 +24,23 @@ const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'currency', label: 'Currency Detail' },
   { key: 'moving', label: 'Moving vs Actual' },
   { key: 'table', label: 'Data Table' },
-  { key: 'refresh', label: 'Upload / Refresh' },
+  { key: 'refresh', label: 'Excel Upload' },
 ]
 
 function App() {
   const [screen, setScreen] = useState<ScreenKey>('dashboard')
-  const [dataset, setDataset] = useState<ExchangeRateDataset | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [excelFile, setExcelFile] = useState<File | null>(null)
-  const [excelPriority, setExcelPriority] = useState(true)
-  const [fillMissing, setFillMissing] = useState(true)
-
-  const [filters, setFilters] = useState<DashboardFilters>({
-    currency: 'ALL',
-    year: 2026,
-    month: 4,
-    rateType: 'LOCAL_PER_USD',
-  })
-
-  const refreshData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const fetched = excelFile
-        ? await fetchRemoteExchangeDataWithExcel(
-            excelFile,
-            { excelPriority, fillMissing },
-            new Date(),
-          )
-        : await fetchRemoteExchangeData(new Date())
-      setDataset(fetched)
-      const cacheSaved = saveDatasetToCache(fetched)
-
-      if (!cacheSaved) {
-        setError(
-          '브라우저 저장공간이 부족해 캐시 저장을 생략했습니다. 화면 조회는 계속 가능합니다.',
-        )
-      }
-
-      const latest = new Date(fetched.baseDate)
-      setFilters((prev) => ({
-        ...prev,
-        year: latest.getFullYear(),
-        month: latest.getMonth() + 1,
-      }))
-    } catch (refreshError) {
-      setError(
-        refreshError instanceof Error
-          ? refreshError.message
-          : '환율 데이터 조회 중 오류가 발생했습니다.',
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const uploadAndMergeExcel = async (
-    file: File,
-    options: { excelPriority: boolean; fillMissing: boolean },
-  ) => {
-    try {
-      setLoading(true)
-      setError(null)
-      setExcelFile(file)
-      setExcelPriority(options.excelPriority)
-      setFillMissing(options.fillMissing)
-
-      const merged = await fetchRemoteExchangeDataWithExcel(file, options, new Date())
-      setDataset(merged)
-
-      const cacheSaved = saveDatasetToCache(merged)
-      if (!cacheSaved) {
-        setError(
-          '브라우저 저장공간이 부족해 캐시 저장을 생략했습니다. 화면 조회는 계속 가능합니다.',
-        )
-      }
-
-      const latest = new Date(merged.baseDate)
-      setFilters((prev) => ({
-        ...prev,
-        year: latest.getFullYear(),
-        month: latest.getMonth() + 1,
-      }))
-    } catch (mergeError) {
-      setError(
-        mergeError instanceof Error
-          ? mergeError.message
-          : '엑셀 병합 중 오류가 발생했습니다.',
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    const cached = loadDatasetFromCache()
-
-    if (cached) {
-      setDataset(cached)
-      const latest = new Date(cached.baseDate)
-      setFilters((prev) => ({
-        ...prev,
-        year: latest.getFullYear(),
-        month: latest.getMonth() + 1,
-      }))
-      return
-    }
-
-    void refreshData()
-  }, [])
+  
+  const {
+    dataset,
+    loading,
+    error,
+    excelPriority,
+    fillMissing,
+    filters,
+    setFilters,
+    refreshData,
+    uploadAndMergeExcel,
+  } = useExchangeData()
 
   const content = useMemo(() => {
     if (!dataset) {
@@ -158,7 +56,13 @@ function App() {
       case 'dashboard':
         return <Dashboard data={dataset} filters={filters} />
       case 'monthly':
-        return <MonthlySummary data={dataset} currencyFilter={filters.currency} />
+        return (
+          <MonthlySummary
+            data={dataset}
+            currencyFilter={filters.currency}
+            onCurrencyChange={(currency) => setFilters((prev) => ({ ...prev, currency }))}
+          />
+        )
       case 'currency':
         return (
           <CurrencyDetail
@@ -196,6 +100,9 @@ function App() {
     filters,
     loading,
     screen,
+    setFilters,
+    refreshData,
+    uploadAndMergeExcel
   ])
 
   return (
@@ -220,26 +127,6 @@ function App() {
         </nav>
 
         <section className="global-filters">
-          <label>
-            Currency
-            <select
-              value={filters.currency}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  currency: event.target.value as CurrencyCode | 'ALL',
-                }))
-              }
-            >
-              <option value="ALL">All</option>
-              {CURRENCIES.map((currency) => (
-                <option key={currency} value={currency}>
-                  {currency}
-                </option>
-              ))}
-            </select>
-          </label>
-
           <label>
             Year
             <select
@@ -285,7 +172,6 @@ function App() {
             >
               <option value="LOCAL_PER_USD">Local per USD</option>
               <option value="KRW">KRW</option>
-              <option value="MOVING_COMPARISON">Moving Comparison</option>
             </select>
           </label>
 

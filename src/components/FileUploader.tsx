@@ -23,7 +23,7 @@ function FileUploader({
   excelPriority,
   fillMissing,
 }: FileUploaderProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  // Removed selectedFile
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
 
@@ -48,22 +48,17 @@ function FileUploader({
           <input
             type="file"
             accept=".xlsx,.xls"
-            onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)}
+            onChange={(event) => {
+              const file = event.target.files?.[0] ?? null
+              if (file) {
+                onUploadExcel(file, {
+                  excelPriority: localExcelPriority,
+                  fillMissing: localFillMissing,
+                })
+              }
+              event.target.value = ''
+            }}
           />
-          <button
-            type="button"
-            disabled={!selectedFile || loading}
-            onClick={() =>
-              selectedFile
-                ? onUploadExcel(selectedFile, {
-                    excelPriority: localExcelPriority,
-                    fillMissing: localFillMissing,
-                  })
-                : Promise.resolve()
-            }
-          >
-            {loading ? '병합 중...' : '엑셀 업로드/병합'}
-          </button>
         </div>
         <div className="inline-controls">
           <label>
