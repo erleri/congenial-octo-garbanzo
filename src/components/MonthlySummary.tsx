@@ -39,56 +39,59 @@ function renderMatrix(
     currencyFilter === 'ALL' ? CURRENCIES : [currencyFilter]
 
   return (
-    <div className="table-scroll">
-      <table className="dense-table">
-        <thead>
-          <tr>
-            <th rowSpan={2}>Currency</th>
-            {YEARS.map((year) => (
-              <th key={`year-${year}`} colSpan={12}>
-                {year}
-              </th>
-            ))}
-          </tr>
-          <tr>
-            {YEARS.flatMap((year) =>
-              MONTHS.map((month) => (
-                <th key={`${year}-${month}`}>{month}월</th>
-              )),
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {activeCurrencies.map((currency) => (
-            <tr key={`${rateType}-${currency}`}>
-              <td>{currency}</td>
+    <>
+      <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
+      <div className="table-scroll">
+        <table className="dense-table">
+          <thead>
+            <tr>
+              <th rowSpan={2}>Currency</th>
+              {YEARS.map((year) => (
+                <th key={`year-${year}`} colSpan={12}>
+                  {year}
+                </th>
+              ))}
+            </tr>
+            <tr>
               {YEARS.flatMap((year) =>
-                MONTHS.map((month) => {
-                  const row = rows.find(
-                    (item) =>
-                      item.currency === currency &&
-                      item.year === year &&
-                      item.month === month,
-                  )
-
-                  const className = row?.status === 'zero' ? 'cell-zero' : ''
-
-                  return (
-                    <td key={`${currency}-${year}-${month}`} className={className}>
-                      {formatCellValue(
-                        row?.value ?? null,
-                        row?.status ?? 'empty',
-                        rateType === 'KRW' ? 'KRW' : currency,
-                      )}
-                    </td>
-                  )
-                }),
+                MONTHS.map((month) => (
+                  <th key={`${year}-${month}`}>{month}월</th>
+                )),
               )}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            {activeCurrencies.map((currency) => (
+              <tr key={`${rateType}-${currency}`}>
+                <td>{currency}</td>
+                {YEARS.flatMap((year) =>
+                  MONTHS.map((month) => {
+                    const row = rows.find(
+                      (item) =>
+                        item.currency === currency &&
+                        item.year === year &&
+                        item.month === month,
+                    )
+
+                    const className = row?.status === 'zero' ? 'cell-zero' : ''
+
+                    return (
+                      <td key={`${currency}-${year}-${month}`} className={className}>
+                        {formatCellValue(
+                          row?.value ?? null,
+                          row?.status ?? 'empty',
+                          rateType === 'KRW' ? 'KRW' : currency,
+                        )}
+                      </td>
+                    )
+                  }),
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }
 
@@ -127,6 +130,7 @@ function MonthlySummary({ data, currencyFilter, onCurrencyChange }: MonthlySumma
 
       <article className="table-card">
         <h3>원본 형태 (Summary)</h3>
+        <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
         <div className="table-scroll">
           <table className="dense-table">
             <thead>

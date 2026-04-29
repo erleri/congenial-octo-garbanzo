@@ -140,6 +140,7 @@ function Admin({
           </button>
         </div>
 
+        <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
         <div className="table-scroll">
           <table className="dense-table">
             <thead>

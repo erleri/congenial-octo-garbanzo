@@ -183,6 +183,7 @@ function CurrencyDetail({ data, filters }: CurrencyDetailProps) {
       <article className="table-card">
         <h3>Exchange Rate (1 Dollar Exchange Rate)</h3>
         <p className="table-help">표시: <span className="imputed-badge">휴</span> = 휴일/결측으로 전일값 보정</p>
+        <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
         {renderMatrix('LOCAL_PER_USD')}
       </article>
     </section>

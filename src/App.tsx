@@ -99,7 +99,10 @@ function App() {
     <div className="app-shell">
       <header className="top-header">
         <div className="title-wrap">
-          <h1>중남미 환율 대시보드 · LATAM FX Dashboard</h1>
+          <h1>
+            <span className="title-primary">중남미 환율 대시보드</span>
+            <span className="title-secondary">LATAM FX Dashboard</span>
+          </h1>
           <p>외부 환율 API 수집 기반 · Built by Imjun Koo</p>
         </div>
 
