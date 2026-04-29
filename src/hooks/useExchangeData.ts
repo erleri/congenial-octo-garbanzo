@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import {
   fetchRemoteExchangeData,
   fetchRemoteExchangeDataWithExcel,
+  fetchStaticDataset,
   loadDatasetFromCache,
   saveDatasetToCache,
 } from '../lib'
@@ -18,7 +19,7 @@ export function useExchangeData() {
   const [fillMissing, setFillMissing] = useState(true)
 
   const [filters, setFilters] = useState<DashboardFilters>({
-    currency: 'ALL',
+    currency: 'BRL',
     year: 2026,
     month: 4,
     rateType: 'LOCAL_PER_USD',
@@ -33,6 +34,16 @@ export function useExchangeData() {
     }))
   }
 
+  const applyDataset = async (data: ExchangeRateDataset) => {
+    setDataset(data)
+    updateFiltersBasedOnDataset(data)
+
+    const cacheSaved = await saveDatasetToCache(data)
+    if (!cacheSaved) {
+      setError('IndexedDB에 데이터를 캐시하는 데 실패했습니다. 화면 조회는 계속 가능합니다.')
+    }
+  }
+
   const refreshData = async () => {
     try {
       setLoading(true)
@@ -44,17 +55,8 @@ export function useExchangeData() {
             new Date(),
           )
         : await fetchRemoteExchangeData(new Date())
-      
-      setDataset(fetched)
-      const cacheSaved = await saveDatasetToCache(fetched)
 
-      if (!cacheSaved) {
-        setError(
-          'IndexedDB에 데이터를 캐시하는 데 실패했습니다. 화면 조회는 계속 가능합니다.',
-        )
-      }
-
-      updateFiltersBasedOnDataset(fetched)
+      await applyDataset(fetched)
     } catch (refreshError) {
       setError(
         refreshError instanceof Error
@@ -78,16 +80,7 @@ export function useExchangeData() {
       setFillMissing(options.fillMissing)
 
       const merged = await fetchRemoteExchangeDataWithExcel(file, options, new Date())
-      setDataset(merged)
-
-      const cacheSaved = await saveDatasetToCache(merged)
-      if (!cacheSaved) {
-        setError(
-          'IndexedDB에 데이터를 캐시하는 데 실패했습니다. 화면 조회는 계속 가능합니다.',
-        )
-      }
-
-      updateFiltersBasedOnDataset(merged)
+      await applyDataset(merged)
       window.alert('엑셀 업로드가 완료되었습니다. 데이터가 병합되었습니다.')
     } catch (mergeError) {
       const msg = mergeError instanceof Error ? mergeError.message : '엑셀 병합 중 오류가 발생했습니다.'
@@ -102,14 +95,28 @@ export function useExchangeData() {
     let isMounted = true
 
     const init = async () => {
-      const cached = await loadDatasetFromCache()
+      const cachedPromise = loadDatasetFromCache()
+      const staticPromise = fetchStaticDataset()
+
+      const cached = await cachedPromise
 
       if (!isMounted) return
 
       if (cached) {
         setDataset(cached)
         updateFiltersBasedOnDataset(cached)
+      }
 
+      const staticDataset = await staticPromise
+
+      if (!isMounted) return
+
+      if (staticDataset) {
+        await applyDataset(staticDataset)
+        return
+      }
+
+      if (cached) {
         const fetchedAt = new Date(cached.fetchedAt).getTime()
         const isFresh = Number.isFinite(fetchedAt) && Date.now() - fetchedAt < AUTO_REFRESH_TTL_MS
 

@@ -8,11 +8,23 @@ const OPEN_ER_API_ENDPOINT = 'https://open.er-api.com/v6'
 const CURRENCY_API_LATEST_ENDPOINT = 'https://latest.currency-api.pages.dev/v1/currencies'
 const CURRENCY_API_SNAPSHOT_ENDPOINT = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api'
 const ALPHA_VANTAGE_ENDPOINT = 'https://www.alphavantage.co/query'
-const API_KEY = import.meta.env.VITE_EXCHANGERATE_API_KEY as string | undefined
-const ALPHA_VANTAGE_API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY as string | undefined
+const FETCH_TIMEOUT_MS = 8000
+
+function readEnv(key: string): string | undefined {
+  const viteEnv = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env
+  if (viteEnv?.[key]) {
+    return viteEnv[key]
+  }
+
+  const nodeEnv = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+  return nodeEnv?.[key]
+}
+
+const API_KEY = readEnv('VITE_EXCHANGERATE_API_KEY')
+const ALPHA_VANTAGE_API_KEY = readEnv('VITE_ALPHA_VANTAGE_API_KEY')
 
 export const SUPPLEMENTAL_CURRENCIES: CurrencyCode[] = ['CLP', 'COP', 'PEN']
-export const ALPHA_VANTAGE_HISTORY_CURRENCIES: CurrencyCode[] = ['ARS', 'CLP', 'COP', 'GTQ', 'PEN', 'UYU']
+export const ALPHA_VANTAGE_HISTORY_CURRENCIES: CurrencyCode[] = ['CLP', 'COP', 'PEN', 'ARS']
 
 export type ExchangeRateHistoryResponse = {
   result: 'success' | 'error'
@@ -49,14 +61,19 @@ export async function fetchJsonWithFallback<T>(url: string): Promise<T> {
   let lastError: unknown = null
 
   for (const candidate of candidates) {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
     try {
-      const response = await fetch(candidate)
+      const response = await fetch(candidate, { signal: controller.signal })
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
       }
       return (await response.json()) as T
     } catch (error) {
       lastError = error
+    } finally {
+      clearTimeout(timeoutId)
     }
   }
 

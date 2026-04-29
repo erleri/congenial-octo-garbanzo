@@ -33,6 +33,10 @@ export interface ExcelMergeOptions {
   fillMissing: boolean
 }
 
+export interface RemoteExchangeDataOptions {
+  supplementalHistoryByCurrency?: Record<string, Record<string, number>>
+}
+
 export function mergeRateSeries(
   apiRows: ExchangeRateDataset['dailyRates'],
   excelRows: ExchangeRateDataset['dailyRates'],
@@ -259,6 +263,7 @@ export function mergeDatasetsWithExcel(
 
 export async function fetchRemoteExchangeData(
   baseDate = new Date(),
+  options: RemoteExchangeDataOptions = {},
 ): Promise<ExchangeRateDataset> {
   const endDate = formatDate(baseDate)
   const startDate = '2010-01-01'
@@ -278,6 +283,7 @@ export async function fetchRemoteExchangeData(
   // 캐시가 있으면 API 호출 없이 재사용 (무료 25 req/일 한도 보호)
   const avCached = await loadAVSupplementalCache()
   const alphaVantageRatesByCurrency: Record<string, Record<string, number>> = {
+    ...(options.supplementalHistoryByCurrency ?? {}),
     ...(avCached?.rates ?? {}),
   }
 
@@ -286,16 +292,10 @@ export async function fetchRemoteExchangeData(
   )
 
   if (missingCurrencies.length > 0) {
-    const fetchedMissing = await Promise.all(
-      missingCurrencies.map(async (currency) => ({
-        currency,
-        rates: await fetchAlphaVantageFXDaily(currency),
-      })),
-    )
-
-    for (const item of fetchedMissing) {
-      if (item.rates) {
-        alphaVantageRatesByCurrency[item.currency] = item.rates
+    for (const currency of missingCurrencies) {
+      const rates = await fetchAlphaVantageFXDaily(currency)
+      if (rates) {
+        alphaVantageRatesByCurrency[currency] = rates
       }
     }
 

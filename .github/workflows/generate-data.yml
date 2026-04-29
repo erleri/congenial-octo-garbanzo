@@ -1,0 +1,49 @@
+name: Generate Static Dataset
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 0 * * *'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-static-dataset
+  cancel-in-progress: false
+
+jobs:
+  generate-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate public/data.json
+        run: npm run generate:data
+        env:
+          VITE_EXCHANGERATE_API_KEY: ${{ secrets.VITE_EXCHANGERATE_API_KEY }}
+          VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+
+      - name: Commit updated dataset
+        run: |
+          if git diff --quiet -- public/data.json data/alpha-vantage-history.json; then
+            echo "No dataset changes"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data.json data/alpha-vantage-history.json
+          git commit -m "chore: refresh static exchange data"
+          git push

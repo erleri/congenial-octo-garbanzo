@@ -231,13 +231,13 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
         ))}
       </div>
 
-      <article className="chart-card chart-card-full">
-        <h3>통화별 Local per USD 월간 추이</h3>
+      <article className="chart-card chart-card-full dashboard-chart-card">
+        <h3>통화별 Local per USD 월간 추이 (2년)</h3>
         <div className="small-multiple-row">
           {localSeriesByCurrency.map((series) => (
             <div key={`local-${series.currency}`} className="small-chart-card">
               <h4>{series.currency}</h4>
-              <ResponsiveContainer width="100%" height={170}>
+              <ResponsiveContainer width="100%" height={118}>
                 <LineChart data={series.points}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" hide />
@@ -270,13 +270,13 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
         </div>
       </article>
 
-      <article className="chart-card chart-card-full" style={{ marginTop: '20px' }}>
+      <article className="chart-card chart-card-full dashboard-chart-card">
         <h3>통화별 Local per USD 최신 일간 추이 ({latestMonth}월)</h3>
         <div className="small-multiple-row">
           {dailySeriesByCurrency.map((series) => (
             <div key={`daily-${series.currency}`} className="small-chart-card">
               <h4>{series.currency}</h4>
-              <ResponsiveContainer width="100%" height={170}>
+              <ResponsiveContainer width="100%" height={118}>
                 <LineChart data={series.points}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="day" hide />

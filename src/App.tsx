@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Admin from './components/Admin'
 import CurrencyDetail from './components/CurrencyDetail'
 import Dashboard from './components/Dashboard'
@@ -6,7 +6,7 @@ import MonthlySummary from './components/MonthlySummary'
 import MovingComparison from './components/MovingComparison'
 import { useExchangeData } from './hooks/useExchangeData'
 import type { DashboardFilters } from './types/exchangeRate'
-import { YEARS, CURRENCIES } from './types/exchangeRate'
+import { CURRENCIES } from './types/exchangeRate'
 import './App.css'
 
 type ScreenKey =
@@ -24,8 +24,21 @@ const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'admin', label: 'Admin' },
 ]
 
+function periodToNumber(period: string): number {
+  const [yearText, monthText] = period.split('-')
+  const year = Number(yearText)
+  const month = Number(monthText)
+  return year * 100 + month
+}
+
 function App() {
   const [screen, setScreen] = useState<ScreenKey>('dashboard')
+  const showHeaderFilters = ['monthly', 'currency'].includes(screen)
+  const [monthlyCurrency, setMonthlyCurrency] = useState<DashboardFilters['currency']>('ALL')
+  const [periodFrom, setPeriodFrom] = useState('')
+  const [periodTo, setPeriodTo] = useState('')
+  const [yearFrom, setYearFrom] = useState<number | null>(null)
+  const [yearTo, setYearTo] = useState<number | null>(null)
   
   const {
     dataset,
@@ -38,6 +51,140 @@ function App() {
     refreshData,
     uploadAndMergeExcel,
   } = useExchangeData()
+
+  const periodOptions = useMemo(() => {
+    if (!dataset) {
+      return []
+    }
+
+    const baseYm = periodToNumber(dataset.baseDate.slice(0, 7))
+
+    const unique = new Set(
+      dataset.dailyRates
+        .filter((row) => {
+          if (row.rateType !== 'LOCAL_PER_USD') {
+            return false
+          }
+
+          const ym = row.year * 100 + row.month
+          return ym <= baseYm
+        })
+        .map((row) => `${row.year}-${String(row.month).padStart(2, '0')}`),
+    )
+
+    return [...unique].sort((a, b) => periodToNumber(a) - periodToNumber(b))
+  }, [dataset])
+
+  const yearOptions = useMemo(() => {
+    if (!dataset) {
+      return []
+    }
+
+    const unique = new Set(
+      dataset.monthlyRates
+        .filter((row) => row.rateType === 'LOCAL_PER_USD')
+        .map((row) => row.year),
+    )
+
+    return [...unique].sort((a, b) => a - b)
+  }, [dataset])
+
+  useEffect(() => {
+    if (!periodOptions.length) {
+      return
+    }
+
+    const latest = periodOptions[periodOptions.length - 1]
+    const defaultFrom = periodOptions[Math.max(0, periodOptions.length - 2)]
+
+    if (!periodFrom || !periodOptions.includes(periodFrom)) {
+      setPeriodFrom(defaultFrom)
+    }
+
+    if (!periodTo || !periodOptions.includes(periodTo)) {
+      setPeriodTo(latest)
+    }
+  }, [periodFrom, periodOptions, periodTo])
+
+  useEffect(() => {
+    if (!yearOptions.length) {
+      return
+    }
+
+    const latest = yearOptions[yearOptions.length - 1]
+    const defaultFrom = yearOptions[Math.max(0, yearOptions.length - 2)]
+
+    if (yearFrom === null || !yearOptions.includes(yearFrom)) {
+      setYearFrom(defaultFrom)
+    }
+
+    if (yearTo === null || !yearOptions.includes(yearTo)) {
+      setYearTo(latest)
+    }
+  }, [yearFrom, yearOptions, yearTo])
+
+  const [effectivePeriodFrom, effectivePeriodTo] = useMemo(() => {
+    if (!periodOptions.length) {
+      return ['', '']
+    }
+
+    const fallbackFrom = periodOptions[Math.max(0, periodOptions.length - 2)]
+    const fallbackTo = periodOptions[periodOptions.length - 1]
+    const from = periodOptions.includes(periodFrom) ? periodFrom : fallbackFrom
+    const to = periodOptions.includes(periodTo) ? periodTo : fallbackTo
+
+    return periodToNumber(from) <= periodToNumber(to) ? [from, to] : [to, from]
+  }, [periodFrom, periodOptions, periodTo])
+
+  const [effectiveYearFrom, effectiveYearTo] = useMemo(() => {
+    if (!yearOptions.length) {
+      return [0, 0]
+    }
+
+    const fallbackFrom = yearOptions[Math.max(0, yearOptions.length - 2)]
+    const fallbackTo = yearOptions[yearOptions.length - 1]
+    const from = yearFrom !== null && yearOptions.includes(yearFrom) ? yearFrom : fallbackFrom
+    const to = yearTo !== null && yearOptions.includes(yearTo) ? yearTo : fallbackTo
+
+    return from <= to ? [from, to] : [to, from]
+  }, [yearFrom, yearOptions, yearTo])
+
+  const monthlyToOptions = useMemo(() => {
+    if (yearFrom === null) {
+      return yearOptions
+    }
+
+    return yearOptions.filter((year) => year >= yearFrom)
+  }, [yearFrom, yearOptions])
+
+  const dailyToOptions = useMemo(() => {
+    if (!periodFrom) {
+      return periodOptions
+    }
+
+    const fromValue = periodToNumber(periodFrom)
+    return periodOptions.filter((period) => periodToNumber(period) >= fromValue)
+  }, [periodFrom, periodOptions])
+
+  useEffect(() => {
+    if (!monthlyToOptions.length) {
+      return
+    }
+
+    if (yearTo === null || !monthlyToOptions.includes(yearTo)) {
+      setYearTo(monthlyToOptions[monthlyToOptions.length - 1])
+    }
+  }, [monthlyToOptions, yearTo])
+
+  useEffect(() => {
+    if (!dailyToOptions.length) {
+      return
+    }
+
+    if (!periodTo || !dailyToOptions.includes(periodTo)) {
+      setPeriodTo(dailyToOptions[dailyToOptions.length - 1])
+    }
+  }, [dailyToOptions, periodTo])
 
   const content = useMemo(() => {
     if (!dataset) {
@@ -56,15 +203,19 @@ function App() {
         return (
           <MonthlySummary
             data={dataset}
-            currencyFilter={filters.currency}
-            onCurrencyChange={(currency) => setFilters((prev) => ({ ...prev, currency }))}
+            currencyFilter={monthlyCurrency}
+            yearFrom={effectiveYearFrom}
+            yearTo={effectiveYearTo}
+            onCurrencyChange={setMonthlyCurrency}
           />
         )
       case 'currency':
         return (
           <CurrencyDetail
             data={dataset}
-            filters={filters}
+            currencyFilter={filters.currency}
+            periodFrom={effectivePeriodFrom}
+            periodTo={effectivePeriodTo}
           />
         )
       case 'moving':
@@ -89,6 +240,7 @@ function App() {
     fillMissing,
     filters,
     loading,
+    monthlyCurrency,
     screen,
     setFilters,
     refreshData,
@@ -117,49 +269,86 @@ function App() {
               {option.label}
             </button>
           ))}
+          <button type="button" className="header-refresh-button" onClick={() => void refreshData()} disabled={loading}>
+            {loading ? '갱신 중...' : 'Refresh'}
+          </button>
         </nav>
 
-        <div className="header-controls">
-          <section className="global-filters">
-            {['monthly', 'currency'].includes(screen) && (
-            <>
-              <label>
-                <select
-                  title="Year"
-                  value={filters.year}
-                  onChange={(event) =>
-                    setFilters((prev) => ({ ...prev, year: Number(event.target.value) }))
-                  }
-                  aria-label="Year"
-                >
-                  {YEARS.map((year) => (
-                    <option key={year} value={year}>
-                      {year}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              {screen === 'currency' && (
+        {showHeaderFilters && (
+          <div className="header-controls">
+            <section className="global-filters">
+              {screen === 'monthly' && (
                 <>
                   <label>
+                    <span className="filter-label">From</span>
                     <select
-                      title="Month"
-                      value={filters.month}
-                      onChange={(event) =>
-                        setFilters((prev) => ({ ...prev, month: Number(event.target.value) }))
-                      }
-                      aria-label="Month"
+                      title="From"
+                      value={yearFrom ?? ''}
+                      onChange={(event) => setYearFrom(Number(event.target.value))}
+                      aria-label="From"
                     >
-                      {Array.from({ length: 12 }, (_, idx) => idx + 1).map((month) => (
-                        <option key={month} value={month}>
-                          {month}월
+                      {yearOptions.map((year) => (
+                        <option key={`from-year-${year}`} value={year}>
+                          {year}
                         </option>
                       ))}
                     </select>
                   </label>
 
                   <label>
+                    <span className="filter-label">To</span>
+                    <select
+                      title="To"
+                      value={yearTo ?? ''}
+                      onChange={(event) => setYearTo(Number(event.target.value))}
+                      aria-label="To"
+                    >
+                        {monthlyToOptions.map((year) => (
+                        <option key={`to-year-${year}`} value={year}>
+                          {year}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+
+              {screen === 'currency' && (
+                <>
+                  <label>
+                    <span className="filter-label">From</span>
+                    <select
+                      title="From"
+                      value={periodFrom}
+                      onChange={(event) => setPeriodFrom(event.target.value)}
+                      aria-label="From"
+                    >
+                      {periodOptions.map((period) => (
+                        <option key={`from-${period}`} value={period}>
+                          {period}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span className="filter-label">To</span>
+                    <select
+                      title="To"
+                      value={periodTo}
+                      onChange={(event) => setPeriodTo(event.target.value)}
+                      aria-label="To"
+                    >
+                          {dailyToOptions.map((period) => (
+                        <option key={`to-${period}`} value={period}>
+                          {period}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    <span className="filter-label">Currency</span>
                     <select
                       title="Currency"
                       value={filters.currency}
@@ -180,14 +369,9 @@ function App() {
                   </label>
                 </>
               )}
-            </>
-          )}
-
-          <button type="button" onClick={() => void refreshData()} disabled={loading}>
-            {loading ? '갱신 중...' : 'Refresh'}
-          </button>
-          </section>
-        </div>
+            </section>
+          </div>
+        )}
       </header>
 
       <main>{content}</main>

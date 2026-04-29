@@ -9,6 +9,8 @@ import { CURRENCIES, MONTHS, YEARS } from '../types/exchangeRate'
 interface MonthlySummaryProps {
   data: ExchangeRateDataset
   currencyFilter: CurrencyFilter
+  yearFrom: number
+  yearTo: number
   onCurrencyChange: (currency: CurrencyFilter) => void
 }
 
@@ -34,9 +36,20 @@ function renderMatrix(
   rows: MonthlyRate[],
   rateType: 'LOCAL_PER_USD' | 'KRW',
   currencyFilter: CurrencyFilter,
+  yearFrom: number,
+  yearTo: number,
 ) {
   const activeCurrencies =
     currencyFilter === 'ALL' ? CURRENCIES : [currencyFilter]
+  const fromYear = Math.min(yearFrom, yearTo)
+  const toYear = Math.max(yearFrom, yearTo)
+
+  const yearGroups = YEARS
+    .map((year) => ({
+      year,
+      months: year >= fromYear && year <= toYear ? MONTHS : [],
+    }))
+    .filter((group) => group.months.length > 0)
 
   return (
     <>
@@ -46,16 +59,16 @@ function renderMatrix(
           <thead>
             <tr>
               <th rowSpan={2}>Currency</th>
-              {YEARS.map((year) => (
-                <th key={`year-${year}`} colSpan={12}>
-                  {year}
+              {yearGroups.map((group) => (
+                <th key={`year-${group.year}`} colSpan={group.months.length}>
+                  {group.year}
                 </th>
               ))}
             </tr>
             <tr>
-              {YEARS.flatMap((year) =>
-                MONTHS.map((month) => (
-                  <th key={`${year}-${month}`}>{month}월</th>
+              {yearGroups.flatMap((group) =>
+                group.months.map((month) => (
+                  <th key={`${group.year}-${month}`}>{month}월</th>
                 )),
               )}
             </tr>
@@ -64,19 +77,19 @@ function renderMatrix(
             {activeCurrencies.map((currency) => (
               <tr key={`${rateType}-${currency}`}>
                 <td>{currency}</td>
-                {YEARS.flatMap((year) =>
-                  MONTHS.map((month) => {
+                {yearGroups.flatMap((group) =>
+                  group.months.map((month) => {
                     const row = rows.find(
                       (item) =>
                         item.currency === currency &&
-                        item.year === year &&
+                        item.year === group.year &&
                         item.month === month,
                     )
 
                     const className = row?.status === 'zero' ? 'cell-zero' : ''
 
                     return (
-                      <td key={`${currency}-${year}-${month}`} className={className}>
+                      <td key={`${currency}-${group.year}-${month}`} className={className}>
                         {formatCellValue(
                           row?.value ?? null,
                           row?.status ?? 'empty',
@@ -95,7 +108,7 @@ function renderMatrix(
   )
 }
 
-function MonthlySummary({ data, currencyFilter, onCurrencyChange }: MonthlySummaryProps) {
+function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChange }: MonthlySummaryProps) {
   const localRows = pickRows(data.monthlyRates, 'LOCAL_PER_USD', currencyFilter)
   const krwRows = pickRows(data.monthlyRates, 'KRW', currencyFilter)
 
@@ -120,12 +133,12 @@ function MonthlySummary({ data, currencyFilter, onCurrencyChange }: MonthlySumma
 
       <article className="table-card">
         <h3>Local per USD 월별 환율</h3>
-        {renderMatrix(localRows, 'LOCAL_PER_USD', currencyFilter)}
+        {renderMatrix(localRows, 'LOCAL_PER_USD', currencyFilter, yearFrom, yearTo)}
       </article>
 
       <article className="table-card">
         <h3>KRW 월별 환율</h3>
-        {renderMatrix(krwRows, 'KRW', currencyFilter)}
+        {renderMatrix(krwRows, 'KRW', currencyFilter, yearFrom, yearTo)}
       </article>
 
       <article className="table-card">
