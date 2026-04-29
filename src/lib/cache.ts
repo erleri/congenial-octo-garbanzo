@@ -2,8 +2,10 @@ import type { ExchangeRateDataset } from '../types/exchangeRate'
 
 const DB_NAME = 'LatamExchangeRateDB'
 const STORE_NAME = 'ExchangeRateStore'
+const AV_STORE_NAME = 'AlphaVantageStore'
 const CACHE_KEY = 'latest_dataset'
-const DB_VERSION = 1
+const AV_CACHE_KEY = 'supplemental_history'
+const DB_VERSION = 2
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -13,6 +15,9 @@ function openDB(): Promise<IDBDatabase> {
       const db = (event.target as IDBOpenDBRequest).result
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME)
+      }
+      if (!db.objectStoreNames.contains(AV_STORE_NAME)) {
+        db.createObjectStore(AV_STORE_NAME)
       }
     }
 
@@ -58,6 +63,43 @@ export async function loadDatasetFromCache(): Promise<ExchangeRateDataset | null
         } else {
           resolve(null)
         }
+      }
+      request.onerror = () => resolve(null)
+    })
+  } catch {
+    return null
+  }
+}
+
+export type AVSupplementalCache = {
+  fetchedAt: string
+  rates: Record<string, Record<string, number>>
+}
+
+export async function saveAVSupplementalCache(data: AVSupplementalCache): Promise<boolean> {
+  try {
+    const db = await openDB()
+    return new Promise((resolve) => {
+      const transaction = db.transaction(AV_STORE_NAME, 'readwrite')
+      const store = transaction.objectStore(AV_STORE_NAME)
+      const request = store.put(data, AV_CACHE_KEY)
+      request.onsuccess = () => resolve(true)
+      request.onerror = () => resolve(false)
+    })
+  } catch {
+    return false
+  }
+}
+
+export async function loadAVSupplementalCache(): Promise<AVSupplementalCache | null> {
+  try {
+    const db = await openDB()
+    return new Promise((resolve) => {
+      const transaction = db.transaction(AV_STORE_NAME, 'readonly')
+      const store = transaction.objectStore(AV_STORE_NAME)
+      const request = store.get(AV_CACHE_KEY)
+      request.onsuccess = () => {
+        resolve(request.result ? (request.result as AVSupplementalCache) : null)
       }
       request.onerror = () => resolve(null)
     })

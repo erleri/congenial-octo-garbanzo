@@ -1,13 +1,12 @@
 import { useMemo, useState } from 'react'
+import Admin from './components/Admin'
 import CurrencyDetail from './components/CurrencyDetail'
 import Dashboard from './components/Dashboard'
-import FileUploader from './components/FileUploader'
 import MonthlySummary from './components/MonthlySummary'
 import MovingComparison from './components/MovingComparison'
-import RawSheetViewer from './components/RawSheetViewer'
 import { useExchangeData } from './hooks/useExchangeData'
 import type { DashboardFilters } from './types/exchangeRate'
-import { YEARS } from './types/exchangeRate'
+import { YEARS, CURRENCIES } from './types/exchangeRate'
 import './App.css'
 
 type ScreenKey =
@@ -15,16 +14,14 @@ type ScreenKey =
   | 'monthly'
   | 'currency'
   | 'moving'
-  | 'table'
-  | 'refresh'
+  | 'admin'
 
 const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'dashboard', label: 'Dashboard' },
-  { key: 'monthly', label: 'Monthly Summary' },
-  { key: 'currency', label: 'Currency Detail' },
+  { key: 'monthly', label: 'Monthly History' },
+  { key: 'currency', label: 'Daily Trend' },
   { key: 'moving', label: 'Moving vs Actual' },
-  { key: 'table', label: 'Data Table' },
-  { key: 'refresh', label: 'Excel Upload' },
+  { key: 'admin', label: 'Admin' },
 ]
 
 function App() {
@@ -68,22 +65,15 @@ function App() {
           <CurrencyDetail
             data={dataset}
             filters={filters}
-            onCurrencyChange={(currency) =>
-              setFilters((prev) => ({ ...prev, currency }))
-            }
           />
         )
       case 'moving':
         return <MovingComparison data={dataset} />
-      case 'table':
-        return <RawSheetViewer data={dataset} />
-      case 'refresh':
+      case 'admin':
         return (
-          <FileUploader
-            loading={loading}
+          <Admin
             error={error}
             dataset={dataset}
-            onRefresh={refreshData}
             onUploadExcel={uploadAndMergeExcel}
             excelPriority={excelPriority}
             fillMissing={fillMissing}
@@ -109,8 +99,8 @@ function App() {
     <div className="app-shell">
       <header className="top-header">
         <div className="title-wrap">
-          <h1>중남미 환율 대시보드</h1>
-          <p>외부 환율 API 수집 기반</p>
+          <h1>중남미 환율 대시보드 · LATAM FX Dashboard</h1>
+          <p>외부 환율 API 수집 기반 · Built by Imjun Koo</p>
         </div>
 
         <nav className="screen-nav">
@@ -126,59 +116,75 @@ function App() {
           ))}
         </nav>
 
-        <section className="global-filters">
-          <label>
-            Year
-            <select
-              value={filters.year}
-              onChange={(event) =>
-                setFilters((prev) => ({ ...prev, year: Number(event.target.value) }))
-              }
-            >
-              {YEARS.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
+        <div className="header-controls">
+          <section className="global-filters">
+            {['monthly', 'currency'].includes(screen) && (
+            <>
+              <label>
+                <select
+                  title="Year"
+                  value={filters.year}
+                  onChange={(event) =>
+                    setFilters((prev) => ({ ...prev, year: Number(event.target.value) }))
+                  }
+                  aria-label="Year"
+                >
+                  {YEARS.map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          <label>
-            Month
-            <select
-              value={filters.month}
-              onChange={(event) =>
-                setFilters((prev) => ({ ...prev, month: Number(event.target.value) }))
-              }
-            >
-              {Array.from({ length: 12 }, (_, idx) => idx + 1).map((month) => (
-                <option key={month} value={month}>
-                  {month}월
-                </option>
-              ))}
-            </select>
-          </label>
+              {screen === 'currency' && (
+                <>
+                  <label>
+                    <select
+                      title="Month"
+                      value={filters.month}
+                      onChange={(event) =>
+                        setFilters((prev) => ({ ...prev, month: Number(event.target.value) }))
+                      }
+                      aria-label="Month"
+                    >
+                      {Array.from({ length: 12 }, (_, idx) => idx + 1).map((month) => (
+                        <option key={month} value={month}>
+                          {month}월
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-          <label>
-            Rate Type
-            <select
-              value={filters.rateType}
-              onChange={(event) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  rateType: event.target.value as DashboardFilters['rateType'],
-                }))
-              }
-            >
-              <option value="LOCAL_PER_USD">Local per USD</option>
-              <option value="KRW">KRW</option>
-            </select>
-          </label>
+                  <label>
+                    <select
+                      title="Currency"
+                      value={filters.currency}
+                      onChange={(event) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          currency: event.target.value as DashboardFilters['currency'],
+                        }))
+                      }
+                      aria-label="Currency"
+                    >
+                      {CURRENCIES.map((item) => (
+                        <option key={item} value={item}>
+                          {item}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
+            </>
+          )}
 
           <button type="button" onClick={() => void refreshData()} disabled={loading}>
             {loading ? '갱신 중...' : 'Refresh'}
           </button>
-        </section>
+          </section>
+        </div>
       </header>
 
       <main>{content}</main>

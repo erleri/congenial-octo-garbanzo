@@ -107,6 +107,7 @@ export function useExchangeData() {
       if (cached) {
         setDataset(cached)
         updateFiltersBasedOnDataset(cached)
+        void refreshData()
         return
       }
 

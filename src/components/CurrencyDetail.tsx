@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   CartesianGrid,
   Line,
@@ -15,12 +15,11 @@ import type {
   DailyRate,
   ExchangeRateDataset,
 } from '../types/exchangeRate'
-import { CURRENCIES, MONTHS } from '../types/exchangeRate'
+import { MONTHS } from '../types/exchangeRate'
 
 interface CurrencyDetailProps {
   data: ExchangeRateDataset
   filters: DashboardFilters
-  onCurrencyChange: (currency: CurrencyCode) => void
 }
 
 function buildMatrix(
@@ -50,20 +49,19 @@ function buildMatrix(
   return dayRows
 }
 
-function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps) {
+function CurrencyDetail({ data, filters }: CurrencyDetailProps) {
   const defaultCurrency =
     filters.currency === 'ALL' ? 'BRL' : (filters.currency as CurrencyCode)
   const currency = defaultCurrency
 
   const [selectedMonth, setSelectedMonth] = useState(filters.month)
 
+  useEffect(() => {
+    setSelectedMonth(filters.month)
+  }, [filters.month])
+
   const localMatrix = useMemo(
     () => buildMatrix(data.dailyRates, currency, filters.year, 'LOCAL_PER_USD'),
-    [currency, data.dailyRates, filters.year],
-  )
-
-  const krwMatrix = useMemo(
-    () => buildMatrix(data.dailyRates, currency, filters.year, 'KRW'),
     [currency, data.dailyRates, filters.year],
   )
 
@@ -93,7 +91,7 @@ function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps
   }
 
   const renderMatrix = (rateType: 'LOCAL_PER_USD' | 'KRW') => {
-    const matrix = rateType === 'LOCAL_PER_USD' ? localMatrix : krwMatrix
+    const matrix = rateType === 'LOCAL_PER_USD' ? localMatrix : []
 
     return (
       <div className="table-scroll">
@@ -115,10 +113,10 @@ function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps
             </tr>
           </thead>
           <tbody>
-            {matrix.map((row) => (
+            {matrix.map((row: any) => (
               <tr key={`${rateType}-day-${row.day}`}>
                 <td>{row.day}</td>
-                {row.values.map((item, idx) => {
+                {row.values.map((item: any, idx: number) => {
                   const classes = [item?.status === 'zero' ? 'cell-zero' : '']
 
                   if (item?.source === 'IMPUTED' && item?.imputationMethod === 'FFILL') {
@@ -163,30 +161,9 @@ function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps
 
   return (
     <section className="panel">
-      <div className="panel-header panel-header-inline">
-        <h2>Currency Detail</h2>
-        <select
-          value={currency}
-          onChange={(event) => onCurrencyChange(event.target.value as CurrencyCode)}
-        >
-          {CURRENCIES.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
+      <div className="panel-header">
+        <h2>Daily Trend</h2>
       </div>
-
-      <article className="table-card">
-        <h3>Exchange Rate (1 Dollar Exchange Rate)</h3>
-        <p className="table-help">표시: <span className="imputed-badge">휴</span> = 휴일/결측으로 전일값 보정</p>
-        {renderMatrix('LOCAL_PER_USD')}
-      </article>
-
-      <article className="table-card">
-        <h3>Exchange Rate (KRW)</h3>
-        {renderMatrix('KRW')}
-      </article>
 
       <article className="chart-card">
         <h3>
@@ -196,11 +173,17 @@ function CurrencyDetail({ data, filters, onCurrencyChange }: CurrencyDetailProps
           <LineChart data={dailySeries}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
+            <YAxis domain={(['auto', 'auto'] as const)} tickFormatter={(v: number) => v.toLocaleString()} width={80} />
+            <Tooltip formatter={(v: any) => v.toLocaleString(undefined, { maximumFractionDigits: 4 })} />
             <Line type="monotone" dataKey="value" stroke="#1f3c88" strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
+      </article>
+
+      <article className="table-card">
+        <h3>Exchange Rate (1 Dollar Exchange Rate)</h3>
+        <p className="table-help">표시: <span className="imputed-badge">휴</span> = 휴일/결측으로 전일값 보정</p>
+        {renderMatrix('LOCAL_PER_USD')}
       </article>
     </section>
   )

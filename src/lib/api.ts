@@ -7,9 +7,12 @@ const HISTORY_ENDPOINT = 'https://api.frankfurter.app'
 const OPEN_ER_API_ENDPOINT = 'https://open.er-api.com/v6'
 const CURRENCY_API_LATEST_ENDPOINT = 'https://latest.currency-api.pages.dev/v1/currencies'
 const CURRENCY_API_SNAPSHOT_ENDPOINT = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api'
+const ALPHA_VANTAGE_ENDPOINT = 'https://www.alphavantage.co/query'
 const API_KEY = import.meta.env.VITE_EXCHANGERATE_API_KEY as string | undefined
+const ALPHA_VANTAGE_API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY as string | undefined
 
 export const SUPPLEMENTAL_CURRENCIES: CurrencyCode[] = ['CLP', 'COP', 'PEN']
+export const ALPHA_VANTAGE_HISTORY_CURRENCIES: CurrencyCode[] = ['ARS', 'CLP', 'COP', 'GTQ', 'PEN', 'UYU']
 
 export type ExchangeRateHistoryResponse = {
   result: 'success' | 'error'
@@ -229,6 +232,50 @@ export async function fetchSupplementalHistoryFromCurrencyApi(
     }
 
     acc[item.date] = item.rates
+    return acc
+  }, {})
+}
+
+export type AlphaVantageFXDailyResponse = {
+  'Time Series FX (Daily)'?: Record<
+    string,
+    { '1. open': string; '2. high': string; '3. low': string; '4. close': string }
+  >
+  'Error Message'?: string
+  Information?: string
+  Note?: string
+}
+
+/**
+ * Alpha Vantage FX_DAILY: USD → toSymbol 전체 일별 히스토리 반환
+ * 반환값: { 'YYYY-MM-DD': rate } 또는 null(키 없음/한도 초과)
+ */
+export async function fetchAlphaVantageFXDaily(
+  toSymbol: string,
+): Promise<Record<string, number> | null> {
+  if (!ALPHA_VANTAGE_API_KEY) {
+    return null
+  }
+
+  const url = `${ALPHA_VANTAGE_ENDPOINT}?function=FX_DAILY&from_symbol=USD&to_symbol=${toSymbol}&outputsize=full&apikey=${ALPHA_VANTAGE_API_KEY}`
+
+  let payload: AlphaVantageFXDailyResponse
+  try {
+    payload = await fetchJsonWithFallback<AlphaVantageFXDailyResponse>(url)
+  } catch {
+    return null
+  }
+
+  const timeSeries = payload['Time Series FX (Daily)']
+  if (!timeSeries) {
+    return null
+  }
+
+  return Object.entries(timeSeries).reduce<Record<string, number>>((acc, [date, ohlc]) => {
+    const close = parseFloat(ohlc['4. close'])
+    if (Number.isFinite(close) && close > 0) {
+      acc[date] = close
+    }
     return acc
   }, {})
 }

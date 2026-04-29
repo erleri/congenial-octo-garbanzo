@@ -14,16 +14,19 @@ import {
   average,
 } from './utils'
 import {
+  ALPHA_VANTAGE_HISTORY_CURRENCIES,
   fetchFrankfurterRange,
   fetchLatestRatesFromExchangeApi,
   fetchLatestRatesFromOpenErApi,
   fetchLatestRatesFromCurrencyApi,
   fetchSupplementalHistoryFromCurrencyApi,
+  fetchAlphaVantageFXDaily,
   SUPPLEMENTAL_CURRENCIES,
 } from './api'
 import { applyForwardFillToDaily, applyMonthlyFallbackFromDaily } from './imputation'
 import { buildMovingComparisonRows } from './moving'
 import { parseExcelWorkbook } from './excel'
+import { loadAVSupplementalCache, saveAVSupplementalCache } from './cache'
 
 export interface ExcelMergeOptions {
   excelPriority: boolean
@@ -269,6 +272,49 @@ export async function fetchRemoteExchangeData(
 
   const mergedRatesByDate: Record<string, Record<string, number>> = {
     ...historyPayload.rates,
+  }
+
+  // Alpha Vantage로 CLP/COP/PEN 전체 히스토리 보충 (Frankfurter 미지원)
+  // 캐시가 있으면 API 호출 없이 재사용 (무료 25 req/일 한도 보호)
+  const avCached = await loadAVSupplementalCache()
+  const alphaVantageRatesByCurrency: Record<string, Record<string, number>> = {
+    ...(avCached?.rates ?? {}),
+  }
+
+  const missingCurrencies = ALPHA_VANTAGE_HISTORY_CURRENCIES.filter(
+    (currency) => !alphaVantageRatesByCurrency[currency],
+  )
+
+  if (missingCurrencies.length > 0) {
+    const fetchedMissing = await Promise.all(
+      missingCurrencies.map(async (currency) => ({
+        currency,
+        rates: await fetchAlphaVantageFXDaily(currency),
+      })),
+    )
+
+    for (const item of fetchedMissing) {
+      if (item.rates) {
+        alphaVantageRatesByCurrency[item.currency] = item.rates
+      }
+    }
+
+    if (Object.keys(alphaVantageRatesByCurrency).length > 0) {
+      void saveAVSupplementalCache({
+        fetchedAt: new Date().toISOString(),
+        rates: alphaVantageRatesByCurrency,
+      })
+    }
+  }
+
+  for (const [currency, dateRates] of Object.entries(alphaVantageRatesByCurrency)) {
+    if (!dateRates) continue
+    for (const [date, rate] of Object.entries(dateRates)) {
+      if (!mergedRatesByDate[date]) continue
+      if (currency === 'ARS' || toNumber(mergedRatesByDate[date][currency]) === null) {
+        mergedRatesByDate[date][currency] = rate
+      }
+    }
   }
 
   const latestYear = parseDateParts(endDate).year

@@ -25,7 +25,17 @@
   display: flex;
   gap: 8px;
   margin-top: 16px;
+  margin-bottom: 0;
   flex-wrap: wrap;
+}
+
+.header-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #d2dcea;
 }
 
 .tab {
@@ -44,19 +54,17 @@
 }
 
 .global-filters {
-  margin-top: 16px;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(140px, 1fr));
-  gap: 10px;
-  align-items: end;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0;
 }
 
 .global-filters label {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  color: #4f5d73;
+  align-items: center;
+  margin: 0;
 }
 
 .global-filters select,
@@ -67,17 +75,20 @@
 .inline-controls select,
 .inline-controls button {
   border: 1px solid #bcc9dc;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #ffffff;
   color: #23314a;
-  padding: 8px 10px;
-  font-size: 14px;
+  padding: 6px 8px;
+  font-size: 13px;
+  min-width: 110px;
 }
 
 .global-filters button {
   background: #1f3c88;
   color: #ffffff;
   cursor: pointer;
+  padding: 6px 12px;
+  min-width: auto;
 }
 
 main {

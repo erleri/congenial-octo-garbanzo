@@ -101,7 +101,7 @@ function MonthlySummary({ data, currencyFilter, onCurrencyChange }: MonthlySumma
   return (
     <section className="panel">
       <div className="panel-header panel-header-inline">
-        <h2>Monthly Summary</h2>
+        <h2>Monthly History</h2>
         <select
           value={currencyFilter}
           onChange={(event) => onCurrencyChange(event.target.value as CurrencyFilter)}
