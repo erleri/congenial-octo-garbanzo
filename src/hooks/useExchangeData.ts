@@ -7,6 +7,8 @@ import {
 } from '../lib'
 import type { DashboardFilters, ExchangeRateDataset } from '../types/exchangeRate'
 
+const AUTO_REFRESH_TTL_MS = 12 * 60 * 60 * 1000
+
 export function useExchangeData() {
   const [dataset, setDataset] = useState<ExchangeRateDataset | null>(null)
   const [loading, setLoading] = useState(false)
@@ -107,7 +109,14 @@ export function useExchangeData() {
       if (cached) {
         setDataset(cached)
         updateFiltersBasedOnDataset(cached)
-        void refreshData()
+
+        const fetchedAt = new Date(cached.fetchedAt).getTime()
+        const isFresh = Number.isFinite(fetchedAt) && Date.now() - fetchedAt < AUTO_REFRESH_TTL_MS
+
+        if (!isFresh) {
+          void refreshData()
+        }
+
         return
       }
 
