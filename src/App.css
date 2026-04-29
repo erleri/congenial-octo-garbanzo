@@ -1,7 +1,29 @@
 .app-shell {
+  width: 100%;
   max-width: 1600px;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 20px;
+  /* PC에서는 App.tsx의 inline style(zoom)에 의해 확대/축소됩니다 */
+}
+
+/* PC 화면 해상도에 비례하여 전체 요소 확대/축소 (스크롤 방지) */
+@media (min-width: 1200px) {
+  body {
+    overflow: hidden;
+  }
+  .app-shell {
+    width: 1600px;
+    height: 920px;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px; /* 스크롤바 여백 */
+  }
 }
 
 .top-header {
@@ -275,6 +297,16 @@ main {
   overflow-x: auto;
 }
 
+.moving-table-wrapper {
+  overflow-x: auto;
+}
+
+@media (min-width: 1200px) {
+  .moving-table-wrapper {
+    overflow: visible;
+  }
+}
+
 .dense-table {
   border-collapse: collapse;
   width: 100%;
@@ -296,6 +328,19 @@ main {
   position: sticky;
   left: 0;
   background: #f8fbff;
+  z-index: 1;
+}
+
+.dense-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f8fbff;
+  z-index: 2;
+  box-shadow: inset 0 -1px 0 #d9e3f0;
+}
+
+.dense-table thead th:first-child {
+  z-index: 3;
 }
 
 .cell-zero {
@@ -603,3 +648,39 @@ main {
   color: #c2410c;
   border: 1px solid #fed7aa;
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  color: #1e293b;
+}
+
+.modal-content p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+}
+

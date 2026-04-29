@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
-import Admin from './components/Admin'
-import CurrencyDetail from './components/CurrencyDetail'
+import { useEffect, useMemo, useState, Suspense, lazy } from 'react'
 import Dashboard from './components/Dashboard'
-import MonthlySummary from './components/MonthlySummary'
-import MovingComparison from './components/MovingComparison'
+const Admin = lazy(() => import('./components/Admin'))
+const CurrencyDetail = lazy(() => import('./components/CurrencyDetail'))
+const MonthlySummary = lazy(() => import('./components/MonthlySummary'))
+const MovingComparison = lazy(() => import('./components/MovingComparison'))
 import { useExchangeData } from './hooks/useExchangeData'
 import type { DashboardFilters } from './types/exchangeRate'
 import { CURRENCIES } from './types/exchangeRate'
@@ -39,6 +39,25 @@ function App() {
   const [periodTo, setPeriodTo] = useState('')
   const [yearFrom, setYearFrom] = useState<number | null>(null)
   const [yearTo, setYearTo] = useState<number | null>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    const handleResize = () => {
+      // PC 해상도(1200px 이상)일 때, 1600x920 크기의 가상 캔버스를 화면에 딱 맞춤
+      if (window.innerWidth >= 1200) {
+        const scaleX = window.innerWidth / 1600
+        const scaleY = window.innerHeight / 920
+        // 스크롤바가 생기지 않도록 너비와 높이 중 더 작은 배율을 선택
+        setScale(Math.min(scaleX, scaleY))
+      } else {
+        setScale(1)
+      }
+    }
+
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
   
   const {
     dataset,
@@ -50,6 +69,8 @@ function App() {
     setFilters,
     refreshData,
     uploadAndMergeExcel,
+    businessPlan,
+    updateBusinessPlan,
   } = useExchangeData()
 
   const periodOptions = useMemo(() => {
@@ -219,7 +240,13 @@ function App() {
           />
         )
       case 'moving':
-        return <MovingComparison data={dataset} />
+        return (
+          <MovingComparison 
+            data={dataset} 
+            businessPlan={businessPlan} 
+            onUpdatePlan={updateBusinessPlan} 
+          />
+        )
       case 'admin':
         return (
           <Admin
@@ -244,11 +271,13 @@ function App() {
     screen,
     setFilters,
     refreshData,
-    uploadAndMergeExcel
+    uploadAndMergeExcel,
+    businessPlan,
+    updateBusinessPlan
   ])
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" style={{ zoom: scale } as React.CSSProperties}>
       <header className="top-header">
         <div className="title-wrap">
           <h1>
@@ -374,7 +403,15 @@ function App() {
         )}
       </header>
 
-      <main>{content}</main>
+      <main>
+        <Suspense fallback={
+          <section className="panel empty" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <h2 style={{ color: '#5b6778' }}>화면을 불러오는 중입니다...</h2>
+          </section>
+        }>
+          {content}
+        </Suspense>
+      </main>
     </div>
   )
 }

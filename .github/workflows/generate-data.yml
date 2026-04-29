@@ -39,11 +39,50 @@ jobs:
         run: |
           if git diff --quiet -- public/data.json data/alpha-vantage-history.json; then
             echo "No dataset changes"
-            exit 0
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/data.json data/alpha-vantage-history.json
+            git commit -m "chore: refresh static exchange data"
+            git push
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/data.json data/alpha-vantage-history.json
-          git commit -m "chore: refresh static exchange data"
-          git push
+      - name: Install Puppeteer browser
+        run: npx puppeteer browsers install chrome
+
+      - name: Build frontend for screenshot
+        run: npm run build
+
+      - name: Start preview server
+        run: npm run preview -- --port 4173 &
+        
+      - name: Wait for server
+        run: sleep 5
+
+      - name: Take Dashboard Screenshot
+        run: node scripts/take-screenshot.js
+
+      - name: Get Mailing List
+        id: mailing
+        run: |
+          if [ -f "data/mailing_list.json" ]; then
+            EMAILS=$(jq -r 'join(",")' data/mailing_list.json)
+            echo "emails=$EMAILS" >> $GITHUB_OUTPUT
+          else
+            echo "emails=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Email
+        if: steps.mailing.outputs.emails != '' && steps.mailing.outputs.emails != 'null'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "📊 [일일 리포트] 중남미 환율 대시보드"
+          to: ${{ steps.mailing.outputs.emails }}
+          from: "환율 대시보드 관리자"
+          html_body: "<h2>오늘의 최신 중남미 환율 대시보드입니다.</h2><p>본 메일은 자동화 시스템에 의해 매일 발송됩니다. 자세한 내용은 첨부된 스크린샷 이미지(dashboard.png)를 확인해 주세요.</p>"
+          attachments: "dashboard.png"

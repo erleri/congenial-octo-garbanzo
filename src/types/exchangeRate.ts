@@ -12,6 +12,11 @@ export const CURRENCIES = [
   'USD',
 ] as const
 
+export interface BusinessPlan {
+  leading: Partial<Record<(typeof CURRENCIES)[number], number>>
+  moving: Partial<Record<(typeof CURRENCIES)[number], number>>
+}
+
 export type CurrencyCode = (typeof CURRENCIES)[number]
 export type CurrencyFilter = CurrencyCode | 'ALL'
 

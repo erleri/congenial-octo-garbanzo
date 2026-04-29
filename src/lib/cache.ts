@@ -1,11 +1,13 @@
-import type { ExchangeRateDataset } from '../types/exchangeRate'
+import type { ExchangeRateDataset, BusinessPlan } from '../types/exchangeRate'
 
 const DB_NAME = 'LatamExchangeRateDB'
 const STORE_NAME = 'ExchangeRateStore'
 const AV_STORE_NAME = 'AlphaVantageStore'
+const PLAN_STORE_NAME = 'BusinessPlanStore'
 const CACHE_KEY = 'latest_dataset'
 const AV_CACHE_KEY = 'supplemental_history'
-const DB_VERSION = 2
+const PLAN_CACHE_KEY = 'latest_business_plan'
+const DB_VERSION = 3
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -18,6 +20,9 @@ function openDB(): Promise<IDBDatabase> {
       }
       if (!db.objectStoreNames.contains(AV_STORE_NAME)) {
         db.createObjectStore(AV_STORE_NAME)
+      }
+      if (!db.objectStoreNames.contains(PLAN_STORE_NAME)) {
+        db.createObjectStore(PLAN_STORE_NAME)
       }
     }
 
@@ -100,6 +105,38 @@ export async function loadAVSupplementalCache(): Promise<AVSupplementalCache | n
       const request = store.get(AV_CACHE_KEY)
       request.onsuccess = () => {
         resolve(request.result ? (request.result as AVSupplementalCache) : null)
+      }
+      request.onerror = () => resolve(null)
+    })
+  } catch {
+    return null
+  }
+}
+
+export async function saveBusinessPlanToCache(plan: BusinessPlan): Promise<boolean> {
+  try {
+    const db = await openDB()
+    return new Promise((resolve) => {
+      const transaction = db.transaction(PLAN_STORE_NAME, 'readwrite')
+      const store = transaction.objectStore(PLAN_STORE_NAME)
+      const request = store.put(plan, PLAN_CACHE_KEY)
+      request.onsuccess = () => resolve(true)
+      request.onerror = () => resolve(false)
+    })
+  } catch {
+    return false
+  }
+}
+
+export async function loadBusinessPlanFromCache(): Promise<BusinessPlan | null> {
+  try {
+    const db = await openDB()
+    return new Promise((resolve) => {
+      const transaction = db.transaction(PLAN_STORE_NAME, 'readonly')
+      const store = transaction.objectStore(PLAN_STORE_NAME)
+      const request = store.get(PLAN_CACHE_KEY)
+      request.onsuccess = () => {
+        resolve(request.result ? (request.result as BusinessPlan) : null)
       }
       request.onerror = () => resolve(null)
     })

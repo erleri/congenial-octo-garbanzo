@@ -3,6 +3,7 @@ import type {
   ExchangeRateDataset,
   MovingColumn,
   MovingComparisonRow,
+  BusinessPlan,
 } from '../types/exchangeRate'
 import { MONTHS } from '../types/exchangeRate'
 import { average } from './utils'
@@ -11,6 +12,7 @@ export function buildMovingComparisonRows(
   dataset: ExchangeRateDataset,
   year: number,
   month: number,
+  businessPlan?: BusinessPlan,
 ): MovingComparisonRow[] {
   const columns: MovingColumn[] = [
     'KRW',
@@ -28,13 +30,14 @@ export function buildMovingComparisonRows(
   ]
 
   const findDaily = (currency: CurrencyCode, day: number): number | null => {
+    const rateType = currency === 'USD' ? 'KRW' : 'LOCAL_PER_USD'
     const row = dataset.dailyRates.find(
       (item) =>
         item.currency === currency &&
         item.year === year &&
         item.month === month &&
         item.day === day &&
-        item.rateType === 'KRW',
+        item.rateType === rateType,
     )
     return row?.value ?? null
   }
@@ -44,12 +47,13 @@ export function buildMovingComparisonRows(
     targetYear: number,
     targetMonth: number,
   ): number | null => {
+    const rateType = currency === 'USD' ? 'KRW' : 'LOCAL_PER_USD'
     const row = dataset.monthlyRates.find(
       (item) =>
         item.currency === currency &&
         item.year === targetYear &&
         item.month === targetMonth &&
-        item.rateType === 'KRW',
+        item.rateType === rateType,
     )
 
     return row?.value ?? null
@@ -120,6 +124,11 @@ export function buildMovingComparisonRows(
   })
 
   const leading = asRecord((currency) => {
+    if (businessPlan?.leading) {
+      const localRate = businessPlan.leading[currency]
+      if (localRate !== undefined && localRate !== null) return localRate
+    }
+
     const values = [1, 2, 3]
       .map((offset) => {
         const targetDate = new Date(year, month - 1 + offset, 1)
@@ -146,6 +155,11 @@ export function buildMovingComparisonRows(
   })
 
   const moving = asRecord((currency) => {
+    if (businessPlan?.moving) {
+      const localRate = businessPlan.moving[currency]
+      if (localRate !== undefined && localRate !== null) return localRate
+    }
+
     const values = [0, 1, 2]
       .map((offset) => {
         const targetDate = new Date(year, month - 1 - offset, 1)

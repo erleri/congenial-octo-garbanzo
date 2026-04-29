@@ -5,8 +5,12 @@ import {
   fetchStaticDataset,
   loadDatasetFromCache,
   saveDatasetToCache,
+  loadBusinessPlanFromCache,
+  saveBusinessPlanToCache,
 } from '../lib'
-import type { DashboardFilters, ExchangeRateDataset } from '../types/exchangeRate'
+import type { DashboardFilters, ExchangeRateDataset, BusinessPlan } from '../types/exchangeRate'
+
+const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
 
 const AUTO_REFRESH_TTL_MS = 12 * 60 * 60 * 1000
 
@@ -17,6 +21,7 @@ export function useExchangeData() {
   const [excelFile, setExcelFile] = useState<File | null>(null)
   const [excelPriority, setExcelPriority] = useState(true)
   const [fillMissing, setFillMissing] = useState(true)
+  const [businessPlan, setBusinessPlan] = useState<BusinessPlan>(INITIAL_BUSINESS_PLAN)
 
   const [filters, setFilters] = useState<DashboardFilters>({
     currency: 'BRL',
@@ -91,12 +96,23 @@ export function useExchangeData() {
     }
   }
 
+  const updateBusinessPlan = async (newPlan: BusinessPlan) => {
+    setBusinessPlan(newPlan)
+    await saveBusinessPlanToCache(newPlan)
+  }
+
   useEffect(() => {
     let isMounted = true
 
     const init = async () => {
+      const cachedPlanPromise = loadBusinessPlanFromCache()
       const cachedPromise = loadDatasetFromCache()
       const staticPromise = fetchStaticDataset()
+
+      const cachedPlan = await cachedPlanPromise
+      if (cachedPlan) {
+        setBusinessPlan(cachedPlan)
+      }
 
       const cached = await cachedPromise
 
@@ -149,5 +165,7 @@ export function useExchangeData() {
     setFilters,
     refreshData,
     uploadAndMergeExcel,
+    businessPlan,
+    updateBusinessPlan,
   }
 }
