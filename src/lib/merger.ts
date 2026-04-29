@@ -317,6 +317,41 @@ export async function fetchRemoteExchangeData(
     }
   }
 
+  // Alpha Vantage 키가 없거나 한도 초과 시를 대비한 보조 경로:
+  // 월별 첫 관측일만 snapshot으로 채운 뒤, 이후 전일 보간(FFILL)으로 연속성 확보
+  const missingSupplementalEntries = Object.entries(mergedRatesByDate).filter(([, rateMap]) =>
+    SUPPLEMENTAL_CURRENCIES.some((currency) => toNumber(rateMap[currency]) === null),
+  )
+
+  if (missingSupplementalEntries.length > 0) {
+    const monthlyAnchorDateByKey = missingSupplementalEntries.reduce<Record<string, string>>(
+      (acc, [date]) => {
+        const { year, month } = parseDateParts(date)
+        const ymKey = `${year}-${String(month).padStart(2, '0')}`
+        const existing = acc[ymKey]
+
+        if (!existing || date < existing) {
+          acc[ymKey] = date
+        }
+
+        return acc
+      },
+      {},
+    )
+
+    const monthlyAnchorDates = Object.values(monthlyAnchorDateByKey)
+    const supplementalMonthlyAnchors = monthlyAnchorDates.length
+      ? await fetchSupplementalHistoryFromCurrencyApi(monthlyAnchorDates)
+      : {}
+
+    for (const [date, supplementalRates] of Object.entries(supplementalMonthlyAnchors)) {
+      mergedRatesByDate[date] = {
+        ...mergedRatesByDate[date],
+        ...supplementalRates,
+      }
+    }
+  }
+
   const latestYear = parseDateParts(endDate).year
   const supplementalHistoryDates = Object.entries(mergedRatesByDate)
     .filter(([date, rateMap]) => {
