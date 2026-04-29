@@ -3,7 +3,7 @@ import { CURRENCIES } from '../types/exchangeRate'
 import { toNumber } from './utils'
 
 const REMOTE_ENDPOINT = 'https://v6.exchangerate-api.com/v6'
-const HISTORY_ENDPOINT = 'https://api.frankfurter.app'
+const HISTORY_ENDPOINTS = ['https://api.frankfurter.dev/v1', 'https://api.frankfurter.app']
 const OPEN_ER_API_ENDPOINT = 'https://open.er-api.com/v6'
 const CURRENCY_API_LATEST_ENDPOINT = 'https://latest.currency-api.pages.dev/v1/currencies'
 const CURRENCY_API_SNAPSHOT_ENDPOINT = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api'
@@ -68,9 +68,19 @@ export async function fetchFrankfurterRange(
   endDate: string,
 ): Promise<FrankfurterRangeResponse> {
   const targets = `${CURRENCIES.filter((currency) => currency !== 'USD').join(',')},KRW`
-  const url = `${HISTORY_ENDPOINT}/${startDate}..${endDate}?from=USD&to=${targets}`
+  let lastError: unknown = null
 
-  return await fetchJsonWithFallback<FrankfurterRangeResponse>(url)
+  for (const endpoint of HISTORY_ENDPOINTS) {
+    const url = `${endpoint}/${startDate}..${endDate}?from=USD&to=${targets}`
+
+    try {
+      return await fetchJsonWithFallback<FrankfurterRangeResponse>(url)
+    } catch (error) {
+      lastError = error
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error('Frankfurter 히스토리 조회 실패')
 }
 
 export async function fetchLatestRatesFromExchangeApi(
