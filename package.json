@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "generate:data": "tsx --env-file=.env.local scripts/generate-data.ts",
+    "generate:data": "tsx scripts/generate-data.ts",
     "lint": "eslint .",
     "preview": "vite preview"
   },

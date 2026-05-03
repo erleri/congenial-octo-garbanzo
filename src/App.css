@@ -478,6 +478,26 @@ main {
   font-weight: 720;
 }
 
+.section-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.section-title-row h3 {
+  margin: 0;
+}
+
+.section-range-label {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .chart-card-full {
   margin-top: 0;
 }

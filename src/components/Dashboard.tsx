@@ -79,6 +79,12 @@ function Dashboard({ data }: DashboardProps) {
   const latestMonth = baseDate.getMonth() + 1
   const baseDateText = data.baseDate
   const recentMonths = buildRecentMonths(latestYear, latestMonth, 24)
+  const firstRecentMonth = recentMonths[0]
+  const lastRecentMonth = recentMonths[recentMonths.length - 1]
+  const monthlyRangeLabel =
+    firstRecentMonth && lastRecentMonth
+      ? `최근 ${recentMonths.length}개월 · ${monthKey(firstRecentMonth.year, firstRecentMonth.month)}~${monthKey(lastRecentMonth.year, lastRecentMonth.month)}`
+      : '최근 24개월'
 
   const previousDate = new Date(latestYear, latestMonth - 2, 1)
   const oneYearAgoText = `${latestYear - 1}-${String(latestMonth).padStart(2, '0')}-${String(baseDate.getDate()).padStart(2, '0')}`
@@ -210,7 +216,7 @@ function Dashboard({ data }: DashboardProps) {
             </div>
             <strong>{formatCellValue(kpi.cumulativeValue, kpi.cumulativeStatus, kpi.currency)}</strong>
             <p className="kpi-today">
-              최신값 {formatCellValue(kpi.todayValue, kpi.todayStatus, kpi.currency)}
+              기준일 환율 {formatCellValue(kpi.todayValue, kpi.todayStatus, kpi.currency)}
             </p>
             {kpi.mom !== null ? (
               <em className={kpi.mom >= 0 ? 'up' : 'down'}>
@@ -240,7 +246,10 @@ function Dashboard({ data }: DashboardProps) {
       </div>
 
       <div className="chart-card chart-card-full dashboard-chart-card">
-        <h3>통화별 월간 추이</h3>
+        <div className="section-title-row">
+          <h3>통화별 월간 추이</h3>
+          <span className="section-range-label">{monthlyRangeLabel}</span>
+        </div>
         <div className="small-multiple-row">
           {localSeriesByCurrency.map((series) => (
             <div key={`local-${series.currency}`} className="small-chart-card">
