@@ -14,6 +14,43 @@ const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
 
 const AUTO_REFRESH_TTL_MS = 12 * 60 * 60 * 1000
 
+function datasetSortValue(data: ExchangeRateDataset): number {
+  const baseDateTime = new Date(`${data.baseDate}T00:00:00Z`).getTime()
+  const fetchedAtTime = new Date(data.fetchedAt).getTime()
+
+  const safeBaseDateTime = Number.isFinite(baseDateTime) ? baseDateTime : 0
+  const safeFetchedAtTime = Number.isFinite(fetchedAtTime) ? fetchedAtTime : 0
+
+  return safeBaseDateTime * 10_000_000 + safeFetchedAtTime
+}
+
+function pickLatestDataset(
+  first: ExchangeRateDataset | null,
+  second: ExchangeRateDataset | null,
+): ExchangeRateDataset | null {
+  if (!first) {
+    return second
+  }
+
+  if (!second) {
+    return first
+  }
+
+  return datasetSortValue(second) > datasetSortValue(first) ? second : first
+}
+
+function isFreshEnough(data: ExchangeRateDataset): boolean {
+  const fetchedAtTime = new Date(data.fetchedAt).getTime()
+  const fetchedAtDate = new Date(data.fetchedAt).toLocaleDateString()
+  const todayDate = new Date().toLocaleDateString()
+
+  return (
+    Number.isFinite(fetchedAtTime) &&
+    Date.now() - fetchedAtTime < AUTO_REFRESH_TTL_MS &&
+    fetchedAtDate === todayDate
+  )
+}
+
 export function useExchangeData() {
   const [dataset, setDataset] = useState<ExchangeRateDataset | null>(null)
   const [loading, setLoading] = useState(false)
@@ -32,11 +69,20 @@ export function useExchangeData() {
 
   const updateFiltersBasedOnDataset = (data: ExchangeRateDataset) => {
     const latest = new Date(data.baseDate)
-    setFilters((prev) => ({
-      ...prev,
-      year: latest.getFullYear(),
-      month: latest.getMonth() + 1,
-    }))
+    const latestVal = latest.getFullYear() * 100 + (latest.getMonth() + 1)
+
+    setFilters((prev) => {
+      const currentVal = prev.year * 100 + prev.month
+      if (latestVal <= currentVal) {
+        return prev
+      }
+
+      return {
+        ...prev,
+        year: latest.getFullYear(),
+        month: latest.getMonth() + 1,
+      }
+    })
   }
 
   const applyDataset = async (data: ExchangeRateDataset) => {
@@ -45,7 +91,7 @@ export function useExchangeData() {
 
     const cacheSaved = await saveDatasetToCache(data)
     if (!cacheSaved) {
-      setError('IndexedDB에 데이터를 캐시하는 데 실패했습니다. 화면 조회는 계속 가능합니다.')
+      setError('IndexedDB에 데이터를 저장하지 못했습니다. 화면 조회는 계속 가능합니다.')
     }
   }
 
@@ -88,9 +134,10 @@ export function useExchangeData() {
       await applyDataset(merged)
       window.alert('엑셀 업로드가 완료되었습니다. 데이터가 병합되었습니다.')
     } catch (mergeError) {
-      const msg = mergeError instanceof Error ? mergeError.message : '엑셀 병합 중 오류가 발생했습니다.'
+      const msg =
+        mergeError instanceof Error ? mergeError.message : '엑셀 병합 중 오류가 발생했습니다.'
       setError(msg)
-      window.alert('엑셀 업로드 중 오류가 발생했습니다: ' + msg)
+      window.alert(`엑셀 업로드 중 오류가 발생했습니다: ${msg}`)
     } finally {
       setLoading(false)
     }
@@ -110,12 +157,11 @@ export function useExchangeData() {
       const staticPromise = fetchStaticDataset()
 
       const cachedPlan = await cachedPlanPromise
-      if (cachedPlan) {
+      if (cachedPlan && isMounted) {
         setBusinessPlan(cachedPlan)
       }
 
       const cached = await cachedPromise
-
       if (!isMounted) return
 
       if (cached) {
@@ -124,19 +170,19 @@ export function useExchangeData() {
       }
 
       const staticDataset = await staticPromise
-
       if (!isMounted) return
 
-      if (staticDataset) {
+      const latestLocalDataset = pickLatestDataset(cached, staticDataset)
+      const staticDatasetIsNewer =
+        staticDataset &&
+        (!cached || datasetSortValue(staticDataset) > datasetSortValue(cached))
+
+      if (staticDatasetIsNewer) {
         await applyDataset(staticDataset)
-        return
       }
 
-      if (cached) {
-        const fetchedAt = new Date(cached.fetchedAt).getTime()
-        const isFresh = Number.isFinite(fetchedAt) && Date.now() - fetchedAt < AUTO_REFRESH_TTL_MS
-
-        if (!isFresh) {
+      if (latestLocalDataset) {
+        if (!isFreshEnough(latestLocalDataset)) {
           void refreshData()
         }
 

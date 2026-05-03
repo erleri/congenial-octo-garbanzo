@@ -18,7 +18,7 @@ export default defineConfig({
               const data = fs.readFileSync(filePath, 'utf-8')
               res.setHeader('Content-Type', 'application/json')
               res.end(data)
-            } catch (e) {
+            } catch {
               res.statusCode = 404
               res.end(JSON.stringify({ error: 'File not found' }))
             }
@@ -31,7 +31,7 @@ export default defineConfig({
                 fs.writeFileSync(filePath, body, 'utf-8')
                 res.statusCode = 200
                 res.end(JSON.stringify({ success: true }))
-              } catch (e) {
+              } catch {
                 res.statusCode = 400
                 res.end(JSON.stringify({ error: 'Invalid JSON' }))
               }

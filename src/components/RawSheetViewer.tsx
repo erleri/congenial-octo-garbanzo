@@ -54,7 +54,7 @@ function RawSheetViewer({ data }: RawSheetViewerProps) {
   }, [query, selectedSheet])
 
   return (
-    <section className="panel">
+    <div className="panel">
       <div className="panel-header panel-header-inline">
         <h2>Data Table</h2>
         <div className="inline-controls">
@@ -107,7 +107,7 @@ function RawSheetViewer({ data }: RawSheetViewerProps) {
           </tbody>
         </table>
       </div>
-    </section>
+    </div>
   )
 }
 

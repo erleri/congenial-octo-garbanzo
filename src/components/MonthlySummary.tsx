@@ -53,12 +53,12 @@ function renderMatrix(
 
   return (
     <>
-      <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
+      <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
       <div className="table-scroll">
         <table className="dense-table">
           <thead>
             <tr>
-              <th rowSpan={2}>Currency</th>
+              <th rowSpan={2}>통화</th>
               {yearGroups.map((group) => (
                 <th key={`year-${group.year}`} colSpan={group.months.length}>
                   {group.year}
@@ -115,14 +115,18 @@ function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChan
   const rawSummary = data.rawSheets.find((sheet) => sheet.name === 'Summary')
 
   return (
-    <section className="panel">
-      <div className="panel-header panel-header-inline">
-        <h2>Monthly History</h2>
+    <div className="panel">
+      <div className="panel-header-inline">
+        <div>
+          <h2>월별 내역</h2>
+          <p className="table-help">선택한 기간과 통화의 월평균 환율입니다.</p>
+        </div>
         <select
           value={currencyFilter}
           onChange={(event) => onCurrencyChange(event.target.value as CurrencyFilter)}
+          aria-label="통화 필터"
         >
-          <option value="ALL">All</option>
+          <option value="ALL">전체 통화</option>
           {CURRENCIES.map((item) => (
             <option key={item} value={item}>
               {item}
@@ -131,19 +135,19 @@ function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChan
         </select>
       </div>
 
-      <article className="table-card">
-        <h3>Local per USD 월별 환율</h3>
+      <div className="table-card">
+        <h3>Local per USD</h3>
         {renderMatrix(localRows, 'LOCAL_PER_USD', currencyFilter, yearFrom, yearTo)}
-      </article>
+      </div>
 
-      <article className="table-card">
-        <h3>KRW 월별 환율</h3>
+      <div className="table-card" style={{ marginTop: 12 }}>
+        <h3>KRW 환산</h3>
         {renderMatrix(krwRows, 'KRW', currencyFilter, yearFrom, yearTo)}
-      </article>
+      </div>
 
-      <article className="table-card">
-        <h3>원본 형태 (Summary)</h3>
-        <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
+      <div className="table-card" style={{ marginTop: 12 }}>
+        <h3>원본 Summary</h3>
+        <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
         <div className="table-scroll">
           <table className="dense-table">
             <thead>
@@ -164,8 +168,8 @@ function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChan
             </tbody>
           </table>
         </div>
-      </article>
-    </section>
+      </div>
+    </div>
   )
 }
 

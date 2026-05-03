@@ -28,7 +28,7 @@ function FileUploader({
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
 
   return (
-    <section className="panel">
+    <div className="panel">
       <div className="panel-header">
         <h2>Upload / Refresh</h2>
       </div>
@@ -100,7 +100,7 @@ function FileUploader({
       </div>
 
       {error ? <p className="error-message">{error}</p> : null}
-    </section>
+    </div>
   )
 }
 

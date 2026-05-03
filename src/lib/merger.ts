@@ -465,7 +465,7 @@ export async function fetchRemoteExchangeData(
   const monthlyRates = buildMonthlyRates(dailyRatesWithFill)
 
   const effectiveBaseDate = dailyRatesWithFill.length > 0
-    ? dailyRatesWithFill[dailyRatesWithFill.length - 1].date
+    ? dailyRatesWithFill.reduce((max, row) => row.date > max ? row.date : max, dailyRatesWithFill[0].date)
     : (latestPayload?.date ??
        currencyApiLatestPayload?.date ??
        openErLatestPayload?.date ??

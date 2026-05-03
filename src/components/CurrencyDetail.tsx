@@ -38,27 +38,32 @@ function buildMatrix(
 ) {
   const filtered = rows.filter((row) => row.currency === currency && row.rateType === rateType)
 
-  const dayRows = Array.from({ length: 31 }, (_, idx) => {
+  return Array.from({ length: 31 }, (_, idx) => {
     const day = idx + 1
-
-    const values = monthColumns.map(({ year, month }) => {
-      const value = filtered.find((row) => row.year === year && row.month === month && row.day === day)
-      return value
-    })
+    const values = monthColumns.map(({ year, month }) =>
+      filtered.find((row) => row.year === year && row.month === month && row.day === day),
+    )
 
     return {
       day,
       values,
     }
   })
+}
 
-  return dayRows
+type MatrixRow = ReturnType<typeof buildMatrix>[number]
+
+function getTooltipSource(item: unknown): string {
+  if (typeof item !== 'object' || item === null || !('payload' in item)) {
+    return 'API'
+  }
+
+  const payload = (item as { payload?: { source?: unknown } }).payload
+  return payload?.source === 'IMPUTED' ? '보정' : 'API'
 }
 
 function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: CurrencyDetailProps) {
-  const defaultCurrency =
-    currencyFilter === 'ALL' ? 'BRL' : (currencyFilter as CurrencyCode)
-  const currency = defaultCurrency
+  const currency = currencyFilter === 'ALL' ? 'BRL' : (currencyFilter as CurrencyCode)
 
   const fromValue = periodFrom ? periodToNumber(periodFrom) : 0
   const toValue = periodTo ? periodToNumber(periodTo) : Number.MAX_SAFE_INTEGER
@@ -101,23 +106,19 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
   )
 
   const dailySeries = useMemo(
-    () => {
-      const filtered = data.dailyRates
+    () =>
+      data.dailyRates
         .filter((row) => {
           const ym = row.year * 100 + row.month
           return row.currency === currency && row.rateType === 'LOCAL_PER_USD' && ym >= fromValue && ym <= toValue
         })
         .sort((a, b) => a.date.localeCompare(b.date))
-
-      return filtered.map((row) => {
-        return {
+        .map((row) => ({
           ts: new Date(`${row.date}T00:00:00Z`).getTime(),
           fullDate: row.date,
           value: typeof row.value === 'number' ? row.value : null,
           source: row.source,
-        }
-      })
-    },
+        })),
     [currency, data.dailyRates, fromValue, toValue],
   )
 
@@ -135,26 +136,24 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
   }, [dailySeries])
 
   const monthlyAvg = (rateType: 'LOCAL_PER_USD' | 'KRW', year: number, month: number) => {
-    const row = data.monthlyRates.find(
+    return data.monthlyRates.find(
       (item) =>
         item.currency === currency &&
         item.year === year &&
         item.month === month &&
         item.rateType === rateType,
     )
-
-    return row
   }
 
   const renderMatrix = (rateType: 'LOCAL_PER_USD' | 'KRW') => {
-    const matrix = rateType === 'LOCAL_PER_USD' ? localMatrix : []
+    const matrix: MatrixRow[] = rateType === 'LOCAL_PER_USD' ? localMatrix : []
 
     return (
       <div className="table-scroll">
         <table className="dense-table">
           <thead>
             <tr>
-              <th>Day</th>
+              <th>일자</th>
               {monthColumns.map(({ year, month }) => (
                 <th key={`${rateType}-${year}-${month}`}>
                   {String(year).slice(2)}.{String(month).padStart(2, '0')}
@@ -163,10 +162,10 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
             </tr>
           </thead>
           <tbody>
-            {matrix.map((row: any) => (
+            {matrix.map((row) => (
               <tr key={`${rateType}-day-${row.day}`}>
                 <td>{row.day}</td>
-                {row.values.map((item: any, idx: number) => {
+                {row.values.map((item, idx) => {
                   const classes = [item?.status === 'zero' ? 'cell-zero' : '']
 
                   if (item?.source === 'IMPUTED' && item?.imputationMethod === 'FFILL') {
@@ -181,7 +180,7 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                         rateType === 'KRW' ? 'KRW' : currency,
                       )}
                       {item?.source === 'IMPUTED' && item?.imputationMethod === 'FFILL' ? (
-                        <span className="imputed-badge" title="휴일/결측으로 전일값 보정">휴</span>
+                        <span className="imputed-badge" title="휴일 또는 결측으로 전일값 보정">보</span>
                       ) : null}
                     </td>
                   )
@@ -210,18 +209,19 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
   }
 
   return (
-    <section className="panel">
+    <div className="panel">
       <div className="panel-header">
-        <h2>Daily Trend</h2>
+        <div>
+          <h2>일별 추이</h2>
+          <p className="table-help">{currency} 기준 일별 환율과 기간 평균입니다.</p>
+        </div>
       </div>
 
-      <article className="chart-card">
-        <h3>
-          {periodFrom} ~ {periodTo} 일별 환율
-        </h3>
+      <div className="chart-card">
+        <h3>{periodFrom} ~ {periodTo} 일별 환율</h3>
         <ResponsiveContainer width="100%" height={320}>
           <LineChart data={dailySeries}>
-            <CartesianGrid strokeDasharray="3 3" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceff3" />
             <XAxis
               type="number"
               dataKey="ts"
@@ -236,35 +236,45 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
             <YAxis domain={(['auto', 'auto'] as const)} tickFormatter={(v: number) => v.toLocaleString()} width={80} />
             <Tooltip
               labelFormatter={(_label, payload) => payload?.[0]?.payload?.fullDate ?? ''}
-              formatter={(value: any, _name: any, item: any) => {
+              formatter={(value: unknown, _name: unknown, item: unknown) => {
                 const formatted = typeof value === 'number'
                   ? value.toLocaleString(undefined, { maximumFractionDigits: 4 })
-                  : value
+                  : String(value ?? '')
 
-                const source = item?.payload?.source === 'IMPUTED' ? '보정' : 'API'
+                const source = getTooltipSource(item)
                 return [formatted, `일별 환율 (${source})`]
+              }}
+              contentStyle={{
+                borderRadius: '6px',
+                border: '1px solid #d9dee7',
+                boxShadow: 'none',
               }}
             />
             {periodAverage !== null ? (
               <ReferenceLine
                 y={periodAverage}
-                stroke="#b34a4a"
+                stroke="#93691d"
                 strokeDasharray="5 5"
-                label={{ value: `평균 ${periodAverage.toLocaleString(undefined, { maximumFractionDigits: 2 })}`, position: 'insideTopRight', fill: '#8f3d3d', fontSize: 11 }}
+                label={{
+                  value: `평균 ${periodAverage.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                  position: 'insideTopRight',
+                  fill: '#93691d',
+                  fontSize: 11,
+                }}
               />
             ) : null}
-            <Line type="monotone" dataKey="value" stroke="#1f3c88" strokeWidth={2} dot={false} activeDot={false} />
+            <Line type="monotone" dataKey="value" stroke="#1f2a44" strokeWidth={2} dot={false} activeDot={false} />
           </LineChart>
         </ResponsiveContainer>
-      </article>
+      </div>
 
-      <article className="table-card">
-        <h3>Exchange Rate (1 Dollar Exchange Rate)</h3>
-        <p className="table-help">표시: <span className="imputed-badge">휴</span> = 휴일/결측으로 전일값 보정</p>
-        <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
+      <div className="table-card" style={{ marginTop: 12 }}>
+        <h3>일별 환율표</h3>
+        <p className="table-help">표시: <span className="imputed-badge">보</span> = 휴일 또는 결측 보정값</p>
+        <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
         {renderMatrix('LOCAL_PER_USD')}
-      </article>
-    </section>
+      </div>
+    </div>
   )
 }
 

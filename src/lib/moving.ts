@@ -209,11 +209,11 @@ export function buildMovingComparisonRows(
     { label: '평균(실적)', values: avgActual, isPercent: false },
     { label: '누적(1월~현재)', values: cumulative, isPercent: false },
     { label: '선행', values: leading, isPercent: false },
-    { label: '선행 比', values: leadingVs, isPercent: true },
+    { label: '선행 대비', values: leadingVs, isPercent: true },
     { label: '이동', values: moving, isPercent: false },
-    { label: '이동 比', values: movingVs, isPercent: true },
-    { label: '전년동월누적', values: lastYearCumulative, isPercent: false },
-    { label: '전년동월누적比', values: yoyVs, isPercent: true },
+    { label: '이동 대비', values: movingVs, isPercent: true },
+    { label: '전년 동월 누적', values: lastYearCumulative, isPercent: false },
+    { label: '전년 동월 대비', values: yoyVs, isPercent: true },
   ]
 
   return [...dayRows, ...summaryRows].map((row) => ({

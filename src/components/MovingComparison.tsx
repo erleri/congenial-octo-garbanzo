@@ -22,11 +22,30 @@ const COLUMNS: Array<{ key: MovingColumn; label: string }> = [
   { key: 'GTQ', label: 'GTQ' },
   { key: 'UYU', label: 'UYU' },
   { key: 'CNY', label: 'CNY' },
-  { key: 'OIL', label: '원유가(U$/bbl)' },
+  { key: 'OIL', label: '유가' },
 ]
 
 const TARGET_CURRENCIES: CurrencyCode[] = ['USD', 'BRL', 'MXN', 'COP', 'CLP', 'PEN']
-const REST_CURRENCIES: CurrencyCode[] = CURRENCIES.filter(c => !TARGET_CURRENCIES.includes(c))
+const REST_CURRENCIES: CurrencyCode[] = CURRENCIES.filter((currency) => !TARGET_CURRENCIES.includes(currency))
+
+function formatMovingValue(value: number | null, column: MovingColumn, isPercent: boolean): string {
+  if (column === 'OIL') {
+    if (value === null) {
+      return '-'
+    }
+
+    if (isPercent) {
+      return `${(value * 100).toFixed(2)}%`
+    }
+
+    return new Intl.NumberFormat('ko-KR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value)
+  }
+
+  return formatCellValue(value, value !== null ? 'ok' : 'empty', column === 'KRW' ? 'KRW' : column, isPercent)
+}
 
 function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparisonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -46,12 +65,12 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
 
   const handlePlanChange = (type: 'leading' | 'moving', currency: CurrencyCode, valueStr: string) => {
     const value = valueStr === '' ? undefined : Number(valueStr)
-    setTempPlan(prev => ({
+    setTempPlan((prev) => ({
       ...prev,
       [type]: {
         ...prev[type],
-        [currency]: value
-      }
+        [currency]: value,
+      },
     }))
   }
 
@@ -61,70 +80,64 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
   }
 
   const renderCurrencyRow = (currency: CurrencyCode, isTarget: boolean) => (
-    <tr key={currency} style={{ opacity: isTarget ? 1 : 0.6 }}>
-      <td>{currency === 'USD' ? 'USD (원/달러)' : currency}</td>
+    <tr key={currency} style={{ opacity: isTarget ? 1 : 0.62 }}>
+      <td>{currency === 'USD' ? 'USD (KRW)' : currency}</td>
       <td>
-        <input 
-          type="number" 
+        <input
+          type="number"
           step="0.0001"
           value={tempPlan.leading[currency] ?? ''}
-          onChange={(e) => handlePlanChange('leading', currency, e.target.value)}
-          style={{ width: '120px', padding: '4px', border: '1px solid #ccc', borderRadius: '4px' }}
-          placeholder="미입력 시 평균값"
+          onChange={(event) => handlePlanChange('leading', currency, event.target.value)}
+          placeholder="자동 평균"
         />
       </td>
       <td>
-        <input 
-          type="number" 
+        <input
+          type="number"
           step="0.0001"
           value={tempPlan.moving[currency] ?? ''}
-          onChange={(e) => handlePlanChange('moving', currency, e.target.value)}
-          style={{ width: '120px', padding: '4px', border: '1px solid #ccc', borderRadius: '4px' }}
-          placeholder="미입력 시 평균값"
+          onChange={(event) => handlePlanChange('moving', currency, event.target.value)}
+          placeholder="자동 평균"
         />
       </td>
     </tr>
   )
 
   return (
-    <section className="panel">
-      <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Moving vs Actual</h2>
-        <button type="button" onClick={openModal} className="primary">계획 환율 입력</button>
+    <div className="panel">
+      <div className="panel-header-inline">
+        <div>
+          <h2>계획 대비</h2>
+          <p className="table-help">이동/선행 평균값과 실제 환율을 비교합니다.</p>
+        </div>
+        <button type="button" onClick={openModal} className="quiet-button">계획 환율 입력</button>
       </div>
 
-      <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
+      <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
       <div className="moving-table-wrapper">
         <table className="dense-table">
           <thead>
             <tr>
-              <th>항목</th>
-              {COLUMNS.map((column) => (
-                <th key={column.key}>{column.label}</th>
+              <th rowSpan={2}>항목</th>
+              <th colSpan={COLUMNS.length}>통화별 환율</th>
+            </tr>
+            <tr>
+              {COLUMNS.map((col) => (
+                <th key={col.key}>{col.label}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.label}>
-                <td>{row.label}</td>
-                {COLUMNS.map((column) => {
-                  const value = row.values[column.key]
-                  const className =
-                    row.isPercent && typeof value === 'number'
-                      ? value >= 0
-                        ? 'cell-up'
-                        : 'cell-down'
-                      : ''
-
+              <tr key={row.label} className={row.isPercent ? 'row-percent' : ''}>
+                <td style={{ whiteSpace: 'nowrap', fontWeight: row.isPercent ? 650 : 450 }}>
+                  {row.label}
+                </td>
+                {COLUMNS.map((col) => {
+                  const val = row.values[col.key]
                   return (
-                    <td key={`${row.label}-${column.key}`} className={className}>
-                      {formatCellValue(
-                        value,
-                        value === null ? 'empty' : 'ok',
-                        column.key === 'KRW' ? 'KRW' : 'USD',
-                        row.isPercent,
-                      )}
+                    <td key={`${row.label}-${col.key}`}>
+                      {formatMovingValue(val, col.key, row.isPercent)}
                     </td>
                   )
                 })}
@@ -133,47 +146,46 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
           </tbody>
         </table>
       </div>
-      <p style={{ marginTop: '12px', fontSize: '12px', color: '#6a7790', fontWeight: 500 }}>
-        * 계획 환율 미입력 시, 해당 통화의 선행 및 이동 환율은 주변 3개월 평균값으로 자동 계산됩니다.
+      <p className="table-help" style={{ marginTop: 10 }}>
+        계획 환율을 입력하지 않은 통화는 최근 3개월 평균값으로 자동 계산합니다.
       </p>
 
       {isModalOpen && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h3>선행 및 이동 계획 환율 설정 (당월 기준)</h3>
-            <p style={{ margin: '8px 0', fontSize: '13px', color: '#5b6778' }}>
-              각 국가별 환율을 달러(USD) 기준으로 입력해주세요. (예: 1 USD = 5.2 BRL)<br/>
-              단, USD 항목에는 달러/원(KRW) 환율을 입력합니다. (예: 1 USD = 1400 KRW)
+          <div className="modal-content" style={{ maxWidth: 650 }}>
+            <h3>계획 환율 설정</h3>
+            <p>
+              각 통화의 USD 기준 계획 환율을 입력합니다. USD 항목에는 1 USD 기준 KRW 값을 입력합니다.
             </p>
-            
+
             <div className="table-scroll" style={{ margin: '16px 0' }}>
               <table className="dense-table" style={{ minWidth: '100%' }}>
-                <thead style={{ position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
+                <thead>
                   <tr>
                     <th>통화</th>
-                    <th>선행 환율 (Leading)</th>
-                    <th>이동 환율 (Moving)</th>
+                    <th>선행 환율</th>
+                    <th>이동 환율</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {TARGET_CURRENCIES.map(currency => renderCurrencyRow(currency, true))}
+                  {TARGET_CURRENCIES.map((currency) => renderCurrencyRow(currency, true))}
                   <tr>
-                    <td colSpan={3} style={{ background: '#f1f5f9', textAlign: 'center', fontSize: '11px', color: '#64748b', padding: '6px' }}>
-                      기타 통화 (입력 불필요)
+                    <td colSpan={3} style={{ textAlign: 'center', color: '#667085' }}>
+                      기타 통화
                     </td>
                   </tr>
-                  {REST_CURRENCIES.map(currency => renderCurrencyRow(currency, false))}
+                  {REST_CURRENCIES.map((currency) => renderCurrencyRow(currency, false))}
                 </tbody>
               </table>
             </div>
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '16px' }}>
-              <button type="button" onClick={() => setIsModalOpen(false)} style={{ padding: '6px 16px' }}>취소</button>
-              <button type="button" onClick={handleSave} className="primary" style={{ padding: '6px 16px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>저장</button>
+            <div className="inline-controls" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="quiet-button">취소</button>
+              <button type="button" onClick={handleSave} className="header-refresh-button">저장</button>
             </div>
           </div>
         </div>
       )}
-    </section>
+    </div>
   )
 }
 

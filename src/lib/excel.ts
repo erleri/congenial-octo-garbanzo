@@ -104,7 +104,8 @@ function detectColumnMapping(
       const cell = getCellValue(sheet, rows, r, c);
       const ym = parseYearMonthFromHeader(toDisplayString(cell));
       if (ym) {
-        let { year, month } = ym;
+        let { year } = ym;
+        const { month } = ym;
         if (year === 0 && lastYear !== 0) year = lastYear;
         if (year !== 0) {
           mapping.set(c, { year, month });
@@ -129,7 +130,6 @@ function detectColumnMapping(
 }
 
 export function parseSummarySheet(
-  sheet: XLSX.WorkSheet,
   rows: (string | number | null)[][],
   rateType: 'LOCAL_PER_USD' | 'KRW',
   marker: string,
@@ -188,7 +188,6 @@ export function parseSummarySheet(
 }
 
 export function parseCurrencySheet(
-  sheet: XLSX.WorkSheet,
   rows: (string | number | null)[][],
   currency: CurrencyCode,
   mapping: Map<number, { year: number; month: number }>
@@ -301,8 +300,8 @@ export async function parseExcelWorkbook(file: File): Promise<{
   const summaryMapping = detectColumnMapping(summarySheet, summaryRows)
 
   const summaryMonthly = [
-    ...parseSummarySheet(summarySheet, summaryRows, 'LOCAL_PER_USD', 'LOCAL', summaryMapping),
-    ...parseSummarySheet(summarySheet, summaryRows, 'KRW', 'KRW', summaryMapping),
+    ...parseSummarySheet(summaryRows, 'LOCAL_PER_USD', 'LOCAL', summaryMapping),
+    ...parseSummarySheet(summaryRows, 'KRW', 'KRW', summaryMapping),
   ]
 
   const currencyParsed = CURRENCIES.flatMap((currency) => {
@@ -318,7 +317,7 @@ export async function parseExcelWorkbook(file: File): Promise<{
     })
 
     const mapping = detectColumnMapping(sheet, rows)
-    return [parseCurrencySheet(sheet, rows, currency, mapping)]
+    return [parseCurrencySheet(rows, currency, mapping)]
   })
 
   const dailyRates = currencyParsed.flatMap((item) => item.daily)

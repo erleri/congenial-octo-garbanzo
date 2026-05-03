@@ -19,7 +19,10 @@ export function formatCellValue(
     return `${(value * 100).toFixed(2)}%`
   }
 
-  const rule = CURRENCY_FORMAT_RULES[currency]
+  const rule = CURRENCY_FORMAT_RULES[currency as CurrencyCode] || {
+    minFractionDigits: 2,
+    maxFractionDigits: 2,
+  }
 
   return new Intl.NumberFormat('ko-KR', {
     minimumFractionDigits: rule.minFractionDigits,

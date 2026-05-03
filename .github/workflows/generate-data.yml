@@ -1,19 +1,20 @@
-name: Generate Static Dataset
+name: Daily Dashboard Email
 
 on:
   workflow_dispatch:
   schedule:
+    # 09:15 KST every day.
     - cron: '15 0 * * *'
 
 permissions:
   contents: write
 
 concurrency:
-  group: generate-static-dataset
+  group: daily-dashboard-email
   cancel-in-progress: false
 
 jobs:
-  generate-data:
+  generate-data-and-send-email:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,7 +24,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20.19.0
           cache: npm
 
       - name: Install dependencies
@@ -34,6 +35,51 @@ jobs:
         env:
           VITE_EXCHANGERATE_API_KEY: ${{ secrets.VITE_EXCHANGERATE_API_KEY }}
           VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+
+      - name: Read dataset metadata
+        id: dataset
+        run: |
+          BASE_DATE=$(jq -r '.baseDate // empty' public/data.json)
+          FETCHED_AT=$(jq -r '.fetchedAt // empty' public/data.json)
+
+          if [ -z "$BASE_DATE" ]; then
+            echo "public/data.json is missing baseDate" >&2
+            exit 1
+          fi
+
+          echo "base_date=$BASE_DATE" >> "$GITHUB_OUTPUT"
+          echo "fetched_at=$FETCHED_AT" >> "$GITHUB_OUTPUT"
+
+      - name: Compose email metadata
+        id: email
+        env:
+          BASE_DATE: ${{ steps.dataset.outputs.base_date }}
+          FETCHED_AT: ${{ steps.dataset.outputs.fetched_at }}
+        run: |
+          python - <<'PY'
+          import os
+
+          base_date = os.environ["BASE_DATE"]
+          fetched_at = os.environ.get("FETCHED_AT") or "-"
+          subject = f"[LATAM FX] {base_date} \uc911\ub0a8\ubbf8 \ud658\uc728 \ub300\uc2dc\ubcf4\ub4dc"
+          html = f"""\
+          <h2>LATAM FX \uc77c\uc77c \ub300\uc2dc\ubcf4\ub4dc</h2>
+          <p>\uc5c5\ub370\uc774\ud2b8\ub41c \uccab \ub300\uc2dc\ubcf4\ub4dc \ud654\uba74\uc744 \ucca8\ubd80\ud588\uc2b5\ub2c8\ub2e4.</p>
+          <ul>
+            <li><strong>\uae30\uc900\uc77c</strong>: {base_date}</li>
+            <li><strong>\ucd5c\uc885 \uac31\uc2e0</strong>: {fetched_at}</li>
+            <li><strong>\ub370\uc774\ud130 \ucd9c\ucc98</strong>: ExchangeRate API, Alpha Vantage, \ubcf4\uc815 \ub370\uc774\ud130</li>
+            <li><strong>\ubcf4\uc815 \ud3ec\ud568</strong>: \uc608</li>
+          </ul>
+          <p>\uc0c1\uc138 \ud654\uba74: <a href="https://latamforex.netlify.app/">LATAM FX Dashboard</a></p>
+          """
+
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              print(f"subject={subject}", file=output)
+              print("html_body<<HTML", file=output)
+              print(html, file=output)
+              print("HTML", file=output)
+          PY
 
       - name: Commit updated dataset
         run: |
@@ -54,26 +100,49 @@ jobs:
         run: npm run build
 
       - name: Start preview server
-        run: npm run preview -- --port 4173 &
-        
-      - name: Wait for server
-        run: sleep 5
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > preview.log 2>&1 &
+          echo $! > preview.pid
 
-      - name: Take Dashboard Screenshot
+      - name: Wait for preview server
+        run: |
+          for i in {1..60}; do
+            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then
+              echo "Preview server is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Preview server did not become ready" >&2
+          cat preview.log >&2
+          exit 1
+
+      - name: Take and validate dashboard screenshot
         run: node scripts/take-screenshot.js
+        env:
+          DASHBOARD_URL: http://127.0.0.1:4173/
 
-      - name: Get Mailing List
+      - name: Validate mailing list
         id: mailing
         run: |
-          if [ -f "data/mailing_list.json" ]; then
-            EMAILS=$(jq -r 'join(",")' data/mailing_list.json)
-            echo "emails=$EMAILS" >> $GITHUB_OUTPUT
-          else
-            echo "emails=" >> $GITHUB_OUTPUT
+          if [ ! -f "data/mailing_list.json" ]; then
+            echo "No mailing list file found; email will be skipped."
+            echo "emails=" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
 
-      - name: Send Email
-        if: steps.mailing.outputs.emails != '' && steps.mailing.outputs.emails != 'null'
+          jq -e 'type == "array" and all(.[]; type == "string" and test("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))' data/mailing_list.json > /dev/null
+
+          EMAILS=$(jq -r 'join(",")' data/mailing_list.json)
+          if [ -z "$EMAILS" ]; then
+            echo "Mailing list is empty; email will be skipped."
+          fi
+
+          echo "emails=$EMAILS" >> "$GITHUB_OUTPUT"
+
+      - name: Send dashboard email
+        if: steps.mailing.outputs.emails != ''
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
@@ -81,8 +150,19 @@ jobs:
           secure: true
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "📊 [일일 리포트] 중남미 환율 대시보드"
+          subject: ${{ steps.email.outputs.subject }}
           to: ${{ steps.mailing.outputs.emails }}
-          from: "환율 대시보드 관리자"
-          html_body: "<h2>오늘의 최신 중남미 환율 대시보드입니다.</h2><p>본 메일은 자동화 시스템에 의해 매일 발송됩니다. 자세한 내용은 첨부된 스크린샷 이미지(dashboard.png)를 확인해 주세요.</p>"
-          attachments: "dashboard.png"
+          from: "LATAM FX Admin <${{ secrets.SMTP_USERNAME }}>"
+          html_body: ${{ steps.email.outputs.html_body }}
+          attachments: dashboard.png
+
+      - name: Upload dashboard artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-dashboard-email-${{ steps.dataset.outputs.base_date || github.run_id }}
+          path: |
+            dashboard.png
+            dashboard-meta.json
+            preview.log
+          if-no-files-found: warn

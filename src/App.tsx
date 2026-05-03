@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import Dashboard from './components/Dashboard'
 const Admin = lazy(() => import('./components/Admin'))
 const CurrencyDetail = lazy(() => import('./components/CurrencyDetail'))
@@ -17,18 +17,29 @@ type ScreenKey =
   | 'admin'
 
 const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'monthly', label: 'Monthly History' },
-  { key: 'currency', label: 'Daily Trend' },
-  { key: 'moving', label: 'Moving vs Actual' },
-  { key: 'admin', label: 'Admin' },
+  { key: 'dashboard', label: '대시보드' },
+  { key: 'monthly', label: '월별 내역' },
+  { key: 'currency', label: '일별 추이' },
+  { key: 'moving', label: '계획 대비' },
+  { key: 'admin', label: '관리' },
 ]
 
 function periodToNumber(period: string): number {
   const [yearText, monthText] = period.split('-')
-  const year = Number(yearText)
-  const month = Number(monthText)
-  return year * 100 + month
+  return Number(yearText) * 100 + Number(monthText)
+}
+
+function formatDateTime(value?: string): string {
+  if (!value) {
+    return '-'
+  }
+
+  return new Date(value).toLocaleString('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 function App() {
@@ -39,26 +50,7 @@ function App() {
   const [periodTo, setPeriodTo] = useState('')
   const [yearFrom, setYearFrom] = useState<number | null>(null)
   const [yearTo, setYearTo] = useState<number | null>(null)
-  const [scale, setScale] = useState(1)
 
-  useEffect(() => {
-    const handleResize = () => {
-      // PC 해상도(1200px 이상)일 때, 1600x920 크기의 가상 캔버스를 화면에 딱 맞춤
-      if (window.innerWidth >= 1200) {
-        const scaleX = window.innerWidth / 1600
-        const scaleY = window.innerHeight / 920
-        // 스크롤바가 생기지 않도록 너비와 높이 중 더 작은 배율을 선택
-        setScale(Math.min(scaleX, scaleY))
-      } else {
-        setScale(1)
-      }
-    }
-
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-  
   const {
     dataset,
     loading,
@@ -108,13 +100,18 @@ function App() {
 
     const latest = periodOptions[periodOptions.length - 1]
     const defaultFrom = periodOptions[Math.max(0, periodOptions.length - 2)]
+    const isPeriodToStale =
+      periodTo &&
+      periodOptions.includes(periodTo) &&
+      periodTo !== latest &&
+      periodToNumber(periodTo) < periodToNumber(latest)
 
     if (!periodFrom || !periodOptions.includes(periodFrom)) {
-      setPeriodFrom(defaultFrom)
+      window.setTimeout(() => setPeriodFrom(defaultFrom), 0)
     }
 
-    if (!periodTo || !periodOptions.includes(periodTo)) {
-      setPeriodTo(latest)
+    if (!periodTo || !periodOptions.includes(periodTo) || isPeriodToStale) {
+      window.setTimeout(() => setPeriodTo(latest), 0)
     }
   }, [periodFrom, periodOptions, periodTo])
 
@@ -125,13 +122,14 @@ function App() {
 
     const latest = yearOptions[yearOptions.length - 1]
     const defaultFrom = yearOptions[Math.max(0, yearOptions.length - 2)]
+    const isYearToStale = yearTo !== null && yearOptions.includes(yearTo) && yearTo < latest
 
     if (yearFrom === null || !yearOptions.includes(yearFrom)) {
-      setYearFrom(defaultFrom)
+      window.setTimeout(() => setYearFrom(defaultFrom), 0)
     }
 
-    if (yearTo === null || !yearOptions.includes(yearTo)) {
-      setYearTo(latest)
+    if (yearTo === null || !yearOptions.includes(yearTo) || isYearToStale) {
+      window.setTimeout(() => setYearTo(latest), 0)
     }
   }, [yearFrom, yearOptions, yearTo])
 
@@ -184,7 +182,7 @@ function App() {
     }
 
     if (yearTo === null || !monthlyToOptions.includes(yearTo)) {
-      setYearTo(monthlyToOptions[monthlyToOptions.length - 1])
+      window.setTimeout(() => setYearTo(monthlyToOptions[monthlyToOptions.length - 1]), 0)
     }
   }, [monthlyToOptions, yearTo])
 
@@ -194,17 +192,17 @@ function App() {
     }
 
     if (!periodTo || !dailyToOptions.includes(periodTo)) {
-      setPeriodTo(dailyToOptions[dailyToOptions.length - 1])
+      window.setTimeout(() => setPeriodTo(dailyToOptions[dailyToOptions.length - 1]), 0)
     }
   }, [dailyToOptions, periodTo])
 
   const content = useMemo(() => {
     if (!dataset) {
       return (
-        <section className="panel empty">
+        <div className="panel empty">
           <h2>데이터를 불러오는 중입니다.</h2>
-          {error ? <p className="error-message">{error}</p> : null}
-        </section>
+          <p className="table-help">네트워크와 정적 데이터 파일 상태를 확인하고 있습니다.</p>
+        </div>
       )
     }
 
@@ -232,10 +230,10 @@ function App() {
         )
       case 'moving':
         return (
-          <MovingComparison 
-            data={dataset} 
-            businessPlan={businessPlan} 
-            onUpdatePlan={updateBusinessPlan} 
+          <MovingComparison
+            data={dataset}
+            businessPlan={businessPlan}
+            onUpdatePlan={updateBusinessPlan}
           />
         )
       case 'admin':
@@ -255,30 +253,30 @@ function App() {
     dataset,
     error,
     excelPriority,
+    effectivePeriodFrom,
+    effectivePeriodTo,
+    effectiveYearFrom,
+    effectiveYearTo,
     fillMissing,
     filters,
-    loading,
     monthlyCurrency,
     screen,
-    setFilters,
-    refreshData,
     uploadAndMergeExcel,
     businessPlan,
-    updateBusinessPlan
+    updateBusinessPlan,
   ])
 
   return (
-    <div className="app-shell" style={{ zoom: scale } as React.CSSProperties}>
+    <div className="app-shell">
       <header className="top-header">
         <div className="title-wrap">
           <h1>
-            <span className="title-primary">중남미 환율 대시보드</span>
-            <span className="title-secondary">LATAM FX Dashboard</span>
+            <span className="title-primary">LATAM FX</span>
+            <span className="title-secondary">환율 대시보드</span>
           </h1>
-          <p>외부 환율 API 수집 기반 · Built by Imjun Koo</p>
         </div>
 
-        <nav className="screen-nav">
+        <nav className="screen-nav" aria-label="화면 선택">
           {SCREEN_OPTIONS.map((option) => (
             <button
               key={option.key}
@@ -289,23 +287,34 @@ function App() {
               {option.label}
             </button>
           ))}
-          <button type="button" className="header-refresh-button" onClick={() => void refreshData()} disabled={loading}>
-            {loading ? '갱신 중...' : 'Refresh'}
-          </button>
         </nav>
+
+        <div className="header-actions">
+          <div className="status-group">
+            <span className="status-item">
+              <span className={`status-dot ${loading ? 'loading' : error ? 'error' : ''}`} />
+              {loading ? '갱신 중' : error ? '확인 필요' : '정상'}
+            </span>
+            <span className="status-item">기준일 {dataset?.baseDate ?? '-'}</span>
+            <span className="status-item">최종 갱신 {formatDateTime(dataset?.fetchedAt)}</span>
+          </div>
+          <button type="button" className="header-refresh-button" onClick={() => void refreshData()} disabled={loading}>
+            {loading ? '갱신 중' : 'Refresh'}
+          </button>
+        </div>
 
         {showHeaderFilters && (
           <div className="header-controls">
-            <section className="global-filters">
+            <div className="global-filters">
               {screen === 'monthly' && (
                 <>
                   <label>
-                    <span className="filter-label">From</span>
+                    <span className="filter-label">시작 연도</span>
                     <select
-                      title="From"
+                      title="시작 연도"
                       value={yearFrom ?? ''}
                       onChange={(event) => setYearFrom(Number(event.target.value))}
-                      aria-label="From"
+                      aria-label="시작 연도"
                     >
                       {yearOptions.map((year) => (
                         <option key={`from-year-${year}`} value={year}>
@@ -316,14 +325,14 @@ function App() {
                   </label>
 
                   <label>
-                    <span className="filter-label">To</span>
+                    <span className="filter-label">종료 연도</span>
                     <select
-                      title="To"
+                      title="종료 연도"
                       value={yearTo ?? ''}
                       onChange={(event) => setYearTo(Number(event.target.value))}
-                      aria-label="To"
+                      aria-label="종료 연도"
                     >
-                        {monthlyToOptions.map((year) => (
+                      {monthlyToOptions.map((year) => (
                         <option key={`to-year-${year}`} value={year}>
                           {year}
                         </option>
@@ -336,12 +345,12 @@ function App() {
               {screen === 'currency' && (
                 <>
                   <label>
-                    <span className="filter-label">From</span>
+                    <span className="filter-label">시작 월</span>
                     <select
-                      title="From"
+                      title="시작 월"
                       value={periodFrom}
                       onChange={(event) => setPeriodFrom(event.target.value)}
-                      aria-label="From"
+                      aria-label="시작 월"
                     >
                       {periodOptions.map((period) => (
                         <option key={`from-${period}`} value={period}>
@@ -352,14 +361,14 @@ function App() {
                   </label>
 
                   <label>
-                    <span className="filter-label">To</span>
+                    <span className="filter-label">종료 월</span>
                     <select
-                      title="To"
+                      title="종료 월"
                       value={periodTo}
                       onChange={(event) => setPeriodTo(event.target.value)}
-                      aria-label="To"
+                      aria-label="종료 월"
                     >
-                          {dailyToOptions.map((period) => (
+                      {dailyToOptions.map((period) => (
                         <option key={`to-${period}`} value={period}>
                           {period}
                         </option>
@@ -368,9 +377,9 @@ function App() {
                   </label>
 
                   <label>
-                    <span className="filter-label">Currency</span>
+                    <span className="filter-label">통화</span>
                     <select
-                      title="Currency"
+                      title="통화"
                       value={filters.currency}
                       onChange={(event) =>
                         setFilters((prev) => ({
@@ -378,7 +387,7 @@ function App() {
                           currency: event.target.value as DashboardFilters['currency'],
                         }))
                       }
-                      aria-label="Currency"
+                      aria-label="통화"
                     >
                       {CURRENCIES.map((item) => (
                         <option key={item} value={item}>
@@ -389,17 +398,19 @@ function App() {
                   </label>
                 </>
               )}
-            </section>
+            </div>
           </div>
         )}
       </header>
 
       <main>
-        <Suspense fallback={
-          <section className="panel empty" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-            <h2 style={{ color: '#5b6778' }}>화면을 불러오는 중입니다...</h2>
-          </section>
-        }>
+        <Suspense
+          fallback={
+            <div className="panel empty" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <h2 style={{ color: '#667085' }}>화면을 불러오는 중입니다.</h2>
+            </div>
+          }
+        >
           {content}
         </Suspense>
       </main>

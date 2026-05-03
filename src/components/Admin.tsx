@@ -62,7 +62,7 @@ function Admin({
       } else {
         setMailingList([])
       }
-    } catch (e) {
+    } catch {
       console.warn('Failed to load mailing list, API might not be available.')
     }
   }
@@ -72,16 +72,16 @@ function Admin({
       const res = await fetch('/api/mailing-list', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mailingList)
+        body: JSON.stringify(mailingList),
       })
       if (res.ok) {
-        alert('메일링 리스트가 저장되었습니다. 변경사항을 깃허브에 푸시해주세요.')
+        alert('메일링 리스트가 저장되었습니다. 변경 사항은 저장소에 반영해야 운영 환경에 적용됩니다.')
         setIsMailingModalOpen(false)
       } else {
-        alert('저장 실패: 로컬 개발 서버(npm run dev) 환경에서만 작동합니다.')
+        alert('저장 실패: 로컬 개발 서버에서만 동작합니다.')
       }
-    } catch (e) {
-      alert('저장 오류: 서버 연결 실패. 로컬 환경인지 확인하세요.')
+    } catch {
+      alert('저장 오류: 로컬 서버 연결을 확인해 주세요.')
     }
   }
 
@@ -94,7 +94,7 @@ function Admin({
   }
 
   const removeEmail = (emailToRemove: string) => {
-    setMailingList(mailingList.filter(e => e !== emailToRemove))
+    setMailingList(mailingList.filter((email) => email !== emailToRemove))
   }
 
   const selectedSheet = dataset?.rawSheets.find((sheet) => sheet.name === sheetName) ?? dataset?.rawSheets[0]
@@ -117,16 +117,19 @@ function Admin({
   }, [query, selectedSheet])
 
   return (
-    <section className="panel">
-      <div className="panel-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Admin</h2>
-        <button type="button" onClick={openMailingModal} className="primary" style={{ padding: '6px 12px', background: '#1f3c88', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-          메일링 리스트 관리
+    <div className="panel">
+      <div className="panel-header-inline">
+        <div>
+          <h2>관리</h2>
+          <p className="table-help">데이터 업로드, 원본 확인, 메일링 리스트를 관리합니다.</p>
+        </div>
+        <button type="button" onClick={openMailingModal} className="quiet-button">
+          메일링 리스트
         </button>
       </div>
 
-      <article className="table-card">
-        <h3>엑셀 업로드</h3>
+      <div className="table-card">
+        <h3>Excel 업로드</h3>
         <div className="inline-controls">
           <input
             type="file"
@@ -148,7 +151,7 @@ function Admin({
               checked={localExcelPriority}
               onChange={(event) => setLocalExcelPriority(event.target.checked)}
             />
-            엑셀 우선(EXCEL {'>'} API)
+            Excel 우선
           </label>
           <label>
             <input
@@ -156,15 +159,15 @@ function Admin({
               checked={localFillMissing}
               onChange={(event) => setLocalFillMissing(event.target.checked)}
             />
-            빈칸 자동 보정
+            보정 포함
           </label>
         </div>
-      </article>
+      </div>
 
-      <article className="table-card">
-        <h3>데이터 조회 및 내보내기</h3>
+      <div className="table-card" style={{ marginTop: 12 }}>
+        <h3>원본 데이터</h3>
         <div className="inline-controls" style={{ marginBottom: 8 }}>
-          <select value={sheetName} onChange={(event) => setSheetName(event.target.value)}>
+          <select value={sheetName} onChange={(event) => setSheetName(event.target.value)} aria-label="시트 선택">
             {dataset?.rawSheets.map((sheet) => (
               <option key={sheet.name} value={sheet.name}>
                 {sheet.name}
@@ -179,6 +182,7 @@ function Admin({
           />
           <button
             type="button"
+            className="quiet-button"
             disabled={!selectedSheet}
             onClick={() => {
               if (!selectedSheet) {
@@ -188,11 +192,11 @@ function Admin({
               downloadCsv(selectedSheet.name, selectedSheet.headers, filteredRows)
             }}
           >
-            CSV 다운로드
+            CSV 내보내기
           </button>
         </div>
 
-        <p className="mobile-table-hint">모바일에서는 표를 좌우로 밀어 전체 데이터를 볼 수 있습니다.</p>
+        <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
         <div className="table-scroll">
           <table className="dense-table">
             <thead>
@@ -213,10 +217,10 @@ function Admin({
             </tbody>
           </table>
         </div>
-      </article>
+      </div>
 
-      <article className="table-card">
-        <h3>데이터 통계</h3>
+      <div className="table-card" style={{ marginTop: 12 }}>
+        <h3>데이터 상태</h3>
         <div className="meta-grid">
           <div>
             <strong>기준일</strong>
@@ -235,50 +239,48 @@ function Admin({
             <div>{dataset?.monthlyRates.length.toLocaleString('ko-KR') ?? '0'}</div>
           </div>
         </div>
-      </article>
+      </div>
 
       {error ? <p className="error-message">{error}</p> : null}
 
       {isMailingModalOpen && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <h3>수신자 이메일 목록 관리</h3>
-            <p style={{ margin: '8px 0', fontSize: '13px', color: '#5b6778' }}>
-              매일 대시보드를 이메일로 받아볼 팀원들을 추가하세요. <br/>
-              <b>주의:</b> 이 설정은 로컬 서버에서만 저장 가능하며, 저장 후 깃허브에 Push해야 클라우드 메일 서버가 인식합니다.
+          <div className="modal-content">
+            <h3>메일링 리스트</h3>
+            <p>
+              일일 대시보드 리포트를 받을 이메일을 관리합니다. 로컬에서 저장한 뒤 저장소에 반영해야 운영 환경에 적용됩니다.
             </p>
-            
-            <div style={{ display: 'flex', gap: '8px', margin: '16px 0' }}>
-              <input 
-                type="email" 
+
+            <div className="inline-controls" style={{ margin: '16px 0' }}>
+              <input
+                type="email"
                 value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addEmail()}
-                placeholder="이메일 주소 입력"
-                style={{ flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                onChange={(event) => setNewEmail(event.target.value)}
+                onKeyDown={(event) => event.key === 'Enter' && addEmail()}
+                placeholder="이메일 주소"
               />
-              <button type="button" onClick={addEmail} style={{ padding: '8px 16px', background: '#e2e8f0', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>추가</button>
+              <button type="button" onClick={addEmail} className="quiet-button">추가</button>
             </div>
 
-            <div className="table-scroll" style={{ maxHeight: '250px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+            <div className="table-scroll" style={{ maxHeight: '250px' }}>
               <table className="dense-table" style={{ minWidth: '100%' }}>
-                <thead style={{ position: 'sticky', top: 0, background: '#f8fbff' }}>
+                <thead>
                   <tr>
-                    <th style={{ textAlign: 'left', padding: '8px' }}>이메일</th>
-                    <th style={{ width: '60px', textAlign: 'center', padding: '8px' }}>삭제</th>
+                    <th>이메일</th>
+                    <th>삭제</th>
                   </tr>
                 </thead>
                 <tbody>
                   {mailingList.length === 0 ? (
                     <tr>
-                      <td colSpan={2} style={{ textAlign: 'center', padding: '16px', color: '#94a3b8' }}>등록된 이메일이 없습니다.</td>
+                      <td colSpan={2}>등록된 이메일이 없습니다.</td>
                     </tr>
                   ) : (
-                    mailingList.map(email => (
+                    mailingList.map((email) => (
                       <tr key={email}>
-                        <td style={{ textAlign: 'left', padding: '8px' }}>{email}</td>
-                        <td style={{ textAlign: 'center', padding: '8px' }}>
-                          <button type="button" onClick={() => removeEmail(email)} style={{ color: '#ef4444', background: 'transparent', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>X</button>
+                        <td>{email}</td>
+                        <td>
+                          <button type="button" onClick={() => removeEmail(email)} className="quiet-button">삭제</button>
                         </td>
                       </tr>
                     ))
@@ -287,14 +289,14 @@ function Admin({
               </table>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '20px' }}>
-              <button type="button" onClick={() => setIsMailingModalOpen(false)} style={{ padding: '8px 16px', border: '1px solid #ccc', background: 'white', borderRadius: '4px', cursor: 'pointer' }}>취소</button>
-              <button type="button" onClick={saveMailingList} style={{ padding: '8px 16px', background: '#1f3c88', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>저장</button>
+            <div className="inline-controls" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
+              <button type="button" onClick={() => setIsMailingModalOpen(false)} className="quiet-button">취소</button>
+              <button type="button" onClick={saveMailingList} className="header-refresh-button">저장</button>
             </div>
           </div>
         </div>
       )}
-    </section>
+    </div>
   )
 }
 
