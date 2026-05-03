@@ -20,7 +20,10 @@ export interface BusinessPlan {
 export type CurrencyCode = (typeof CURRENCIES)[number]
 export type CurrencyFilter = CurrencyCode | 'ALL'
 
-export const YEARS = Array.from({ length: 17 }, (_, idx) => 2010 + idx)
+export const YEARS = Array.from(
+  { length: new Date().getFullYear() - 2010 + 1 },
+  (_, idx) => 2010 + idx,
+)
 export const MONTHS = Array.from({ length: 12 }, (_, idx) => idx + 1)
 
 export type RateType = 'LOCAL_PER_USD' | 'KRW' | 'MOVING_COMPARISON'

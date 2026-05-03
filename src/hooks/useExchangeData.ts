@@ -25,8 +25,8 @@ export function useExchangeData() {
 
   const [filters, setFilters] = useState<DashboardFilters>({
     currency: 'BRL',
-    year: 2026,
-    month: 4,
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
     rateType: 'LOCAL_PER_USD',
   })
 

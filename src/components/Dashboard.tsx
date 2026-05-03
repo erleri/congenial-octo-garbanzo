@@ -163,28 +163,29 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
       .filter((row) => row.rateType === 'LOCAL_PER_USD' && row.currency === currency)
       .sort((a, b) => a.date.localeCompare(b.date))
 
-    const currentMonthRows = currencyDaily.filter(
-      (row) => row.year === latestYear && row.month === latestMonth && row.date <= baseDateText
-    )
-
-    const points = currentMonthRows.map((row) => {
-      const currentDate = new Date(row.year, row.month - 1, row.day)
-      const past30Date = new Date(currentDate)
+    // 최근 30일 데이터 추출
+    const points = currencyDaily.slice(-30).map((row) => {
+      // 30일 이평선 계산을 위해 해당 시점 기준 과거 30일치 추출
+      const rowDate = new Date(row.date)
+      const past30Date = new Date(rowDate)
       past30Date.setDate(past30Date.getDate() - 29)
-      const past30Str = `${past30Date.getFullYear()}-${String(past30Date.getMonth() + 1).padStart(2, '0')}-${String(past30Date.getDate()).padStart(2, '0')}`
+      const past30Str = past30Date.toISOString().slice(0, 10)
 
       const windowValues = currencyDaily
-        .filter(r => r.date >= past30Str && r.date <= row.date && typeof r.value === 'number')
-        .map(r => r.value as number)
+        .filter((r) => r.date >= past30Str && r.date <= row.date && typeof r.value === 'number')
+        .map((r) => r.value as number)
 
       return {
-        day: `${row.day}일`,
+        day: `${row.month}/${row.day}`,
         value: row.value,
         ma30: windowValues.length ? average(windowValues) : null,
       }
     })
 
-    const allValues = points.flatMap(p => [p.value, p.ma30]).filter((v): v is number => v !== null)
+    const allValues = points
+      .flatMap((p) => [p.value, p.ma30])
+      .filter((v): v is number => v !== null)
+
     return {
       currency,
       points,
@@ -271,7 +272,7 @@ function Dashboard({ data, filters: _filters }: DashboardProps) {
       </article>
 
       <article className="chart-card chart-card-full dashboard-chart-card">
-        <h3>통화별 Local per USD 최신 일간 추이 ({latestMonth}월)</h3>
+        <h3>통화별 Local per USD 최신 일간 추이 (30일)</h3>
         <div className="small-multiple-row">
           {dailySeriesByCurrency.map((series) => (
             <div key={`daily-${series.currency}`} className="small-chart-card">

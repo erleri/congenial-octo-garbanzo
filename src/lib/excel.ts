@@ -11,6 +11,7 @@ import {
   parseBaseDateFromFilename,
   // parseDateParts,
   getYearMonthFromColumn,
+  parseYearMonthFromHeader,
   toDisplayString,
   toNumericCell,
   getStatus,
@@ -63,13 +64,82 @@ export function buildRawSheetsFromWorkbook(workbook: XLSX.WorkBook): RawSheet[] 
   })
 }
 
+/**
+ * Gets value from a cell, accounting for merged cells.
+ */
+function getCellValue(
+  sheet: XLSX.WorkSheet,
+  rows: (string | number | null)[][],
+  R: number,
+  C: number
+): string | number | null {
+  const cell = rows[R]?.[C];
+  if (cell !== null && cell !== undefined) return cell;
+
+  const merges = sheet['!merges'] || [];
+  for (const m of merges) {
+    if (R >= m.s.r && R <= m.e.r && C >= m.s.c && C <= m.e.c) {
+      return rows[m.s.r]?.[m.s.c] ?? null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Detects the mapping between column index and {year, month}.
+ */
+function detectColumnMapping(
+  sheet: XLSX.WorkSheet,
+  rows: (string | number | null)[][]
+): Map<number, { year: number; month: number }> {
+  const mapping = new Map<number, { year: number; month: number }>();
+  
+  // Scann first 10 rows to find header patterns
+  for (let r = 0; r < Math.min(rows.length, 10); r++) {
+    const row = rows[r];
+    let foundCount = 0;
+    let lastYear = 0;
+
+    for (let c = 1; c < row.length; c++) {
+      const cell = getCellValue(sheet, rows, r, c);
+      const ym = parseYearMonthFromHeader(toDisplayString(cell));
+      if (ym) {
+        let { year, month } = ym;
+        if (year === 0 && lastYear !== 0) year = lastYear;
+        if (year !== 0) {
+          mapping.set(c, { year, month });
+          lastYear = year;
+          foundCount++;
+        }
+      }
+    }
+
+    // If we found multiple month headers in this row, we assume it's the header row
+    if (foundCount >= 3) {
+      return mapping;
+    }
+  }
+
+  // Fallback to hardcoded mapping if no header found
+  for (let c = 1; c < 100; c++) {
+    const ym = getYearMonthFromColumn(c);
+    if (ym) mapping.set(c, ym);
+  }
+  return mapping;
+}
+
 export function parseSummarySheet(
+  sheet: XLSX.WorkSheet,
   rows: (string | number | null)[][],
   rateType: 'LOCAL_PER_USD' | 'KRW',
   marker: string,
+  mapping: Map<number, { year: number; month: number }>
 ): MonthlyRate[] {
   const sectionStart = rows.findIndex((row) =>
-    row.some((cell) => toDisplayString(cell).toUpperCase().includes(marker)),
+    row.some((cell) => {
+      const text = toDisplayString(cell).toUpperCase();
+      return text.includes(marker) || (marker === 'LOCAL' && text.includes('1 DOLLAR'));
+    }),
   )
 
   if (sectionStart < 0) {
@@ -95,7 +165,7 @@ export function parseSummarySheet(
 
     const currency = currencyText as CurrencyCode
     for (let col = 1; col < row.length; col += 1) {
-      const ym = getYearMonthFromColumn(col)
+      const ym = mapping.get(col)
       if (!ym) {
         continue
       }
@@ -118,8 +188,10 @@ export function parseSummarySheet(
 }
 
 export function parseCurrencySheet(
+  sheet: XLSX.WorkSheet,
   rows: (string | number | null)[][],
   currency: CurrencyCode,
+  mapping: Map<number, { year: number; month: number }>
 ): { daily: ExchangeRateDataset['dailyRates']; monthly: MonthlyRate[] } {
   const parseSection = (
     marker: string,
@@ -139,9 +211,8 @@ export function parseCurrencySheet(
     for (let rowIndex = start + 1; rowIndex < rows.length; rowIndex += 1) {
       const row = rows[rowIndex]
       const first = toDisplayString(row[0]).toLowerCase()
-
-      const isAvgRow = first.includes('avg')
-      const dayMatch = first.match(/^(\d+)\s*일?$/)
+      const isAvgRow = first.includes('avg') || first.includes('평균') || first.includes('average')
+      const dayMatch = first.match(/^(\d+)\s*(일|st|nd|rd|th)?$/i)
       const day = dayMatch ? Number(dayMatch[1]) : NaN
       const isDayRow = Number.isInteger(day) && day >= 1 && day <= 31
 
@@ -155,7 +226,7 @@ export function parseCurrencySheet(
       }
 
       for (let col = 1; col < row.length; col += 1) {
-        const ym = getYearMonthFromColumn(col)
+        const ym = mapping.get(col)
         if (!ym) {
           continue
         }
@@ -200,7 +271,7 @@ export function parseCurrencySheet(
   }
 
   const local = parseSection('1 DOLLAR EXCHANGE RATE', 'LOCAL_PER_USD')
-  const krw = parseSection('(KRW)', 'KRW')
+  const krw = parseSection('KRW', 'KRW')
 
   return {
     daily: [...local.daily, ...krw.daily],
@@ -227,9 +298,11 @@ export async function parseExcelWorkbook(file: File): Promise<{
       })
     : []
 
+  const summaryMapping = detectColumnMapping(summarySheet, summaryRows)
+
   const summaryMonthly = [
-    ...parseSummarySheet(summaryRows, 'LOCAL_PER_USD', 'LOCAL'),
-    ...parseSummarySheet(summaryRows, 'KRW', 'KRW'),
+    ...parseSummarySheet(summarySheet, summaryRows, 'LOCAL_PER_USD', 'LOCAL', summaryMapping),
+    ...parseSummarySheet(summarySheet, summaryRows, 'KRW', 'KRW', summaryMapping),
   ]
 
   const currencyParsed = CURRENCIES.flatMap((currency) => {
@@ -244,7 +317,8 @@ export async function parseExcelWorkbook(file: File): Promise<{
       defval: null,
     })
 
-    return [parseCurrencySheet(rows, currency)]
+    const mapping = detectColumnMapping(sheet, rows)
+    return [parseCurrencySheet(sheet, rows, currency, mapping)]
   })
 
   const dailyRates = currencyParsed.flatMap((item) => item.daily)

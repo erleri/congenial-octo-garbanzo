@@ -464,11 +464,12 @@ export async function fetchRemoteExchangeData(
   const dailyRatesWithFill = applyForwardFillToDaily(dailyRates, endDate)
   const monthlyRates = buildMonthlyRates(dailyRatesWithFill)
 
-  const effectiveBaseDate =
-    latestPayload?.date ??
-    currencyApiLatestPayload?.date ??
-    openErLatestPayload?.date ??
-    historyPayload.end_date
+  const effectiveBaseDate = dailyRatesWithFill.length > 0
+    ? dailyRatesWithFill[dailyRatesWithFill.length - 1].date
+    : (latestPayload?.date ??
+       currencyApiLatestPayload?.date ??
+       openErLatestPayload?.date ??
+       historyPayload.end_date)
 
   const dataset: ExchangeRateDataset = {
     baseDate: effectiveBaseDate,

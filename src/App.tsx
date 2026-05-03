@@ -78,18 +78,9 @@ function App() {
       return []
     }
 
-    const baseYm = periodToNumber(dataset.baseDate.slice(0, 7))
-
     const unique = new Set(
       dataset.dailyRates
-        .filter((row) => {
-          if (row.rateType !== 'LOCAL_PER_USD') {
-            return false
-          }
-
-          const ym = row.year * 100 + row.month
-          return ym <= baseYm
-        })
+        .filter((row) => row.rateType === 'LOCAL_PER_USD')
         .map((row) => `${row.year}-${String(row.month).padStart(2, '0')}`),
     )
 
