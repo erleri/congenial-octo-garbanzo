@@ -64,13 +64,14 @@ jobs:
           subject = f"[LATAM FX] {base_date} \uc911\ub0a8\ubbf8 \ud658\uc728 \ub300\uc2dc\ubcf4\ub4dc"
           html = f"""\
           <h2>LATAM FX \uc77c\uc77c \ub300\uc2dc\ubcf4\ub4dc</h2>
-          <p>\uc5c5\ub370\uc774\ud2b8\ub41c \uccab \ub300\uc2dc\ubcf4\ub4dc \ud654\uba74\uc744 \ucca8\ubd80\ud588\uc2b5\ub2c8\ub2e4.</p>
+          <p>\uc5c5\ub370\uc774\ud2b8\ub41c \uccab \ub300\uc2dc\ubcf4\ub4dc \ud654\uba74\uc785\ub2c8\ub2e4.</p>
           <ul>
             <li><strong>\uae30\uc900\uc77c</strong>: {base_date}</li>
             <li><strong>\ucd5c\uc885 \uac31\uc2e0</strong>: {fetched_at}</li>
             <li><strong>\ub370\uc774\ud130 \ucd9c\ucc98</strong>: ExchangeRate API, Alpha Vantage, \ubcf4\uc815 \ub370\uc774\ud130</li>
             <li><strong>\ubcf4\uc815 \ud3ec\ud568</strong>: \uc608</li>
           </ul>
+          <p><img src="cid:dashboard-image" alt="LATAM FX dashboard" style="width:100%;max-width:1440px;height:auto;border:1px solid #d9dee7;"></p>
           <p>\uc0c1\uc138 \ud654\uba74: <a href="https://latamforex.netlify.app/">LATAM FX Dashboard</a></p>
           """
 
@@ -179,13 +180,15 @@ jobs:
           message["Subject"] = os.environ["EMAIL_SUBJECT"]
           message["From"] = f"LATAM FX Admin <{username}>"
           message["To"] = ", ".join(recipients)
-          message.set_content("LATAM FX daily dashboard is attached.")
+          message.set_content("LATAM FX daily dashboard is included below.")
           message.add_alternative(os.environ["EMAIL_HTML_BODY"], subtype="html")
 
-          message.add_attachment(
+          html_part = message.get_payload()[1]
+          html_part.add_related(
               screenshot_path.read_bytes(),
               maintype="image",
               subtype="png",
+              cid="<dashboard-image>",
               filename="dashboard.png",
           )
 
