@@ -33,6 +33,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Validate exchange API secrets
+        run: node scripts/validate-api-keys.js
+        env:
+          VITE_EXCHANGERATE_API_KEY: ${{ secrets.VITE_EXCHANGERATE_API_KEY }}
+          VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+
       - name: Generate public/data.json
         run: npm run generate:data
         env:
