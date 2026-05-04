@@ -118,7 +118,7 @@ function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChan
     <div className="panel">
       <div className="panel-header-inline">
         <div>
-          <h2>월별 내역</h2>
+          <h2>월별 이력</h2>
           <p className="table-help">선택한 기간과 통화의 월평균 환율입니다.</p>
         </div>
         <select

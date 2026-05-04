@@ -1,9 +1,27 @@
-# 중남미 환율 대시보드
+# LATAM FX Dashboard
 
-중남미 주요 통화 환율을 조회하고 비교하는 React + TypeScript + Vite 기반 대시보드입니다.
+중남미 주요 통화의 USD 기준 환율과 계획 대비 실적을 확인하는 React + TypeScript + Vite 기반 업무 대시보드입니다.
 
 운영 URL:
 - https://latamforex.netlify.app/
+
+## 주요 기능
+
+- Dashboard: 기준일 환율, 당월 누적 평균, MoM, 52주 범위, 월간/일간 미니차트
+- 월별 이력: 통화별 월평균 환율 테이블
+- 일별 추이: 선택 통화의 일별 환율 차트와 일별 표
+- 계획 대비: 월별 선행 환율/이동 환율과 실제 환율 비교
+- 관리: 데이터 상태 확인, Excel 업로드, CSV 내보내기, 메일링 리스트 관리
+
+## 운영 구조
+
+현재 운영 흐름은 GitHub Actions + Netlify + Supabase 기준입니다.
+
+1. GitHub Actions가 매일 09:15 KST에 데이터를 생성합니다.
+2. 생성 결과는 `public/data.json`에 저장되고 main 브랜치에 커밋됩니다.
+3. Netlify가 main 변경을 감지해 자동 배포합니다.
+4. 대시보드 메일링 워크플로는 배포용 화면을 캡처해 수신자에게 발송합니다.
+5. 계획 환율은 Supabase에 월별 운영 데이터로 저장합니다.
 
 ## 로컬 실행
 
@@ -12,52 +30,58 @@ npm install
 npm run dev
 ```
 
-## 데이터 파이프라인 설계안
+로컬 기본 URL:
 
-현재 운영 경로는 GitHub Actions + Netlify 기준으로 설계되어 있습니다.
+```text
+http://127.0.0.1:5173/
+```
 
-1. GitHub Actions가 하루 1회 또는 수동 실행으로 정적 데이터 파일을 생성합니다.
-2. 생성 결과는 public/data.json 에 저장됩니다.
-3. Actions가 변경된 data.json 을 main 브랜치에 커밋합니다.
-4. Netlify가 main 변경을 감지해 자동 배포합니다.
-5. 앱은 초기 로딩 시 public/data.json 을 우선 읽고, 실패 시 브라우저 캐시와 실시간 API 경로로 폴백합니다.
-
-이 구조의 목적은 다음과 같습니다.
-
-- 초기 로딩 시간 단축
-- 사용자 수 증가 시 외부 API 호출 폭증 방지
-- Alpha Vantage 같은 제한형 API 의존도 완화
-- 운영 배포마다 같은 데이터 스냅샷 제공
-
-## 수동 데이터 생성
+## 데이터 생성
 
 ```bash
 npm run generate:data
 ```
 
-생성된 결과는 public/data.json 에 저장됩니다.
+생성 결과:
 
-## GitHub Actions 설정
+```text
+public/data.json
+data/alpha-vantage-history.json
+```
 
-워크플로우 파일:
-- .github/workflows/generate-data.yml
+## 환경변수
 
-선택적 시크릿:
-- VITE_EXCHANGERATE_API_KEY
-- VITE_ALPHA_VANTAGE_API_KEY
+로컬 개발은 `.env.local`에, Netlify/GitHub Actions 운영은 각 서비스의 환경변수/Secrets에 등록합니다.
 
-시크릿이 없어도 기본 fallback 경로로 동작하지만, 있으면 데이터 품질과 안정성이 더 좋아집니다.
+```text
+VITE_EXCHANGERATE_API_KEY
+VITE_ALPHA_VANTAGE_API_KEY
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+SMTP_USERNAME
+SMTP_PASSWORD
+```
 
-## 현재 로딩 우선순위
+`VITE_SUPABASE_ANON_KEY`에는 Supabase의 `Publishable key` 값을 넣습니다. `service_role`, `secret key`, `sb_secret_...` 값은 브라우저 앱에 넣으면 안 됩니다.
 
-1. IndexedDB 캐시를 즉시 표시
-2. public/data.json 이 있으면 그 값을 우선 적용하고 캐시 갱신
-3. 정적 데이터가 없을 때만 실시간 API 로딩
-4. 캐시가 신선하면 자동 재수집 생략
+## Supabase 계획 환율
 
-## 배포 흐름
+계획 환율은 Supabase Auth 이메일 로그인과 RLS 정책으로 보호합니다.
 
-1. 기능 코드 변경 시 main 푸시
-2. Netlify가 자동 배포
-3. 데이터만 갱신할 때는 GitHub Actions가 public/data.json 커밋
-4. 그 커밋도 Netlify 자동 배포를 트리거
+초기 설정:
+
+1. Supabase SQL Editor에서 `supabase/migrations/20260504120000_business_plan_rates.sql` 실행
+2. `business_plan_admins`에 수정 권한자 이메일 등록
+3. Netlify/GitHub Actions에 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` 등록
+4. Supabase Auth redirect URL에 운영 URL과 로컬 URL 등록
+
+상세 체크리스트는 `OPERATIONS_TODO.md`를 참고합니다.
+
+## 검증 명령
+
+```bash
+npx.cmd tsc -b --noEmit
+npm.cmd run lint
+```
+
+참고: 이 로컬 Windows 환경에서는 Vite/Rolldown의 `spawn EPERM` 또는 명확한 에러 없는 build 실패가 발생한 이력이 있습니다. 운영 빌드는 Netlify/GitHub Actions 결과를 함께 확인합니다.

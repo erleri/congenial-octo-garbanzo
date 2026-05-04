@@ -62,6 +62,12 @@ function getTooltipSource(item: unknown): string {
   return payload?.source === 'IMPUTED' ? '보정' : 'API'
 }
 
+function formatRateValue(value: unknown, currency: CurrencyCode): string {
+  return typeof value === 'number'
+    ? formatCellValue(value, 'ok', currency)
+    : String(value ?? '-')
+}
+
 function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: CurrencyDetailProps) {
   const currency = currencyFilter === 'ALL' ? 'BRL' : (currencyFilter as CurrencyCode)
 
@@ -122,17 +128,58 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
     [currency, data.dailyRates, fromValue, toValue],
   )
 
-  const periodAverage = useMemo(() => {
-    const values = dailySeries
-      .map((item) => item.value)
-      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+  const monthlyAverageLines = useMemo(() => {
+    const groups = new Map<
+      string,
+      {
+        year: number
+        month: number
+        startTs: number
+        endTs: number
+        values: number[]
+      }
+    >()
 
-    if (!values.length) {
-      return null
+    for (const item of dailySeries) {
+      if (typeof item.value !== 'number' || !Number.isFinite(item.value)) {
+        continue
+      }
+
+      const [yearText, monthText] = item.fullDate.split('-')
+      const year = Number(yearText)
+      const month = Number(monthText)
+      const key = `${year}-${String(month).padStart(2, '0')}`
+      const existing = groups.get(key)
+
+      if (existing) {
+        existing.startTs = Math.min(existing.startTs, item.ts)
+        existing.endTs = Math.max(existing.endTs, item.ts)
+        existing.values.push(item.value)
+        continue
+      }
+
+      groups.set(key, {
+        year,
+        month,
+        startTs: item.ts,
+        endTs: item.ts,
+        values: [item.value],
+      })
     }
 
-    const sum = values.reduce((acc, value) => acc + value, 0)
-    return sum / values.length
+    return [...groups.entries()]
+      .map(([key, group]) => {
+        const sum = group.values.reduce((acc, value) => acc + value, 0)
+        return {
+          key,
+          year: group.year,
+          month: group.month,
+          startTs: group.startTs,
+          endTs: group.endTs,
+          average: sum / group.values.length,
+        }
+      })
+      .sort((a, b) => a.startTs - b.startTs)
   }, [dailySeries])
 
   const monthlyAvg = (rateType: 'LOCAL_PER_USD' | 'KRW', year: number, month: number) => {
@@ -233,16 +280,16 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                 return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
               }}
             />
-            <YAxis domain={(['auto', 'auto'] as const)} tickFormatter={(v: number) => v.toLocaleString()} width={80} />
+            <YAxis
+              domain={(['auto', 'auto'] as const)}
+              tickFormatter={(value: number) => formatCellValue(value, 'ok', currency)}
+              width={80}
+            />
             <Tooltip
               labelFormatter={(_label, payload) => payload?.[0]?.payload?.fullDate ?? ''}
               formatter={(value: unknown, _name: unknown, item: unknown) => {
-                const formatted = typeof value === 'number'
-                  ? value.toLocaleString(undefined, { maximumFractionDigits: 4 })
-                  : String(value ?? '')
-
                 const source = getTooltipSource(item)
-                return [formatted, `일별 환율 (${source})`]
+                return [formatRateValue(value, currency), `일별 환율 (${source})`]
               }}
               contentStyle={{
                 borderRadius: '6px',
@@ -250,19 +297,23 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                 boxShadow: 'none',
               }}
             />
-            {periodAverage !== null ? (
+            {monthlyAverageLines.map((line) => (
               <ReferenceLine
-                y={periodAverage}
+                key={line.key}
+                segment={[
+                  { x: line.startTs, y: line.average },
+                  { x: line.endTs, y: line.average },
+                ]}
                 stroke="#93691d"
                 strokeDasharray="5 5"
                 label={{
-                  value: `평균 ${periodAverage.toLocaleString(undefined, { maximumFractionDigits: 2 })}`,
+                  value: `${line.month}월 평균 ${formatCellValue(line.average, 'ok', currency)}`,
                   position: 'insideTopRight',
                   fill: '#93691d',
                   fontSize: 11,
                 }}
               />
-            ) : null}
+            ))}
             <Line type="monotone" dataKey="value" stroke="#1f2a44" strokeWidth={2} dot={false} activeDot={false} />
           </LineChart>
         </ResponsiveContainer>

@@ -1,13 +1,22 @@
 import { useMemo, useState } from 'react'
 import { formatCellValue } from '../lib/formatters'
 import { buildMovingComparisonRows } from '../lib/moving'
-import type { ExchangeRateDataset, MovingColumn, BusinessPlan, CurrencyCode } from '../types/exchangeRate'
+import type {
+  ExchangeRateDataset,
+  MovingColumn,
+  BusinessPlan,
+  CurrencyCode,
+  BusinessPlanStatus,
+} from '../types/exchangeRate'
 import { CURRENCIES } from '../types/exchangeRate'
 
 interface MovingComparisonProps {
   data: ExchangeRateDataset
   businessPlan: BusinessPlan
   onUpdatePlan: (plan: BusinessPlan) => Promise<void>
+  businessPlanStatus: BusinessPlanStatus
+  onRequestPlanAccess: (email: string) => Promise<void>
+  onSignOutPlanAccess: () => Promise<void>
 }
 
 const COLUMNS: Array<{ key: MovingColumn; label: string }> = [
@@ -47,9 +56,39 @@ function formatMovingValue(value: number | null, column: MovingColumn, isPercent
   return formatCellValue(value, value !== null ? 'ok' : 'empty', column === 'KRW' ? 'KRW' : column, isPercent)
 }
 
-function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparisonProps) {
+function formatStatusDateTime(value: string | null): string {
+  if (!value) {
+    return '-'
+  }
+
+  return new Date(value).toLocaleString('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function formatPeriodMonth(value: string | null): string {
+  if (!value) {
+    return '-'
+  }
+
+  return value.slice(0, 7)
+}
+
+function MovingComparison({
+  data,
+  businessPlan,
+  onUpdatePlan,
+  businessPlanStatus,
+  onRequestPlanAccess,
+  onSignOutPlanAccess,
+}: MovingComparisonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [tempPlan, setTempPlan] = useState<BusinessPlan>(businessPlan)
+  const [loginEmail, setLoginEmail] = useState('')
+  const [authMessage, setAuthMessage] = useState<string | null>(null)
 
   const rows = useMemo(() => {
     const baseDate = new Date(data.baseDate)
@@ -60,6 +99,7 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
 
   const openModal = () => {
     setTempPlan(businessPlan)
+    setAuthMessage(null)
     setIsModalOpen(true)
   }
 
@@ -75,8 +115,27 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
   }
 
   const handleSave = async () => {
-    await onUpdatePlan(tempPlan)
-    setIsModalOpen(false)
+    try {
+      await onUpdatePlan(tempPlan)
+      setIsModalOpen(false)
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : '계획 환율 저장에 실패했습니다.')
+    }
+  }
+
+  const handleRequestLogin = async () => {
+    const trimmed = loginEmail.trim()
+    if (!trimmed) {
+      setAuthMessage('이메일을 입력해 주세요.')
+      return
+    }
+
+    try {
+      await onRequestPlanAccess(trimmed)
+      setAuthMessage('로그인 링크를 이메일로 보냈습니다.')
+    } catch (error) {
+      setAuthMessage(error instanceof Error ? error.message : '로그인 링크 발송에 실패했습니다.')
+    }
   }
 
   const renderCurrencyRow = (currency: CurrencyCode, isTarget: boolean) => (
@@ -87,6 +146,7 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
           type="number"
           step="0.0001"
           value={tempPlan.leading[currency] ?? ''}
+          disabled={!businessPlanStatus.canEdit || businessPlanStatus.saving}
           onChange={(event) => handlePlanChange('leading', currency, event.target.value)}
           placeholder="자동 평균"
         />
@@ -96,6 +156,7 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
           type="number"
           step="0.0001"
           value={tempPlan.moving[currency] ?? ''}
+          disabled={!businessPlanStatus.canEdit || businessPlanStatus.saving}
           onChange={(event) => handlePlanChange('moving', currency, event.target.value)}
           placeholder="자동 평균"
         />
@@ -158,6 +219,51 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
               각 통화의 USD 기준 계획 환율을 입력합니다. USD 항목에는 1 USD 기준 KRW 값을 입력합니다.
             </p>
 
+            <div className="plan-auth-panel">
+              <div className="plan-auth-grid">
+                <span>적용월</span>
+                <strong>{formatPeriodMonth(businessPlanStatus.periodMonth)}</strong>
+                <span>저장 위치</span>
+                <strong>
+                  {businessPlanStatus.source === 'supabase'
+                    ? 'Supabase'
+                    : businessPlanStatus.source === 'local'
+                      ? '로컬 임시값'
+                      : '-'}
+                </strong>
+                <span>로그인</span>
+                <strong>{businessPlanStatus.userEmail ?? '로그인 필요'}</strong>
+                <span>권한</span>
+                <strong>{businessPlanStatus.canEdit ? '수정 가능' : '읽기 전용'}</strong>
+                <span>최종 수정</span>
+                <strong>
+                  {formatStatusDateTime(businessPlanStatus.lastUpdatedAt)}
+                  {businessPlanStatus.lastUpdatedBy ? ` · ${businessPlanStatus.lastUpdatedBy}` : ''}
+                </strong>
+              </div>
+
+              {!businessPlanStatus.isAuthenticated ? (
+                <div className="inline-controls plan-login-row">
+                  <input
+                    type="email"
+                    value={loginEmail}
+                    onChange={(event) => setLoginEmail(event.target.value)}
+                    placeholder="회사 이메일"
+                  />
+                  <button type="button" onClick={handleRequestLogin} className="quiet-button">
+                    로그인 링크 받기
+                  </button>
+                </div>
+              ) : (
+                <button type="button" onClick={() => void onSignOutPlanAccess()} className="quiet-button">
+                  로그아웃
+                </button>
+              )}
+
+              {authMessage ? <p className="table-help">{authMessage}</p> : null}
+              {businessPlanStatus.error ? <p className="table-help error-text">{businessPlanStatus.error}</p> : null}
+            </div>
+
             <div className="table-scroll" style={{ margin: '16px 0' }}>
               <table className="dense-table" style={{ minWidth: '100%' }}>
                 <thead>
@@ -180,7 +286,14 @@ function MovingComparison({ data, businessPlan, onUpdatePlan }: MovingComparison
             </div>
             <div className="inline-controls" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
               <button type="button" onClick={() => setIsModalOpen(false)} className="quiet-button">취소</button>
-              <button type="button" onClick={handleSave} className="header-refresh-button">저장</button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="header-refresh-button"
+                disabled={!businessPlanStatus.canEdit || businessPlanStatus.saving}
+              >
+                {businessPlanStatus.saving ? '저장 중' : '저장'}
+              </button>
             </div>
           </div>
         </div>

@@ -8,9 +8,37 @@ import {
   loadBusinessPlanFromCache,
   saveBusinessPlanToCache,
 } from '../lib'
-import type { DashboardFilters, ExchangeRateDataset, BusinessPlan } from '../types/exchangeRate'
+import {
+  canUseRemoteBusinessPlan,
+  getBusinessPlanPeriodMonth,
+  loadBusinessPlanAdminAccess,
+  loadBusinessPlanFromSupabase,
+  requestBusinessPlanLogin,
+  saveBusinessPlanToSupabase,
+  signOutBusinessPlanUser,
+} from '../lib/businessPlanRemote'
+import { supabase } from '../lib/supabaseClient'
+import type {
+  DashboardFilters,
+  ExchangeRateDataset,
+  BusinessPlan,
+  BusinessPlanStatus,
+} from '../types/exchangeRate'
 
 const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
+const INITIAL_BUSINESS_PLAN_STATUS: BusinessPlanStatus = {
+  configured: canUseRemoteBusinessPlan(),
+  loading: false,
+  saving: false,
+  source: 'none',
+  periodMonth: null,
+  isAuthenticated: false,
+  canEdit: false,
+  userEmail: null,
+  lastUpdatedAt: null,
+  lastUpdatedBy: null,
+  error: null,
+}
 
 const AUTO_REFRESH_TTL_MS = 12 * 60 * 60 * 1000
 
@@ -59,6 +87,9 @@ export function useExchangeData() {
   const [excelPriority, setExcelPriority] = useState(true)
   const [fillMissing, setFillMissing] = useState(true)
   const [businessPlan, setBusinessPlan] = useState<BusinessPlan>(INITIAL_BUSINESS_PLAN)
+  const [businessPlanStatus, setBusinessPlanStatus] =
+    useState<BusinessPlanStatus>(INITIAL_BUSINESS_PLAN_STATUS)
+  const [businessPlanUserEmail, setBusinessPlanUserEmail] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<DashboardFilters>({
     currency: 'BRL',
@@ -143,9 +174,114 @@ export function useExchangeData() {
     }
   }
 
+  const loadRemoteBusinessPlan = async (
+    data: ExchangeRateDataset,
+    userEmail: string | null,
+  ) => {
+    const periodMonth = getBusinessPlanPeriodMonth(data.baseDate)
+
+    if (!canUseRemoteBusinessPlan()) {
+      setBusinessPlanStatus((prev) => ({
+        ...prev,
+        configured: false,
+        periodMonth,
+        isAuthenticated: Boolean(userEmail),
+        userEmail,
+        source: prev.source === 'none' ? 'local' : prev.source,
+        error: 'Supabase 환경변수가 설정되지 않아 로컬 임시값을 사용합니다.',
+      }))
+      return
+    }
+
+    setBusinessPlanStatus((prev) => ({
+      ...prev,
+      configured: true,
+      loading: true,
+      periodMonth,
+      isAuthenticated: Boolean(userEmail),
+      userEmail,
+      error: null,
+    }))
+
+    try {
+      const [remotePlan, canEdit] = await Promise.all([
+        loadBusinessPlanFromSupabase(periodMonth),
+        loadBusinessPlanAdminAccess(userEmail),
+      ])
+
+      setBusinessPlan(remotePlan.plan)
+      await saveBusinessPlanToCache(remotePlan.plan)
+      setBusinessPlanStatus((prev) => ({
+        ...prev,
+        loading: false,
+        source: 'supabase',
+        canEdit,
+        lastUpdatedAt: remotePlan.lastUpdatedAt,
+        lastUpdatedBy: remotePlan.lastUpdatedBy,
+        error: null,
+      }))
+    } catch (remoteError) {
+      const cachedPlan = await loadBusinessPlanFromCache()
+      if (cachedPlan) {
+        setBusinessPlan(cachedPlan)
+      }
+
+      setBusinessPlanStatus((prev) => ({
+        ...prev,
+        loading: false,
+        source: cachedPlan ? 'local' : 'none',
+        canEdit: false,
+        error:
+          remoteError instanceof Error
+            ? remoteError.message
+            : 'Supabase 계획 환율을 불러오지 못해 로컬 임시값을 사용합니다.',
+      }))
+    }
+  }
+
   const updateBusinessPlan = async (newPlan: BusinessPlan) => {
-    setBusinessPlan(newPlan)
-    await saveBusinessPlanToCache(newPlan)
+    if (!dataset) {
+      throw new Error('데이터가 아직 로드되지 않았습니다.')
+    }
+
+    if (!businessPlanStatus.canEdit || !businessPlanUserEmail || !businessPlanStatus.periodMonth) {
+      throw new Error('계획 환율 저장 권한이 없습니다.')
+    }
+
+    setBusinessPlanStatus((prev) => ({ ...prev, saving: true, error: null }))
+
+    try {
+      const saved = await saveBusinessPlanToSupabase(
+        businessPlanStatus.periodMonth,
+        newPlan,
+        businessPlanUserEmail,
+      )
+      setBusinessPlan(saved.plan)
+      await saveBusinessPlanToCache(saved.plan)
+      setBusinessPlanStatus((prev) => ({
+        ...prev,
+        saving: false,
+        source: 'supabase',
+        lastUpdatedAt: saved.lastUpdatedAt,
+        lastUpdatedBy: saved.lastUpdatedBy,
+        error: null,
+      }))
+    } catch (saveError) {
+      setBusinessPlanStatus((prev) => ({
+        ...prev,
+        saving: false,
+        error: saveError instanceof Error ? saveError.message : '계획 환율 저장에 실패했습니다.',
+      }))
+      throw saveError
+    }
+  }
+
+  const requestBusinessPlanAccess = async (email: string) => {
+    await requestBusinessPlanLogin(email)
+  }
+
+  const signOutBusinessPlanAccess = async () => {
+    await signOutBusinessPlanUser()
   }
 
   useEffect(() => {
@@ -200,6 +336,42 @@ export function useExchangeData() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    if (!supabase) {
+      return undefined
+    }
+
+    let isMounted = true
+
+    void supabase.auth.getSession().then(({ data: sessionData }) => {
+      if (!isMounted) {
+        return
+      }
+
+      setBusinessPlanUserEmail(sessionData.session?.user.email?.toLowerCase() ?? null)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setBusinessPlanUserEmail(session?.user.email?.toLowerCase() ?? null)
+    })
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!dataset) {
+      return
+    }
+
+    void loadRemoteBusinessPlan(dataset, businessPlanUserEmail)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataset?.baseDate, businessPlanUserEmail])
+
   return {
     dataset,
     loading,
@@ -213,5 +385,8 @@ export function useExchangeData() {
     uploadAndMergeExcel,
     businessPlan,
     updateBusinessPlan,
+    businessPlanStatus,
+    requestBusinessPlanAccess,
+    signOutBusinessPlanAccess,
   }
 }

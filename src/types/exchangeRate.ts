@@ -17,6 +17,22 @@ export interface BusinessPlan {
   moving: Partial<Record<(typeof CURRENCIES)[number], number>>
 }
 
+export type BusinessPlanType = keyof BusinessPlan
+
+export interface BusinessPlanStatus {
+  configured: boolean
+  loading: boolean
+  saving: boolean
+  source: 'supabase' | 'local' | 'none'
+  periodMonth: string | null
+  isAuthenticated: boolean
+  canEdit: boolean
+  userEmail: string | null
+  lastUpdatedAt: string | null
+  lastUpdatedBy: string | null
+  error: string | null
+}
+
 export type CurrencyCode = (typeof CURRENCIES)[number]
 export type CurrencyFilter = CurrencyCode | 'ALL'
 

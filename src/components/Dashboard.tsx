@@ -2,6 +2,7 @@ import {
   CartesianGrid,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -19,6 +20,20 @@ import type {
 interface DashboardProps {
   data: ExchangeRateDataset
   filters: DashboardFilters
+}
+
+interface MiniChartPoint {
+  value: number | null
+  averageValue: number | null
+  isLatest: boolean
+}
+
+interface DotProps {
+  cx?: number
+  cy?: number
+  payload?: {
+    isLatest?: boolean
+  }
 }
 
 const KPI_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'PEN'] as const
@@ -71,6 +86,52 @@ function getDaily(
     (row) =>
       row.currency === currency && row.date === date && row.rateType === 'LOCAL_PER_USD',
   )
+}
+
+function formatChartRate(value: unknown, currency: (typeof KPI_CURRENCIES)[number]): string {
+  return typeof value === 'number'
+    ? formatCellValue(value, 'ok', currency)
+    : String(value ?? '-')
+}
+
+function addMiniChartStats<T extends { value: number | null }>(points: T[]): Array<T & MiniChartPoint> {
+  const values = points
+    .map((point) => point.value)
+    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+  const averageValue = average(values)
+  let latestIndex = -1
+
+  for (let index = points.length - 1; index >= 0; index -= 1) {
+    if (typeof points[index].value === 'number') {
+      latestIndex = index
+      break
+    }
+  }
+
+  return points.map((point, index) => ({
+    ...point,
+    averageValue,
+    isLatest: index === latestIndex,
+  }))
+}
+
+function renderLatestDot(color: string) {
+  return function LatestDot({ cx, cy, payload }: DotProps) {
+    if (!payload?.isLatest || typeof cx !== 'number' || typeof cy !== 'number') {
+      return null
+    }
+
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={3}
+        fill={color}
+        stroke="#ffffff"
+        strokeWidth={1.5}
+      />
+    )
+  }
 }
 
 function Dashboard({ data }: DashboardProps) {
@@ -169,14 +230,15 @@ function Dashboard({ data }: DashboardProps) {
         monthlyMap.set(monthKey(row.year, row.month), row.value)
       })
 
-    const points = recentMonths.map(({ year, month }) => ({
+    const points = addMiniChartStats(recentMonths.map(({ year, month }) => ({
       month: monthLabel(year, month),
       value: monthlyMap.get(monthKey(year, month)) ?? null,
-    }))
+    })))
 
     return {
       currency,
       points,
+      averageValue: points[0]?.averageValue ?? null,
       domain: buildDomain(points.map((point) => point.value)),
     }
   })
@@ -186,14 +248,15 @@ function Dashboard({ data }: DashboardProps) {
       .filter((row) => row.rateType === 'LOCAL_PER_USD' && row.currency === currency)
       .sort((a, b) => a.date.localeCompare(b.date))
 
-    const points = currencyDaily.slice(-30).map((row) => ({
+    const points = addMiniChartStats(currencyDaily.slice(-30).map((row) => ({
       day: `${row.month}/${row.day}`,
       value: row.value,
-    }))
+    })))
 
     return {
       currency,
       points,
+      averageValue: points[0]?.averageValue ?? null,
       domain: buildDomain(points.map((point) => point.value)),
     }
   })
@@ -215,9 +278,6 @@ function Dashboard({ data }: DashboardProps) {
               </div>
             </div>
             <strong>{formatCellValue(kpi.cumulativeValue, kpi.cumulativeStatus, kpi.currency)}</strong>
-            <p className="kpi-today">
-              기준일 환율 {formatCellValue(kpi.todayValue, kpi.todayStatus, kpi.currency)}
-            </p>
             {kpi.mom !== null ? (
               <em className={kpi.mom >= 0 ? 'up' : 'down'}>
                 {kpi.mom >= 0 ? '+' : '-'}{Math.abs(kpi.mom * 100).toFixed(2)}% MoM
@@ -226,9 +286,13 @@ function Dashboard({ data }: DashboardProps) {
               <em className="kpi-today">MoM -</em>
             )}
             <div className="gauge-container">
+              <p className="kpi-today">
+                기준일 환율 {formatCellValue(kpi.todayValue, kpi.todayStatus, kpi.currency)}
+              </p>
+              <div className="gauge-title">52주 범위 · 기준일 위치</div>
               <div className="gauge-labels">
-                <span>{kpi.low52?.toFixed(2) ?? '-'}</span>
-                <span>{kpi.high52?.toFixed(2) ?? '-'}</span>
+                <span>{formatCellValue(kpi.low52, kpi.low52 === null ? 'empty' : 'ok', kpi.currency)}</span>
+                <span>{formatCellValue(kpi.high52, kpi.high52 === null ? 'empty' : 'ok', kpi.currency)}</span>
               </div>
               <div className="gauge-track">
                 <div
@@ -259,7 +323,22 @@ function Dashboard({ data }: DashboardProps) {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceff3" />
                   <XAxis dataKey="month" hide />
                   <YAxis domain={series.domain} hide />
+                  {series.averageValue !== null ? (
+                    <ReferenceLine
+                      y={series.averageValue}
+                      stroke="#9aa3af"
+                      strokeDasharray="4 4"
+                      strokeWidth={1}
+                      label={{
+                        value: `24M 평균 ${formatChartRate(series.averageValue, series.currency)}`,
+                        position: 'insideTopRight',
+                        fill: '#6b7280',
+                        fontSize: 10,
+                      }}
+                    />
+                  ) : null}
                   <Tooltip
+                    formatter={(value: unknown) => [formatChartRate(value, series.currency), '환율']}
                     labelStyle={{ color: '#667085', fontSize: '12px' }}
                     contentStyle={{
                       borderRadius: '6px',
@@ -272,7 +351,7 @@ function Dashboard({ data }: DashboardProps) {
                     dataKey="value"
                     stroke={SERIES_COLORS[series.currency]}
                     strokeWidth={2}
-                    dot={false}
+                    dot={renderLatestDot(SERIES_COLORS[series.currency])}
                     activeDot={{ r: 3, strokeWidth: 0 }}
                   />
                 </LineChart>
@@ -293,7 +372,22 @@ function Dashboard({ data }: DashboardProps) {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceff3" />
                   <XAxis dataKey="day" hide />
                   <YAxis domain={series.domain} hide />
+                  {series.averageValue !== null ? (
+                    <ReferenceLine
+                      y={series.averageValue}
+                      stroke="#9aa3af"
+                      strokeDasharray="4 4"
+                      strokeWidth={1}
+                      label={{
+                        value: `30D 평균 ${formatChartRate(series.averageValue, series.currency)}`,
+                        position: 'insideTopRight',
+                        fill: '#6b7280',
+                        fontSize: 10,
+                      }}
+                    />
+                  ) : null}
                   <Tooltip
+                    formatter={(value: unknown) => [formatChartRate(value, series.currency), '환율']}
                     labelStyle={{ color: '#667085', fontSize: '12px' }}
                     contentStyle={{
                       borderRadius: '6px',
@@ -306,7 +400,7 @@ function Dashboard({ data }: DashboardProps) {
                     dataKey="value"
                     stroke={SERIES_COLORS[series.currency]}
                     strokeWidth={2}
-                    dot={false}
+                    dot={renderLatestDot(SERIES_COLORS[series.currency])}
                     activeDot={{ r: 3, strokeWidth: 0 }}
                   />
                 </LineChart>

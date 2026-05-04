@@ -63,6 +63,9 @@ function App() {
     uploadAndMergeExcel,
     businessPlan,
     updateBusinessPlan,
+    businessPlanStatus,
+    requestBusinessPlanAccess,
+    signOutBusinessPlanAccess,
   } = useExchangeData()
 
   const periodOptions = useMemo(() => {
@@ -234,6 +237,9 @@ function App() {
             data={dataset}
             businessPlan={businessPlan}
             onUpdatePlan={updateBusinessPlan}
+            businessPlanStatus={businessPlanStatus}
+            onRequestPlanAccess={requestBusinessPlanAccess}
+            onSignOutPlanAccess={signOutBusinessPlanAccess}
           />
         )
       case 'admin':
@@ -264,6 +270,9 @@ function App() {
     uploadAndMergeExcel,
     businessPlan,
     updateBusinessPlan,
+    businessPlanStatus,
+    requestBusinessPlanAccess,
+    signOutBusinessPlanAccess,
   ])
 
   return (
@@ -291,15 +300,15 @@ function App() {
 
         <div className="header-actions">
           <div className="status-group">
+            <span className="status-item">기준일 {dataset?.baseDate ?? '-'}</span>
+            <span className="status-item">최종 갱신 {formatDateTime(dataset?.fetchedAt)}</span>
             <span className="status-item">
               <span className={`status-dot ${loading ? 'loading' : error ? 'error' : ''}`} />
               {loading ? '갱신 중' : error ? '확인 필요' : '정상'}
             </span>
-            <span className="status-item">기준일 {dataset?.baseDate ?? '-'}</span>
-            <span className="status-item">최종 갱신 {formatDateTime(dataset?.fetchedAt)}</span>
           </div>
           <button type="button" className="header-refresh-button" onClick={() => void refreshData()} disabled={loading}>
-            {loading ? '갱신 중' : 'Refresh'}
+            {loading ? '갱신 중' : '데이터 갱신'}
           </button>
         </div>
 
@@ -406,8 +415,8 @@ function App() {
       <main>
         <Suspense
           fallback={
-            <div className="panel empty" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <h2 style={{ color: '#667085' }}>화면을 불러오는 중입니다.</h2>
+            <div className="panel empty loading-panel">
+              <h2>화면을 불러오는 중입니다.</h2>
             </div>
           }
         >
