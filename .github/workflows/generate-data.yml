@@ -143,18 +143,56 @@ jobs:
 
       - name: Send dashboard email
         if: steps.mailing.outputs.emails != ''
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          secure: true
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: ${{ steps.email.outputs.subject }}
-          to: ${{ steps.mailing.outputs.emails }}
-          from: "LATAM FX Admin <${{ secrets.SMTP_USERNAME }}>"
-          html_body: ${{ steps.email.outputs.html_body }}
-          attachments: dashboard.png
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_TO: ${{ steps.mailing.outputs.emails }}
+          EMAIL_SUBJECT: ${{ steps.email.outputs.subject }}
+          EMAIL_HTML_BODY: ${{ steps.email.outputs.html_body }}
+        run: |
+          python - <<'PY'
+          import os
+          import smtplib
+          from email.message import EmailMessage
+          from pathlib import Path
+
+          username = os.environ.get("SMTP_USERNAME", "").strip()
+          password = "".join(os.environ.get("SMTP_PASSWORD", "").split())
+          recipients = [
+              item.strip()
+              for item in os.environ.get("EMAIL_TO", "").split(",")
+              if item.strip()
+          ]
+
+          if not username:
+              raise SystemExit("SMTP_USERNAME secret is missing or empty.")
+          if not password:
+              raise SystemExit("SMTP_PASSWORD secret is missing or empty.")
+          if not recipients:
+              raise SystemExit("No email recipients were provided.")
+
+          screenshot_path = Path("dashboard.png")
+          if not screenshot_path.exists():
+              raise SystemExit("dashboard.png was not created.")
+
+          message = EmailMessage()
+          message["Subject"] = os.environ["EMAIL_SUBJECT"]
+          message["From"] = f"LATAM FX Admin <{username}>"
+          message["To"] = ", ".join(recipients)
+          message.set_content("LATAM FX daily dashboard is attached.")
+          message.add_alternative(os.environ["EMAIL_HTML_BODY"], subtype="html")
+
+          message.add_attachment(
+              screenshot_path.read_bytes(),
+              maintype="image",
+              subtype="png",
+              filename="dashboard.png",
+          )
+
+          with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+              smtp.login(username, password)
+              smtp.send_message(message)
+          PY
 
       - name: Upload dashboard artifacts
         if: always()
