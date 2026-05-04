@@ -18,7 +18,7 @@ type ScreenKey =
 
 const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'dashboard', label: '대시보드' },
-  { key: 'monthly', label: '월별 내역' },
+  { key: 'monthly', label: '월별 이력' },
   { key: 'currency', label: '일별 추이' },
   { key: 'moving', label: '계획 대비' },
   { key: 'admin', label: '관리' },
