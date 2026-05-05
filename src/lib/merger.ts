@@ -255,7 +255,7 @@ export function mergeDatasetsWithExcel(
   }
 
   merged.movingComparison = buildMovingComparisonRows(merged, year, month)
-  if (!merged.rawSheets.length) {
+  if (!merged.rawSheets?.length) {
     merged.rawSheets = buildRawSheets(merged)
   }
 
@@ -517,9 +517,10 @@ export async function fetchRemoteExchangeDataWithExcel(
   file: File,
   options: ExcelMergeOptions,
   baseDate = new Date(),
+  remoteOptions: RemoteExchangeDataOptions = {},
 ): Promise<ExchangeRateDataset> {
   const [apiDataset, excelDataset] = await Promise.all([
-    fetchRemoteExchangeData(baseDate),
+    fetchRemoteExchangeData(baseDate, remoteOptions),
     parseExcelWorkbook(file),
   ])
 

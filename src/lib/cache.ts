@@ -42,9 +42,10 @@ export async function saveDatasetToCache(dataset: ExchangeRateDataset): Promise<
     return new Promise((resolve) => {
       const transaction = db.transaction(STORE_NAME, 'readwrite')
       const store = transaction.objectStore(STORE_NAME)
-      
-      // Store full dataset without truncating rawSheets or dailyRates
-      const request = store.put(dataset, CACHE_KEY)
+
+      const cacheableDataset: ExchangeRateDataset = { ...dataset }
+      delete cacheableDataset.rawSheets
+      const request = store.put(cacheableDataset, CACHE_KEY)
 
       request.onsuccess = () => resolve(true)
       request.onerror = () => resolve(false)

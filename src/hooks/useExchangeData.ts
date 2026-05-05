@@ -4,8 +4,10 @@ import {
   fetchRemoteExchangeDataWithExcel,
   fetchStaticDataset,
   fetchManualBackfillDataset,
+  fetchSupplementalHistoryDataset,
   loadDatasetFromCache,
   saveDatasetToCache,
+  saveAVSupplementalCache,
   loadBusinessPlanFromCache,
   saveBusinessPlanToCache,
 } from '../lib'
@@ -131,14 +133,27 @@ export function useExchangeData() {
     try {
       setLoading(true)
       setError(null)
-      const manualBackfill = excelFile ? null : await fetchManualBackfillDataset()
+      const [manualBackfill, supplementalHistory] = await Promise.all([
+        fetchManualBackfillDataset(),
+        fetchSupplementalHistoryDataset(),
+      ])
+
+      if (supplementalHistory) {
+        void saveAVSupplementalCache(supplementalHistory)
+      }
+
       const fetched = excelFile
         ? await fetchRemoteExchangeDataWithExcel(
             excelFile,
             { excelPriority, fillMissing },
             new Date(),
+            {
+              supplementalHistoryByCurrency: supplementalHistory?.rates,
+              manualBackfillByDate: manualBackfill?.ratesByDate,
+            },
           )
         : await fetchRemoteExchangeData(new Date(), {
+            supplementalHistoryByCurrency: supplementalHistory?.rates,
             manualBackfillByDate: manualBackfill?.ratesByDate,
           })
 
@@ -165,7 +180,24 @@ export function useExchangeData() {
       setExcelPriority(options.excelPriority)
       setFillMissing(options.fillMissing)
 
-      const merged = await fetchRemoteExchangeDataWithExcel(file, options, new Date())
+      const [manualBackfill, supplementalHistory] = await Promise.all([
+        fetchManualBackfillDataset(),
+        fetchSupplementalHistoryDataset(),
+      ])
+
+      if (supplementalHistory) {
+        void saveAVSupplementalCache(supplementalHistory)
+      }
+
+      const merged = await fetchRemoteExchangeDataWithExcel(
+        file,
+        options,
+        new Date(),
+        {
+          supplementalHistoryByCurrency: supplementalHistory?.rates,
+          manualBackfillByDate: manualBackfill?.ratesByDate,
+        },
+      )
       await applyDataset(merged)
       window.alert('엑셀 업로드가 완료되었습니다. 데이터가 병합되었습니다.')
     } catch (mergeError) {

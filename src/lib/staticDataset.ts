@@ -1,10 +1,15 @@
-import type { ExchangeRateDataset } from '../types/exchangeRate'
+import type { ExchangeRateDataset, RawSheetsDataset } from '../types/exchangeRate'
 
 export interface ManualBackfillDataset {
   generatedAt: string
   sourceWorkbook: string
   currencies: string[]
   ratesByDate: Record<string, Record<string, number>>
+}
+
+export interface SupplementalHistoryDataset {
+  fetchedAt: string
+  rates: Record<string, Record<string, number>>
 }
 
 function isDatasetShape(value: unknown): value is ExchangeRateDataset {
@@ -18,8 +23,7 @@ function isDatasetShape(value: unknown): value is ExchangeRateDataset {
     typeof candidate.fetchedAt === 'string' &&
     Array.isArray(candidate.dailyRates) &&
     Array.isArray(candidate.monthlyRates) &&
-    Array.isArray(candidate.movingComparison) &&
-    Array.isArray(candidate.rawSheets)
+    Array.isArray(candidate.movingComparison)
   )
 }
 
@@ -39,6 +43,30 @@ function isManualBackfillShape(value: unknown): value is ManualBackfillDataset {
   )
 }
 
+function isRawSheetsShape(value: unknown): value is RawSheetsDataset {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const candidate = value as Partial<RawSheetsDataset>
+  return Array.isArray(candidate.rawSheets)
+}
+
+function isSupplementalHistoryShape(
+  value: unknown,
+): value is SupplementalHistoryDataset {
+  if (!value || typeof value !== 'object') {
+    return false
+  }
+
+  const candidate = value as Partial<SupplementalHistoryDataset>
+  return (
+    typeof candidate.fetchedAt === 'string' &&
+    !!candidate.rates &&
+    typeof candidate.rates === 'object'
+  )
+}
+
 export async function fetchStaticDataset(path = '/data.json'): Promise<ExchangeRateDataset | null> {
   try {
     const response = await fetch(path, { cache: 'no-store' })
@@ -48,6 +76,22 @@ export async function fetchStaticDataset(path = '/data.json'): Promise<ExchangeR
 
     const payload = (await response.json()) as unknown
     return isDatasetShape(payload) ? payload : null
+  } catch {
+    return null
+  }
+}
+
+export async function fetchRawSheetsDataset(
+  path = '/raw-sheets.json',
+): Promise<RawSheetsDataset | null> {
+  try {
+    const response = await fetch(path, { cache: 'no-store' })
+    if (!response.ok) {
+      return null
+    }
+
+    const payload = (await response.json()) as unknown
+    return isRawSheetsShape(payload) ? payload : null
   } catch {
     return null
   }
@@ -64,6 +108,22 @@ export async function fetchManualBackfillDataset(
 
     const payload = (await response.json()) as unknown
     return isManualBackfillShape(payload) ? payload : null
+  } catch {
+    return null
+  }
+}
+
+export async function fetchSupplementalHistoryDataset(
+  path = '/alpha-vantage-history.json',
+): Promise<SupplementalHistoryDataset | null> {
+  try {
+    const response = await fetch(path, { cache: 'no-store' })
+    if (!response.ok) {
+      return null
+    }
+
+    const payload = (await response.json()) as unknown
+    return isSupplementalHistoryShape(payload) ? payload : null
   } catch {
     return null
   }

@@ -104,6 +104,10 @@ export interface ExchangeRateDataset {
   monthlyRates: MonthlyRate[]
   dailyRates: DailyRate[]
   movingComparison: MovingComparisonRow[]
+  rawSheets?: RawSheet[]
+}
+
+export interface RawSheetsDataset {
   rawSheets: RawSheet[]
 }
 
@@ -130,6 +134,6 @@ export const CURRENCY_FORMAT_RULES: Record<CurrencyCode | 'KRW', CurrencyFormatR
   GTQ: { minFractionDigits: 2, maxFractionDigits: 4 },
   UYU: { minFractionDigits: 2, maxFractionDigits: 4 },
   CNY: { minFractionDigits: 2, maxFractionDigits: 4 },
-  ARS: { minFractionDigits: 2, maxFractionDigits: 4 },
+  ARS: { minFractionDigits: 2, maxFractionDigits: 2 },
   USD: { minFractionDigits: 2, maxFractionDigits: 4 },
 }

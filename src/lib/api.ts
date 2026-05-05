@@ -23,7 +23,15 @@ function readEnv(key: string): string | undefined {
 const API_KEY = readEnv('VITE_EXCHANGERATE_API_KEY')
 const ALPHA_VANTAGE_API_KEY = readEnv('VITE_ALPHA_VANTAGE_API_KEY')
 
-export const SUPPLEMENTAL_CURRENCIES: CurrencyCode[] = ['CLP', 'COP', 'PEN']
+export const SUPPLEMENTAL_CURRENCIES: CurrencyCode[] = [
+  'CLP',
+  'COP',
+  'PEN',
+  'ARS',
+  'GTQ',
+  'PYG',
+  'UYU',
+]
 export const ALPHA_VANTAGE_HISTORY_CURRENCIES: CurrencyCode[] = ['CLP', 'COP', 'PEN', 'ARS']
 
 export type ExchangeRateHistoryResponse = {

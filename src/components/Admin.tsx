@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import type { ExchangeRateDataset } from '../types/exchangeRate'
+import { useEffect, useState } from 'react'
+import { fetchRawSheetsDataset } from '../lib'
+import type { ExchangeRateDataset, RawSheet } from '../types/exchangeRate'
 
 interface AdminProps {
   error: string | null
@@ -51,13 +52,42 @@ function Admin({
 }: AdminProps) {
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
-  const [sheetName, setSheetName] = useState(
-    dataset?.rawSheets[0]?.name ?? 'Summary',
-  )
+  const [sheetName, setSheetName] = useState('Summary')
+  const [fetchedRawSheets, setFetchedRawSheets] = useState<RawSheet[]>([])
 
   const [isMailingModalOpen, setIsMailingModalOpen] = useState(false)
   const [mailingList, setMailingList] = useState<string[]>([])
   const [newEmail, setNewEmail] = useState('')
+
+  useEffect(() => {
+    let isMounted = true
+
+    if (dataset?.rawSheets?.length) {
+      return () => {
+        isMounted = false
+      }
+    }
+
+    void fetchRawSheetsDataset().then((payload) => {
+      if (!isMounted || !payload?.rawSheets?.length) {
+        return
+      }
+
+      setFetchedRawSheets(payload.rawSheets)
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [dataset?.rawSheets])
+
+  const rawSheets =
+    dataset?.rawSheets?.length ? dataset.rawSheets : fetchedRawSheets
+  const activeSheetName = rawSheets.some((sheet) => sheet.name === sheetName)
+    ? sheetName
+    : (rawSheets[0]?.name ?? '')
+  const selectedSheet =
+    rawSheets.find((sheet) => sheet.name === activeSheetName) ?? rawSheets[0]
 
   const openMailingModal = async () => {
     setIsMailingModalOpen(true)
@@ -105,10 +135,6 @@ function Admin({
   const removeEmail = (emailToRemove: string) => {
     setMailingList(mailingList.filter((email) => email !== emailToRemove))
   }
-
-  const selectedSheet =
-    dataset?.rawSheets.find((sheet) => sheet.name === sheetName) ??
-    dataset?.rawSheets[0]
 
   return (
     <div className="panel">
@@ -168,11 +194,12 @@ function Admin({
         <h3>원본 데이터 내보내기</h3>
         <div className="inline-controls" style={{ marginBottom: 8 }}>
           <select
-            value={sheetName}
+            value={activeSheetName}
             onChange={(event) => setSheetName(event.target.value)}
             aria-label="시트 선택"
+            disabled={!rawSheets.length}
           >
-            {dataset?.rawSheets.map((sheet) => (
+            {rawSheets.map((sheet) => (
               <option key={sheet.name} value={sheet.name}>
                 {sheet.name}
               </option>
@@ -198,8 +225,14 @@ function Admin({
           </button>
         </div>
         <p className="table-help">
-          원본 시트는 화면에 상시 표시하지 않고, 필요할 때만 CSV로 추출합니다.
+          원본 시트는 메인 데이터셋과 분리되어 있으며, 필요할 때만 CSV로
+          추출합니다.
         </p>
+        {!rawSheets.length ? (
+          <p className="table-help">
+            원본 시트 데이터를 아직 불러오지 못했습니다.
+          </p>
+        ) : null}
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
