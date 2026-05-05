@@ -113,7 +113,7 @@ function Admin({
       })
       if (res.ok) {
         alert(
-          '메일링 리스트가 저장되었습니다. 변경 사항은 저장소에 반영해야 운영 환경에 적용됩니다.',
+          '메일링 리스트가 저장되었습니다. 변경 사항은 저장소에 반영되어야 운영 환경에 적용됩니다.',
         )
         setIsMailingModalOpen(false)
       } else {
@@ -225,8 +225,7 @@ function Admin({
           </button>
         </div>
         <p className="table-help">
-          원본 시트는 메인 데이터셋과 분리되어 있으며, 필요할 때만 CSV로
-          추출합니다.
+          원본 시트는 메인 데이터셋과 분리되어 있으며, 필요할 때만 CSV로 추출합니다.
         </p>
         {!rawSheets.length ? (
           <p className="table-help">
@@ -271,7 +270,7 @@ function Admin({
             <h3>메일링 리스트</h3>
             <p>
               일일 대시보드 리포트를 받을 이메일을 관리합니다. 로컬에서 저장한 뒤
-              저장소에 반영해야 운영 환경에 적용됩니다.
+              저장소에 반영되어야 운영 환경에 적용됩니다.
             </p>
 
             <div className="inline-controls" style={{ margin: '16px 0' }}>
@@ -292,7 +291,7 @@ function Admin({
                 <thead>
                   <tr>
                     <th>이메일</th>
-                    <th>삭제</th>
+                    <th>작업</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -310,7 +309,7 @@ function Admin({
                             onClick={() => removeEmail(email)}
                             className="quiet-button"
                           >
-                            삭제
+                            제거
                           </button>
                         </td>
                       </tr>

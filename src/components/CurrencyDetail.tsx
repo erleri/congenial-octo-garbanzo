@@ -227,7 +227,9 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                         rateType === 'KRW' ? 'KRW' : currency,
                       )}
                       {item?.source === 'IMPUTED' && item?.imputationMethod === 'FFILL' ? (
-                        <span className="imputed-badge" title="휴일 또는 결측으로 전일값 보정">보</span>
+                        <span className="imputed-badge" title="휴일 또는 결측값으로 인한 일별 보정">
+                          보
+                        </span>
                       ) : null}
                     </td>
                   )
@@ -321,8 +323,10 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
 
       <div className="table-card" style={{ marginTop: 12 }}>
         <h3>일별 환율표</h3>
-        <p className="table-help">표시: <span className="imputed-badge">보</span> = 휴일 또는 결측 보정값</p>
-        <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
+        <p className="table-help">
+          표시: <span className="imputed-badge">보</span> = 휴일 또는 결측값 보정
+        </p>
+        <p className="mobile-table-hint">표를 좌우로 이동하면 전체 데이터를 확인할 수 있습니다.</p>
         {renderMatrix('LOCAL_PER_USD')}
       </div>
     </div>

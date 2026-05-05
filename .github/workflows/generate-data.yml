@@ -140,22 +140,22 @@ jobs:
           else:
               summary_block = (
                   "<h3 style=\"margin:0 0 8px;font-size:15px;\">일일 요약</h3>"
-                  "<p style=\"margin:0 0 16px;\">직전 유효일과 비교할 요약 데이터를 만들지 못했습니다.</p>"
+                  "<p style=\"margin:0 0 16px;\">직전 유효일과 비교한 요약 데이터를 만들지 못했습니다.</p>"
               )
 
-          subject = f"[LATAM FX] {base_date} \uc911\ub0a8\ubbf8 \ud658\uc728 \ub300\uc2dc\ubcf4\ub4dc"
+          subject = f"[LATAM FX] {base_date} 중남미 환율 대시보드"
           html = f"""\
-          <h2>LATAM FX \uc77c\uc77c \ub300\uc2dc\ubcf4\ub4dc</h2>
+          <h2>LATAM FX 일일 대시보드</h2>
           {summary_block}
-          <p>\uc5c5\ub370\uc774\ud2b8\ub41c \uccab \ub300\uc2dc\ubcf4\ub4dc \ud654\uba74\uc785\ub2c8\ub2e4.</p>
+          <p>업데이트된 첫 대시보드 화면입니다.</p>
           <ul>
-            <li><strong>\uae30\uc900\uc77c</strong>: {base_date}</li>
-            <li><strong>\ucd5c\uc885 \uac31\uc2e0</strong>: {fetched_at}</li>
-            <li><strong>\ub370\uc774\ud130 \ucd9c\ucc98</strong>: ExchangeRate API, Alpha Vantage, \ubcf4\uc815 \ub370\uc774\ud130</li>
-            <li><strong>\ubcf4\uc815 \ud3ec\ud568</strong>: \uc608</li>
+            <li><strong>기준일</strong>: {base_date}</li>
+            <li><strong>최종 갱신</strong>: {fetched_at}</li>
+            <li><strong>데이터 출처</strong>: ExchangeRate API, Alpha Vantage, 보정 데이터</li>
+            <li><strong>보정 포함</strong>: 예</li>
           </ul>
           <p><img src="cid:dashboard-image" alt="LATAM FX dashboard" style="width:100%;max-width:1440px;height:auto;border:1px solid #d9dee7;"></p>
-          <p>\uc0c1\uc138 \ud654\uba74: <a href="https://latamforex.netlify.app/">LATAM FX Dashboard</a></p>
+          <p>상세 화면: <a href="https://latamforex.netlify.app/">LATAM FX Dashboard</a></p>
           """
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
