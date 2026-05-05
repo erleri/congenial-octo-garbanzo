@@ -3,6 +3,7 @@ import {
   fetchRemoteExchangeData,
   fetchRemoteExchangeDataWithExcel,
   fetchStaticDataset,
+  fetchManualBackfillDataset,
   loadDatasetFromCache,
   saveDatasetToCache,
   loadBusinessPlanFromCache,
@@ -130,13 +131,16 @@ export function useExchangeData() {
     try {
       setLoading(true)
       setError(null)
+      const manualBackfill = excelFile ? null : await fetchManualBackfillDataset()
       const fetched = excelFile
         ? await fetchRemoteExchangeDataWithExcel(
             excelFile,
             { excelPriority, fillMissing },
             new Date(),
           )
-        : await fetchRemoteExchangeData(new Date())
+        : await fetchRemoteExchangeData(new Date(), {
+            manualBackfillByDate: manualBackfill?.ratesByDate,
+          })
 
       await applyDataset(fetched)
     } catch (refreshError) {

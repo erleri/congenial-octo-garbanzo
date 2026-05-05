@@ -35,6 +35,7 @@ export interface ExcelMergeOptions {
 
 export interface RemoteExchangeDataOptions {
   supplementalHistoryByCurrency?: Record<string, Record<string, number>>
+  manualBackfillByDate?: Record<string, Record<string, number>>
 }
 
 export function mergeRateSeries(
@@ -405,6 +406,28 @@ export async function fetchRemoteExchangeData(
     }
 
     mergedRatesByDate[currencyApiLatestPayload.date] = merged
+  }
+
+  if (options.manualBackfillByDate) {
+    const manualBackfillCurrencies = new Set<CurrencyCode>(['PYG', 'GTQ', 'UYU'])
+
+    for (const [date, currencyRates] of Object.entries(options.manualBackfillByDate)) {
+      const existing = mergedRatesByDate[date]
+      if (!existing) {
+        continue
+      }
+
+      for (const [currency, value] of Object.entries(currencyRates)) {
+        if (!manualBackfillCurrencies.has(currency as CurrencyCode)) {
+          continue
+        }
+
+        const numeric = toNumber(value)
+        if (numeric !== null) {
+          existing[currency] = numeric
+        }
+      }
+    }
   }
 
   const dailyRates: ExchangeRateDataset['dailyRates'] = Object.entries(

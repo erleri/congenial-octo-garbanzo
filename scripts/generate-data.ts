@@ -11,6 +11,13 @@ type RepoSupplementalCache = {
   rates: Record<string, Record<string, number>>
 }
 
+type RepoBackfillCache = {
+  generatedAt: string
+  sourceWorkbook: string
+  currencies: string[]
+  ratesByDate: Record<string, Record<string, number>>
+}
+
 async function loadRepoSupplementalCache(cachePath: string): Promise<RepoSupplementalCache | null> {
   try {
     const raw = await readFile(cachePath, 'utf8')
@@ -20,10 +27,21 @@ async function loadRepoSupplementalCache(cachePath: string): Promise<RepoSupplem
   }
 }
 
+async function loadRepoBackfillCache(cachePath: string): Promise<RepoBackfillCache | null> {
+  try {
+    const raw = await readFile(cachePath, 'utf8')
+    return JSON.parse(raw) as RepoBackfillCache
+  } catch {
+    return null
+  }
+}
+
 async function main() {
   const outputPath = resolve(process.cwd(), 'public', 'data.json')
   const supplementalCachePath = resolve(process.cwd(), 'data', 'alpha-vantage-history.json')
+  const backfillCachePath = resolve(process.cwd(), 'data', 'fx-backfill-history.json')
   const repoSupplementalCache = await loadRepoSupplementalCache(supplementalCachePath)
+  const repoBackfillCache = await loadRepoBackfillCache(backfillCachePath)
   const supplementalRates = {
     ...(repoSupplementalCache?.rates ?? {}),
   }
@@ -41,6 +59,7 @@ async function main() {
 
   const dataset = await fetchRemoteExchangeData(new Date(), {
     supplementalHistoryByCurrency: supplementalRates,
+    manualBackfillByDate: repoBackfillCache?.ratesByDate,
   })
 
   await mkdir(dirname(outputPath), { recursive: true })
@@ -56,6 +75,20 @@ async function main() {
   console.log(`Updated ${supplementalCachePath}`)
   console.log(`Base date: ${dataset.baseDate}`)
   console.log(`Fetched at: ${dataset.fetchedAt}`)
+
+  if (repoBackfillCache?.ratesByDate) {
+    const targetCurrencies = ['GTQ', 'PYG', 'UYU']
+    const stats = targetCurrencies.map((currency) => {
+      const count = dataset.dailyRates.filter(
+        (row) => row.currency === currency && row.rateType === 'LOCAL_PER_USD' && row.value !== null,
+      ).length
+
+      return { currency, dailyNonNullCount: count }
+    })
+
+    console.log(`Loaded manual backfill from ${backfillCachePath}`)
+    console.table(stats)
+  }
 }
 
 main().catch((error) => {

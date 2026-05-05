@@ -53,7 +53,9 @@ function renderMatrix(
 
   return (
     <>
-      <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
+      <p className="mobile-table-hint">
+        표를 좌우로 이동하면 전체 데이터를 확인할 수 있습니다.
+      </p>
       <div className="table-scroll">
         <table className="dense-table">
           <thead>
@@ -89,7 +91,10 @@ function renderMatrix(
                     const className = row?.status === 'zero' ? 'cell-zero' : ''
 
                     return (
-                      <td key={`${currency}-${group.year}-${month}`} className={className}>
+                      <td
+                        key={`${currency}-${group.year}-${month}`}
+                        className={className}
+                      >
                         {formatCellValue(
                           row?.value ?? null,
                           row?.status ?? 'empty',
@@ -108,22 +113,30 @@ function renderMatrix(
   )
 }
 
-function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChange }: MonthlySummaryProps) {
+function MonthlySummary({
+  data,
+  currencyFilter,
+  yearFrom,
+  yearTo,
+  onCurrencyChange,
+}: MonthlySummaryProps) {
   const localRows = pickRows(data.monthlyRates, 'LOCAL_PER_USD', currencyFilter)
   const krwRows = pickRows(data.monthlyRates, 'KRW', currencyFilter)
-
-  const rawSummary = data.rawSheets.find((sheet) => sheet.name === 'Summary')
 
   return (
     <div className="panel">
       <div className="panel-header-inline">
         <div>
           <h2>월별 이력</h2>
-          <p className="table-help">선택한 기간과 통화의 월평균 환율입니다.</p>
+          <p className="table-help">
+            선택한 기간과 통화의 월평균 환율을 확인합니다.
+          </p>
         </div>
         <select
           value={currencyFilter}
-          onChange={(event) => onCurrencyChange(event.target.value as CurrencyFilter)}
+          onChange={(event) =>
+            onCurrencyChange(event.target.value as CurrencyFilter)
+          }
           aria-label="통화 필터"
         >
           <option value="ALL">전체 통화</option>
@@ -137,37 +150,18 @@ function MonthlySummary({ data, currencyFilter, yearFrom, yearTo, onCurrencyChan
 
       <div className="table-card">
         <h3>Local per USD</h3>
-        {renderMatrix(localRows, 'LOCAL_PER_USD', currencyFilter, yearFrom, yearTo)}
+        {renderMatrix(
+          localRows,
+          'LOCAL_PER_USD',
+          currencyFilter,
+          yearFrom,
+          yearTo,
+        )}
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
         <h3>KRW 환산</h3>
         {renderMatrix(krwRows, 'KRW', currencyFilter, yearFrom, yearTo)}
-      </div>
-
-      <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>원본 Summary</h3>
-        <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
-        <div className="table-scroll">
-          <table className="dense-table">
-            <thead>
-              <tr>
-                {(rawSummary?.headers ?? []).map((header) => (
-                  <th key={header}>{header}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {(rawSummary?.rows ?? []).slice(0, 500).map((row, rowIndex) => (
-                <tr key={`raw-${rowIndex}`}>
-                  {(rawSummary?.headers ?? []).map((header) => (
-                    <td key={`${rowIndex}-${header}`}>{String(row[header] ?? '-')}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   )

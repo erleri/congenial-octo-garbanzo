@@ -66,13 +66,87 @@ jobs:
           FETCHED_AT: ${{ steps.dataset.outputs.fetched_at }}
         run: |
           python - <<'PY'
+          import json
           import os
+          from pathlib import Path
+
+          dataset = json.loads(Path("public/data.json").read_text(encoding="utf-8"))
+          daily_rates = dataset.get("dailyRates", [])
 
           base_date = os.environ["BASE_DATE"]
           fetched_at = os.environ.get("FETCHED_AT") or "-"
+
+          latest_local_rows = [
+              row
+              for row in daily_rates
+              if row.get("date") == base_date
+              and row.get("rateType") == "LOCAL_PER_USD"
+              and row.get("currency") != "USD"
+              and isinstance(row.get("value"), (int, float))
+          ]
+
+          latest_by_currency = {row["currency"]: row for row in latest_local_rows}
+          previous_by_currency = {}
+
+          for row in reversed(daily_rates):
+              currency = row.get("currency")
+              if currency not in latest_by_currency:
+                  continue
+              if row.get("rateType") != "LOCAL_PER_USD":
+                  continue
+              if row.get("date") == base_date:
+                  continue
+              if not isinstance(row.get("value"), (int, float)):
+                  continue
+              if currency in previous_by_currency:
+                  continue
+              previous_by_currency[currency] = row
+
+          summary_items = []
+          for currency, latest_row in latest_by_currency.items():
+              previous_row = previous_by_currency.get(currency)
+              if not previous_row:
+                  continue
+
+              previous_value = previous_row["value"]
+              latest_value = latest_row["value"]
+              if previous_value in (None, 0):
+                  continue
+
+              change_pct = ((latest_value - previous_value) / previous_value) * 100
+              summary_items.append(
+                  {
+                      "currency": currency,
+                      "change_pct": change_pct,
+                      "previous_date": previous_row["date"],
+                  }
+              )
+
+          summary_items.sort(key=lambda item: abs(item["change_pct"]), reverse=True)
+          top_summary = summary_items[:3]
+
+          if top_summary:
+              summary_html = "".join(
+                  f"<li><strong>{item['currency']}</strong>: {item['change_pct']:+.2f}% "
+                  f"(직전 유효일 {item['previous_date']} 대비)</li>"
+                  for item in top_summary
+              )
+              summary_block = (
+                  "<h3 style=\"margin:0 0 8px;font-size:15px;\">일일 요약</h3>"
+                  "<ul style=\"margin:0 0 16px 18px;padding:0;\">"
+                  f"{summary_html}"
+                  "</ul>"
+              )
+          else:
+              summary_block = (
+                  "<h3 style=\"margin:0 0 8px;font-size:15px;\">일일 요약</h3>"
+                  "<p style=\"margin:0 0 16px;\">직전 유효일과 비교할 요약 데이터를 만들지 못했습니다.</p>"
+              )
+
           subject = f"[LATAM FX] {base_date} \uc911\ub0a8\ubbf8 \ud658\uc728 \ub300\uc2dc\ubcf4\ub4dc"
           html = f"""\
           <h2>LATAM FX \uc77c\uc77c \ub300\uc2dc\ubcf4\ub4dc</h2>
+          {summary_block}
           <p>\uc5c5\ub370\uc774\ud2b8\ub41c \uccab \ub300\uc2dc\ubcf4\ub4dc \ud654\uba74\uc785\ub2c8\ub2e4.</p>
           <ul>
             <li><strong>\uae30\uc900\uc77c</strong>: {base_date}</li>

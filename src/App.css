@@ -16,6 +16,10 @@
   --danger: #a61b12;
   --warning: #9a5b05;
   --blue: #1f5fbf;
+  --glass-bg: rgb(255 255 255 / 0.72);
+  --glass-border: rgb(255 255 255 / 0.5);
+  --glass-shadow: 0 10px 24px rgb(15 23 42 / 0.05);
+  --glass-blur: 12px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --shadow-subtle: none;
@@ -51,8 +55,13 @@ button {
   grid-template-columns: minmax(190px, auto) minmax(380px, 1fr) auto;
   align-items: center;
   gap: 20px;
-  padding: 0 0 12px;
-  border-bottom: 1px solid #bfc7d3;
+  padding: 14px 16px 12px;
+  border: 1px solid rgb(210 216 225 / 0.9);
+  border-radius: calc(var(--radius-md) + 2px);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.64));
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.7);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
 }
 
 .title-wrap h1 {
@@ -135,12 +144,20 @@ button {
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
+  padding: 6px 8px;
+  border: 1px solid var(--glass-border);
+  border-radius: calc(var(--radius-md) + 6px);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  backdrop-filter: blur(var(--glass-blur));
 }
 
 .status-group {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 2px 0;
   color: var(--text-muted);
   font-size: 12px;
   white-space: nowrap;
@@ -181,6 +198,13 @@ button {
   font-size: 13px;
   font-weight: 650;
   box-shadow: var(--shadow-subtle);
+}
+
+.header-refresh-button {
+  border-color: rgb(195 203 214 / 0.95);
+  background: rgb(255 255 255 / 0.68);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .quiet-button:hover,
@@ -712,6 +736,8 @@ main {
   align-items: center;
   justify-content: center;
   background: rgb(16 24 40 / 0.52);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .modal-content {
@@ -719,11 +745,13 @@ main {
   max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  border: 1px solid var(--border);
+  border: 1px solid rgb(255 255 255 / 0.48);
   border-radius: var(--radius-md);
-  background: var(--surface);
+  background: rgb(255 255 255 / 0.86);
   padding: 18px;
-  box-shadow: 0 18px 36px rgb(17 24 39 / 0.14);
+  box-shadow: 0 18px 36px rgb(17 24 39 / 0.12);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .loading-panel {
@@ -747,10 +775,12 @@ main {
 .plan-auth-panel {
   display: grid;
   gap: 10px;
-  border: 1px solid var(--border-soft);
+  border: 1px solid rgb(255 255 255 / 0.46);
   border-radius: var(--radius-md);
-  background: #fbfcfd;
+  background: rgb(255 255 255 / 0.72);
   padding: 12px;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .plan-auth-grid {
@@ -822,6 +852,7 @@ main {
   .header-actions {
     align-items: stretch;
     flex-direction: column;
+    padding: 8px;
   }
 
   .status-group {
@@ -852,6 +883,16 @@ main {
 
   .panel {
     padding: 12px;
+  }
+
+  .top-header,
+  .header-actions,
+  .modal-overlay,
+  .modal-content,
+  .plan-auth-panel,
+  .header-refresh-button {
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
   }
 
   .kpi-grid,

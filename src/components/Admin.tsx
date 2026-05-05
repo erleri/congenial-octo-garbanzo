@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import type { ExchangeRateDataset } from '../types/exchangeRate'
 
 interface AdminProps {
@@ -12,7 +12,11 @@ interface AdminProps {
   fillMissing: boolean
 }
 
-function downloadCsv(filename: string, headers: string[], rows: Array<Record<string, string | number | null>>) {
+function downloadCsv(
+  filename: string,
+  headers: string[],
+  rows: Array<Record<string, string | number | null>>,
+) {
   const escaped = (value: string | number | null): string => {
     if (value === null) {
       return ''
@@ -24,7 +28,9 @@ function downloadCsv(filename: string, headers: string[], rows: Array<Record<str
 
   const csv = [
     headers.join(','),
-    ...rows.map((row) => headers.map((header) => escaped(row[header] ?? null)).join(',')),
+    ...rows.map((row) =>
+      headers.map((header) => escaped(row[header] ?? null)).join(','),
+    ),
   ].join('\n')
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -45,8 +51,9 @@ function Admin({
 }: AdminProps) {
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
-  const [sheetName, setSheetName] = useState(dataset?.rawSheets[0]?.name ?? 'Summary')
-  const [query, setQuery] = useState('')
+  const [sheetName, setSheetName] = useState(
+    dataset?.rawSheets[0]?.name ?? 'Summary',
+  )
 
   const [isMailingModalOpen, setIsMailingModalOpen] = useState(false)
   const [mailingList, setMailingList] = useState<string[]>([])
@@ -75,7 +82,9 @@ function Admin({
         body: JSON.stringify(mailingList),
       })
       if (res.ok) {
-        alert('메일링 리스트가 저장되었습니다. 변경 사항은 저장소에 반영해야 운영 환경에 적용됩니다.')
+        alert(
+          '메일링 리스트가 저장되었습니다. 변경 사항은 저장소에 반영해야 운영 환경에 적용됩니다.',
+        )
         setIsMailingModalOpen(false)
       } else {
         alert('저장 실패: 로컬 개발 서버에서만 동작합니다.')
@@ -97,33 +106,24 @@ function Admin({
     setMailingList(mailingList.filter((email) => email !== emailToRemove))
   }
 
-  const selectedSheet = dataset?.rawSheets.find((sheet) => sheet.name === sheetName) ?? dataset?.rawSheets[0]
-
-  const filteredRows = useMemo(() => {
-    if (!selectedSheet) {
-      return []
-    }
-
-    if (!query.trim()) {
-      return selectedSheet.rows
-    }
-
-    const lowered = query.toLowerCase()
-    return selectedSheet.rows.filter((row) =>
-      selectedSheet.headers.some((header) =>
-        String(row[header] ?? '').toLowerCase().includes(lowered),
-      ),
-    )
-  }, [query, selectedSheet])
+  const selectedSheet =
+    dataset?.rawSheets.find((sheet) => sheet.name === sheetName) ??
+    dataset?.rawSheets[0]
 
   return (
     <div className="panel">
       <div className="panel-header-inline">
         <div>
           <h2>관리</h2>
-          <p className="table-help">데이터 업로드, 원본 확인, 메일링 리스트를 관리합니다.</p>
+          <p className="table-help">
+            데이터 업로드와 운영용 내보내기 작업을 관리합니다.
+          </p>
         </div>
-        <button type="button" onClick={openMailingModal} className="quiet-button">
+        <button
+          type="button"
+          onClick={openMailingModal}
+          className="quiet-button"
+        >
           메일링 리스트
         </button>
       </div>
@@ -165,21 +165,19 @@ function Admin({
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>원본 데이터</h3>
+        <h3>원본 데이터 내보내기</h3>
         <div className="inline-controls" style={{ marginBottom: 8 }}>
-          <select value={sheetName} onChange={(event) => setSheetName(event.target.value)} aria-label="시트 선택">
+          <select
+            value={sheetName}
+            onChange={(event) => setSheetName(event.target.value)}
+            aria-label="시트 선택"
+          >
             {dataset?.rawSheets.map((sheet) => (
               <option key={sheet.name} value={sheet.name}>
                 {sheet.name}
               </option>
             ))}
           </select>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="검색"
-          />
           <button
             type="button"
             className="quiet-button"
@@ -189,34 +187,19 @@ function Admin({
                 return
               }
 
-              downloadCsv(selectedSheet.name, selectedSheet.headers, filteredRows)
+              downloadCsv(
+                selectedSheet.name,
+                selectedSheet.headers,
+                selectedSheet.rows,
+              )
             }}
           >
             CSV 내보내기
           </button>
         </div>
-
-        <p className="mobile-table-hint">표를 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
-        <div className="table-scroll">
-          <table className="dense-table">
-            <thead>
-              <tr>
-                {selectedSheet?.headers.map((header) => (
-                  <th key={header}>{header}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRows.map((row, rowIndex) => (
-                <tr key={`${selectedSheet?.name}-${rowIndex}`}>
-                  {selectedSheet?.headers.map((header) => (
-                    <td key={`${rowIndex}-${header}`}>{String(row[header] ?? '-')}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <p className="table-help">
+          원본 시트는 화면에 상시 표시하지 않고, 필요할 때만 CSV로 추출합니다.
+        </p>
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
@@ -228,7 +211,11 @@ function Admin({
           </div>
           <div>
             <strong>최종 갱신</strong>
-            <div>{dataset ? new Date(dataset.fetchedAt).toLocaleString('ko-KR') : '-'}</div>
+            <div>
+              {dataset
+                ? new Date(dataset.fetchedAt).toLocaleString('ko-KR')
+                : '-'}
+            </div>
           </div>
           <div>
             <strong>일별 레코드</strong>
@@ -236,7 +223,9 @@ function Admin({
           </div>
           <div>
             <strong>월별 레코드</strong>
-            <div>{dataset?.monthlyRates.length.toLocaleString('ko-KR') ?? '0'}</div>
+            <div>
+              {dataset?.monthlyRates.length.toLocaleString('ko-KR') ?? '0'}
+            </div>
           </div>
         </div>
       </div>
@@ -248,7 +237,8 @@ function Admin({
           <div className="modal-content">
             <h3>메일링 리스트</h3>
             <p>
-              일일 대시보드 리포트를 받을 이메일을 관리합니다. 로컬에서 저장한 뒤 저장소에 반영해야 운영 환경에 적용됩니다.
+              일일 대시보드 리포트를 받을 이메일을 관리합니다. 로컬에서 저장한 뒤
+              저장소에 반영해야 운영 환경에 적용됩니다.
             </p>
 
             <div className="inline-controls" style={{ margin: '16px 0' }}>
@@ -259,7 +249,9 @@ function Admin({
                 onKeyDown={(event) => event.key === 'Enter' && addEmail()}
                 placeholder="이메일 주소"
               />
-              <button type="button" onClick={addEmail} className="quiet-button">추가</button>
+              <button type="button" onClick={addEmail} className="quiet-button">
+                추가
+              </button>
             </div>
 
             <div className="table-scroll" style={{ maxHeight: '250px' }}>
@@ -280,7 +272,13 @@ function Admin({
                       <tr key={email}>
                         <td>{email}</td>
                         <td>
-                          <button type="button" onClick={() => removeEmail(email)} className="quiet-button">삭제</button>
+                          <button
+                            type="button"
+                            onClick={() => removeEmail(email)}
+                            className="quiet-button"
+                          >
+                            삭제
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -289,9 +287,24 @@ function Admin({
               </table>
             </div>
 
-            <div className="inline-controls" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
-              <button type="button" onClick={() => setIsMailingModalOpen(false)} className="quiet-button">취소</button>
-              <button type="button" onClick={saveMailingList} className="header-refresh-button">저장</button>
+            <div
+              className="inline-controls"
+              style={{ justifyContent: 'flex-end', marginTop: 16 }}
+            >
+              <button
+                type="button"
+                onClick={() => setIsMailingModalOpen(false)}
+                className="quiet-button"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={saveMailingList}
+                className="header-refresh-button"
+              >
+                저장
+              </button>
             </div>
           </div>
         </div>
