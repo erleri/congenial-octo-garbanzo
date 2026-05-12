@@ -4,6 +4,7 @@ const Admin = lazy(() => import('./components/Admin'))
 const CurrencyDetail = lazy(() => import('./components/CurrencyDetail'))
 const MonthlySummary = lazy(() => import('./components/MonthlySummary'))
 const MovingComparison = lazy(() => import('./components/MovingComparison'))
+import { buildInfo } from './buildInfo'
 import { useExchangeData } from './hooks/useExchangeData'
 import type { DashboardFilters } from './types/exchangeRate'
 import { CURRENCIES } from './types/exchangeRate'
@@ -34,6 +35,15 @@ function formatDateTime(value?: string): string {
     return '-'
   }
 
+  return new Date(value).toLocaleString('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+function formatBuildTime(value: string): string {
   return new Date(value).toLocaleString('ko-KR', {
     month: '2-digit',
     day: '2-digit',
@@ -320,6 +330,12 @@ function App() {
           <div className="status-group">
             <span className="status-item">기준일 {dataset?.baseDate ?? '-'}</span>
             <span className="status-item">최종 갱신 {formatDateTime(dataset?.fetchedAt)}</span>
+            <span
+              className="status-item version-item"
+              title={`${buildInfo.branch} / built ${formatBuildTime(buildInfo.builtAt)}`}
+            >
+              build {buildInfo.commit}
+            </span>
             <span className="status-item">
               <span className={`status-dot ${loading ? 'loading' : error ? 'error' : ''}`} />
               {loading ? '갱신 중' : error ? '확인 필요' : '정상'}

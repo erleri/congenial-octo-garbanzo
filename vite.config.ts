@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'fs'
+import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import type { ServerResponse } from 'node:http'
 
@@ -28,8 +29,25 @@ function parseMailingListPayload(rawBody: string): string[] | null {
   return [...new Set(normalized)]
 }
 
+function readGitValue(command: string): string {
+  try {
+    return execSync(command, { stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim()
+  } catch {
+    return ''
+  }
+}
+
+const appCommit = (process.env.COMMIT_REF || readGitValue('git rev-parse HEAD') || 'unknown').slice(0, 7)
+const appBranch = process.env.BRANCH || readGitValue('git branch --show-current') || 'local'
+const appBuiltAt = new Date().toISOString()
+
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    __APP_COMMIT__: JSON.stringify(appCommit),
+    __APP_BRANCH__: JSON.stringify(appBranch),
+    __APP_BUILT_AT__: JSON.stringify(appBuiltAt),
+  },
   plugins: [
     react(),
     {

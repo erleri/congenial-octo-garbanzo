@@ -171,6 +171,10 @@ button {
   font-variant-numeric: tabular-nums;
 }
 
+.version-item {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
 .status-dot {
   display: inline-block;
   width: 7px;
