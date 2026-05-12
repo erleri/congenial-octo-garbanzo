@@ -11,6 +11,7 @@ interface AdminProps {
   ) => Promise<void>
   excelPriority: boolean
   fillMissing: boolean
+  initialMailingOpen?: boolean
 }
 
 function downloadCsv(
@@ -49,13 +50,14 @@ function Admin({
   onUploadExcel,
   excelPriority,
   fillMissing,
+  initialMailingOpen = false,
 }: AdminProps) {
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
   const [sheetName, setSheetName] = useState('Summary')
   const [fetchedRawSheets, setFetchedRawSheets] = useState<RawSheet[]>([])
 
-  const [isMailingModalOpen, setIsMailingModalOpen] = useState(false)
+  const [isMailingModalOpen, setIsMailingModalOpen] = useState(initialMailingOpen)
   const [mailingList, setMailingList] = useState<string[]>([])
   const [newEmail, setNewEmail] = useState('')
 
@@ -89,8 +91,7 @@ function Admin({
   const selectedSheet =
     rawSheets.find((sheet) => sheet.name === activeSheetName) ?? rawSheets[0]
 
-  const openMailingModal = async () => {
-    setIsMailingModalOpen(true)
+  const loadMailingList = async () => {
     try {
       const res = await fetch('/api/mailing-list')
       if (res.ok) {
@@ -103,6 +104,20 @@ function Admin({
       console.warn('Failed to load mailing list, API might not be available.')
     }
   }
+
+  const openMailingModal = async () => {
+    setIsMailingModalOpen(true)
+    await loadMailingList()
+  }
+
+  useEffect(() => {
+    if (initialMailingOpen) {
+      const timeoutId = window.setTimeout(() => {
+        void loadMailingList()
+      }, 0)
+      return () => window.clearTimeout(timeoutId)
+    }
+  }, [initialMailingOpen])
 
   const saveMailingList = async () => {
     try {

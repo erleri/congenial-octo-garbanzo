@@ -9,7 +9,12 @@ lerna-debug.log*
 
 node_modules
 dist
+dist-local
 dist-ssr
+email-chart.png
+email-chart-meta.json
+email-market-context.json
+public/email-preview.html
 *.local
 
 # Editor directories and files

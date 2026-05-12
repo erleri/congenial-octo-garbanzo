@@ -36,13 +36,14 @@ interface DotProps {
   }
 }
 
-const KPI_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'PEN'] as const
+const KPI_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN'] as const
 
 const SERIES_COLORS = {
   BRL: '#2f6f5e',
   MXN: '#4f6f38',
   CLP: '#93691d',
   COP: '#70577a',
+  ARS: '#8a4f2a',
   PEN: '#24706d',
 } as const
 

@@ -43,7 +43,8 @@ function formatDateTime(value?: string): string {
 }
 
 function App() {
-  const [screen, setScreen] = useState<ScreenKey>('dashboard')
+  const [isMailingDeepLink, setIsMailingDeepLink] = useState(window.location.hash === '#mailing')
+  const [screen, setScreen] = useState<ScreenKey>(isMailingDeepLink ? 'admin' : 'dashboard')
   const showHeaderFilters = ['monthly', 'currency'].includes(screen)
   const [monthlyCurrency, setMonthlyCurrency] = useState<DashboardFilters['currency']>('ALL')
   const [periodFrom, setPeriodFrom] = useState('')
@@ -67,6 +68,20 @@ function App() {
     requestBusinessPlanAccess,
     signOutBusinessPlanAccess,
   } = useExchangeData()
+
+  useEffect(() => {
+    const syncHash = () => {
+      const nextIsMailingDeepLink = window.location.hash === '#mailing'
+      setIsMailingDeepLink(nextIsMailingDeepLink)
+      if (nextIsMailingDeepLink) {
+        setScreen('admin')
+      }
+    }
+
+    syncHash()
+    window.addEventListener('hashchange', syncHash)
+    return () => window.removeEventListener('hashchange', syncHash)
+  }, [])
 
   const periodOptions = useMemo(() => {
     if (!dataset) {
@@ -245,11 +260,13 @@ function App() {
       case 'admin':
         return (
           <Admin
+            key={isMailingDeepLink ? 'admin-mailing' : 'admin'}
             error={error}
             dataset={dataset}
             onUploadExcel={uploadAndMergeExcel}
             excelPriority={excelPriority}
             fillMissing={fillMissing}
+            initialMailingOpen={isMailingDeepLink}
           />
         )
       default:
@@ -273,6 +290,7 @@ function App() {
     businessPlanStatus,
     requestBusinessPlanAccess,
     signOutBusinessPlanAccess,
+    isMailingDeepLink,
   ])
 
   return (

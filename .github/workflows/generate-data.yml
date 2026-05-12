@@ -59,185 +59,14 @@ jobs:
           echo "base_date=$BASE_DATE" >> "$GITHUB_OUTPUT"
           echo "fetched_at=$FETCHED_AT" >> "$GITHUB_OUTPUT"
 
+      - name: Create market context
+        run: node scripts/create-market-context.js
+        env:
+          VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+
       - name: Compose email metadata
         id: email
-        env:
-          BASE_DATE: ${{ steps.dataset.outputs.base_date }}
-          FETCHED_AT: ${{ steps.dataset.outputs.fetched_at }}
-        run: |
-          python - <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          # 주요 통화 고정 리스트
-          MAJOR_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN']
-
-          dataset = json.loads(Path("public/data.json").read_text(encoding="utf-8"))
-          daily_rates = dataset.get("dailyRates", [])
-
-          base_date = os.environ["BASE_DATE"]
-          fetched_at = os.environ.get("FETCHED_AT") or "-"
-
-          # 기준일(오늘) 데이터 구성
-          latest_local_rows = [
-              row
-              for row in daily_rates
-              if row.get("date") == base_date
-              and row.get("rateType") == "LOCAL_PER_USD"
-              and row.get("currency") in MAJOR_CURRENCIES
-              and isinstance(row.get("value"), (int, float))
-          ]
-
-          latest_by_currency = {row["currency"]: row for row in latest_local_rows}
-          previous_by_currency = {}
-
-          # 직전 유효일 데이터 매칭
-          for row in reversed(daily_rates):
-              currency = row.get("currency")
-              if currency not in MAJOR_CURRENCIES:
-                  continue
-              if row.get("rateType") != "LOCAL_PER_USD":
-                  continue
-              if row.get("date") == base_date:
-                  continue
-              if not isinstance(row.get("value"), (int, float)):
-                  continue
-              if currency in previous_by_currency:
-                  continue
-              previous_by_currency[currency] = row
-
-          # 6개 통화별 환율 + 변동률 계산
-          currency_details = []
-          for currency in MAJOR_CURRENCIES:
-              latest_row = latest_by_currency.get(currency)
-              previous_row = previous_by_currency.get(currency)
-
-              if not latest_row:
-                  currency_details.append({
-                      "currency": currency,
-                      "rate": None,
-                      "change_pct": None,
-                      "previous_date": None,
-                      "status": "데이터없음"
-                  })
-                  continue
-
-              if not previous_row:
-                  currency_details.append({
-                      "currency": currency,
-                      "rate": latest_row["value"],
-                      "change_pct": None,
-                      "previous_date": None,
-                      "status": "비교불가"
-                  })
-                  continue
-
-              previous_value = previous_row["value"]
-              latest_value = latest_row["value"]
-
-              if previous_value in (None, 0):
-                  currency_details.append({
-                      "currency": currency,
-                      "rate": latest_value,
-                      "change_pct": None,
-                      "previous_date": None,
-                      "status": "비교불가"
-                  })
-                  continue
-
-              change_pct = ((latest_value - previous_value) / previous_value) * 100
-              currency_details.append({
-                  "currency": currency,
-                  "rate": latest_value,
-                  "change_pct": change_pct,
-                  "previous_date": previous_row["date"],
-                  "status": "정상"
-              })
-
-          # 상단 환율 요약 블록 (6개 통화 모두 표시)
-          rate_rows = []
-          for detail in currency_details:
-              currency = detail["currency"]
-              rate = detail["rate"]
-              change_pct = detail["change_pct"]
-              previous_date = detail["previous_date"]
-              status = detail["status"]
-
-              if status == "데이터없음":
-                  rate_html = f"<td style=\"text-align:right;padding:6px;\">-</td>"
-                  change_html = f"<td style=\"text-align:center;padding:6px;\">데이터없음</td>"
-              elif status == "비교불가":
-                  rate_html = f"<td style=\"text-align:right;padding:6px;\">{rate:.2f}</td>"
-                  change_html = f"<td style=\"text-align:center;padding:6px;\">-</td>"
-              else:
-                  change_sign = "+" if change_pct >= 0 else ""
-                  change_color = "green" if change_pct > 0 else ("red" if change_pct < 0 else "gray")
-                  rate_html = f"<td style=\"text-align:right;padding:6px;\">{rate:.2f}</td>"
-                  change_html = f"<td style=\"text-align:right;padding:6px;color:{change_color};font-weight:bold;\">{change_sign}{change_pct:.2f}%</td>"
-
-              rate_rows.append(
-                  f"<tr><td style=\"padding:6px;font-weight:bold;\">{currency}</td>"
-                  f"{rate_html}{change_html}"
-                  f"<td style=\"text-align:center;padding:6px;font-size:12px;color:#666;\">"
-                  f"{'직전 ' + previous_date if previous_date else '-'}</td></tr>"
-              )
-
-          summary_html = "".join(rate_rows)
-          summary_block = f"""\
-          <h3 style=\"margin:0 0 8px;font-size:15px;\">주요 통화 환율</h3>
-          <p style=\"margin:0 0 12px;font-size:12px;color:#666;\">기준일: {base_date} (직전 유효일 대비 변동)</p>
-          <table style=\"width:100%;border-collapse:collapse;border:1px solid #d9dee7;margin:0 0 16px;font-size:13px;\">
-            <thead>
-              <tr style=\"background-color:#f3f4f6;\">
-                <th style=\"text-align:left;padding:8px;border-bottom:1px solid #d9dee7;\">통화</th>
-                <th style=\"text-align:right;padding:8px;border-bottom:1px solid #d9dee7;\">환율(USD)</th>
-                <th style=\"text-align:right;padding:8px;border-bottom:1px solid #d9dee7;\">변동률</th>
-                <th style=\"text-align:center;padding:8px;border-bottom:1px solid #d9dee7;\">기준일</th>
-              </tr>
-            </thead>
-            <tbody>
-              {summary_html}
-            </tbody>
-          </table>
-          """
-
-          # CTA 버튼 스타일 정의
-          cta_button = f"""\
-          <table style=\"width:100%;margin:0;padding:0;\">
-            <tr>
-              <td style=\"text-align:center;padding:0;\">
-                <a href=\"https://latamforex.netlify.app/\" style=\"display:inline-block;background-color:#2563eb;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:4px;font-weight:bold;font-size:14px;\">앱에서 전체 분석 보기</a>
-              </td>
-            </tr>
-          </table>
-          """
-
-          subject = f"[LATAM FX] {base_date} 중남미 환율 대시보드"
-          html = f"""\
-          <h2>LATAM FX 일일 대시보드</h2>
-          {cta_button}
-          <p style=\"margin:12px 0;\"></p>
-          {summary_block}
-          <p style=\"margin:16px 0;font-size:12px;color:#666;\">
-            <strong>상세 항목</strong><br>
-            기준일: {base_date}<br>
-            최종 갱신: {fetched_at}<br>
-            데이터 출처: ExchangeRate API, Alpha Vantage, 보정 데이터<br>
-            보정 포함: 예
-          </p>
-          <p style=\"margin:16px 0;\"><img src="cid:dashboard-image" alt="LATAM FX dashboard" style="width:100%;max-width:1440px;height:auto;border:1px solid #d9dee7;"></p>
-          <p style=\"margin:16px 0;text-align:center;\">
-            <a href=\"https://latamforex.netlify.app/\" style=\"display:inline-block;background-color:#2563eb;color:#ffffff;text-decoration:none;padding:10px 20px;border-radius:4px;font-weight:bold;font-size:14px;\">앱에서 전체 분석 보기</a>
-          </p>
-          """
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              print(f"subject={subject}", file=output)
-              print("html_body<<HTML", file=output)
-              print(html, file=output)
-              print("HTML", file=output)
-          PY
+        run: node scripts/compose-email.js
 
       - name: Commit updated dataset
         run: |
@@ -254,35 +83,8 @@ jobs:
       - name: Install Puppeteer browser
         run: npx puppeteer browsers install chrome
 
-      - name: Build frontend for screenshot
-        run: npm run build
-        env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-
-      - name: Start preview server
-        run: |
-          npm run preview -- --host 127.0.0.1 --port 4173 > preview.log 2>&1 &
-          echo $! > preview.pid
-
-      - name: Wait for preview server
-        run: |
-          for i in {1..60}; do
-            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then
-              echo "Preview server is ready"
-              exit 0
-            fi
-            sleep 1
-          done
-
-          echo "Preview server did not become ready" >&2
-          cat preview.log >&2
-          exit 1
-
-      - name: Take and validate dashboard screenshot
-        run: node scripts/take-screenshot.js
-        env:
-          DASHBOARD_URL: http://127.0.0.1:4173/
+      - name: Create email chart
+        run: node scripts/create-email-chart.js
 
       - name: Validate mailing list
         id: mailing
@@ -293,7 +95,7 @@ jobs:
             exit 0
           fi
 
-          jq -e 'type == "array" and all(.[]; type == "string" and test("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))' data/mailing_list.json > /dev/null
+          jq -e 'type == "array" and all(.[]; type == "string" and test("^[^@\s]+@[^@\s]+\.[^@\s]+$"))' data/mailing_list.json > /dev/null
 
           EMAILS=$(jq -r 'join(",")' data/mailing_list.json)
           if [ -z "$EMAILS" ]; then
@@ -332,9 +134,9 @@ jobs:
           if not recipients:
               raise SystemExit("No email recipients were provided.")
 
-          screenshot_path = Path("dashboard.png")
-          if not screenshot_path.exists():
-              raise SystemExit("dashboard.png was not created.")
+          chart_path = Path("email-chart.png")
+          if not chart_path.exists():
+              raise SystemExit("email-chart.png was not created.")
 
           message = EmailMessage()
           message["Subject"] = os.environ["EMAIL_SUBJECT"]
@@ -345,11 +147,11 @@ jobs:
 
           html_part = message.get_payload()[1]
           html_part.add_related(
-              screenshot_path.read_bytes(),
+              chart_path.read_bytes(),
               maintype="image",
               subtype="png",
-              cid="<dashboard-image>",
-              filename="dashboard.png",
+              cid="<fx-chart-image>",
+              filename="email-chart.png",
           )
 
           with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
@@ -363,7 +165,7 @@ jobs:
         with:
           name: daily-dashboard-email-${{ steps.dataset.outputs.base_date || github.run_id }}
           path: |
-            dashboard.png
-            dashboard-meta.json
-            preview.log
+            email-chart.png
+            email-chart-meta.json
+            email-market-context.json
           if-no-files-found: warn
