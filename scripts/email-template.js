@@ -17,6 +17,7 @@ const SOURCE_LABELS = {
   EXCEL: 'Excel',
   IMPUTED: 'Adjusted',
 }
+const EMAIL_CONTENT_MAX_WIDTH = 600
 
 export function loadJson(filePath, fallback = null) {
   try {
@@ -166,7 +167,7 @@ function renderCard(detail) {
   const momColor = typeof detail.mom === 'number' && detail.mom >= 0 ? '#a61b12' : '#1f5fbf'
 
   return `
-    <td style="width:33.33%;padding:5px;vertical-align:top;">
+    <td class="kpi-col" style="width:33.33%;padding:5px;vertical-align:top;">
       <table role="presentation" style="width:100%;border-collapse:collapse;border:1px solid #cfd5df;border-radius:6px;background:#ffffff;">
         <tr>
           <td style="padding:11px 11px 12px;">
@@ -219,19 +220,41 @@ export function composeEmailBody({
   const baseDate = dataset.baseDate
   const fetchedAt = dataset.fetchedAt ?? '-'
   const subject = `[LATAM FX] ${baseDate} Daily FX Brief`
+  const hasChart = Boolean(chartSrc)
+  const chartSection = hasChart
+    ? `<p style="margin:18px 0;"><img src="${chartSrc}" alt="LATAM FX 30-day chart" style="display:block;width:100%;max-width:${EMAIL_CONTENT_MAX_WIDTH}px;height:auto;border:1px solid #d9dee7;"></p>`
+    : `<p style="margin:18px 0;padding:12px;border:1px solid #d9dee7;color:#667085;font-size:12px;background:#f8fafc;">Chart image is not available in this preview build.</p>`
   const body = `
-    ${includePreviewChrome ? `<p style="margin:0 0 12px;font-size:12px;color:#667085;">Subject: ${subject}</p>` : ''}
-    <h2 style="margin:0 0 8px;">LATAM FX Daily Brief</h2>
-    <p style="margin:0 0 14px;font-size:13px;color:#667085;">
-      Base date: ${baseDate}<br>
-      Fetched at: ${fetchedAt}<br>
-      Source: ExchangeRate API, Alpha Vantage, adjusted data
-    </p>
-    ${renderCta('0 0 16px')}
-    ${renderMarketContext(marketContext)}
-    ${renderKpiSummary(getCurrencyDetails(dataset), baseDate)}
-    <p style="margin:18px 0;"><img src="${chartSrc}" alt="LATAM FX 30-day chart" style="width:100%;max-width:760px;height:auto;border:1px solid #d9dee7;"></p>
-    ${renderCta('16px 0')}
+    <style>
+      @media only screen and (max-width: 620px) {
+        .email-inner { width: 100% !important; }
+        .kpi-col { display: block !important; width: 100% !important; padding: 5px 0 !important; }
+      }
+    </style>
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 auto;">
+      <tr>
+        <td align="center" style="padding:0;">
+          <table role="presentation" class="email-inner" style="width:100%;max-width:${EMAIL_CONTENT_MAX_WIDTH}px;border-collapse:collapse;margin:0 auto;">
+            <tr>
+              <td style="padding:0;">
+                ${includePreviewChrome ? `<p style="margin:0 0 12px;font-size:12px;color:#667085;">Subject: ${subject}</p>` : ''}
+                <h2 style="margin:0 0 8px;">LATAM FX Daily Brief</h2>
+                <p style="margin:0 0 14px;font-size:13px;color:#667085;">
+                  Base date: ${baseDate}<br>
+                  Fetched at: ${fetchedAt}<br>
+                  Source: ExchangeRate API, Alpha Vantage, adjusted data
+                </p>
+                ${renderCta('0 0 16px')}
+                ${renderMarketContext(marketContext)}
+                ${renderKpiSummary(getCurrencyDetails(dataset), baseDate)}
+                ${chartSection}
+                ${renderCta('16px 0')}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   `
 
   return { subject, html: body }

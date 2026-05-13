@@ -5,6 +5,7 @@ import puppeteer from 'puppeteer'
 const DATA_PATH = path.resolve('public/data.json')
 const CHART_PATH = path.resolve('email-chart.png')
 const META_PATH = path.resolve('email-chart-meta.json')
+const EMAIL_CONTENT_WIDTH = 600
 const CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN']
 const COLORS = {
   BRL: '#2f6f5e',
@@ -74,7 +75,7 @@ function average(values) {
 }
 
 function buildChartCard(currency, points, mtdAverage) {
-  const width = 340
+  const width = 246
   const height = 150
   const padding = { top: 20, right: 20, bottom: 24, left: 34 }
   const numeric = points.filter((point) => isNumeric(point.value))
@@ -131,14 +132,14 @@ function buildHtml(dataset, chartData) {
           * { box-sizing: border-box; }
           body {
             margin: 0;
-            width: 760px;
+            width: ${EMAIL_CONTENT_WIDTH}px;
             background: #f5f7fb;
             color: #172033;
             font-family: Arial, Helvetica, sans-serif;
           }
           .wrap {
-            width: 760px;
-            padding: 26px;
+            width: ${EMAIL_CONTENT_WIDTH}px;
+            padding: 20px;
           }
           .top {
             display: flex;
@@ -159,7 +160,7 @@ function buildHtml(dataset, chartData) {
           .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 12px;
           }
           .card {
             background: #ffffff;
@@ -275,7 +276,7 @@ async function main() {
 
   try {
     const page = await browser.newPage()
-    await page.setViewport({ width: 760, height: 760, deviceScaleFactor: 2 })
+    await page.setViewport({ width: EMAIL_CONTENT_WIDTH, height: 760, deviceScaleFactor: 2 })
     await page.setContent(html, { waitUntil: 'networkidle0' })
     await page.screenshot({ path: CHART_PATH, fullPage: true })
   } finally {
