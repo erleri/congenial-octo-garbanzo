@@ -95,7 +95,7 @@ jobs:
             exit 0
           fi
 
-          jq -e 'type == "array" and all(.[]; type == "string" and test("^[^@\s]+@[^@\s]+\.[^@\s]+$"))' data/mailing_list.json > /dev/null
+          jq -e 'type == "array" and all(.[]; type == "string" and test("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"))' data/mailing_list.json > /dev/null
 
           EMAILS=$(jq -r 'join(",")' data/mailing_list.json)
           if [ -z "$EMAILS" ]; then
