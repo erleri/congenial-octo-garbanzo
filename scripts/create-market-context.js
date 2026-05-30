@@ -6,6 +6,7 @@ const DATA_PATH = path.resolve('public/data.json')
 const OUTPUT_PATH = path.resolve('email-market-context.json')
 const ALPHA_VANTAGE_ENDPOINT = 'https://www.alphavantage.co/query'
 const FALLBACK_BULLET = 'No clear public-news signal was found from the automated source.'
+const FALLBACK_BIAS = 'Mixed until clearer public-news signals appear.'
 
 const CURRENCY_TERMS = {
   BRL: ['brl', 'brazil', 'brazilian', 'real'],
@@ -84,6 +85,29 @@ function summarizeTopics(article) {
   return topics.slice(0, 2).join(', ')
 }
 
+function summarizeFeedTopics(articles, limit = 3) {
+  const counts = new Map()
+
+  for (const article of articles) {
+    if (!Array.isArray(article.topics)) {
+      continue
+    }
+
+    for (const topic of article.topics) {
+      const topicName = topic.topic
+      if (!topicName) {
+        continue
+      }
+      counts.set(topicName, (counts.get(topicName) ?? 0) + 1)
+    }
+  }
+
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([topic]) => topic)
+}
+
 function findEvidence(currency, articles) {
   const terms = CURRENCY_TERMS[currency] ?? []
   const directMatches = articles.filter((article) => {
@@ -97,7 +121,7 @@ function findEvidence(currency, articles) {
   return directMatches.length ? directMatches : articles.slice(0, 2)
 }
 
-function buildBullet(move, evidence) {
+function buildMoveBullet(move, evidence) {
   const moveText = `${move.currency} ${move.direction} ${Math.abs(move.changePct).toFixed(2)}% vs USD`
   if (!evidence.length) {
     return `${moveText}; no clear matching public-news topic was found.`
@@ -110,6 +134,52 @@ function buildBullet(move, evidence) {
   return `${moveText}; ${contextText}.`
 }
 
+function buildWhatMovedToday(moves, articles) {
+  if (!moves.length) {
+    return [FALLBACK_BULLET]
+  }
+
+  const feedTopics = summarizeFeedTopics(articles)
+  const bullets = []
+
+  if (feedTopics.length) {
+    bullets.push(`USD public-news flow referenced ${feedTopics.join(', ')}; treated as automated context only.`)
+  }
+
+  const topMove = moves[0]
+  bullets.push(buildMoveBullet(topMove, findEvidence(topMove.currency, articles)))
+
+  if (moves.length > 1) {
+    const secondaryMoves = moves
+      .slice(1, 3)
+      .map((move) => `${move.currency} ${move.direction} ${Math.abs(move.changePct).toFixed(2)}%`)
+      .join('; ')
+    bullets.push(`Additional daily moves vs USD: ${secondaryMoves}.`)
+  }
+
+  return bullets.slice(0, 3)
+}
+
+function classifyMoveBias(move) {
+  const absChange = Math.abs(move.changePct)
+  if (absChange < 0.2) {
+    return 'rangebound'
+  }
+
+  return move.changePct < 0 ? 'supportive' : 'pressured'
+}
+
+function buildNearTermBias(moves, articles) {
+  if (!moves.length) {
+    return FALLBACK_BIAS
+  }
+
+  const biasItems = moves.slice(0, 3).map((move) => `${move.currency} ${classifyMoveBias(move)}`)
+  const confidence = articles.length ? 'public signals available' : 'limited public-news signal'
+
+  return `${biasItems.join(', ')}; ${confidence}.`
+}
+
 async function main() {
   const dataset = loadJson(DATA_PATH)
   if (!dataset?.baseDate) {
@@ -118,12 +188,15 @@ async function main() {
 
   const moves = getLatestMoves(dataset)
   const articles = await fetchNews(dataset.baseDate)
-  const bullets = moves.map((move) => buildBullet(move, findEvidence(move.currency, articles))).slice(0, 3)
+  const whatMovedToday = buildWhatMovedToday(moves, articles)
+  const nearTermBias = buildNearTermBias(moves, articles)
   const payload = {
-    status: bullets.length ? 'ok' : 'fallback',
+    status: moves.length ? 'ok' : 'fallback',
     generatedAt: new Date().toISOString(),
     baseDate: dataset.baseDate,
-    bullets: bullets.length ? bullets : [FALLBACK_BULLET],
+    bullets: whatMovedToday,
+    whatMovedToday,
+    nearTermBias,
     topMoves: moves.map((move) => ({
       currency: move.currency,
       latest: formatRate(move.latest),
@@ -143,6 +216,8 @@ main().catch((error) => {
     generatedAt: new Date().toISOString(),
     baseDate: loadJson(DATA_PATH, {})?.baseDate ?? null,
     bullets: [FALLBACK_BULLET],
+    whatMovedToday: [FALLBACK_BULLET],
+    nearTermBias: FALLBACK_BIAS,
     topMoves: [],
     source: 'fallback',
     error: error instanceof Error ? error.message : String(error),

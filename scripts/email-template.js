@@ -187,9 +187,16 @@ function renderCta(margin = '16px 0') {
 }
 
 function renderMarketContext(marketContext) {
-  const bullets = Array.isArray(marketContext?.bullets)
-    ? marketContext.bullets.slice(0, 3)
-    : []
+  const bullets = Array.isArray(marketContext?.whatMovedToday)
+    ? marketContext.whatMovedToday.slice(0, 3)
+    : Array.isArray(marketContext?.bullets)
+      ? marketContext.bullets.slice(0, 3)
+      : []
+  const nearTermBias = typeof marketContext?.nearTermBias === 'string'
+    ? marketContext.nearTermBias
+    : 'Mixed until clearer public-news signals appear.'
+  const source = marketContext?.source ?? 'automated source'
+  const baseDate = marketContext?.baseDate ? ` / Context date: ${marketContext.baseDate}` : ''
   const effectiveBullets = bullets.length
     ? bullets
     : ['No clear public-news signal was found from the automated source.']
@@ -198,11 +205,17 @@ function renderMarketContext(marketContext) {
     <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 18px;border:1px solid #d7deea;background:#f8fafc;border-radius:6px;">
       <tr>
         <td style="padding:13px 15px;">
-          <h3 style="margin:0 0 8px;font-size:15px;color:#111827;">Today's market context</h3>
-          <p style="margin:0 0 8px;font-size:12px;color:#667085;">Automated Alpha Vantage news topics for reference only; not a confirmed cause analysis.</p>
-          <ul style="margin:0;padding-left:18px;color:#344054;font-size:13px;line-height:1.5;">
+          <h3 style="margin:0 0 6px;font-size:15px;color:#111827;">Today's market context</h3>
+          <p style="margin:0 0 10px;font-size:12px;color:#667085;">Automated public-news context and rule-based bias; not a confirmed cause analysis.${baseDate}</p>
+          <div style="margin:0 0 5px;font-size:11px;color:#475467;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;">What moved today</div>
+          <ul style="margin:0 0 10px;padding-left:18px;color:#344054;font-size:13px;line-height:1.5;">
             ${effectiveBullets.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
           </ul>
+          <div style="border-top:1px solid #dfe5ef;padding-top:9px;">
+            <div style="margin:0 0 3px;font-size:11px;color:#475467;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;">Near-term bias</div>
+            <p style="margin:0;color:#344054;font-size:13px;line-height:1.45;">${escapeHtml(nearTermBias)}</p>
+            <p style="margin:6px 0 0;color:#667085;font-size:11px;line-height:1.35;">Source: ${escapeHtml(source)}</p>
+          </div>
         </td>
       </tr>
     </table>

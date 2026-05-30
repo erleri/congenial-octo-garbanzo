@@ -428,18 +428,15 @@ function Dashboard({ data }: DashboardProps) {
       </div>
 
       <div className="chart-card chart-card-full dashboard-chart-card">
-        <div className="section-title-row">
-          <h3>통화별 월간 추이</h3>
-          <span className="section-range-label">{monthlyRangeLabel}</span>
-        </div>
+        <h3>최근 30일 추이</h3>
         <div className="small-multiple-row">
-          {localSeriesByCurrency.map((series) => (
-            <div key={`local-${series.currency}`} className="small-chart-card">
+          {dailySeriesByCurrency.map((series) => (
+            <div key={`daily-${series.currency}`} className="small-chart-card">
               <h4>{series.currency}</h4>
               <ResponsiveContainer width="100%" height={118}>
                 <LineChart data={series.points}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceff3" />
-                  <XAxis dataKey="month" hide />
+                  <XAxis dataKey="day" hide />
                   <YAxis domain={series.domain} hide />
                   {series.averageValue !== null ? (
                     <ReferenceLine
@@ -448,7 +445,7 @@ function Dashboard({ data }: DashboardProps) {
                       strokeDasharray="4 4"
                       strokeWidth={1}
                       label={{
-                        value: `24M 평균 ${formatChartRate(series.averageValue, series.currency)}`,
+                        value: `30D 평균 ${formatChartRate(series.averageValue, series.currency)}`,
                         position: 'insideTopRight',
                         fill: '#6b7280',
                         fontSize: 10,
@@ -480,15 +477,18 @@ function Dashboard({ data }: DashboardProps) {
       </div>
 
       <div className="chart-card chart-card-full dashboard-chart-card">
-        <h3>최근 30일 추이</h3>
+        <div className="section-title-row">
+          <h3>통화별 월간 추이</h3>
+          <span className="section-range-label">{monthlyRangeLabel}</span>
+        </div>
         <div className="small-multiple-row">
-          {dailySeriesByCurrency.map((series) => (
-            <div key={`daily-${series.currency}`} className="small-chart-card">
+          {localSeriesByCurrency.map((series) => (
+            <div key={`local-${series.currency}`} className="small-chart-card">
               <h4>{series.currency}</h4>
               <ResponsiveContainer width="100%" height={118}>
                 <LineChart data={series.points}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceff3" />
-                  <XAxis dataKey="day" hide />
+                  <XAxis dataKey="month" hide />
                   <YAxis domain={series.domain} hide />
                   {series.averageValue !== null ? (
                     <ReferenceLine
@@ -497,7 +497,7 @@ function Dashboard({ data }: DashboardProps) {
                       strokeDasharray="4 4"
                       strokeWidth={1}
                       label={{
-                        value: `30D 평균 ${formatChartRate(series.averageValue, series.currency)}`,
+                        value: `24M 평균 ${formatChartRate(series.averageValue, series.currency)}`,
                         position: 'insideTopRight',
                         fill: '#6b7280',
                         fontSize: 10,
