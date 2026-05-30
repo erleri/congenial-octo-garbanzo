@@ -23,7 +23,6 @@ function FileUploader({
   excelPriority,
   fillMissing,
 }: FileUploaderProps) {
-  // Removed selectedFile
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
 
@@ -35,7 +34,7 @@ function FileUploader({
 
       <div className="refresh-box">
         <p>
-          엑셀 업로드 대신 외부 환율 API에서 데이터를 수집해 로컬 캐시에 저장합니다.
+          원격 환율 API에서 최신 데이터를 수집해 로컬 캐시에 저장합니다.
         </p>
         <button type="button" onClick={onRefresh} disabled={loading}>
           {loading ? '새로고침 중...' : '환율 데이터 새로고침'}
@@ -43,7 +42,7 @@ function FileUploader({
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>엑셀 업로드(우선 병합)</h3>
+        <h3>Excel 업로드 (우선 병합)</h3>
         <div className="inline-controls" style={{ marginBottom: 8 }}>
           <input
             type="file"
@@ -67,7 +66,7 @@ function FileUploader({
               checked={localExcelPriority}
               onChange={(event) => setLocalExcelPriority(event.target.checked)}
             />
-            엑셀 우선(EXCEL {'>'} API)
+            Excel 우선(EXCEL {'>'} API)
           </label>
           <label>
             <input

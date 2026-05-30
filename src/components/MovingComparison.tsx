@@ -65,7 +65,7 @@ function formatMovingValue(value: number | null, column: MovingColumn, isPercent
 
 function formatStatusDateTime(value: string | null): string {
   if (!value) {
-    return '운영 저장 이력 없음'
+    return '기록 없음'
   }
 
   return new Date(value).toLocaleString('ko-KR', {
@@ -86,19 +86,19 @@ function formatPeriodMonth(value: string | null): string {
 }
 
 function getPlanSourceLabel(status: BusinessPlanStatus): string {
-  if (!status.configured) {
+  if (!status.configured || status.remoteLoadStatus === 'not_configured') {
     return '설정 필요'
   }
 
-  if (status.source === 'supabase') {
-    return status.remoteLoadStatus === 'loaded' ? '운영 저장값 확인됨' : 'Supabase 연결됨'
+  if (status.source === 'supabase' && status.remoteLoadStatus === 'loaded') {
+    return status.canEdit ? '운영 데이터 확인됨' : '읽기 전용'
   }
 
   if (status.source === 'local') {
-    return '로컬 임시값'
+    return '로컬 임시 보기'
   }
 
-  return '저장값 없음'
+  return '설정 필요'
 }
 
 function getPlanStatusTone(status: BusinessPlanStatus): 'success' | 'warning' | 'error' {
@@ -106,7 +106,7 @@ function getPlanStatusTone(status: BusinessPlanStatus): 'success' | 'warning' | 
     return 'success'
   }
 
-  if (status.remoteLoadStatus === 'loaded') {
+  if (status.remoteLoadStatus === 'loaded' || status.source === 'local') {
     return 'warning'
   }
 
@@ -115,22 +115,22 @@ function getPlanStatusTone(status: BusinessPlanStatus): 'success' | 'warning' | 
 
 function getPlanStatusSummary(status: BusinessPlanStatus): string {
   if (!status.configured || status.remoteLoadStatus === 'not_configured') {
-    return 'Supabase 설정이 없어 로컬 임시값을 보고 있습니다. 운영 저장값이 아닙니다.'
+    return '운영 저장소 연결이 없어 임시값을 보여주고 있습니다.'
   }
 
   if (status.remoteLoadStatus === 'loaded' && status.canEdit) {
-    return 'Supabase에서 운영 저장값을 재확인했고, 이 계정은 저장할 수 있습니다.'
+    return '운영 데이터로 확인했고, 현재 계정은 저장할 수 있습니다.'
   }
 
   if (status.remoteLoadStatus === 'loaded') {
-    return 'Supabase 운영 저장값을 보고 있지만, 현재 계정은 읽기 전용입니다.'
+    return '운영 데이터는 확인했지만, 현재 계정은 읽기 전용입니다.'
   }
 
   if (status.remoteLoadStatus === 'failed' || status.source === 'local') {
-    return '원격 값을 불러오지 못해 로컬 임시값을 보고 있습니다. 운영 기준으로 확정하지 마세요.'
+    return '운영 데이터를 불러오지 못해 임시값을 보여주고 있습니다.'
   }
 
-  return '계획 환율 저장값을 아직 확인하지 못했습니다.'
+  return '계획 환율 상태를 아직 확인하지 못했습니다.'
 }
 
 function MovingComparison({
@@ -167,7 +167,7 @@ function MovingComparison({
         hour: '2-digit',
         minute: '2-digit',
       })
-    : '검증 이력 없음'
+    : '확인 기록 없음'
 
   const openModal = () => {
     setTempPlan(businessPlan)
@@ -289,7 +289,7 @@ function MovingComparison({
             <strong>{lastUpdatedByLabel}</strong>
           </div>
           <div>
-            <span>마지막 검증</span>
+            <span>마지막 확인</span>
             <strong>{lastVerifiedLabel}</strong>
           </div>
           <div>
@@ -302,22 +302,22 @@ function MovingComparison({
       <div className="scope-grid">
         <div className="scope-card">
           <span className={`scope-badge ${businessPlanStatus.canEdit ? 'scope-badge-operational' : 'scope-badge-readonly'}`}>
-            {businessPlanStatus.canEdit ? '운영 반영' : '권한 필요'}
+            {businessPlanStatus.canEdit ? '운영 반영 가능' : '권한 필요'}
           </span>
           <strong>계획 환율 저장</strong>
           <p>
             {businessPlanStatus.canEdit
-              ? '저장하면 Supabase의 운영 기준값이 갱신됩니다.'
+              ? '저장하면 운영 기준값이 갱신됩니다.'
               : '현재는 읽기 전용입니다. 편집 권한이 있는 계정으로 로그인해야 저장할 수 있습니다.'}
           </p>
         </div>
         <div className="scope-card">
           <span className={businessPlanStatus.remoteLoadStatus === 'loaded' ? 'scope-badge scope-badge-operational' : 'scope-badge scope-badge-readonly'}>
-            {businessPlanStatus.remoteLoadStatus === 'loaded' ? '운영값 확인' : '임시값 주의'}
+            {businessPlanStatus.remoteLoadStatus === 'loaded' ? '운영 데이터 확인됨' : '로컬 임시 보기'}
           </span>
           <strong>현재 계획 데이터 출처</strong>
           <p className="source-state">{planSourceLabel}</p>
-          <p>운영 저장값이 아닐 때는 보고용 참고값으로만 다루세요.</p>
+          <p>운영 데이터가 아닐 때는 보고용 참고값으로만 사용하세요.</p>
         </div>
       </div>
 
@@ -334,7 +334,7 @@ function MovingComparison({
             {lastUpdatedLabel}
             {businessPlanStatus.lastUpdatedBy ? ` / ${businessPlanStatus.lastUpdatedBy}` : ''}
           </strong>
-          <span>마지막 검증</span>
+          <span>마지막 확인</span>
           <strong>{lastVerifiedLabel}</strong>
         </div>
       </div>
@@ -369,7 +369,7 @@ function MovingComparison({
         </table>
       </div>
       <p className="table-help" style={{ marginTop: 10 }}>
-        계획 환율을 입력하지 않은 통화는 최근 3개월 평균값으로 자동 계산됩니다.
+        계획 환율을 입력하지 않은 통화는 최근 3개월 평균값으로 자동 계산합니다.
       </p>
 
       {isModalOpen && (
@@ -397,7 +397,7 @@ function MovingComparison({
                   {lastUpdatedLabel}
                   {businessPlanStatus.lastUpdatedBy ? ` / ${businessPlanStatus.lastUpdatedBy}` : ''}
                 </strong>
-                <span>마지막 검증</span>
+                <span>마지막 확인</span>
                 <strong>{lastVerifiedLabel}</strong>
               </div>
 

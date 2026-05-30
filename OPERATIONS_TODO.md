@@ -2,18 +2,27 @@
 
 This checklist tracks the remaining production setup needed for business plan rates.
 
+## Verified on 2026-05-30
+
+- GitHub `main` is deployed on Netlify with build commit `ee404d2`.
+- Production site responds at `https://latamforex.netlify.app/`.
+- Production `public/data.json` reports `baseDate = 2026-05-30`.
+- The latest checked `Daily Dashboard Email` run completed successfully, including API secret validation, market context creation, email composition, mailing-list validation, send, and artifact upload. That run used an older commit, so the new hybrid market context still needs the next run or a deliberate manual run to be confirmed in production email.
+- Supabase publishable config is present in the production bundle, and `business_plan_rates` can be read through the public REST API.
+- No `service_role`, `sb_secret_...`, or literal `secret key` value pattern was found in the production bundle.
+
 ## Supabase Business Plan Rates
 
-- [ ] Run `supabase/migrations/20260504120000_business_plan_rates.sql` in the Supabase SQL Editor.
+- [x] Run `supabase/migrations/20260504120000_business_plan_rates.sql` in the Supabase SQL Editor.
 - [ ] Add each editor email to `public.business_plan_admins` with `active = true`.
-- [ ] Confirm `public.business_plan_rates` can be read by anonymous and authenticated users.
+- [ ] Confirm `public.business_plan_rates` can be read by anonymous and authenticated users. Anonymous read is verified; authenticated read still needs an admin/non-admin session check.
 - [ ] Confirm only active `business_plan_admins` can insert business plan rates.
 
 ## Environment Variables
 
-- [ ] Add `VITE_SUPABASE_URL` to Netlify.
-- [ ] Add `VITE_SUPABASE_ANON_KEY` to Netlify.
-- [ ] Confirm the browser app never receives `service_role`, `secret key`, or `sb_secret_...` values.
+- [x] Add `VITE_SUPABASE_URL` to Netlify.
+- [x] Add `VITE_SUPABASE_ANON_KEY` to Netlify.
+- [x] Confirm the browser app never receives `service_role`, `secret key`, or `sb_secret_...` values.
 
 ## Auth Redirect URLs
 

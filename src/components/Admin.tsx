@@ -135,11 +135,11 @@ function Admin({
       isLocalDev
         ? {
             tone: 'info',
-            text: 'Mailing list changes are only saved by the local dev server. Production recipients still follow the deployed repository configuration.',
+            text: '로컬 개발 서버에서만 저장됩니다. 운영 수신 대상은 배포 설정 기준으로 유지됩니다.',
           }
         : {
             tone: 'warning',
-            text: 'This production view is read-only. Operational recipients follow the GitHub repository and deployment settings.',
+            text: '운영 화면은 읽기 전용입니다. 실제 수신 대상은 저장소와 배포 설정 기준으로 관리됩니다.',
           },
     )
     setIsMailingModalOpen(true)
@@ -159,7 +159,7 @@ function Admin({
     if (!isLocalDev) {
       setMailingNotice({
         tone: 'warning',
-        text: 'Saving is disabled on the production site. Update the mailing target through the repository-managed configuration instead.',
+        text: '운영 화면에서는 저장할 수 없습니다. 수신 대상은 저장소 기준 설정에서 관리해 주세요.',
       })
       return
     }
@@ -172,12 +172,12 @@ function Admin({
       })
 
       if (!res.ok) {
-        throw new Error('The local mailing API is unavailable.')
+        throw new Error('로컬 메일링 API에 연결할 수 없습니다.')
       }
 
       setMailingNotice({
         tone: 'success',
-        text: 'Mailing list saved to the local development server.',
+        text: '로컬 개발 서버에 메일링 리스트를 저장했습니다.',
       })
       window.setTimeout(() => setIsMailingModalOpen(false), 400)
     } catch (mailingError) {
@@ -186,7 +186,7 @@ function Admin({
         text:
           mailingError instanceof Error
             ? mailingError.message
-            : 'Failed to save the mailing list. Check the local dev server.',
+            : '메일링 리스트 저장에 실패했습니다.',
       })
     }
   }
@@ -209,7 +209,7 @@ function Admin({
         <div>
           <h2>관리</h2>
           <p className="table-help">
-            데이터 확인, 로컬 미리보기, 메일 운영 범위를 한 화면에서 구분합니다.
+            데이터 확인, 로컬 미리보기, 메일 운영 범위를 이 화면에서 구분합니다.
           </p>
         </div>
         <button type="button" onClick={openMailingModal} className="quiet-button">
@@ -219,25 +219,25 @@ function Admin({
 
       <div className="scope-grid">
         <div className="scope-card">
-          <span className="scope-badge scope-badge-local">로컬 전용</span>
+          <span className="scope-badge scope-badge-local">로컬 임시 보기</span>
           <strong>Excel 업로드</strong>
-          <p>이 브라우저에서만 반영되는 로컬 미리보기입니다. 운영 데이터와 내일 발송 메일에는 반영되지 않습니다.</p>
+          <p>이 브라우저에서만 확인하는 미리보기입니다. 운영 데이터나 일일 발송 메일에는 반영되지 않습니다.</p>
         </div>
         <div className="scope-card">
-          <span className="scope-badge scope-badge-operational">운영 확인</span>
+          <span className="scope-badge scope-badge-operational">운영 데이터 확인됨</span>
           <strong>현재 데이터 출처</strong>
           <p className="source-state">{DATASET_SOURCE_LABELS[datasetSource]}</p>
-          <p>build, 기준일, 데이터 출처를 함께 보고 지금 화면이 어떤 상태인지 빠르게 확인할 수 있습니다.</p>
+          <p>build, 기준일, 데이터 출처를 함께 보고 지금 화면의 기준을 확인합니다.</p>
         </div>
         <div className="scope-card">
           <span className={`scope-badge ${isLocalDev ? 'scope-badge-local' : 'scope-badge-readonly'}`}>
-            {isLocalDev ? '로컬만 저장' : '운영 읽기 전용'}
+            {isLocalDev ? '로컬 임시 보기' : '읽기 전용'}
           </span>
           <strong>메일링 리스트</strong>
           <p>
             {isLocalDev
               ? '로컬 개발 서버에서만 저장됩니다. 운영 수신 대상은 저장소와 배포 설정 기준입니다.'
-              : '운영 사이트에서는 편집하지 않습니다. 실제 수신 대상은 GitHub 저장소와 배포 설정 기준입니다.'}
+              : '운영 화면에서는 편집하지 않습니다. 실제 수신 대상은 저장소와 배포 설정 기준입니다.'}
           </p>
         </div>
       </div>
@@ -245,7 +245,7 @@ function Admin({
       <div className="table-card">
         <h3>Excel 업로드</h3>
         <p className={noticeClassName('warning')}>
-          이 브라우저에서만 반영되는 로컬 미리보기입니다.
+          이 브라우저에서만 반영되는 로컬 임시 보기입니다.
         </p>
         <p className="table-help" style={{ marginTop: 8 }}>
           현재 화면 출처: <strong>{DATASET_SOURCE_LABELS[datasetSource]}</strong>
@@ -283,7 +283,7 @@ function Admin({
               checked={localFillMissing}
               onChange={(event) => setLocalFillMissing(event.target.checked)}
             />
-            누락값 보정 포함
+            결측값 보정 포함
           </label>
         </div>
         {excelNotice ? <p className={noticeClassName(excelNotice.tone)}>{excelNotice.text}</p> : null}
@@ -320,7 +320,7 @@ function Admin({
           </button>
         </div>
         <p className="table-help">
-          메인 대시보드 데이터와 별개로, 원본 시트 자체를 점검할 때만 사용합니다.
+          메인 대시보드 데이터와 별개로, 원본 시트 자체를 확인할 때 사용합니다.
         </p>
         {!rawSheets.length ? (
           <p className="table-help">원본 시트 데이터를 아직 불러오지 못했습니다.</p>
@@ -352,7 +352,7 @@ function Admin({
           </div>
           <div>
             <strong>메일 운영 상태</strong>
-            <div>{isLocalDev ? '로컬만 저장' : '운영 읽기 전용'}</div>
+            <div>{isLocalDev ? '로컬 임시 보기' : '읽기 전용'}</div>
           </div>
         </div>
       </div>
@@ -364,8 +364,7 @@ function Admin({
           <div className="modal-content">
             <h3>메일링 리스트</h3>
             <p>
-              일일 대시보드 리포트를 받는 메일 주소입니다. 운영 사이트에서는 실제 수신 대상이
-              바로 바뀌지 않습니다.
+              일일 대시보드 리포트를 받는 메일 주소입니다. 운영 화면에서는 실제 수신 대상이 바로 바뀌지 않습니다.
             </p>
 
             {mailingNotice ? <p className={noticeClassName(mailingNotice.tone)}>{mailingNotice.text}</p> : null}

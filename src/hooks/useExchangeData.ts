@@ -206,7 +206,7 @@ export function useExchangeData() {
 
       return {
         type: 'success' as const,
-        text: 'Excel upload completed. The merged result only applies in this browser.',
+        text: 'Excel 데이터를 로컬 임시 보기에 반영했습니다.',
       }
     } catch (mergeError) {
       const message =
@@ -241,7 +241,7 @@ export function useExchangeData() {
         lastSaveStatus: 'idle',
         lastVerifiedAt: null,
         lastSaveMessage: null,
-        error: 'Supabase is not configured, so the local cached plan is being used.',
+        error: '운영 저장소 연결이 없어 로컬 임시 보기를 사용하고 있습니다.',
       }))
       return
     }
@@ -303,7 +303,7 @@ export function useExchangeData() {
         error:
           remoteError instanceof Error
             ? remoteError.message
-            : 'Failed to load the remote business plan. Falling back to the local cache.',
+            : '운영 데이터를 불러오지 못해 로컬 임시 보기를 사용하고 있습니다.',
       }))
     }
   }
@@ -314,7 +314,7 @@ export function useExchangeData() {
     }
 
     if (!businessPlanStatus.canEdit || !businessPlanUserEmail || !businessPlanStatus.periodMonth) {
-      throw new Error('You do not have permission to update the business plan.')
+      throw new Error('현재 계정에는 계획 환율 저장 권한이 없습니다.')
     }
 
     setBusinessPlanStatus((prev) => ({
@@ -344,19 +344,19 @@ export function useExchangeData() {
         lastVerifiedAt: saved.lastVerifiedAt,
         lastSaveMessage:
           saved.verificationStatus === 'verified'
-            ? 'Supabase 재조회로 저장이 확인되었습니다.'
-            : `저장 요청은 성공했지만 운영값 재확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
+            ? '저장 후 운영 데이터로 다시 확인했습니다.'
+            : `저장 요청은 완료됐지만 운영 데이터 확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
         error: null,
       }))
 
       return saved.verificationStatus === 'verified'
         ? {
             type: 'success' as const,
-            text: 'Supabase 재조회로 계획 환율 저장이 확인되었습니다.',
+            text: '저장 후 운영 데이터로 다시 확인했습니다.',
           }
         : {
             type: 'warning' as const,
-            text: `저장 요청은 성공했지만 운영값 재확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
+            text: `저장 요청은 완료됐지만 운영 데이터 확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
           }
     } catch (saveError) {
       setBusinessPlanStatus((prev) => ({
@@ -364,9 +364,9 @@ export function useExchangeData() {
         saving: false,
         lastSaveStatus: 'failed',
         lastSaveMessage:
-          saveError instanceof Error ? saveError.message : 'Failed to save the business plan.',
+          saveError instanceof Error ? saveError.message : '계획 환율 저장에 실패했습니다.',
         error:
-          saveError instanceof Error ? saveError.message : 'Failed to save the business plan.',
+          saveError instanceof Error ? saveError.message : '계획 환율 저장에 실패했습니다.',
       }))
       throw saveError
     }
