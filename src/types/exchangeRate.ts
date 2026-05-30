@@ -19,18 +19,37 @@ export interface BusinessPlan {
 
 export type BusinessPlanType = keyof BusinessPlan
 
+export type BusinessPlanRemoteLoadStatus = 'not_configured' | 'idle' | 'loading' | 'loaded' | 'failed'
+export type BusinessPlanAdminAccessStatus = 'unknown' | 'checking' | 'allowed' | 'denied' | 'failed'
+export type BusinessPlanSaveStatus = 'idle' | 'saving' | 'verified' | 'unverified' | 'failed'
+
 export interface BusinessPlanStatus {
   configured: boolean
   loading: boolean
   saving: boolean
   source: 'supabase' | 'local' | 'none'
+  remoteLoadStatus: BusinessPlanRemoteLoadStatus
+  adminAccessStatus: BusinessPlanAdminAccessStatus
+  lastSaveStatus: BusinessPlanSaveStatus
   periodMonth: string | null
   isAuthenticated: boolean
   canEdit: boolean
   userEmail: string | null
   lastUpdatedAt: string | null
   lastUpdatedBy: string | null
+  lastVerifiedAt: string | null
+  lastSaveMessage: string | null
   error: string | null
+}
+
+export type DatasetSource = 'remote' | 'static' | 'cache' | 'excel' | 'none'
+
+export const DATASET_SOURCE_LABELS: Record<DatasetSource, string> = {
+  remote: '외부 API 최신 조회',
+  static: '정적 배포 데이터',
+  cache: '로컬 캐시',
+  excel: '업로드 Excel 병합',
+  none: '-',
 }
 
 export type CurrencyCode = (typeof CURRENCIES)[number]

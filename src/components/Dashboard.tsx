@@ -11,6 +11,7 @@ import {
 import { formatCellValue, monthLabel } from '../lib/formatters'
 import type {
   CellStatus,
+  CurrencyCode,
   DailyRate,
   DashboardFilters,
   ExchangeRateDataset,
@@ -69,6 +70,22 @@ function getMonthly(
   )
 }
 
+function getMonthlyRate(
+  rows: MonthlyRate[],
+  currency: CurrencyCode,
+  year: number,
+  month: number,
+  rateType: 'LOCAL_PER_USD' | 'KRW',
+): MonthlyRate | undefined {
+  return rows.find(
+    (row) =>
+      row.currency === currency &&
+      row.year === year &&
+      row.month === month &&
+      row.rateType === rateType,
+  )
+}
+
 function average(values: number[]): number | null {
   if (!values.length) {
     return null
@@ -86,6 +103,17 @@ function getDaily(
   return rows.find(
     (row) =>
       row.currency === currency && row.date === date && row.rateType === 'LOCAL_PER_USD',
+  )
+}
+
+function getDailyRate(
+  rows: DailyRate[],
+  currency: CurrencyCode,
+  date: string,
+  rateType: 'LOCAL_PER_USD' | 'KRW',
+): DailyRate | undefined {
+  return rows.find(
+    (row) => row.currency === currency && row.date === date && row.rateType === rateType,
   )
 }
 
@@ -150,6 +178,52 @@ function Dashboard({ data }: DashboardProps) {
 
   const previousDate = new Date(latestYear, latestMonth - 2, 1)
   const oneYearAgoText = `${latestYear - 1}-${String(latestMonth).padStart(2, '0')}-${String(baseDate.getDate()).padStart(2, '0')}`
+
+  const usdKrwMonthlyValues = data.dailyRates
+    .filter(
+      (row) =>
+        row.currency === 'USD' &&
+        row.rateType === 'KRW' &&
+        row.year === latestYear &&
+        row.month === latestMonth &&
+        row.date <= baseDateText &&
+        typeof row.value === 'number',
+    )
+    .map((row) => row.value as number)
+  const usdKrwMtdAverage = average(usdKrwMonthlyValues)
+  const usdKrwToday = getDailyRate(data.dailyRates, 'USD', baseDateText, 'KRW')
+  const usdKrwPrevious = getMonthlyRate(
+    data.monthlyRates,
+    'USD',
+    previousDate.getFullYear(),
+    previousDate.getMonth() + 1,
+    'KRW',
+  )
+  const usdKrwMom =
+    typeof usdKrwMtdAverage === 'number' &&
+    typeof usdKrwPrevious?.value === 'number' &&
+    usdKrwPrevious.value !== 0
+      ? (usdKrwMtdAverage - usdKrwPrevious.value) / usdKrwPrevious.value
+      : null
+  const usdKrwLastYearDaily = data.dailyRates
+    .filter(
+      (row) =>
+        row.currency === 'USD' &&
+        row.rateType === 'KRW' &&
+        row.date >= oneYearAgoText &&
+        row.date <= baseDateText &&
+        typeof row.value === 'number',
+    )
+    .map((row) => row.value as number)
+  const usdKrwLow52 = usdKrwLastYearDaily.length ? Math.min(...usdKrwLastYearDaily) : null
+  const usdKrwHigh52 = usdKrwLastYearDaily.length ? Math.max(...usdKrwLastYearDaily) : null
+  const usdKrwPercent52 =
+    typeof usdKrwToday?.value === 'number' &&
+    usdKrwLow52 !== null &&
+    usdKrwHigh52 !== null &&
+    usdKrwHigh52 > usdKrwLow52
+      ? Math.max(0, Math.min(100, ((usdKrwToday.value - usdKrwLow52) / (usdKrwHigh52 - usdKrwLow52)) * 100))
+      : 50
 
   const kpis = KPI_CURRENCIES.map((currency) => {
     const monthlyValues = data.dailyRates
@@ -267,6 +341,49 @@ function Dashboard({ data }: DashboardProps) {
       <div className="dashboard-meta">
         <span className="base-date-chip">기준일 {baseDateText}</span>
         <span className="data-pill">당월 누적 평균</span>
+      </div>
+
+      <div className="usd-krw-anchor">
+        <div className="usd-krw-anchor-main">
+          <span className="source-badge badge-api">기준 환율</span>
+          <div>
+            <h2>USD/KRW Anchor</h2>
+            <p>원달러 기준 환율 · KRW 환산의 기준축</p>
+          </div>
+        </div>
+        <div className="usd-krw-anchor-metrics">
+          <div>
+            <span>기준일 환율</span>
+            <strong>{formatCellValue(usdKrwToday?.value ?? null, usdKrwToday?.status ?? 'empty', 'KRW')}</strong>
+          </div>
+          <div>
+            <span>당월 누적 평균</span>
+            <strong>{formatCellValue(usdKrwMtdAverage, usdKrwMtdAverage === null ? 'empty' : 'ok', 'KRW')}</strong>
+          </div>
+          <div>
+            <span>MoM</span>
+            <strong className={usdKrwMom === null ? '' : usdKrwMom >= 0 ? 'up' : 'down'}>
+              {usdKrwMom === null ? '-' : `${usdKrwMom >= 0 ? '+' : '-'}${Math.abs(usdKrwMom * 100).toFixed(2)}%`}
+            </strong>
+          </div>
+          <div className="usd-krw-anchor-range">
+            <span>52주 범위 내 위치</span>
+            <div className="gauge-labels">
+              <span>{formatCellValue(usdKrwLow52, usdKrwLow52 === null ? 'empty' : 'ok', 'KRW')}</span>
+              <span>{formatCellValue(usdKrwHigh52, usdKrwHigh52 === null ? 'empty' : 'ok', 'KRW')}</span>
+            </div>
+            <div className="gauge-track">
+              <div
+                className="gauge-fill"
+                style={{
+                  width: `${usdKrwPercent52}%`,
+                  backgroundColor: '#1f5fbf',
+                }}
+              />
+              <div className="gauge-marker" style={{ left: `${usdKrwPercent52}%` }} />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="kpi-grid">

@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
+  fetchManualBackfillDataset,
   fetchRemoteExchangeData,
   fetchRemoteExchangeDataWithExcel,
   fetchStaticDataset,
-  fetchManualBackfillDataset,
   fetchSupplementalHistoryDataset,
-  loadDatasetFromCache,
-  saveDatasetToCache,
-  saveAVSupplementalCache,
   loadBusinessPlanFromCache,
+  loadDatasetFromCache,
+  saveAVSupplementalCache,
   saveBusinessPlanToCache,
+  saveDatasetToCache,
 } from '../lib'
 import {
   canUseRemoteBusinessPlan,
@@ -22,10 +22,11 @@ import {
 } from '../lib/businessPlanRemote'
 import { supabase } from '../lib/supabaseClient'
 import type {
-  DashboardFilters,
-  ExchangeRateDataset,
   BusinessPlan,
   BusinessPlanStatus,
+  DashboardFilters,
+  DatasetSource,
+  ExchangeRateDataset,
 } from '../types/exchangeRate'
 
 const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
@@ -34,12 +35,17 @@ const INITIAL_BUSINESS_PLAN_STATUS: BusinessPlanStatus = {
   loading: false,
   saving: false,
   source: 'none',
+  remoteLoadStatus: canUseRemoteBusinessPlan() ? 'idle' : 'not_configured',
+  adminAccessStatus: 'unknown',
+  lastSaveStatus: 'idle',
   periodMonth: null,
   isAuthenticated: false,
   canEdit: false,
   userEmail: null,
   lastUpdatedAt: null,
   lastUpdatedBy: null,
+  lastVerifiedAt: null,
+  lastSaveMessage: null,
   error: null,
 }
 
@@ -84,6 +90,7 @@ function isFreshEnough(data: ExchangeRateDataset): boolean {
 
 export function useExchangeData() {
   const [dataset, setDataset] = useState<ExchangeRateDataset | null>(null)
+  const [datasetSource, setDatasetSource] = useState<DatasetSource>('none')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [excelFile, setExcelFile] = useState<File | null>(null)
@@ -119,13 +126,14 @@ export function useExchangeData() {
     })
   }
 
-  const applyDataset = async (data: ExchangeRateDataset) => {
+  const applyDataset = async (data: ExchangeRateDataset, source: DatasetSource) => {
     setDataset(data)
+    setDatasetSource(source)
     updateFiltersBasedOnDataset(data)
 
     const cacheSaved = await saveDatasetToCache(data)
     if (!cacheSaved) {
-      setError('IndexedDB에 데이터를 저장하지 못했습니다. 화면 조회는 계속 가능합니다.')
+      setError('IndexedDB cache could not be saved. The current session still remains usable.')
     }
   }
 
@@ -157,12 +165,12 @@ export function useExchangeData() {
             manualBackfillByDate: manualBackfill?.ratesByDate,
           })
 
-      await applyDataset(fetched)
+      await applyDataset(fetched, excelFile ? 'excel' : 'remote')
     } catch (refreshError) {
       setError(
         refreshError instanceof Error
           ? refreshError.message
-          : '환율 데이터 조회 중 오류가 발생했습니다.',
+          : 'An error occurred while refreshing the exchange data.',
       )
     } finally {
       setLoading(false)
@@ -189,22 +197,26 @@ export function useExchangeData() {
         void saveAVSupplementalCache(supplementalHistory)
       }
 
-      const merged = await fetchRemoteExchangeDataWithExcel(
-        file,
-        options,
-        new Date(),
-        {
-          supplementalHistoryByCurrency: supplementalHistory?.rates,
-          manualBackfillByDate: manualBackfill?.ratesByDate,
-        },
-      )
-      await applyDataset(merged)
-      window.alert('엑셀 업로드가 완료되었습니다. 데이터가 병합되었습니다.')
+      const merged = await fetchRemoteExchangeDataWithExcel(file, options, new Date(), {
+        supplementalHistoryByCurrency: supplementalHistory?.rates,
+        manualBackfillByDate: manualBackfill?.ratesByDate,
+      })
+
+      await applyDataset(merged, 'excel')
+
+      return {
+        type: 'success' as const,
+        text: 'Excel upload completed. The merged result only applies in this browser.',
+      }
     } catch (mergeError) {
-      const msg =
-        mergeError instanceof Error ? mergeError.message : '엑셀 병합 중 오류가 발생했습니다.'
-      setError(msg)
-      window.alert(`엑셀 업로드 중 오류가 발생했습니다: ${msg}`)
+      const message =
+        mergeError instanceof Error ? mergeError.message : 'An error occurred while merging Excel data.'
+      setError(message)
+
+      return {
+        type: 'error' as const,
+        text: `Excel upload failed: ${message}`,
+      }
     } finally {
       setLoading(false)
     }
@@ -224,7 +236,12 @@ export function useExchangeData() {
         isAuthenticated: Boolean(userEmail),
         userEmail,
         source: prev.source === 'none' ? 'local' : prev.source,
-        error: 'Supabase 환경변수가 설정되지 않아 로컬 임시값을 사용합니다.',
+        remoteLoadStatus: 'not_configured',
+        adminAccessStatus: 'unknown',
+        lastSaveStatus: 'idle',
+        lastVerifiedAt: null,
+        lastSaveMessage: null,
+        error: 'Supabase is not configured, so the local cached plan is being used.',
       }))
       return
     }
@@ -236,14 +253,22 @@ export function useExchangeData() {
       periodMonth,
       isAuthenticated: Boolean(userEmail),
       userEmail,
+      remoteLoadStatus: 'loading',
+      adminAccessStatus: userEmail ? 'checking' : 'unknown',
       error: null,
     }))
 
     try {
-      const [remotePlan, canEdit] = await Promise.all([
-        loadBusinessPlanFromSupabase(periodMonth),
-        loadBusinessPlanAdminAccess(userEmail),
-      ])
+      const remotePlan = await loadBusinessPlanFromSupabase(periodMonth)
+      let canEdit = false
+      let adminAccessStatus: BusinessPlanStatus['adminAccessStatus'] = userEmail ? 'denied' : 'unknown'
+
+      try {
+        canEdit = await loadBusinessPlanAdminAccess(userEmail)
+        adminAccessStatus = userEmail ? (canEdit ? 'allowed' : 'denied') : 'unknown'
+      } catch {
+        adminAccessStatus = 'failed'
+      }
 
       setBusinessPlan(remotePlan.plan)
       await saveBusinessPlanToCache(remotePlan.plan)
@@ -251,9 +276,14 @@ export function useExchangeData() {
         ...prev,
         loading: false,
         source: 'supabase',
+        remoteLoadStatus: 'loaded',
+        adminAccessStatus,
         canEdit,
         lastUpdatedAt: remotePlan.lastUpdatedAt,
         lastUpdatedBy: remotePlan.lastUpdatedBy,
+        lastVerifiedAt: remotePlan.lastVerifiedAt,
+        lastSaveStatus: prev.lastSaveStatus === 'saving' ? 'idle' : prev.lastSaveStatus,
+        lastSaveMessage: null,
         error: null,
       }))
     } catch (remoteError) {
@@ -266,25 +296,34 @@ export function useExchangeData() {
         ...prev,
         loading: false,
         source: cachedPlan ? 'local' : 'none',
+        remoteLoadStatus: 'failed',
+        adminAccessStatus: 'unknown',
+        lastVerifiedAt: null,
         canEdit: false,
         error:
           remoteError instanceof Error
             ? remoteError.message
-            : 'Supabase 계획 환율을 불러오지 못해 로컬 임시값을 사용합니다.',
+            : 'Failed to load the remote business plan. Falling back to the local cache.',
       }))
     }
   }
 
   const updateBusinessPlan = async (newPlan: BusinessPlan) => {
     if (!dataset) {
-      throw new Error('데이터가 아직 로드되지 않았습니다.')
+      throw new Error('Exchange data is not loaded yet.')
     }
 
     if (!businessPlanStatus.canEdit || !businessPlanUserEmail || !businessPlanStatus.periodMonth) {
-      throw new Error('계획 환율 저장 권한이 없습니다.')
+      throw new Error('You do not have permission to update the business plan.')
     }
 
-    setBusinessPlanStatus((prev) => ({ ...prev, saving: true, error: null }))
+    setBusinessPlanStatus((prev) => ({
+      ...prev,
+      saving: true,
+      lastSaveStatus: 'saving',
+      lastSaveMessage: null,
+      error: null,
+    }))
 
     try {
       const saved = await saveBusinessPlanToSupabase(
@@ -298,15 +337,36 @@ export function useExchangeData() {
         ...prev,
         saving: false,
         source: 'supabase',
+        remoteLoadStatus: saved.verificationStatus === 'verified' ? 'loaded' : prev.remoteLoadStatus,
+        lastSaveStatus: saved.verificationStatus,
         lastUpdatedAt: saved.lastUpdatedAt,
         lastUpdatedBy: saved.lastUpdatedBy,
+        lastVerifiedAt: saved.lastVerifiedAt,
+        lastSaveMessage:
+          saved.verificationStatus === 'verified'
+            ? 'Supabase 재조회로 저장이 확인되었습니다.'
+            : `저장 요청은 성공했지만 운영값 재확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
         error: null,
       }))
+
+      return saved.verificationStatus === 'verified'
+        ? {
+            type: 'success' as const,
+            text: 'Supabase 재조회로 계획 환율 저장이 확인되었습니다.',
+          }
+        : {
+            type: 'warning' as const,
+            text: `저장 요청은 성공했지만 운영값 재확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
+          }
     } catch (saveError) {
       setBusinessPlanStatus((prev) => ({
         ...prev,
         saving: false,
-        error: saveError instanceof Error ? saveError.message : '계획 환율 저장에 실패했습니다.',
+        lastSaveStatus: 'failed',
+        lastSaveMessage:
+          saveError instanceof Error ? saveError.message : 'Failed to save the business plan.',
+        error:
+          saveError instanceof Error ? saveError.message : 'Failed to save the business plan.',
       }))
       throw saveError
     }
@@ -334,15 +394,20 @@ export function useExchangeData() {
       }
 
       const cached = await cachedPromise
-      if (!isMounted) return
+      if (!isMounted) {
+        return
+      }
 
       if (cached) {
         setDataset(cached)
+        setDatasetSource('cache')
         updateFiltersBasedOnDataset(cached)
       }
 
       const staticDataset = await staticPromise
-      if (!isMounted) return
+      if (!isMounted) {
+        return
+      }
 
       const latestLocalDataset = pickLatestDataset(cached, staticDataset)
       const staticDatasetIsNewer =
@@ -350,7 +415,7 @@ export function useExchangeData() {
         (!cached || datasetSortValue(staticDataset) > datasetSortValue(cached))
 
       if (staticDatasetIsNewer) {
-        await applyDataset(staticDataset)
+        await applyDataset(staticDataset, 'static')
       }
 
       if (latestLocalDataset) {
@@ -369,7 +434,7 @@ export function useExchangeData() {
     return () => {
       isMounted = false
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -405,11 +470,12 @@ export function useExchangeData() {
     }
 
     void loadRemoteBusinessPlan(dataset, businessPlanUserEmail)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset?.baseDate, businessPlanUserEmail])
 
   return {
     dataset,
+    datasetSource,
     loading,
     error,
     excelFile,

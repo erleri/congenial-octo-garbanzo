@@ -19,6 +19,9 @@ export interface RemoteBusinessPlanResult {
   plan: BusinessPlan
   lastUpdatedAt: string | null
   lastUpdatedBy: string | null
+  lastVerifiedAt: string | null
+  verificationStatus: 'verified' | 'unverified'
+  verificationMessage: string | null
 }
 
 export function getBusinessPlanPeriodMonth(baseDate: string): string {
@@ -93,7 +96,14 @@ export async function loadBusinessPlanFromSupabase(
     }
   }
 
-  return { plan, lastUpdatedAt, lastUpdatedBy }
+  return {
+    plan,
+    lastUpdatedAt,
+    lastUpdatedBy,
+    lastVerifiedAt: new Date().toISOString(),
+    verificationStatus: 'verified',
+    verificationMessage: null,
+  }
 }
 
 export async function loadBusinessPlanAdminAccess(email: string | null): Promise<boolean> {
@@ -140,10 +150,20 @@ export async function saveBusinessPlanToSupabase(
     throw error
   }
 
-  return {
-    plan,
-    lastUpdatedAt: new Date().toISOString(),
-    lastUpdatedBy: normalizedEmail,
+  try {
+    return await loadBusinessPlanFromSupabase(periodMonth)
+  } catch (verificationError) {
+    return {
+      plan,
+      lastUpdatedAt: null,
+      lastUpdatedBy: normalizedEmail,
+      lastVerifiedAt: null,
+      verificationStatus: 'unverified',
+      verificationMessage:
+        verificationError instanceof Error
+          ? verificationError.message
+          : 'Saved rows were inserted, but the operational value could not be re-read.',
+    }
   }
 }
 

@@ -1,21 +1,16 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
+import { buildInfo } from './buildInfo'
 import Dashboard from './components/Dashboard'
+import { useExchangeData } from './hooks/useExchangeData'
+import './App.css'
+import { CURRENCIES, DATASET_SOURCE_LABELS, type DashboardFilters } from './types/exchangeRate'
+
 const Admin = lazy(() => import('./components/Admin'))
 const CurrencyDetail = lazy(() => import('./components/CurrencyDetail'))
 const MonthlySummary = lazy(() => import('./components/MonthlySummary'))
 const MovingComparison = lazy(() => import('./components/MovingComparison'))
-import { buildInfo } from './buildInfo'
-import { useExchangeData } from './hooks/useExchangeData'
-import type { DashboardFilters } from './types/exchangeRate'
-import { CURRENCIES } from './types/exchangeRate'
-import './App.css'
 
-type ScreenKey =
-  | 'dashboard'
-  | 'monthly'
-  | 'currency'
-  | 'moving'
-  | 'admin'
+type ScreenKey = 'dashboard' | 'monthly' | 'currency' | 'moving' | 'admin'
 
 const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'dashboard', label: '대시보드' },
@@ -64,6 +59,7 @@ function App() {
 
   const {
     dataset,
+    datasetSource,
     loading,
     error,
     excelPriority,
@@ -229,7 +225,7 @@ function App() {
       return (
         <div className="panel empty">
           <h2>데이터를 불러오는 중입니다.</h2>
-          <p className="table-help">네트워크와 정적 데이터 파일 상태를 확인하고 있습니다.</p>
+          <p className="table-help">정적 데이터와 원격 응답 상태를 함께 확인하고 있습니다.</p>
         </div>
       )
     }
@@ -273,6 +269,7 @@ function App() {
             key={isMailingDeepLink ? 'admin-mailing' : 'admin'}
             error={error}
             dataset={dataset}
+            datasetSource={datasetSource}
             onUploadExcel={uploadAndMergeExcel}
             excelPriority={excelPriority}
             fillMissing={fillMissing}
@@ -283,24 +280,25 @@ function App() {
         return null
     }
   }, [
+    businessPlan,
+    businessPlanStatus,
     dataset,
-    error,
-    excelPriority,
+    datasetSource,
     effectivePeriodFrom,
     effectivePeriodTo,
     effectiveYearFrom,
     effectiveYearTo,
+    error,
+    excelPriority,
     fillMissing,
     filters,
-    monthlyCurrency,
-    screen,
-    uploadAndMergeExcel,
-    businessPlan,
-    updateBusinessPlan,
-    businessPlanStatus,
-    requestBusinessPlanAccess,
-    signOutBusinessPlanAccess,
     isMailingDeepLink,
+    monthlyCurrency,
+    requestBusinessPlanAccess,
+    screen,
+    signOutBusinessPlanAccess,
+    updateBusinessPlan,
+    uploadAndMergeExcel,
   ])
 
   return (
@@ -330,6 +328,7 @@ function App() {
           <div className="status-group">
             <span className="status-item">기준일 {dataset?.baseDate ?? '-'}</span>
             <span className="status-item">최종 갱신 {formatDateTime(dataset?.fetchedAt)}</span>
+            <span className="status-item">데이터 {DATASET_SOURCE_LABELS[datasetSource]}</span>
             <span
               className="status-item version-item"
               title={`${buildInfo.branch} / built ${formatBuildTime(buildInfo.builtAt)}`}
@@ -341,7 +340,12 @@ function App() {
               {loading ? '갱신 중' : error ? '확인 필요' : '정상'}
             </span>
           </div>
-          <button type="button" className="header-refresh-button" onClick={() => void refreshData()} disabled={loading}>
+          <button
+            type="button"
+            className="header-refresh-button"
+            onClick={() => void refreshData()}
+            disabled={loading}
+          >
             {loading ? '갱신 중' : '데이터 갱신'}
           </button>
         </div>

@@ -196,7 +196,7 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
     const matrix: MatrixRow[] = rateType === 'LOCAL_PER_USD' ? localMatrix : []
 
     return (
-      <div className="table-scroll">
+      <div className="table-scroll sticky-table-wrapper">
         <table className="dense-table">
           <thead>
             <tr>

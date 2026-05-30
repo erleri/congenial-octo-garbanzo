@@ -1,17 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { fetchRawSheetsDataset } from '../lib'
-import type { ExchangeRateDataset, RawSheet } from '../types/exchangeRate'
+import {
+  DATASET_SOURCE_LABELS,
+  type DatasetSource,
+  type ExchangeRateDataset,
+  type RawSheet,
+} from '../types/exchangeRate'
+
+interface ActionNotice {
+  type: 'success' | 'error'
+  text: string
+}
 
 interface AdminProps {
   error: string | null
   dataset: ExchangeRateDataset | null
+  datasetSource: DatasetSource
   onUploadExcel: (
     file: File,
     options: { excelPriority: boolean; fillMissing: boolean },
-  ) => Promise<void>
+  ) => Promise<ActionNotice>
   excelPriority: boolean
   fillMissing: boolean
   initialMailingOpen?: boolean
+}
+
+interface InlineNotice {
+  tone: 'info' | 'success' | 'warning' | 'error'
+  text: string
 }
 
 function downloadCsv(
@@ -30,9 +46,7 @@ function downloadCsv(
 
   const csv = [
     headers.join(','),
-    ...rows.map((row) =>
-      headers.map((header) => escaped(row[header] ?? null)).join(','),
-    ),
+    ...rows.map((row) => headers.map((header) => escaped(row[header] ?? null)).join(',')),
   ].join('\n')
 
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -44,9 +58,14 @@ function downloadCsv(
   URL.revokeObjectURL(href)
 }
 
+function noticeClassName(tone: InlineNotice['tone']) {
+  return `inline-notice ${tone}-notice`
+}
+
 function Admin({
   error,
   dataset,
+  datasetSource,
   onUploadExcel,
   excelPriority,
   fillMissing,
@@ -56,10 +75,17 @@ function Admin({
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
   const [sheetName, setSheetName] = useState('Summary')
   const [fetchedRawSheets, setFetchedRawSheets] = useState<RawSheet[]>([])
+  const [excelNotice, setExcelNotice] = useState<InlineNotice | null>(null)
 
   const [isMailingModalOpen, setIsMailingModalOpen] = useState(initialMailingOpen)
   const [mailingList, setMailingList] = useState<string[]>([])
   const [newEmail, setNewEmail] = useState('')
+  const [mailingNotice, setMailingNotice] = useState<InlineNotice | null>(null)
+
+  const isLocalDev = useMemo(() => {
+    const host = window.location.hostname
+    return host === '127.0.0.1' || host === 'localhost'
+  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -83,13 +109,11 @@ function Admin({
     }
   }, [dataset?.rawSheets])
 
-  const rawSheets =
-    dataset?.rawSheets?.length ? dataset.rawSheets : fetchedRawSheets
+  const rawSheets = dataset?.rawSheets?.length ? dataset.rawSheets : fetchedRawSheets
   const activeSheetName = rawSheets.some((sheet) => sheet.name === sheetName)
     ? sheetName
     : (rawSheets[0]?.name ?? '')
-  const selectedSheet =
-    rawSheets.find((sheet) => sheet.name === activeSheetName) ?? rawSheets[0]
+  const selectedSheet = rawSheets.find((sheet) => sheet.name === activeSheetName) ?? rawSheets[0]
 
   const loadMailingList = async () => {
     try {
@@ -97,15 +121,27 @@ function Admin({
       if (res.ok) {
         const data = await res.json()
         setMailingList(Array.isArray(data) ? data : [])
-      } else {
-        setMailingList([])
+        return
       }
+
+      setMailingList([])
     } catch {
-      console.warn('Failed to load mailing list, API might not be available.')
+      setMailingList([])
     }
   }
 
   const openMailingModal = async () => {
+    setMailingNotice(
+      isLocalDev
+        ? {
+            tone: 'info',
+            text: 'Mailing list changes are only saved by the local dev server. Production recipients still follow the deployed repository configuration.',
+          }
+        : {
+            tone: 'warning',
+            text: 'This production view is read-only. Operational recipients follow the GitHub repository and deployment settings.',
+          },
+    )
     setIsMailingModalOpen(true)
     await loadMailingList()
   }
@@ -120,22 +156,38 @@ function Admin({
   }, [initialMailingOpen])
 
   const saveMailingList = async () => {
+    if (!isLocalDev) {
+      setMailingNotice({
+        tone: 'warning',
+        text: 'Saving is disabled on the production site. Update the mailing target through the repository-managed configuration instead.',
+      })
+      return
+    }
+
     try {
       const res = await fetch('/api/mailing-list', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mailingList),
       })
-      if (res.ok) {
-        alert(
-          '메일링 리스트가 저장되었습니다. 변경 사항은 저장소에 반영되어야 운영 환경에 적용됩니다.',
-        )
-        setIsMailingModalOpen(false)
-      } else {
-        alert('저장 실패: 로컬 개발 서버에서만 동작합니다.')
+
+      if (!res.ok) {
+        throw new Error('The local mailing API is unavailable.')
       }
-    } catch {
-      alert('저장 오류: 로컬 서버 연결을 확인해 주세요.')
+
+      setMailingNotice({
+        tone: 'success',
+        text: 'Mailing list saved to the local development server.',
+      })
+      window.setTimeout(() => setIsMailingModalOpen(false), 400)
+    } catch (mailingError) {
+      setMailingNotice({
+        tone: 'error',
+        text:
+          mailingError instanceof Error
+            ? mailingError.message
+            : 'Failed to save the mailing list. Check the local dev server.',
+      })
     }
   }
 
@@ -157,30 +209,61 @@ function Admin({
         <div>
           <h2>관리</h2>
           <p className="table-help">
-            데이터 업로드와 운영용 내보내기 작업을 관리합니다.
+            데이터 확인, 로컬 미리보기, 메일 운영 범위를 한 화면에서 구분합니다.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={openMailingModal}
-          className="quiet-button"
-        >
+        <button type="button" onClick={openMailingModal} className="quiet-button">
           메일링 리스트
         </button>
       </div>
 
+      <div className="scope-grid">
+        <div className="scope-card">
+          <span className="scope-badge scope-badge-local">로컬 전용</span>
+          <strong>Excel 업로드</strong>
+          <p>이 브라우저에서만 반영되는 로컬 미리보기입니다. 운영 데이터와 내일 발송 메일에는 반영되지 않습니다.</p>
+        </div>
+        <div className="scope-card">
+          <span className="scope-badge scope-badge-operational">운영 확인</span>
+          <strong>현재 데이터 출처</strong>
+          <p className="source-state">{DATASET_SOURCE_LABELS[datasetSource]}</p>
+          <p>build, 기준일, 데이터 출처를 함께 보고 지금 화면이 어떤 상태인지 빠르게 확인할 수 있습니다.</p>
+        </div>
+        <div className="scope-card">
+          <span className={`scope-badge ${isLocalDev ? 'scope-badge-local' : 'scope-badge-readonly'}`}>
+            {isLocalDev ? '로컬만 저장' : '운영 읽기 전용'}
+          </span>
+          <strong>메일링 리스트</strong>
+          <p>
+            {isLocalDev
+              ? '로컬 개발 서버에서만 저장됩니다. 운영 수신 대상은 저장소와 배포 설정 기준입니다.'
+              : '운영 사이트에서는 편집하지 않습니다. 실제 수신 대상은 GitHub 저장소와 배포 설정 기준입니다.'}
+          </p>
+        </div>
+      </div>
+
       <div className="table-card">
         <h3>Excel 업로드</h3>
-        <div className="inline-controls">
+        <p className={noticeClassName('warning')}>
+          이 브라우저에서만 반영되는 로컬 미리보기입니다.
+        </p>
+        <p className="table-help" style={{ marginTop: 8 }}>
+          현재 화면 출처: <strong>{DATASET_SOURCE_LABELS[datasetSource]}</strong>
+        </p>
+        <div className="inline-controls" style={{ marginTop: 10 }}>
           <input
             type="file"
             accept=".xlsx,.xls"
-            onChange={(event) => {
+            onChange={async (event) => {
               const file = event.target.files?.[0] ?? null
               if (file) {
-                onUploadExcel(file, {
+                const notice = await onUploadExcel(file, {
                   excelPriority: localExcelPriority,
                   fillMissing: localFillMissing,
+                })
+                setExcelNotice({
+                  tone: notice.type,
+                  text: notice.text,
                 })
               }
               event.target.value = ''
@@ -200,13 +283,14 @@ function Admin({
               checked={localFillMissing}
               onChange={(event) => setLocalFillMissing(event.target.checked)}
             />
-            보정 포함
+            누락값 보정 포함
           </label>
         </div>
+        {excelNotice ? <p className={noticeClassName(excelNotice.tone)}>{excelNotice.text}</p> : null}
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>원본 데이터 내보내기</h3>
+        <h3>원본 데이터 미리보기</h3>
         <div className="inline-controls" style={{ marginBottom: 8 }}>
           <select
             value={activeSheetName}
@@ -229,23 +313,17 @@ function Admin({
                 return
               }
 
-              downloadCsv(
-                selectedSheet.name,
-                selectedSheet.headers,
-                selectedSheet.rows,
-              )
+              downloadCsv(selectedSheet.name, selectedSheet.headers, selectedSheet.rows)
             }}
           >
             CSV 내보내기
           </button>
         </div>
         <p className="table-help">
-          원본 시트는 메인 데이터셋과 분리되어 있으며, 필요할 때만 CSV로 추출합니다.
+          메인 대시보드 데이터와 별개로, 원본 시트 자체를 점검할 때만 사용합니다.
         </p>
         {!rawSheets.length ? (
-          <p className="table-help">
-            원본 시트 데이터를 아직 불러오지 못했습니다.
-          </p>
+          <p className="table-help">원본 시트 데이터를 아직 불러오지 못했습니다.</p>
         ) : null}
       </div>
 
@@ -258,11 +336,11 @@ function Admin({
           </div>
           <div>
             <strong>최종 갱신</strong>
-            <div>
-              {dataset
-                ? new Date(dataset.fetchedAt).toLocaleString('ko-KR')
-                : '-'}
-            </div>
+            <div>{dataset ? new Date(dataset.fetchedAt).toLocaleString('ko-KR') : '-'}</div>
+          </div>
+          <div>
+            <strong>데이터 출처</strong>
+            <div>{DATASET_SOURCE_LABELS[datasetSource]}</div>
           </div>
           <div>
             <strong>일별 레코드</strong>
@@ -270,9 +348,11 @@ function Admin({
           </div>
           <div>
             <strong>월별 레코드</strong>
-            <div>
-              {dataset?.monthlyRates.length.toLocaleString('ko-KR') ?? '0'}
-            </div>
+            <div>{dataset?.monthlyRates.length.toLocaleString('ko-KR') ?? '0'}</div>
+          </div>
+          <div>
+            <strong>메일 운영 상태</strong>
+            <div>{isLocalDev ? '로컬만 저장' : '운영 읽기 전용'}</div>
           </div>
         </div>
       </div>
@@ -284,9 +364,11 @@ function Admin({
           <div className="modal-content">
             <h3>메일링 리스트</h3>
             <p>
-              일일 대시보드 리포트를 받을 이메일을 관리합니다. 로컬에서 저장한 뒤
-              저장소에 반영되어야 운영 환경에 적용됩니다.
+              일일 대시보드 리포트를 받는 메일 주소입니다. 운영 사이트에서는 실제 수신 대상이
+              바로 바뀌지 않습니다.
             </p>
+
+            {mailingNotice ? <p className={noticeClassName(mailingNotice.tone)}>{mailingNotice.text}</p> : null}
 
             <div className="inline-controls" style={{ margin: '16px 0' }}>
               <input
@@ -294,9 +376,10 @@ function Admin({
                 value={newEmail}
                 onChange={(event) => setNewEmail(event.target.value)}
                 onKeyDown={(event) => event.key === 'Enter' && addEmail()}
-                placeholder="이메일 주소"
+                placeholder="email@example.com"
+                disabled={!isLocalDev}
               />
-              <button type="button" onClick={addEmail} className="quiet-button">
+              <button type="button" onClick={addEmail} className="quiet-button" disabled={!isLocalDev}>
                 추가
               </button>
             </div>
@@ -323,6 +406,7 @@ function Admin({
                             type="button"
                             onClick={() => removeEmail(email)}
                             className="quiet-button"
+                            disabled={!isLocalDev}
                           >
                             제거
                           </button>
@@ -334,21 +418,15 @@ function Admin({
               </table>
             </div>
 
-            <div
-              className="inline-controls"
-              style={{ justifyContent: 'flex-end', marginTop: 16 }}
-            >
-              <button
-                type="button"
-                onClick={() => setIsMailingModalOpen(false)}
-                className="quiet-button"
-              >
-                취소
+            <div className="inline-controls" style={{ justifyContent: 'flex-end', marginTop: 16 }}>
+              <button type="button" onClick={() => setIsMailingModalOpen(false)} className="quiet-button">
+                닫기
               </button>
               <button
                 type="button"
                 onClick={saveMailingList}
                 className="header-refresh-button"
+                disabled={!isLocalDev}
               >
                 저장
               </button>

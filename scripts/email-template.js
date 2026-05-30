@@ -42,11 +42,11 @@ export function formatRate(value) {
   return value.toLocaleString('en-US', { maximumFractionDigits: 4 })
 }
 
-function monthlyAverage(dailyRates, baseDate, currency, year, month) {
+function monthlyAverage(dailyRates, baseDate, currency, year, month, rateType = 'LOCAL_PER_USD') {
   const values = dailyRates
     .filter((row) =>
       row.currency === currency &&
-      row.rateType === 'LOCAL_PER_USD' &&
+      row.rateType === rateType &&
       row.year === year &&
       row.month === month &&
       row.date <= baseDate &&
@@ -57,10 +57,10 @@ function monthlyAverage(dailyRates, baseDate, currency, year, month) {
   return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null
 }
 
-function findMonthlyValue(dataset, currency, year, month) {
+function findMonthlyValue(dataset, currency, year, month, rateType = 'LOCAL_PER_USD') {
   return (dataset.monthlyRates ?? []).find((row) =>
     row.currency === currency &&
-    row.rateType === 'LOCAL_PER_USD' &&
+    row.rateType === rateType &&
     row.year === year &&
     row.month === month &&
     typeof row.value === 'number',
@@ -128,6 +128,56 @@ export function getCurrencyDetails(dataset) {
   })
 }
 
+export function getUsdKrwAnchor(dataset) {
+  const dailyRates = dataset.dailyRates ?? []
+  const baseDate = dataset.baseDate
+  const [baseYear, baseMonth] = baseDate.split('-').map(Number)
+  const oneYearAgo = `${baseYear - 1}-${String(baseMonth).padStart(2, '0')}-${baseDate.split('-')[2]}`
+  const [prevYear, prevMonth] = previousMonth(baseYear, baseMonth)
+  const latestRow = dailyRates.find((row) =>
+    row.currency === 'USD' &&
+    row.rateType === 'KRW' &&
+    row.date === baseDate &&
+    typeof row.value === 'number',
+  )
+  const mtdAverage = monthlyAverage(dailyRates, baseDate, 'USD', baseYear, baseMonth, 'KRW')
+  const previousAverage = findMonthlyValue(dataset, 'USD', prevYear, prevMonth, 'KRW')
+  const mom =
+    typeof mtdAverage === 'number' &&
+    typeof previousAverage === 'number' &&
+    previousAverage !== 0
+      ? ((mtdAverage - previousAverage) / previousAverage) * 100
+      : null
+  const yearlyValues = dailyRates
+    .filter((row) =>
+      row.currency === 'USD' &&
+      row.rateType === 'KRW' &&
+      oneYearAgo <= row.date &&
+      row.date <= baseDate &&
+      typeof row.value === 'number',
+    )
+    .map((row) => row.value)
+  const low52 = yearlyValues.length ? Math.min(...yearlyValues) : null
+  const high52 = yearlyValues.length ? Math.max(...yearlyValues) : null
+  const todayValue = latestRow?.value ?? null
+  const percent52 =
+    typeof todayValue === 'number' &&
+    typeof low52 === 'number' &&
+    typeof high52 === 'number' &&
+    high52 > low52
+      ? Math.max(0, Math.min(100, ((todayValue - low52) / (high52 - low52)) * 100))
+      : 50
+
+  return {
+    rate: todayValue,
+    mtdAverage,
+    mom,
+    low52,
+    high52,
+    percent52,
+  }
+}
+
 function renderCta(margin = '16px 0') {
   return `
     <p style="margin:${margin};text-align:center;">
@@ -153,6 +203,59 @@ function renderMarketContext(marketContext) {
           <ul style="margin:0;padding-left:18px;color:#344054;font-size:13px;line-height:1.5;">
             ${effectiveBullets.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
           </ul>
+        </td>
+      </tr>
+    </table>
+  `
+}
+
+function renderUsdKrwAnchor(anchor) {
+  const momText =
+    typeof anchor.mom === 'number' ? `${anchor.mom >= 0 ? '+' : ''}${anchor.mom.toFixed(2)}% MoM` : 'MoM -'
+  const momColor = typeof anchor.mom === 'number' && anchor.mom >= 0 ? '#a61b12' : '#1f5fbf'
+
+  return `
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 18px;border:1px solid #cfd5df;border-left:4px solid #1f5fbf;background:#ffffff;border-radius:6px;">
+      <tr>
+        <td style="padding:12px 14px;">
+          <table role="presentation" style="width:100%;border-collapse:collapse;">
+            <tr>
+              <td style="vertical-align:top;width:38%;padding-right:10px;">
+                <div style="display:inline-block;border:1px solid #ccd6e6;border-radius:4px;background:#f8fafc;color:#1f5fbf;padding:2px 6px;font-size:10px;font-weight:bold;">Anchor</div>
+                <h3 style="margin:7px 0 4px;font-size:16px;color:#111827;">USD/KRW Anchor</h3>
+                <p style="margin:0;color:#667085;font-size:12px;line-height:1.4;">KRW conversion reference rate</p>
+              </td>
+              <td style="vertical-align:top;">
+                <table role="presentation" style="width:100%;border-collapse:collapse;">
+                  <tr>
+                    <td style="padding:4px 8px;border-right:1px solid #e4e8ee;">
+                      <div style="color:#667085;font-size:11px;font-weight:bold;">Base rate</div>
+                      <div style="margin-top:3px;color:#111827;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">${formatRate(anchor.rate)}</div>
+                    </td>
+                    <td style="padding:4px 8px;border-right:1px solid #e4e8ee;">
+                      <div style="color:#667085;font-size:11px;font-weight:bold;">MTD avg</div>
+                      <div style="margin-top:3px;color:#111827;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;">${formatRate(anchor.mtdAverage)}</div>
+                    </td>
+                    <td style="padding:4px 8px;">
+                      <div style="color:#667085;font-size:11px;font-weight:bold;">MoM</div>
+                      <div style="margin-top:3px;color:${momColor};font-size:14px;font-weight:bold;">${momText}</div>
+                    </td>
+                  </tr>
+                </table>
+                <div style="margin:9px 8px 0;color:#667085;font-size:11px;font-weight:bold;">52-week range</div>
+                <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:3px;">
+                  <tr>
+                    <td style="padding:0 8px;color:#5b6472;font-size:11px;font-weight:bold;font-variant-numeric:tabular-nums;">${formatRate(anchor.low52)}</td>
+                    <td style="padding:0 8px;text-align:right;color:#5b6472;font-size:11px;font-weight:bold;font-variant-numeric:tabular-nums;">${formatRate(anchor.high52)}</td>
+                  </tr>
+                </table>
+                <div style="height:4px;background:#edf0f4;border-radius:999px;margin:4px 8px 0;position:relative;">
+                  <div style="height:4px;width:${anchor.percent52.toFixed(1)}%;background:#1f5fbf;opacity:.35;border-radius:999px;"></div>
+                  <div style="width:2px;height:10px;background:#162033;margin-left:${anchor.percent52.toFixed(1)}%;margin-top:-7px;"></div>
+                </div>
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
@@ -246,6 +349,7 @@ export function composeEmailBody({
                 </p>
                 ${renderCta('0 0 16px')}
                 ${renderMarketContext(marketContext)}
+                ${renderUsdKrwAnchor(getUsdKrwAnchor(dataset))}
                 ${renderKpiSummary(getCurrencyDetails(dataset), baseDate)}
                 ${chartSection}
                 ${renderCta('16px 0')}
