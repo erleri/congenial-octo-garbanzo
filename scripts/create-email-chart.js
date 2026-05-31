@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer'
 const DATA_PATH = path.resolve('public/data.json')
 const CHART_PATH = path.resolve('email-chart.png')
 const META_PATH = path.resolve('email-chart-meta.json')
-const EMAIL_CONTENT_WIDTH = 600
+const EMAIL_CONTENT_WIDTH = 660
 const CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN']
 const COLORS = {
   BRL: '#2f6f5e',
@@ -37,6 +37,25 @@ function formatRate(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 4,
   })
+}
+
+function formatShortDate(value) {
+  if (typeof value !== 'string') {
+    return '-'
+  }
+
+  const [, month, day] = value.split('-')
+  return month && day ? `${month}-${day}` : value
+}
+
+function formatGeneratedAt(date = new Date()) {
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  const hours = String(date.getUTCHours()).padStart(2, '0')
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+
+  return `${year}-${month}-${day} ${hours}:${minutes} UTC`
 }
 
 function buildPolyline(points, width, height, padding) {
@@ -74,10 +93,77 @@ function average(values) {
   return values.reduce((sum, value) => sum + value, 0) / values.length
 }
 
+function calculateChangePct(points) {
+  const numeric = points.filter((point) => isNumeric(point.value))
+  const first = numeric.at(0)
+  const latest = numeric.at(-1)
+
+  return latest && first && first.value !== 0
+    ? ((latest.value - first.value) / first.value) * 100
+    : null
+}
+
+function calculateRangePosition(points) {
+  const numeric = points.filter((point) => isNumeric(point.value))
+  const latest = numeric.at(-1)
+
+  if (!latest || numeric.length < 2) {
+    return null
+  }
+
+  const min = Math.min(...numeric.map((point) => point.value))
+  const max = Math.max(...numeric.map((point) => point.value))
+
+  if (max <= min) {
+    return null
+  }
+
+  return ((latest.value - min) / (max - min)) * 100
+}
+
+function buildChartNotes(chartData) {
+  const chartRows = CURRENCIES.map((currency) => {
+    const points = chartData[currency].points
+
+    return {
+      currency,
+      changePct: calculateChangePct(points),
+      rangePosition: calculateRangePosition(points),
+    }
+  })
+  const largestMove = chartRows
+    .filter((row) => isNumeric(row.changePct))
+    .sort((a, b) => Math.abs(b.changePct) - Math.abs(a.changePct))[0]
+  const rangePressure = chartRows
+    .filter((row) => isNumeric(row.rangePosition))
+    .map((row) => ({
+      ...row,
+      edgeDistance: Math.min(row.rangePosition, 100 - row.rangePosition),
+    }))
+    .sort((a, b) => a.edgeDistance - b.edgeDistance)[0]
+  const upCount = chartRows.filter((row) => isNumeric(row.changePct) && row.changePct >= 0).length
+  const downCount = chartRows.filter((row) => isNumeric(row.changePct) && row.changePct < 0).length
+  const mostChanged = largestMove
+    ? `${largestMove.currency} ${largestMove.changePct >= 0 ? '+' : ''}${largestMove.changePct.toFixed(2)}%`
+    : '-'
+  const nearestEdge = rangePressure
+    ? `${rangePressure.currency} ${rangePressure.rangePosition >= 50 ? 'upper side' : 'lower side'}`
+    : '-'
+  const broadTone = `${upCount} up / ${downCount} down`
+  const text = `Most changed: ${mostChanged} · Nearest edge: ${nearestEdge} · Broad tone: ${broadTone}`
+
+  return {
+    mostChanged,
+    nearestEdge,
+    broadTone,
+    text,
+  }
+}
+
 function buildChartCard(currency, points, mtdAverage) {
-  const width = 246
-  const height = 150
-  const padding = { top: 20, right: 20, bottom: 24, left: 34 }
+  const width = 284
+  const height = 132
+  const padding = { top: 18, right: 18, bottom: 20, left: 32 }
   const numeric = points.filter((point) => isNumeric(point.value))
   const latest = numeric.at(-1)
   const first = numeric.at(0)
@@ -94,7 +180,6 @@ function buildChartCard(currency, points, mtdAverage) {
       <div class="card-head">
         <div>
           <h2>${currency}</h2>
-          <p>Last 30 valid daily rates</p>
           <p>MTD avg ${formatRate(mtdAverage)}</p>
         </div>
         <div class="latest">
@@ -112,14 +197,15 @@ function buildChartCard(currency, points, mtdAverage) {
         <polyline points="${line}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
       <div class="range">
-        <span>${points[0]?.date ?? '-'}</span>
-        <span>${points.at(-1)?.date ?? '-'}</span>
+        <span>${formatShortDate(points[0]?.date)}</span>
+        <span>${formatShortDate(points.at(-1)?.date)}</span>
       </div>
     </section>
   `
 }
 
-function buildHtml(dataset, chartData) {
+function buildHtml(dataset, chartData, chartNotes) {
+  const generatedAt = formatGeneratedAt()
   const cards = CURRENCIES
     .map((currency) => buildChartCard(currency, chartData[currency].points, chartData[currency].mtdAverage))
     .join('')
@@ -133,53 +219,70 @@ function buildHtml(dataset, chartData) {
           body {
             margin: 0;
             width: ${EMAIL_CONTENT_WIDTH}px;
-            background: #f5f7fb;
-            color: #172033;
+            background: #f8fafc;
+            color: #111827;
             font-family: Arial, Helvetica, sans-serif;
           }
           .wrap {
             width: ${EMAIL_CONTENT_WIDTH}px;
-            padding: 20px;
+            padding: 18px;
           }
           .top {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 18px;
+            align-items: flex-start;
+            margin-bottom: 14px;
           }
           h1 {
             margin: 0;
-            font-size: 26px;
+            font-size: 19px;
+            line-height: 1.2;
             letter-spacing: 0;
           }
           .meta {
-            margin: 6px 0 0;
+            margin: 5px 0 0;
             color: #667085;
-            font-size: 13px;
+            font-size: 11px;
+          }
+          .chart-notes {
+            margin: 0 0 12px;
+            border: 1px solid #d7deea;
+            border-radius: 6px;
+            background: #f3f6fa;
+            padding: 7px 10px;
+            color: #667085;
+            font-size: 11px;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+          }
+          .chart-notes strong {
+            color: #344054;
+            font-weight: 700;
           }
           .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
           }
           .card {
             background: #ffffff;
-            border: 1px solid #d9dee7;
-            border-radius: 8px;
-            padding: 14px;
+            border: 1px solid #d7deea;
+            border-radius: 6px;
+            padding: 12px;
           }
           .card-head {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 12px;
+            gap: 10px;
           }
           h2 {
             margin: 0;
-            font-size: 19px;
+            font-size: 17px;
+            line-height: 1.1;
           }
           .card p {
-            margin: 3px 0 0;
+            margin: 4px 0 0;
             color: #667085;
             font-size: 11px;
           }
@@ -188,7 +291,9 @@ function buildHtml(dataset, chartData) {
           }
           .latest strong {
             display: block;
-            font-size: 16px;
+            font-size: 15px;
+            line-height: 1.1;
+            font-variant-numeric: tabular-nums;
           }
           .latest span {
             display: block;
@@ -199,15 +304,15 @@ function buildHtml(dataset, chartData) {
           .latest .up { color: #16803f; }
           .latest .down { color: #b42318; }
           .axis {
-            fill: #667085;
-            font-size: 10px;
+            fill: #7b8494;
+            font-size: 9px;
           }
           .range {
             display: flex;
             justify-content: space-between;
             color: #667085;
             font-size: 10px;
-            margin-top: -2px;
+            margin-top: -4px;
           }
         </style>
       </head>
@@ -215,10 +320,11 @@ function buildHtml(dataset, chartData) {
         <main class="wrap">
           <header class="top">
             <div>
-              <h1>LATAM FX Daily Trend</h1>
-              <p class="meta">Base date: ${dataset.baseDate} / Generated: ${new Date().toISOString()}</p>
+              <h1>30-day LATAM FX trend</h1>
+              <p class="meta">Base date: ${dataset.baseDate} · Generated: ${generatedAt}</p>
             </div>
           </header>
+          <p class="chart-notes"><strong>Chart notes</strong> · ${chartNotes.text}</p>
           <div class="grid">
             ${cards}
           </div>
@@ -269,7 +375,8 @@ async function main() {
     }),
   )
 
-  const html = buildHtml(dataset, chartData)
+  const chartNotes = buildChartNotes(chartData)
+  const html = buildHtml(dataset, chartData, chartNotes)
   const browser = await puppeteer.launch({
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   })
@@ -297,6 +404,7 @@ async function main() {
       mtdAverageByCurrency: Object.fromEntries(
         CURRENCIES.map((currency) => [currency, chartData[currency].mtdAverage]),
       ),
+      chartNotes,
     }, null, 2)}\n`,
     'utf8',
   )

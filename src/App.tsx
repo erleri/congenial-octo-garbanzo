@@ -232,7 +232,7 @@ function App() {
 
     switch (screen) {
       case 'dashboard':
-        return <Dashboard data={dataset} filters={filters} />
+        return <Dashboard data={dataset} filters={filters} businessPlan={businessPlan} />
       case 'monthly':
         return (
           <MonthlySummary

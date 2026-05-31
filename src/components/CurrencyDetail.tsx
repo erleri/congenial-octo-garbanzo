@@ -25,6 +25,30 @@ interface CurrencyDetailProps {
   periodTo: string
 }
 
+interface DetailDotProps {
+  cx?: number
+  cy?: number
+  payload?: {
+    isLatest?: boolean
+  }
+}
+
+const DETAIL_GRID_STROKE = '#eef1f5'
+const DETAIL_AVERAGE_STROKE = '#a8b0bd'
+const DETAIL_LINE_STROKE = '#1f2a44'
+const DETAIL_TOOLTIP_STYLE = {
+  borderRadius: '6px',
+  border: '1px solid #d9dee7',
+  boxShadow: 'none',
+  color: '#111827',
+  fontSize: '12px',
+} as const
+const DETAIL_LABEL_STYLE = {
+  fill: '#8a94a3',
+  fontSize: 10,
+  fontWeight: 600,
+} as const
+
 function periodToNumber(period: string): number {
   const [yearText, monthText] = period.split('-')
   return Number(yearText) * 100 + Number(monthText)
@@ -66,6 +90,23 @@ function formatRateValue(value: unknown, currency: CurrencyCode): string {
   return typeof value === 'number'
     ? formatCellValue(value, 'ok', currency)
     : String(value ?? '-')
+}
+
+function renderLatestDetailDot({ cx, cy, payload }: DetailDotProps) {
+  if (!payload?.isLatest || typeof cx !== 'number' || typeof cy !== 'number') {
+    return null
+  }
+
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={3}
+      fill={DETAIL_LINE_STROKE}
+      stroke="#ffffff"
+      strokeWidth={1.5}
+    />
+  )
 }
 
 function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: CurrencyDetailProps) {
@@ -112,19 +153,24 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
   )
 
   const dailySeries = useMemo(
-    () =>
-      data.dailyRates
+    () => {
+      const rows = data.dailyRates
         .filter((row) => {
           const ym = row.year * 100 + row.month
           return row.currency === currency && row.rateType === 'LOCAL_PER_USD' && ym >= fromValue && ym <= toValue
         })
         .sort((a, b) => a.date.localeCompare(b.date))
-        .map((row) => ({
+
+      const latestValidIndex = rows.findLastIndex((row) => typeof row.value === 'number')
+
+      return rows.map((row, index) => ({
           ts: new Date(`${row.date}T00:00:00Z`).getTime(),
           fullDate: row.date,
           value: typeof row.value === 'number' ? row.value : null,
           source: row.source,
-        })),
+          isLatest: index === latestValidIndex,
+        }))
+    },
     [currency, data.dailyRates, fromValue, toValue],
   )
 
@@ -269,8 +315,8 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
       <div className="chart-card">
         <h3>{periodFrom} ~ {periodTo} 일별 환율</h3>
         <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={dailySeries}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceff3" />
+          <LineChart data={dailySeries} margin={{ top: 8, right: 12, bottom: 2, left: 0 }}>
+            <CartesianGrid strokeDasharray="2 4" vertical={false} stroke={DETAIL_GRID_STROKE} />
             <XAxis
               type="number"
               dataKey="ts"
@@ -281,11 +327,17 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                 const date = new Date(value)
                 return `${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getDate()).padStart(2, '0')}`
               }}
+              tick={{ fill: '#6b7280', fontSize: 11 }}
+              tickLine={false}
+              axisLine={{ stroke: '#d9dee7' }}
             />
             <YAxis
               domain={(['auto', 'auto'] as const)}
               tickFormatter={(value: number) => formatCellValue(value, 'ok', currency)}
-              width={80}
+              width={72}
+              tick={{ fill: '#6b7280', fontSize: 11 }}
+              tickLine={false}
+              axisLine={{ stroke: '#d9dee7' }}
             />
             <Tooltip
               labelFormatter={(_label, payload) => payload?.[0]?.payload?.fullDate ?? ''}
@@ -293,11 +345,8 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                 const source = getTooltipSource(item)
                 return [formatRateValue(value, currency), `일별 환율 (${source})`]
               }}
-              contentStyle={{
-                borderRadius: '6px',
-                border: '1px solid #d9dee7',
-                boxShadow: 'none',
-              }}
+              labelStyle={{ color: '#667085', fontSize: '12px' }}
+              contentStyle={DETAIL_TOOLTIP_STYLE}
             />
             {monthlyAverageLines.map((line) => (
               <ReferenceLine
@@ -306,17 +355,25 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
                   { x: line.startTs, y: line.average },
                   { x: line.endTs, y: line.average },
                 ]}
-                stroke="#93691d"
+                stroke={DETAIL_AVERAGE_STROKE}
                 strokeDasharray="5 5"
+                strokeWidth={1}
                 label={{
                   value: `${line.month}월 평균 ${formatCellValue(line.average, 'ok', currency)}`,
                   position: 'insideTopRight',
-                  fill: '#93691d',
-                  fontSize: 11,
+                  ...DETAIL_LABEL_STYLE,
                 }}
               />
             ))}
-            <Line type="monotone" dataKey="value" stroke="#1f2a44" strokeWidth={2} dot={false} activeDot={false} />
+            <Line
+              type="monotone"
+              dataKey="value"
+              stroke={DETAIL_LINE_STROKE}
+              strokeWidth={2}
+              dot={renderLatestDetailDot}
+              activeDot={{ r: 3, strokeWidth: 1, stroke: '#ffffff' }}
+              connectNulls
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>

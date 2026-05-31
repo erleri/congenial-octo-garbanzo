@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite --configLoader native",
+    "dev:local": "vite --configLoader native --host 127.0.0.1 --port 5173",
     "build": "tsc -b && vite build",
     "build:local": "tsc -b && vite build --configLoader native --emptyOutDir false --outDir dist-local",
     "generate:data": "tsx scripts/generate-data.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "preview:local": "vite preview --host 127.0.0.1 --port 4173"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",

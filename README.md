@@ -36,6 +36,20 @@ npm run dev
 http://127.0.0.1:5173/
 ```
 
+Windows에서 Codex 세션 안의 장시간 실행 명령이 끊기면, 별도 CMD 또는 PowerShell 창에서 아래처럼 직접 실행합니다.
+
+```cmd
+cd /d "C:\Users\Koo Imjun\중남미 환율사이트"
+npm.cmd run dev:local
+```
+
+운영 배포와 비슷한 정적 결과를 확인할 때는 빌드 후 preview를 사용합니다.
+
+```cmd
+npm.cmd run build:local
+npm.cmd run preview:local
+```
+
 ## 데이터 생성
 
 ```bash

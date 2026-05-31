@@ -11,6 +11,12 @@ This checklist tracks the remaining production setup needed for business plan ra
 - Supabase publishable config is present in the production bundle, and `business_plan_rates` can be read through the public REST API.
 - No `service_role`, `sb_secret_...`, or literal `secret key` value pattern was found in the production bundle.
 
+## Local Verification Notes
+
+- Use `npm.cmd run dev:local` from a normal local CMD/PowerShell window when the Codex shell cannot keep the Vite server alive.
+- Use `npm.cmd run build:local` followed by `npm.cmd run preview:local` when checking static preview behavior.
+- Keep the dashboard header lightweight: show only factual context such as base date and active averaging period.
+
 ## Supabase Business Plan Rates
 
 - [x] Run `supabase/migrations/20260504120000_business_plan_rates.sql` in the Supabase SQL Editor.
@@ -45,3 +51,8 @@ This checklist tracks the remaining production setup needed for business plan ra
 - [ ] Temporarily test without Supabase env vars in a local build and confirm the panel shows `설정 필요` or `로컬 임시값`.
 - [ ] Confirm remote load failure does not present cached values as operational values.
 - [ ] Confirm insert success plus re-read failure shows a warning, not a success message.
+
+## Daily No-Cost Improvement Checks
+
+- [ ] Confirm the dashboard header stays factual and shows only the base date and active averaging period.
+- [ ] Confirm the generated email still uses the latest no-cost market context and chart notes after the next scheduled GitHub Actions run.

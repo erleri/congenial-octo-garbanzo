@@ -121,17 +121,53 @@ function findEvidence(currency, articles) {
   return directMatches.length ? directMatches : articles.slice(0, 2)
 }
 
-function buildMoveBullet(move, evidence) {
-  const moveText = `${move.currency} ${move.direction} ${Math.abs(move.changePct).toFixed(2)}% vs USD`
-  if (!evidence.length) {
-    return `${moveText}; no clear matching public-news topic was found.`
+function describeMove(move, includeVsUsd = true) {
+  const suffix = includeVsUsd ? ' vs USD' : ''
+  return `${move.currency} ${move.direction} ${Math.abs(move.changePct).toFixed(2)}%${suffix}`
+}
+
+function buildUsdToneSentence(articles) {
+  const feedTopics = summarizeFeedTopics(articles)
+
+  if (!feedTopics.length) {
+    return null
   }
 
-  const article = evidence[0]
-  const topicText = summarizeTopics(article)
-  const contextText = topicText ? `referenced topics: ${topicText}` : 'related market headlines found'
+  return `USD-related public-news flow centered on ${feedTopics.join(', ')}; treated as automated context only.`
+}
 
-  return `${moveText}; ${contextText}.`
+function buildRegionalPressureSentence(moves) {
+  if (!moves.length) {
+    return FALLBACK_BULLET
+  }
+
+  const selectedMoves = moves.slice(0, 3)
+  const hasWeaker = selectedMoves.some((move) => move.direction === 'weakened')
+  const hasStronger = selectedMoves.some((move) => move.direction === 'strengthened')
+  const tone = hasWeaker && hasStronger
+    ? 'was mixed'
+    : hasWeaker
+      ? 'tilted weaker'
+      : 'tilted stronger'
+  const moveText = selectedMoves
+    .map((move) => describeMove(move, false))
+    .join('; ')
+
+  return `Regional price action ${tone}: ${moveText} against USD.`
+}
+
+function buildCurrencyMoveSentence(move, evidence) {
+  const moveText = describeMove(move)
+  if (!evidence.length) {
+    return `Price action was led by ${move.currency}, which ${move.direction} ${Math.abs(move.changePct).toFixed(2)}% vs USD; no clear matching public-news topic was found in the automated source.`
+  }
+
+  const topicText = summarizeTopics(evidence[0])
+  if (!topicText) {
+    return `Price action was led by ${moveText}; related public-market headlines were available but no clear topic label was attached.`
+  }
+
+  return `Price action was led by ${moveText}; automated public-news context referenced ${topicText}.`
 }
 
 function buildWhatMovedToday(moves, articles) {
@@ -139,23 +175,15 @@ function buildWhatMovedToday(moves, articles) {
     return [FALLBACK_BULLET]
   }
 
-  const feedTopics = summarizeFeedTopics(articles)
   const bullets = []
+  const usdTone = buildUsdToneSentence(articles)
 
-  if (feedTopics.length) {
-    bullets.push(`USD public-news flow referenced ${feedTopics.join(', ')}; treated as automated context only.`)
+  if (usdTone) {
+    bullets.push(usdTone)
   }
 
-  const topMove = moves[0]
-  bullets.push(buildMoveBullet(topMove, findEvidence(topMove.currency, articles)))
-
-  if (moves.length > 1) {
-    const secondaryMoves = moves
-      .slice(1, 3)
-      .map((move) => `${move.currency} ${move.direction} ${Math.abs(move.changePct).toFixed(2)}%`)
-      .join('; ')
-    bullets.push(`Additional daily moves vs USD: ${secondaryMoves}.`)
-  }
+  bullets.push(buildRegionalPressureSentence(moves))
+  bullets.push(buildCurrencyMoveSentence(moves[0], findEvidence(moves[0].currency, articles)))
 
   return bullets.slice(0, 3)
 }
@@ -169,15 +197,49 @@ function classifyMoveBias(move) {
   return move.changePct < 0 ? 'supportive' : 'pressured'
 }
 
+function joinCurrencyList(currencies) {
+  if (!currencies?.length) {
+    return ''
+  }
+
+  if (currencies.length === 1) {
+    return currencies[0]
+  }
+
+  return `${currencies.slice(0, -1).join(', ')} and ${currencies.at(-1)}`
+}
+
+function subjectVerb(currencies, singularVerb, pluralVerb) {
+  return currencies.length === 1 ? singularVerb : pluralVerb
+}
+
 function buildNearTermBias(moves, articles) {
   if (!moves.length) {
     return FALLBACK_BIAS
   }
 
-  const biasItems = moves.slice(0, 3).map((move) => `${move.currency} ${classifyMoveBias(move)}`)
-  const confidence = articles.length ? 'public signals available' : 'limited public-news signal'
+  const grouped = moves.slice(0, 3).reduce((acc, move) => {
+    const bias = classifyMoveBias(move)
+    acc[bias] = [...(acc[bias] ?? []), move.currency]
+    return acc
+  }, {})
+  const segments = []
 
-  return `${biasItems.join(', ')}; ${confidence}.`
+  if (grouped.pressured?.length) {
+    segments.push(`${joinCurrencyList(grouped.pressured)} ${subjectVerb(grouped.pressured, 'looks', 'look')} pressured on price action`)
+  }
+
+  if (grouped.supportive?.length) {
+    segments.push(`${joinCurrencyList(grouped.supportive)} ${subjectVerb(grouped.supportive, 'looks', 'look')} supportive on price action`)
+  }
+
+  if (grouped.rangebound?.length) {
+    segments.push(`${joinCurrencyList(grouped.rangebound)} ${subjectVerb(grouped.rangebound, 'remains', 'remain')} rangebound`)
+  }
+
+  const confidence = articles.length ? 'public-news signal was available' : 'public-news signal was limited'
+
+  return `Near-term bias remains mixed: ${segments.join(', ')}; ${confidence}.`
 }
 
 async function main() {

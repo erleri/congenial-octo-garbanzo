@@ -17,7 +17,7 @@ const SOURCE_LABELS = {
   EXCEL: 'Excel',
   IMPUTED: 'Adjusted',
 }
-const EMAIL_CONTENT_MAX_WIDTH = 600
+const EMAIL_CONTENT_MAX_WIDTH = 660
 
 export function loadJson(filePath, fallback = null) {
   try {
@@ -40,6 +40,14 @@ export function formatRate(value) {
   }
 
   return value.toLocaleString('en-US', { maximumFractionDigits: 4 })
+}
+
+function formatPercent(value) {
+  if (typeof value !== 'number') {
+    return '-'
+  }
+
+  return `${value >= 0 ? '+' : '-'}${Math.abs(value * 100).toFixed(2)}%`
 }
 
 function monthlyAverage(dailyRates, baseDate, currency, year, month, rateType = 'LOCAL_PER_USD') {
@@ -71,7 +79,112 @@ function previousMonth(year, month) {
   return month === 1 ? [year - 1, 12] : [year, month - 1]
 }
 
-export function getCurrencyDetails(dataset) {
+function findPreviousDailyValue(dailyRates, currency, baseDate) {
+  return dailyRates
+    .filter((row) =>
+      row.currency === currency &&
+      row.rateType === 'LOCAL_PER_USD' &&
+      row.date < baseDate &&
+      typeof row.value === 'number',
+    )
+    .sort((a, b) => b.date.localeCompare(a.date))[0]?.value ?? null
+}
+
+function calculatePlanDelta(planValue, actualValue) {
+  if (
+    typeof planValue !== 'number' ||
+    typeof actualValue !== 'number' ||
+    !Number.isFinite(planValue) ||
+    !Number.isFinite(actualValue) ||
+    actualValue === 0
+  ) {
+    return null
+  }
+
+  return (planValue - actualValue) / actualValue
+}
+
+function classifyKpiTag(mom, percent52) {
+  if (percent52 >= 85) {
+    return {
+      label: 'Upper range',
+      tone: 'edge',
+      description: 'Base-date rate sits in the upper band of the recent 52-week range.',
+    }
+  }
+
+  if (percent52 <= 15) {
+    return {
+      label: 'Lower range',
+      tone: 'edge',
+      description: 'Base-date rate sits in the lower band of the recent 52-week range.',
+    }
+  }
+
+  if (typeof mom === 'number' && Math.abs(mom) >= 1) {
+    return mom >= 0
+      ? {
+          label: 'Weaker',
+          tone: 'up',
+          description: 'Not in the upper/lower 52-week band; MoM is +1.00% or higher.',
+        }
+      : {
+          label: 'Stronger',
+          tone: 'down',
+          description: 'Not in the upper/lower 52-week band; MoM is -1.00% or lower.',
+        }
+  }
+
+  return {
+    label: 'Rangebound',
+    tone: 'neutral',
+    description: 'Not in the upper/lower 52-week band; MoM is within ±1.00%.',
+  }
+}
+
+function buildFocusItems(currencyDetails) {
+  const items = []
+  const biggestDailyMove = currencyDetails
+    .filter((detail) => typeof detail.dailyChange === 'number')
+    .sort((a, b) => Math.abs(b.dailyChange) - Math.abs(a.dailyChange))[0]
+  const biggestMomMove = currencyDetails
+    .filter((detail) => typeof detail.mom === 'number')
+    .sort((a, b) => Math.abs(b.mom) - Math.abs(a.mom))[0]
+  const closestRangeEdge = currencyDetails
+    .filter((detail) => typeof detail.rate === 'number')
+    .sort((a, b) => Math.abs(b.percent52 - 50) - Math.abs(a.percent52 - 50))[0]
+
+  if (biggestDailyMove) {
+    items.push({
+      label: 'Daily',
+      value: `${biggestDailyMove.currency} ${formatPercent(biggestDailyMove.dailyChange)}`,
+      detail: biggestDailyMove.dailyChange >= 0 ? 'local FX higher vs USD' : 'local FX lower vs USD',
+      tone: biggestDailyMove.dailyChange >= 0 ? 'up' : 'down',
+    })
+  }
+
+  if (biggestMomMove) {
+    items.push({
+      label: 'MoM',
+      value: `${biggestMomMove.currency} ${biggestMomMove.mom >= 0 ? '+' : ''}${biggestMomMove.mom.toFixed(2)}%`,
+      detail: 'vs previous avg',
+      tone: biggestMomMove.mom >= 0 ? 'up' : 'down',
+    })
+  }
+
+  if (closestRangeEdge) {
+    items.push({
+      label: '52W range',
+      value: `${closestRangeEdge.currency} ${closestRangeEdge.percent52.toFixed(0)}%`,
+      detail: closestRangeEdge.percent52 >= 50 ? 'upper side' : 'lower side',
+      tone: 'edge',
+    })
+  }
+
+  return items.slice(0, 3)
+}
+
+export function getCurrencyDetails(dataset, businessPlan = null) {
   const dailyRates = dataset.dailyRates ?? []
   const baseDate = dataset.baseDate
   const [baseYear, baseMonth] = baseDate.split('-').map(Number)
@@ -107,6 +220,13 @@ export function getCurrencyDetails(dataset) {
     const low52 = yearlyValues.length ? Math.min(...yearlyValues) : null
     const high52 = yearlyValues.length ? Math.max(...yearlyValues) : null
     const todayValue = latestRow?.value ?? null
+    const previousDailyValue = findPreviousDailyValue(dailyRates, currency, baseDate)
+    const dailyChange =
+      typeof todayValue === 'number' &&
+      typeof previousDailyValue === 'number' &&
+      previousDailyValue !== 0
+        ? (todayValue - previousDailyValue) / previousDailyValue
+        : null
     const percent52 =
       typeof todayValue === 'number' &&
       typeof low52 === 'number' &&
@@ -114,15 +234,19 @@ export function getCurrencyDetails(dataset) {
       high52 > low52
         ? Math.max(0, Math.min(100, ((todayValue - low52) / (high52 - low52)) * 100))
         : 50
+    const movingVs = calculatePlanDelta(businessPlan?.moving?.[currency], mtdAverage)
 
     return {
       currency,
       rate: todayValue,
       mtdAverage,
       mom,
+      dailyChange,
+      movingVs,
       low52,
       high52,
       percent52,
+      tag: classifyKpiTag(mom, percent52),
       source: latestRow?.source ?? 'API',
     }
   })
@@ -196,7 +320,7 @@ function renderMarketContext(marketContext) {
     ? marketContext.nearTermBias
     : 'Mixed until clearer public-news signals appear.'
   const source = marketContext?.source ?? 'automated source'
-  const baseDate = marketContext?.baseDate ? ` / Context date: ${marketContext.baseDate}` : ''
+  const baseDate = marketContext?.baseDate ? ` · ${marketContext.baseDate}` : ''
   const effectiveBullets = bullets.length
     ? bullets
     : ['No clear public-news signal was found from the automated source.']
@@ -206,7 +330,7 @@ function renderMarketContext(marketContext) {
       <tr>
         <td style="padding:13px 15px;">
           <h3 style="margin:0 0 6px;font-size:15px;color:#111827;">Today's market context</h3>
-          <p style="margin:0 0 10px;font-size:12px;color:#667085;">Automated public-news context and rule-based bias; not a confirmed cause analysis.${baseDate}</p>
+          <p style="margin:0 0 10px;font-size:12px;color:#667085;">Public-news context only; not confirmed cause analysis${baseDate}</p>
           <div style="margin:0 0 5px;font-size:11px;color:#475467;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;">What moved today</div>
           <ul style="margin:0 0 10px;padding-left:18px;color:#344054;font-size:13px;line-height:1.5;">
             ${effectiveBullets.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
@@ -275,12 +399,60 @@ function renderUsdKrwAnchor(anchor) {
   `
 }
 
+function tagStyle(tone) {
+  if (tone === 'up') {
+    return 'border:1px solid #f0c3bd;background:#fff7f5;color:#a61b12;'
+  }
+
+  if (tone === 'down') {
+    return 'border:1px solid #bfd1f4;background:#f5f8ff;color:#1f5fbf;'
+  }
+
+  if (tone === 'edge') {
+    return 'border:1px solid #d7c8a5;background:#fffaf0;color:#8a5a00;'
+  }
+
+  return 'border:1px solid #d4dae3;background:#f8fafc;color:#475467;'
+}
+
+function renderTodayFocus(currencyDetails) {
+  const focusItems = buildFocusItems(currencyDetails)
+
+  if (!focusItems.length) {
+    return ''
+  }
+
+  return `
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 14px;border:1px solid #d7deea;background:#ffffff;border-radius:6px;">
+      <tr>
+        <td style="padding:10px 14px;">
+          <div style="display:inline-block;border:1px solid #ccd6e6;border-radius:4px;background:#f8fafc;color:#1f5fbf;padding:2px 6px;font-size:10px;font-weight:bold;">Today’s Focus</div>
+          <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:8px;">
+            <tr>
+              ${focusItems.map((item, index) => `
+                <td class="focus-col" style="width:33.33%;vertical-align:top;padding:${index === 0 ? '0 8px 0 0' : index === focusItems.length - 1 ? '0 0 0 8px' : '0 8px'};${index === 1 ? 'border-left:1px solid #e4e8ee;border-right:1px solid #e4e8ee;' : ''}">
+                  <div style="margin:0 0 3px;color:#667085;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;">${escapeHtml(item.label)}</div>
+                  <div style="color:${item.tone === 'up' ? '#a61b12' : item.tone === 'down' ? '#1f5fbf' : '#8a5a00'};font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;">${escapeHtml(item.value)}</div>
+                  <div style="margin-top:2px;color:#667085;font-size:11px;line-height:1.3;">${escapeHtml(item.detail)}</div>
+                </td>
+              `).join('')}
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  `
+}
+
 function renderCard(detail) {
   const color = CARD_COLORS[detail.currency] ?? '#1f2a44'
   const sourceLabel = SOURCE_LABELS[detail.source] ?? detail.source
   const momText =
     typeof detail.mom === 'number' ? `${detail.mom >= 0 ? '+' : ''}${detail.mom.toFixed(2)}% MoM` : 'MoM -'
   const momColor = typeof detail.mom === 'number' && detail.mom >= 0 ? '#a61b12' : '#1f5fbf'
+  const movingVsText =
+    typeof detail.movingVs === 'number' ? `이동 대비 ${formatPercent(detail.movingVs)}` : ''
+  const movingVsColor = typeof detail.movingVs === 'number' && detail.movingVs >= 0 ? '#a61b12' : '#1f5fbf'
 
   return `
     <td class="kpi-col" style="width:33.33%;padding:5px;vertical-align:top;">
@@ -290,11 +462,13 @@ function renderCard(detail) {
             <table role="presentation" style="width:100%;border-collapse:collapse;">
               <tr>
                 <td style="color:#344054;font-size:11px;font-weight:bold;">${detail.currency} / USD</td>
-                <td style="text-align:right;"><span style="display:inline-block;border:1px solid #ccd6e6;border-radius:4px;background:#f8fafc;color:#1f5fbf;padding:2px 6px;font-size:10px;font-weight:bold;">${sourceLabel}</span></td>
+                <td style="text-align:right;"><span title="${escapeHtml(detail.tag.description)}" style="display:inline-block;${tagStyle(detail.tag.tone)}border-radius:4px;padding:2px 6px;font-size:10px;font-weight:bold;">${escapeHtml(detail.tag.label)}</span></td>
               </tr>
             </table>
+            <div style="margin-top:5px;"><span style="display:inline-block;border:1px solid #ccd6e6;border-radius:4px;background:#f8fafc;color:#1f5fbf;padding:2px 6px;font-size:10px;font-weight:bold;">${sourceLabel}</span></div>
             <div style="margin-top:6px;color:#111827;font-size:25px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;">${formatRate(detail.mtdAverage)}</div>
             <div style="margin-top:7px;color:${momColor};font-size:12px;font-weight:bold;">${momText}</div>
+            ${movingVsText ? `<div style="margin-top:4px;color:${movingVsColor};font-size:11px;font-weight:bold;">${movingVsText}</div>` : ''}
             <div style="margin-top:13px;color:#5b6472;font-size:12px;font-variant-numeric:tabular-nums;">Base rate ${formatRate(detail.rate)}</div>
             <div style="margin-top:5px;color:#667085;font-size:11px;font-weight:bold;">52-week range</div>
             <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:3px;">
@@ -327,15 +501,25 @@ function renderKpiSummary(currencyDetails, baseDate) {
   `
 }
 
+function renderTagRuleFootnote() {
+  return `
+    <p style="margin:-6px 0 16px;color:#667085;font-size:10px;line-height:1.4;text-align:center;">
+      Tag rule: upper/lower 52-week range takes priority; otherwise MoM ±1.00% defines stronger/weaker tags.
+    </p>
+  `
+}
+
 export function composeEmailBody({
   dataset,
   marketContext,
+  businessPlan = null,
   chartSrc = 'cid:fx-chart-image',
   includePreviewChrome = false,
 }) {
   const baseDate = dataset.baseDate
   const fetchedAt = dataset.fetchedAt ?? '-'
   const subject = `[LATAM FX] ${baseDate} Daily FX Brief`
+  const currencyDetails = getCurrencyDetails(dataset, businessPlan)
   const hasChart = Boolean(chartSrc)
   const chartSection = hasChart
     ? `<p style="margin:18px 0;"><img src="${chartSrc}" alt="LATAM FX 30-day chart" style="display:block;width:100%;max-width:${EMAIL_CONTENT_MAX_WIDTH}px;height:auto;border:1px solid #d9dee7;"></p>`
@@ -345,6 +529,7 @@ export function composeEmailBody({
       @media only screen and (max-width: 620px) {
         .email-inner { width: 100% !important; }
         .kpi-col { display: block !important; width: 100% !important; padding: 5px 0 !important; }
+        .focus-col { display: block !important; width: 100% !important; padding: 7px 0 !important; border: 0 !important; }
       }
     </style>
     <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 auto;">
@@ -363,8 +548,10 @@ export function composeEmailBody({
                 ${renderCta('0 0 16px')}
                 ${renderMarketContext(marketContext)}
                 ${renderUsdKrwAnchor(getUsdKrwAnchor(dataset))}
-                ${renderKpiSummary(getCurrencyDetails(dataset), baseDate)}
+                ${renderTodayFocus(currencyDetails)}
+                ${renderKpiSummary(currencyDetails, baseDate)}
                 ${chartSection}
+                ${renderTagRuleFootnote()}
                 ${renderCta('16px 0')}
               </td>
             </tr>
@@ -385,7 +572,7 @@ export function wrapPreviewDocument(subject, body) {
     <title>${escapeHtml(subject)}</title>
     <style>
       body { margin: 0; background: #eef2f7; font-family: Arial, Helvetica, sans-serif; color: #111827; }
-      .preview-shell { max-width: 820px; margin: 0 auto; padding: 28px 14px; }
+      .preview-shell { max-width: 900px; margin: 0 auto; padding: 28px 14px; }
       .email-frame { background: #fff; border: 1px solid #d9dee7; padding: 24px; box-shadow: 0 12px 30px rgba(15, 23, 42, .08); }
     </style>
   </head>
