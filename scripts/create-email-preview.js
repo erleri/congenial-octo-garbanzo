@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { loadBusinessPlanForEmail } from './business-plan-email.js'
 import { composeEmailBody, loadJson, wrapPreviewDocument } from './email-template.js'
 
 const DATA_PATH = path.resolve('public/data.json')
@@ -16,9 +17,11 @@ const marketContext = loadJson(MARKET_CONTEXT_PATH, null)
 const chartSrc = fs.existsSync(CHART_PATH)
   ? `data:image/png;base64,${fs.readFileSync(CHART_PATH).toString('base64')}`
   : ''
+const businessPlan = await loadBusinessPlanForEmail(dataset)
 const { subject, html } = composeEmailBody({
   dataset,
   marketContext,
+  businessPlan,
   chartSrc,
   includePreviewChrome: true,
 })

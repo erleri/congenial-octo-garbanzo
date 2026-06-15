@@ -451,7 +451,7 @@ function renderCard(detail) {
     typeof detail.mom === 'number' ? `${detail.mom >= 0 ? '+' : ''}${detail.mom.toFixed(2)}% MoM` : 'MoM -'
   const momColor = typeof detail.mom === 'number' && detail.mom >= 0 ? '#a61b12' : '#1f5fbf'
   const movingVsText =
-    typeof detail.movingVs === 'number' ? `이동 대비 ${formatPercent(detail.movingVs)}` : ''
+    typeof detail.movingVs === 'number' ? `Moving vs ${formatPercent(detail.movingVs)}` : ''
   const movingVsColor = typeof detail.movingVs === 'number' && detail.movingVs >= 0 ? '#a61b12' : '#1f5fbf'
 
   return `

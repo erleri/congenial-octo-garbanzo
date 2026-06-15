@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { loadBusinessPlanForEmail } from './business-plan-email.js'
 import { composeEmailBody, loadJson } from './email-template.js'
 
 const DATA_PATH = path.resolve('public/data.json')
@@ -11,7 +12,8 @@ if (!dataset?.baseDate) {
 }
 
 const marketContext = loadJson(MARKET_CONTEXT_PATH, null)
-const { subject, html } = composeEmailBody({ dataset, marketContext })
+const businessPlan = await loadBusinessPlanForEmail(dataset)
+const { subject, html } = composeEmailBody({ dataset, marketContext, businessPlan })
 const outputPath = process.env.GITHUB_OUTPUT
 
 if (outputPath) {
