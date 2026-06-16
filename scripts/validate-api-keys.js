@@ -1,5 +1,4 @@
 const EXCHANGE_RATE_ENDPOINT = 'https://v6.exchangerate-api.com/v6'
-const ALPHA_VANTAGE_ENDPOINT = 'https://www.alphavantage.co/query'
 const FETCH_TIMEOUT_MS = 10000
 
 function readRequiredEnv(name) {
@@ -8,6 +7,10 @@ function readRequiredEnv(name) {
     throw new Error(`${name} secret is missing or empty.`)
   }
   return value
+}
+
+function readOptionalEnv(name) {
+  return process.env[name]?.trim() ?? ''
 }
 
 async function fetchJson(url) {
@@ -37,36 +40,17 @@ async function validateExchangeRateApi(apiKey) {
   console.log('ExchangeRate API: OK')
 }
 
-async function validateAlphaVantageApi(apiKey) {
-  const params = new URLSearchParams({
-    function: 'FX_DAILY',
-    from_symbol: 'USD',
-    to_symbol: 'CLP',
-    outputsize: 'compact',
-    apikey: apiKey,
-  })
-
-  const payload = await fetchJson(`${ALPHA_VANTAGE_ENDPOINT}?${params.toString()}`)
-  const timeSeries = payload?.['Time Series FX (Daily)']
-
-  if (!timeSeries || typeof timeSeries !== 'object') {
-    const message =
-      payload?.['Error Message'] ??
-      payload?.Information ??
-      payload?.Note ??
-      'unexpected response'
-    throw new Error(`Alpha Vantage API validation failed: ${message}`)
-  }
-
-  console.log('Alpha Vantage API: OK')
-}
-
 async function main() {
   const exchangeRateApiKey = readRequiredEnv('VITE_EXCHANGERATE_API_KEY')
-  const alphaVantageApiKey = readRequiredEnv('VITE_ALPHA_VANTAGE_API_KEY')
+  const alphaVantageApiKey = readOptionalEnv('VITE_ALPHA_VANTAGE_API_KEY')
 
   await validateExchangeRateApi(exchangeRateApiKey)
-  await validateAlphaVantageApi(alphaVantageApiKey)
+
+  if (alphaVantageApiKey) {
+    console.log('Alpha Vantage API key: configured; live validation skipped to preserve daily quota.')
+  } else {
+    console.warn('Alpha Vantage API key: not configured; cached data and fallback context will be used.')
+  }
 }
 
 main().catch((error) => {
