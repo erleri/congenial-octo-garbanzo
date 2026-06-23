@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createClient } from '@supabase/supabase-js'
 
 const dataset = JSON.parse(fs.readFileSync(path.resolve('public/data.json'), 'utf8'))
@@ -10,6 +11,35 @@ function requiredEnv(name) {
     throw new Error(`${name} is required.`)
   }
   return value
+}
+
+export function numericValuesMatch(expected, actual, tolerance = 1e-10) {
+  if (expected === null || expected === undefined) {
+    return actual === null || actual === undefined
+  }
+
+  if (actual === null || actual === undefined) {
+    return false
+  }
+
+  const expectedNumber = Number(expected)
+  const actualNumber = Number(actual)
+  if (!Number.isFinite(expectedNumber) || !Number.isFinite(actualNumber)) {
+    return false
+  }
+
+  const scale = Math.max(1, Math.abs(expectedNumber), Math.abs(actualNumber))
+  return Math.abs(expectedNumber - actualNumber) <= tolerance * scale
+}
+
+function describeValue(value) {
+  if (value === null) {
+    return 'null'
+  }
+  if (value === undefined) {
+    return 'undefined'
+  }
+  return JSON.stringify(value)
 }
 
 async function main() {
@@ -81,13 +111,20 @@ async function main() {
       failures.push(`${sample.currency}/${sample.rateType}/${sample.date}: ${error.message}`)
       continue
     }
+    const valueMatches = numericValuesMatch(sample.value, data.rate_value)
     if (
-      Number(data.rate_value) !== sample.value ||
+      !valueMatches ||
       data.status !== sample.status ||
       data.source !== sample.source ||
       data.imputation_method !== sample.imputationMethod
     ) {
-      failures.push(`${sample.currency}/${sample.rateType}/${sample.date}: value mismatch`)
+      failures.push(
+        `${sample.currency}/${sample.rateType}/${sample.date}: mismatch ` +
+        `(expected value=${describeValue(sample.value)}, status=${sample.status}, ` +
+        `source=${sample.source}, method=${sample.imputationMethod}; ` +
+        `actual value=${describeValue(data.rate_value)}, status=${data.status}, ` +
+        `source=${data.source}, method=${data.imputation_method})`,
+      )
     }
   }
 
@@ -98,7 +135,13 @@ async function main() {
   console.log(`Verified state and ${samples.length} representative daily rows.`)
 }
 
-main().catch((error) => {
-  console.error(error)
-  process.exitCode = 1
-})
+const isDirectRun =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error)
+    process.exitCode = 1
+  })
+}
