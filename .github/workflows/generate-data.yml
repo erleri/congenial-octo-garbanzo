@@ -45,6 +45,18 @@ jobs:
           VITE_EXCHANGERATE_API_KEY: ${{ secrets.VITE_EXCHANGERATE_API_KEY }}
           VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
 
+      - name: Sync exchange rates to Supabase
+        run: |
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "SUPABASE_SERVICE_ROLE_KEY is not configured; keeping JSON-only operation."
+            exit 0
+          fi
+          npm run sync:supabase
+          npm run verify:supabase
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: Read dataset metadata
         id: dataset
         run: |
@@ -63,6 +75,9 @@ jobs:
         run: node scripts/create-market-context.js
         env:
           VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          FX_EMAIL_DATA_SOURCE: auto
 
       - name: Compose email metadata
         id: email
@@ -88,6 +103,10 @@ jobs:
 
       - name: Create email chart
         run: node scripts/create-email-chart.js
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          FX_EMAIL_DATA_SOURCE: auto
 
       - name: Validate mailing list
         id: mailing

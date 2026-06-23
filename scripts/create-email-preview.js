@@ -2,15 +2,15 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { loadBusinessPlanForEmail } from './business-plan-email.js'
 import { composeEmailBody, loadJson, wrapPreviewDocument } from './email-template.js'
+import { loadOperationalFxDataset } from './load-fx-dataset.js'
 
-const DATA_PATH = path.resolve('public/data.json')
 const MARKET_CONTEXT_PATH = path.resolve('email-market-context.json')
 const CHART_PATH = path.resolve('email-chart.png')
 const PREVIEW_PATH = path.resolve('public/email-preview.html')
 
-const dataset = loadJson(DATA_PATH)
+const dataset = await loadOperationalFxDataset()
 if (!dataset?.baseDate) {
-  throw new Error('public/data.json is missing baseDate.')
+  throw new Error('FX dataset is missing baseDate.')
 }
 
 const marketContext = loadJson(MARKET_CONTEXT_PATH, null)

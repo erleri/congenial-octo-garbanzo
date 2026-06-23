@@ -15,13 +15,29 @@
 
 ## 운영 구조
 
-현재 운영 흐름은 GitHub Actions + Netlify + Supabase 기준입니다.
+현재 운영 흐름은 GitHub Actions + Netlify + Supabase 기준입니다. 환율 데이터는
+Supabase 병행 이전을 지원하며 안정화 전까지 기존 JSON 경로도 유지합니다.
 
 1. GitHub Actions가 매일 09:15 KST에 데이터를 생성합니다.
 2. 생성 결과는 `public/data.json`에 저장되고 main 브랜치에 커밋됩니다.
-3. Netlify가 main 변경을 감지해 자동 배포합니다.
-4. 대시보드 메일링 워크플로는 배포용 화면을 캡처해 수신자에게 발송합니다.
-5. 계획 환율은 Supabase에 월별 운영 데이터로 저장합니다.
+3. 서버 전용 키가 설정되어 있으면 같은 데이터를 Supabase에도 upsert하고 검증합니다.
+4. Netlify가 main 변경을 감지해 자동 배포합니다.
+5. 대시보드 메일링 워크플로는 배포용 화면을 캡처해 수신자에게 발송합니다.
+6. 계획 환율은 Supabase에 월별 운영 데이터로 저장합니다.
+
+### 환율 데이터 소스 전환
+
+`VITE_FX_DATA_SOURCE`로 프론트엔드 조회 경로를 선택합니다.
+
+```text
+json       기존 public/data.json만 사용
+supabase   Supabase만 사용하며 연결 실패를 오류로 처리
+auto       Supabase 우선, 실패하면 IndexedDB 캐시와 JSON으로 복구
+```
+
+Supabase 모드는 대시보드와 월별 집계를 먼저 받고, 일별 상세는 `통화 + 연도`
+단위로 조회해 IndexedDB에 저장합니다. 과거 연도 캐시는 재사용하고 최신 연도만
+데이터 버전에 맞춰 갱신합니다.
 
 ## 로컬 실행
 
@@ -72,11 +88,25 @@ VITE_EXCHANGERATE_API_KEY
 VITE_ALPHA_VANTAGE_API_KEY
 VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
+VITE_FX_DATA_SOURCE
+SUPABASE_SERVICE_ROLE_KEY
 SMTP_USERNAME
 SMTP_PASSWORD
 ```
 
 `VITE_SUPABASE_ANON_KEY`에는 Supabase의 `Publishable key` 값을 넣습니다. `service_role`, `secret key`, `sb_secret_...` 값은 브라우저 앱에 넣으면 안 됩니다.
+
+`SUPABASE_SERVICE_ROLE_KEY`는 GitHub Actions 동기화에서만 사용하며 Netlify 또는
+`VITE_` 환경변수로 노출하면 안 됩니다.
+
+## Supabase 환율 데이터
+
+초기 설정:
+
+1. `supabase/migrations/20260623112518_fx_rate_storage.sql` 적용
+2. GitHub Secrets에 `SUPABASE_SERVICE_ROLE_KEY` 추가
+3. `npm run sync:supabase`
+4. `npm run verify:supabase`
 
 ## Supabase 계획 환율
 

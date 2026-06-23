@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   fetchManualBackfillDataset,
   fetchRemoteExchangeData,
   fetchRemoteExchangeDataWithExcel,
-  fetchStaticDataset,
   fetchSupplementalHistoryDataset,
+  loadDailyYears,
+  loadInitialExchangeDataset,
   loadBusinessPlanFromCache,
   loadDatasetFromCache,
   saveAVSupplementalCache,
@@ -27,6 +28,7 @@ import type {
   DashboardFilters,
   DatasetSource,
   ExchangeRateDataset,
+  FxDatasetMetadata,
 } from '../types/exchangeRate'
 
 const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
@@ -49,43 +51,29 @@ const INITIAL_BUSINESS_PLAN_STATUS: BusinessPlanStatus = {
   error: null,
 }
 
-const AUTO_REFRESH_TTL_MS = 12 * 60 * 60 * 1000
-
-function datasetSortValue(data: ExchangeRateDataset): number {
-  const baseDateTime = new Date(`${data.baseDate}T00:00:00Z`).getTime()
-  const fetchedAtTime = new Date(data.fetchedAt).getTime()
-
-  const safeBaseDateTime = Number.isFinite(baseDateTime) ? baseDateTime : 0
-  const safeFetchedAtTime = Number.isFinite(fetchedAtTime) ? fetchedAtTime : 0
-
-  return safeBaseDateTime * 10_000_000 + safeFetchedAtTime
-}
-
-function pickLatestDataset(
-  first: ExchangeRateDataset | null,
-  second: ExchangeRateDataset | null,
-): ExchangeRateDataset | null {
-  if (!first) {
-    return second
-  }
-
-  if (!second) {
-    return first
-  }
-
-  return datasetSortValue(second) > datasetSortValue(first) ? second : first
-}
-
-function isFreshEnough(data: ExchangeRateDataset): boolean {
-  const fetchedAtTime = new Date(data.fetchedAt).getTime()
-  const fetchedAtDate = new Date(data.fetchedAt).toLocaleDateString()
-  const todayDate = new Date().toLocaleDateString()
-
-  return (
-    Number.isFinite(fetchedAtTime) &&
-    Date.now() - fetchedAtTime < AUTO_REFRESH_TTL_MS &&
-    fetchedAtDate === todayDate
+function mergeDailyRows(
+  current: ExchangeRateDataset,
+  incoming: ExchangeRateDataset['dailyRates'],
+): ExchangeRateDataset {
+  const rows = new Map(
+    current.dailyRates.map((row) => [
+      `${row.currency}|${row.rateType}|${row.date}`,
+      row,
+    ]),
   )
+
+  for (const row of incoming) {
+    rows.set(`${row.currency}|${row.rateType}|${row.date}`, row)
+  }
+
+  return {
+    ...current,
+    dailyRates: [...rows.values()].sort((a, b) =>
+      a.date.localeCompare(b.date) ||
+      a.currency.localeCompare(b.currency) ||
+      a.rateType.localeCompare(b.rateType),
+    ),
+  }
 }
 
 export function useExchangeData() {
@@ -100,6 +88,8 @@ export function useExchangeData() {
   const [businessPlanStatus, setBusinessPlanStatus] =
     useState<BusinessPlanStatus>(INITIAL_BUSINESS_PLAN_STATUS)
   const [businessPlanUserEmail, setBusinessPlanUserEmail] = useState<string | null>(null)
+  const [fxMetadata, setFxMetadata] = useState<FxDatasetMetadata | null>(null)
+  const [dailyRangeLoading, setDailyRangeLoading] = useState(false)
 
   const [filters, setFilters] = useState<DashboardFilters>({
     currency: 'BRL',
@@ -136,6 +126,47 @@ export function useExchangeData() {
       setError('IndexedDB cache could not be saved. The current session still remains usable.')
     }
   }
+
+  const ensureDailyRange = useCallback(async (
+    currency: DashboardFilters['currency'],
+    periodFrom: string,
+    periodTo: string,
+  ) => {
+    if (!fxMetadata || currency === 'ALL' || !periodFrom || !periodTo) {
+      return
+    }
+
+    const startYear = Number(periodFrom.slice(0, 4))
+    const endYear = Number(periodTo.slice(0, 4))
+    if (!Number.isFinite(startYear) || !Number.isFinite(endYear)) {
+      return
+    }
+
+    const fromYear = Math.min(startYear, endYear)
+    const toYear = Math.max(startYear, endYear)
+    const years = Array.from({ length: toYear - fromYear + 1 }, (_, index) => fromYear + index)
+
+    try {
+      setDailyRangeLoading(true)
+      const rows = await loadDailyYears(fxMetadata, currency, years)
+      setDataset((current) => current ? mergeDailyRows(current, rows) : current)
+
+      const adjacentYears = [fromYear - 1, toYear + 1].filter(
+        (year) => year >= 2009 && year <= new Date().getFullYear(),
+      )
+      void loadDailyYears(fxMetadata, currency, adjacentYears).then((prefetched) => {
+        setDataset((current) => current ? mergeDailyRows(current, prefetched) : current)
+      })
+    } catch (rangeError) {
+      setError(
+        rangeError instanceof Error
+          ? `선택 기간 데이터를 불러오지 못했습니다. ${rangeError.message}`
+          : '선택 기간 데이터를 불러오지 못했습니다.',
+      )
+    } finally {
+      setDailyRangeLoading(false)
+    }
+  }, [fxMetadata])
 
   const refreshData = async () => {
     try {
@@ -386,7 +417,6 @@ export function useExchangeData() {
     const init = async () => {
       const cachedPlanPromise = loadBusinessPlanFromCache()
       const cachedPromise = loadDatasetFromCache()
-      const staticPromise = fetchStaticDataset()
 
       const cachedPlan = await cachedPlanPromise
       if (cachedPlan && isMounted) {
@@ -404,29 +434,27 @@ export function useExchangeData() {
         updateFiltersBasedOnDataset(cached)
       }
 
-      const staticDataset = await staticPromise
-      if (!isMounted) {
-        return
-      }
-
-      const latestLocalDataset = pickLatestDataset(cached, staticDataset)
-      const staticDatasetIsNewer =
-        staticDataset &&
-        (!cached || datasetSortValue(staticDataset) > datasetSortValue(cached))
-
-      if (staticDatasetIsNewer) {
-        await applyDataset(staticDataset, 'static')
-      }
-
-      if (latestLocalDataset) {
-        if (!isFreshEnough(latestLocalDataset)) {
-          void refreshData()
+      try {
+        const initial = await loadInitialExchangeDataset()
+        if (!isMounted) {
+          return
         }
-
-        return
+        setFxMetadata(initial.metadata)
+        await applyDataset(initial.dataset, initial.source)
+        if (initial.stale) {
+          setError('Supabase 연결이 원활하지 않아 마지막 캐시 또는 JSON 데이터를 표시합니다.')
+        }
+      } catch (initialError) {
+        if (cached) {
+          setError('최신 데이터를 불러오지 못해 마지막 로컬 캐시를 표시합니다.')
+          return
+        }
+        setError(
+          initialError instanceof Error
+            ? initialError.message
+            : '환율 데이터를 불러오지 못했습니다.',
+        )
       }
-
-      await refreshData()
     }
 
     void init()
@@ -481,9 +509,12 @@ export function useExchangeData() {
     excelFile,
     excelPriority,
     fillMissing,
+    dailyRangeLoading,
+    fxMetadata,
     filters,
     setFilters,
     refreshData,
+    ensureDailyRange,
     uploadAndMergeExcel,
     businessPlan,
     updateBusinessPlan,
