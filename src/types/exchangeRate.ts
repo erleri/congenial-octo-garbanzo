@@ -42,12 +42,13 @@ export interface BusinessPlanStatus {
   error: string | null
 }
 
-export type DatasetSource = 'remote' | 'static' | 'cache' | 'excel' | 'none'
+export type DatasetSource = 'remote' | 'static' | 'cache' | 'supabase' | 'excel' | 'none'
 
 export const DATASET_SOURCE_LABELS: Record<DatasetSource, string> = {
   remote: '외부 API 최신 조회',
   static: '정적 배포 데이터',
   cache: '로컬 캐시',
+  supabase: 'Supabase 운영 데이터',
   excel: '업로드 Excel 병합',
   none: '-',
 }
@@ -124,6 +125,26 @@ export interface ExchangeRateDataset {
   dailyRates: DailyRate[]
   movingComparison: MovingComparisonRow[]
   rawSheets?: RawSheet[]
+}
+
+export type FxDataSourceMode = 'json' | 'supabase' | 'auto'
+
+export interface FxDatasetMetadata {
+  baseDate: string
+  fetchedAt: string
+  dataVersion: string
+  dailyRowCount: number
+  monthlyRowCount: number
+}
+
+export interface DailySeriesQuery {
+  currency: CurrencyCode
+  year: number
+}
+
+export interface DailySeriesResult extends DailySeriesQuery {
+  rows: DailyRate[]
+  source: 'supabase' | 'cache'
 }
 
 export interface RawSheetsDataset {

@@ -1,0 +1,97 @@
+name: Supabase Initial Load
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type LOAD_SUPABASE to confirm the full FX data upload
+        required: true
+        type: string
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-initial-load
+  cancel-in-progress: false
+
+jobs:
+  load-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Confirm requested operation
+        shell: bash
+        run: |
+          if [ "${{ inputs.confirmation }}" != "LOAD_SUPABASE" ]; then
+            echo "Confirmation did not match LOAD_SUPABASE." >&2
+            exit 1
+          fi
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate Supabase secrets
+        shell: bash
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ]; then
+            echo "VITE_SUPABASE_URL secret is missing." >&2
+            exit 1
+          fi
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "SUPABASE_SERVICE_ROLE_KEY secret is missing." >&2
+            exit 1
+          fi
+
+      - name: Show source dataset summary
+        shell: bash
+        run: |
+          jq '{
+            baseDate,
+            fetchedAt,
+            dailyRows: (.dailyRates | length),
+            monthlyRows: (.monthlyRates | length)
+          }' public/data.json
+
+      - name: Upload full exchange-rate history
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FX_FULL_SYNC: "true"
+        run: npm run sync:supabase
+
+      - name: Verify uploaded exchange-rate history
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run verify:supabase
+
+      - name: Write completion summary
+        if: success()
+        shell: bash
+        run: |
+          {
+            echo "## Supabase initial load completed"
+            echo
+            echo "- Source: \`public/data.json\`"
+            echo "- Base date: \`$(jq -r '.baseDate' public/data.json)\`"
+            echo "- Daily rows: \`$(jq -r '.dailyRates | length' public/data.json)\`"
+            echo "- Monthly rows: \`$(jq -r '.monthlyRates | length' public/data.json)\`"
+            echo "- Verification: passed"
+          } >> "$GITHUB_STEP_SUMMARY"

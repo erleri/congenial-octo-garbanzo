@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { MAJOR_CURRENCIES, formatRate, loadJson } from './email-template.js'
+import { loadOperationalFxDataset } from './load-fx-dataset.js'
 
 const DATA_PATH = path.resolve('public/data.json')
 const OUTPUT_PATH = path.resolve('email-market-context.json')
@@ -243,9 +244,9 @@ function buildNearTermBias(moves, articles) {
 }
 
 async function main() {
-  const dataset = loadJson(DATA_PATH)
+  const dataset = await loadOperationalFxDataset()
   if (!dataset?.baseDate) {
-    throw new Error('public/data.json is missing baseDate.')
+    throw new Error('FX dataset is missing baseDate.')
   }
 
   const moves = getLatestMoves(dataset)

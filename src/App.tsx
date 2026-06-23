@@ -64,9 +64,11 @@ function App() {
     error,
     excelPriority,
     fillMissing,
+    dailyRangeLoading,
     filters,
     setFilters,
     refreshData,
+    ensureDailyRange,
     uploadAndMergeExcel,
     businessPlan,
     updateBusinessPlan,
@@ -95,7 +97,7 @@ function App() {
     }
 
     const unique = new Set(
-      dataset.dailyRates
+      dataset.monthlyRates
         .filter((row) => row.rateType === 'LOCAL_PER_USD')
         .map((row) => `${row.year}-${String(row.month).padStart(2, '0')}`),
     )
@@ -220,6 +222,25 @@ function App() {
     }
   }, [dailyToOptions, periodTo])
 
+  useEffect(() => {
+    if (
+      screen !== 'currency' ||
+      filters.currency === 'ALL' ||
+      !effectivePeriodFrom ||
+      !effectivePeriodTo
+    ) {
+      return
+    }
+
+    void ensureDailyRange(filters.currency, effectivePeriodFrom, effectivePeriodTo)
+  }, [
+    effectivePeriodFrom,
+    effectivePeriodTo,
+    ensureDailyRange,
+    filters.currency,
+    screen,
+  ])
+
   const content = useMemo(() => {
     if (!dataset) {
       return (
@@ -337,7 +358,7 @@ function App() {
             </span>
             <span className="status-item">
               <span className={`status-dot ${loading ? 'loading' : error ? 'error' : ''}`} />
-              {loading ? '갱신 중' : error ? '확인 필요' : '정상'}
+              {loading || dailyRangeLoading ? '갱신 중' : error ? '확인 필요' : '정상'}
             </span>
           </div>
           <button

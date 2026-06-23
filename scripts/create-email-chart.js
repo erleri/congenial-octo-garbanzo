@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import puppeteer from 'puppeteer'
+import { loadOperationalFxDataset } from './load-fx-dataset.js'
 
-const DATA_PATH = path.resolve('public/data.json')
 const CHART_PATH = path.resolve('email-chart.png')
 const META_PATH = path.resolve('email-chart-meta.json')
 const EMAIL_CONTENT_WIDTH = 660
@@ -334,13 +334,12 @@ function buildHtml(dataset, chartData, chartNotes) {
 }
 
 async function main() {
-  const raw = await fs.readFile(DATA_PATH, 'utf8')
-  const dataset = JSON.parse(raw)
+  const dataset = await loadOperationalFxDataset()
   const dailyRates = Array.isArray(dataset.dailyRates) ? dataset.dailyRates : []
   const [baseYear, baseMonth] = dataset.baseDate.split('-').map(Number)
 
   if (!dataset.baseDate || !dailyRates.length) {
-    throw new Error('public/data.json is missing baseDate or dailyRates.')
+    throw new Error('FX dataset is missing baseDate or dailyRates.')
   }
 
   const chartData = Object.fromEntries(

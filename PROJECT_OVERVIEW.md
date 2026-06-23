@@ -27,10 +27,14 @@ GitHub Actions 워크플로 `.github/workflows/generate-data.yml`이 매일 데�
 1. 환율 API와 보정 로직으로 데이터셋을 생성합니다.
 2. 결과를 `public/data.json`에 저장합니다.
 3. `data/alpha-vantage-history.json` 보조 캐시를 갱신합니다.
-4. 변경이 있으면 main 브랜치에 커밋합니다.
-5. Netlify가 main 변경을 감지해 자동 배포합니다.
+4. 서버 전용 키가 설정된 환경에서는 일별·월별 환율을 Supabase에 병행 upsert합니다.
+5. Supabase 적재 행 수와 대표 표본을 JSON과 비교합니다.
+6. 변경이 있으면 main 브랜치에 커밋합니다.
+7. Netlify가 main 변경을 감지해 자동 배포합니다.
 
-앱은 시작 시 IndexedDB 캐시와 `public/data.json`을 비교해 더 최신 데이터를 사용합니다.
+앱은 `VITE_FX_DATA_SOURCE`에 따라 JSON, Supabase 또는 자동 폴백을 사용합니다.
+Supabase 경로에서는 대시보드·월별 집계를 먼저 로드하고 일별 데이터는 통화와
+연도 단위로 조회해 IndexedDB에 캐시합니다.
 
 ### 계획 환율 데이터
 
