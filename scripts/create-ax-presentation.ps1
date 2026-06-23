@@ -277,23 +277,24 @@ Add-SectionNumber $s '04'
 Add-Title $s 'LatamFX를 움직이는 연결 구조' '화면 하나가 아니라, 각 역할이 이어져 하나의 업무 흐름을 만든다'
 
 # Draw connections first so nodes remain visually on top.
-Add-LabeledArrow $s 140 246 140 292 '환율 제공' 151 256 72 '355F8A'
-Add-LabeledArrow $s 230 332 385 223 '코드·데이터 저장' 265 260 105 '3D7287'
-Add-LabeledArrow $s 565 202 735 218 '자동 배포' 615 185 75 '24736B'
-Add-LabeledArrow $s 735 252 590 301 '웹사이트 제공' 628 267 90 '24736B'
-Add-LabeledArrow $s 585 334 735 363 '계획 저장·조회' 628 337 100 '765C7D' $true
-Add-LabeledArrow $s 230 356 280 427 '리포트 생성' 195 385 84 'A56A3A'
-Add-LabeledArrow $s 425 449 500 449 '리포트 전달' 425 422 82 'A56A3A'
-Add-LabeledArrow $s 480 356 565 415 '화면 확인' 493 374 70 '24736B'
+Add-LabeledArrow $s 135 238 135 282 '환율 제공' 145 249 72 '355F8A'
+Add-LabeledArrow $s 390 202 225 307 '매일 자동 실행' 267 231 92 '3D7287'
+Add-LabeledArrow $s 570 202 735 212 '코드 배포' 615 181 72 '24736B'
+Add-LabeledArrow $s 735 244 590 290 '웹사이트 제공' 627 254 90 '24736B'
+Add-LabeledArrow $s 225 337 365 438 '환율 계산·적재' 244 374 100 '765C7D'
+Add-LabeledArrow $s 478 414 478 356 '환율·계획 조회' 491 370 100 '765C7D' $true
+Add-LabeledArrow $s 545 449 590 449 '데이터 조회' 536 390 82 'A56A3A'
+Add-LabeledArrow $s 745 449 780 449 '메일 전달' 725 390 70 'A56A3A'
+Add-LabeledArrow $s 590 330 780 430 '화면 확인' 665 358 70 '24736B'
 
-Add-RoleNode $s '환율 제공처' '원천 환율 제공' 45 175 190 72 '355F8A'
-Add-RoleNode $s 'GitHub Actions' '매일 수집·계산·갱신' 45 293 190 82 '3D7287'
-Add-RoleNode $s 'GitHub' '앱 코드 + 환율 데이터 저장' 385 164 180 78 '355F8A'
-Add-RoleNode $s 'Netlify' '앱을 웹사이트로 자동 배포' 735 178 180 78 '24736B'
-Add-RoleNode $s 'LatamFX' '계산·비교하고 판단하기 쉽게 보여주는 업무 화면' 365 268 225 90 '24736B' $true
-Add-RoleNode $s 'Supabase' '계획 환율·로그인·수정 권한' 735 326 180 78 '765C7D'
-Add-RoleNode $s '이메일 리포트' '정리된 환율 정보를 자동 전달' 255 414 175 72 'A56A3A'
-Add-RoleNode $s '현업 사용자' '같은 기준으로 확인하고 최종 판단' 500 414 190 72 '24736B'
+Add-RoleNode $s '환율 제공처' '원천 환율 제공' 45 170 180 68 '355F8A'
+Add-RoleNode $s 'GitHub Actions' '매일 수집·계산·DB 갱신' 45 282 180 78 '3D7287'
+Add-RoleNode $s 'GitHub' '앱 코드·자동화 설정 보관' 390 165 180 75 '355F8A'
+Add-RoleNode $s 'Netlify' '앱을 웹사이트로 자동 배포' 735 175 180 75 '24736B'
+Add-RoleNode $s 'LatamFX' '환율을 비교하고 판단하기 쉽게 보여주는 업무 화면' 365 270 225 86 '24736B' $true
+Add-RoleNode $s 'Supabase' '환율·계획 데이터와 권한 관리' 365 414 180 68 '765C7D'
+Add-RoleNode $s '이메일 리포트' '같은 환율 정보를 자동 전달' 590 414 155 68 'A56A3A'
+Add-RoleNode $s '현업 사용자' '웹·메일 확인 후 판단' 780 414 150 68 '24736B'
 Add-Footer $s 'LatamFX AX 사례 · 데이터 수집 → 계산·저장 → 배포 → 확인·전달'
 
 # 6. Four conditions
@@ -357,14 +358,14 @@ Add-Pill $s 'Q&A APPENDIX' 54 30 105 '697386' | Out-Null
 Add-Title $s '데이터와 기술 구조' '질문이 있을 때만 설명하는 운영 구조'
 Add-FlowBox $s '환율 API / 보정 데이터' 70 185 175 '355F8A'
 Add-Arrow $s 250 211 290 211
-Add-FlowBox $s '정기 데이터 생성' 295 185 150 '3D7287'
+Add-FlowBox $s '수집·계산·DB 적재' 295 185 150 '3D7287'
 Add-Arrow $s 450 211 490 211
-Add-FlowBox $s '대시보드 배포' 495 185 150 '24736B'
+Add-FlowBox $s 'Supabase 저장·조회' 495 185 150 '24736B'
 Add-Arrow $s 650 211 690 211
-Add-FlowBox $s '사용자 확인' 695 185 150 '765C7D'
+Add-FlowBox $s '화면·메일 확인' 695 185 150 '765C7D'
 Add-Card $s '화면' "React + TypeScript`rNetlify 배포" 105 310 210 110 '355F8A' 14
-Add-Card $s '계획 환율·권한' "Supabase Auth + Database`r권한별 수정" 375 310 210 110 '24736B' 14
-Add-Card $s '운영 자동화' "GitHub Actions`r정기 생성과 배포" 645 310 210 110 '765C7D' 14
+Add-Card $s '환율·계획 데이터' "Supabase Database + Auth`r조회와 권한별 수정" 375 310 210 110 '24736B' 14
+Add-Card $s '운영 자동화' "GitHub Actions`r정기 수집·검증·적재" 645 310 210 110 '765C7D' 14
 
 # Appendix B
 $s = $pres.Slides.Add(10, $blank)
