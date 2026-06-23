@@ -25,8 +25,15 @@ type DashboardRpcPayload = {
   monthlyRates: Array<Record<string, unknown>>
 }
 
-const PAGE_SIZE = 1000
+type InitialSupabaseDataset = {
+  dataset: ExchangeRateDataset
+  metadata: FxDatasetMetadata
+  stale: boolean
+}
+
 const pendingDailyRequests = new Map<string, Promise<DailyRate[]>>()
+const dailyMemoryCache = new Map<string, DailyRate[]>()
+let initialSupabaseDatasetPromise: Promise<InitialSupabaseDataset> | null = null
 
 export function getFxDataSourceMode(): FxDataSourceMode {
   const raw = import.meta.env.VITE_FX_DATA_SOURCE?.trim().toLowerCase()
@@ -103,22 +110,14 @@ async function fetchAllMonthlyRates(): Promise<MonthlyRate[]> {
   if (!supabase) {
     throw new Error('Supabase is not configured.')
   }
-  const rows: MonthlyRate[] = []
-  for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error } = await supabase
-      .from('fx_monthly_rates')
-      .select('period_month,currency,rate_type,rate_value,status,source,imputation_method')
-      .order('period_month')
-      .range(from, from + PAGE_SIZE - 1)
-    if (error) {
-      throw error
-    }
-    rows.push(...(data ?? []).map((row) => normalizeMonthly(row)))
-    if (!data || data.length < PAGE_SIZE) {
-      break
-    }
+  const { data, error } = await supabase.rpc('get_fx_monthly_history')
+  if (error) {
+    throw error
   }
-  return rows
+  if (!Array.isArray(data)) {
+    throw new Error('Monthly exchange-rate history is empty.')
+  }
+  return data.map((row) => normalizeMonthly(row as Record<string, unknown>))
 }
 
 async function fetchDashboardSnapshot(): Promise<DashboardRpcPayload> {
@@ -135,11 +134,7 @@ async function fetchDashboardSnapshot(): Promise<DashboardRpcPayload> {
   return data as DashboardRpcPayload
 }
 
-export async function loadSupabaseInitialDataset(): Promise<{
-  dataset: ExchangeRateDataset
-  metadata: FxDatasetMetadata
-  stale: boolean
-}> {
+async function performSupabaseInitialLoad(): Promise<InitialSupabaseDataset> {
   const cachedMetadata = await loadFxMetadataFromCache()
   const cachedMonthly = await loadMonthlyRatesFromCache(cachedMetadata?.dataVersion)
 
@@ -156,8 +151,10 @@ export async function loadSupabaseInitialDataset(): Promise<{
       monthlyRates,
       movingComparison: [],
     }
-    void saveFxMetadataToCache(metadata)
-    void saveMonthlyRatesToCache(metadata.dataVersion, monthlyRates)
+    await Promise.all([
+      saveFxMetadataToCache(metadata),
+      saveMonthlyRatesToCache(metadata.dataVersion, monthlyRates),
+    ])
     return { dataset, metadata, stale: false }
   } catch (error) {
     if (cachedMetadata && cachedMonthly) {
@@ -177,6 +174,26 @@ export async function loadSupabaseInitialDataset(): Promise<{
   }
 }
 
+export function loadSupabaseInitialDataset(): Promise<InitialSupabaseDataset> {
+  if (!initialSupabaseDatasetPromise) {
+    initialSupabaseDatasetPromise = performSupabaseInitialLoad().catch((error) => {
+      initialSupabaseDatasetPromise = null
+      throw error
+    })
+  }
+  return initialSupabaseDatasetPromise
+}
+
+function dailyRequestKey(
+  metadata: FxDatasetMetadata,
+  currency: CurrencyCode,
+  year: number,
+): string {
+  const baseYear = Number(metadata.baseDate.slice(0, 4))
+  const version = year === baseYear ? metadata.dataVersion : 'historical'
+  return `${version}:${currency}:${year}`
+}
+
 async function fetchDailyYear(
   metadata: FxDatasetMetadata,
   currency: CurrencyCode,
@@ -185,7 +202,12 @@ async function fetchDailyYear(
   if (!supabase) {
     throw new Error('Supabase is not configured.')
   }
-  const key = `${metadata.dataVersion}:${currency}:${year}`
+  const key = dailyRequestKey(metadata, currency, year)
+  const memoryRows = dailyMemoryCache.get(key)
+  if (memoryRows) {
+    return memoryRows
+  }
+
   const pending = pendingDailyRequests.get(key)
   if (pending) {
     return pending
@@ -199,6 +221,7 @@ async function fetchDailyYear(
       year,
     )
     if (cached) {
+      dailyMemoryCache.set(key, cached)
       return cached
     }
     const { data, error } = await supabase
@@ -213,7 +236,8 @@ async function fetchDailyYear(
       throw error
     }
     const rows = (data ?? []).map((row) => normalizeDaily(row))
-    void saveDailyRatesToCache(metadata.dataVersion, currency, year, rows)
+    await saveDailyRatesToCache(metadata.dataVersion, currency, year, rows)
+    dailyMemoryCache.set(key, rows)
     return rows
   })().finally(() => pendingDailyRequests.delete(key))
 
