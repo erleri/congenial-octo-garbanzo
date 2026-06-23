@@ -105,8 +105,12 @@ SMTP_PASSWORD
 
 1. `supabase/migrations/20260623112518_fx_rate_storage.sql` 적용
 2. GitHub Secrets에 `SUPABASE_SERVICE_ROLE_KEY` 추가
-3. `npm run sync:supabase`
-4. `npm run verify:supabase`
+3. GitHub Actions의 `Supabase Initial Load` 선택
+4. `Run workflow`에서 확인 문구 `LOAD_SUPABASE` 입력
+5. 전체 적재와 검증이 모두 성공했는지 확인
+
+초기 적재 워크플로는 환율 API 호출, 이메일 발송, Git 커밋과 Netlify 배포를
+수행하지 않습니다. 저장소에 이미 있는 `public/data.json`만 Supabase로 복사합니다.
 
 ## Supabase 계획 환율
 

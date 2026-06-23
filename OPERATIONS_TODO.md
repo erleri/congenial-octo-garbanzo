@@ -64,7 +64,7 @@ This checklist tracks the remaining production setup needed for business plan ra
 - [x] JSON/Supabase/자동 폴백 데이터 저장소 구현
 - [x] 통화·연도 단위 IndexedDB 캐시와 인접 연도 사전 로딩 구현
 - [ ] GitHub Secrets에 `SUPABASE_SERVICE_ROLE_KEY` 등록
-- [ ] 최초 `FX_FULL_SYNC=true npm run sync:supabase` 실행
+- [ ] GitHub Actions의 `Supabase Initial Load`에서 확인 문구 `LOAD_SUPABASE` 입력 후 실행
 - [ ] `npm run verify:supabase`로 전체 행 수와 표본 일치 확인
 - [ ] Netlify에 `VITE_FX_DATA_SOURCE=auto` 명시
 - [ ] 프리뷰 배포에서 신규 24개월 조회 1초 이내 확인
