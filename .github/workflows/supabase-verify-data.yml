@@ -1,0 +1,70 @@
+name: Supabase Verify Data
+
+on:
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-verify-data
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate Supabase secrets
+        shell: bash
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ]; then
+            echo "VITE_SUPABASE_URL secret is missing." >&2
+            exit 1
+          fi
+          if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            echo "SUPABASE_SERVICE_ROLE_KEY secret is missing." >&2
+            exit 1
+          fi
+
+      - name: Test verification comparisons
+        run: node scripts/test-verify-values.js
+
+      - name: Verify uploaded exchange-rate history
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run verify:supabase
+
+      - name: Write verification summary
+        if: success()
+        shell: bash
+        run: |
+          {
+            echo "## Supabase FX verification passed"
+            echo
+            echo "- Source: \`public/data.json\`"
+            echo "- Base date: \`$(jq -r '.baseDate' public/data.json)\`"
+            echo "- Daily rows: \`$(jq -r '.dailyRates | length' public/data.json)\`"
+            echo "- Monthly rows: \`$(jq -r '.monthlyRates | length' public/data.json)\`"
+            echo "- Existing Supabase data was not modified."
+          } >> "$GITHUB_STEP_SUMMARY"
