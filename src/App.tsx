@@ -2,6 +2,15 @@ import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { buildInfo } from './buildInfo'
 import Dashboard from './components/Dashboard'
 import { useExchangeData } from './hooks/useExchangeData'
+import {
+  buildPeriodOptions,
+  buildYearOptions,
+  defaultPeriodRange,
+  defaultYearRange,
+  periodToNumber,
+  resolvePeriodRange,
+  resolveYearRange,
+} from './lib/periodSelection'
 import './App.css'
 import { CURRENCIES, DATASET_SOURCE_LABELS, type DashboardFilters } from './types/exchangeRate'
 
@@ -19,11 +28,6 @@ const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'moving', label: '계획 대비' },
   { key: 'admin', label: '관리' },
 ]
-
-function periodToNumber(period: string): number {
-  const [yearText, monthText] = period.split('-')
-  return Number(yearText) * 100 + Number(monthText)
-}
 
 function formatDateTime(value?: string): string {
   if (!value) {
@@ -95,49 +99,24 @@ function App() {
     if (!dataset) {
       return []
     }
-
-    const unique = new Set(
-      dataset.monthlyRates
-        .filter((row) => row.rateType === 'LOCAL_PER_USD')
-        .map((row) => `${row.year}-${String(row.month).padStart(2, '0')}`),
-    )
-
-    return [...unique].sort((a, b) => periodToNumber(a) - periodToNumber(b))
+    return buildPeriodOptions(dataset.monthlyRates, dataset.baseDate)
   }, [dataset])
 
-  const yearOptions = useMemo(() => {
-    if (!dataset) {
-      return []
-    }
-
-    const unique = new Set(
-      dataset.monthlyRates
-        .filter((row) => row.rateType === 'LOCAL_PER_USD')
-        .map((row) => row.year),
-    )
-
-    return [...unique].sort((a, b) => a - b)
-  }, [dataset])
+  const yearOptions = useMemo(() => buildYearOptions(periodOptions), [periodOptions])
 
   useEffect(() => {
     if (!periodOptions.length) {
       return
     }
 
-    const latest = periodOptions[periodOptions.length - 1]
-    const defaultFrom = periodOptions[Math.max(0, periodOptions.length - 2)]
-    const isPeriodToStale =
-      periodTo &&
-      periodOptions.includes(periodTo) &&
-      periodTo !== latest &&
-      periodToNumber(periodTo) < periodToNumber(latest)
+    const [defaultFrom, defaultTo] = defaultPeriodRange(periodOptions)
 
     if (!periodFrom || !periodOptions.includes(periodFrom)) {
       window.setTimeout(() => setPeriodFrom(defaultFrom), 0)
     }
 
-    if (!periodTo || !periodOptions.includes(periodTo) || isPeriodToStale) {
-      window.setTimeout(() => setPeriodTo(latest), 0)
+    if (!periodTo || !periodOptions.includes(periodTo)) {
+      window.setTimeout(() => setPeriodTo(defaultTo), 0)
     }
   }, [periodFrom, periodOptions, periodTo])
 
@@ -146,16 +125,14 @@ function App() {
       return
     }
 
-    const latest = yearOptions[yearOptions.length - 1]
-    const defaultFrom = yearOptions[Math.max(0, yearOptions.length - 2)]
-    const isYearToStale = yearTo !== null && yearOptions.includes(yearTo) && yearTo < latest
+    const [defaultFrom, defaultTo] = defaultYearRange(yearOptions)
 
     if (yearFrom === null || !yearOptions.includes(yearFrom)) {
       window.setTimeout(() => setYearFrom(defaultFrom), 0)
     }
 
-    if (yearTo === null || !yearOptions.includes(yearTo) || isYearToStale) {
-      window.setTimeout(() => setYearTo(latest), 0)
+    if (yearTo === null || !yearOptions.includes(yearTo)) {
+      window.setTimeout(() => setYearTo(defaultTo), 0)
     }
   }, [yearFrom, yearOptions, yearTo])
 
@@ -164,12 +141,7 @@ function App() {
       return ['', '']
     }
 
-    const fallbackFrom = periodOptions[Math.max(0, periodOptions.length - 2)]
-    const fallbackTo = periodOptions[periodOptions.length - 1]
-    const from = periodOptions.includes(periodFrom) ? periodFrom : fallbackFrom
-    const to = periodOptions.includes(periodTo) ? periodTo : fallbackTo
-
-    return periodToNumber(from) <= periodToNumber(to) ? [from, to] : [to, from]
+    return resolvePeriodRange(periodOptions, periodFrom, periodTo)
   }, [periodFrom, periodOptions, periodTo])
 
   const [effectiveYearFrom, effectiveYearTo] = useMemo(() => {
@@ -177,12 +149,7 @@ function App() {
       return [0, 0]
     }
 
-    const fallbackFrom = yearOptions[Math.max(0, yearOptions.length - 2)]
-    const fallbackTo = yearOptions[yearOptions.length - 1]
-    const from = yearFrom !== null && yearOptions.includes(yearFrom) ? yearFrom : fallbackFrom
-    const to = yearTo !== null && yearOptions.includes(yearTo) ? yearTo : fallbackTo
-
-    return from <= to ? [from, to] : [to, from]
+    return resolveYearRange(yearOptions, yearFrom, yearTo)
   }, [yearFrom, yearOptions, yearTo])
 
   const monthlyToOptions = useMemo(() => {

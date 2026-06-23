@@ -12,6 +12,7 @@
     "sync:supabase": "node scripts/sync-fx-to-supabase.js",
     "verify:supabase": "node scripts/verify-fx-supabase.js",
     "test:verify-values": "node scripts/test-verify-values.js",
+    "test:period-selection": "tsx scripts/test-period-selection.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:local": "vite preview --host 127.0.0.1 --port 4173 --outDir dist-local"
