@@ -468,6 +468,7 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
   const latestYear = baseDate.getFullYear()
   const latestMonth = baseDate.getMonth() + 1
   const baseDateText = data.baseDate
+  const baseDateShort = `${String(baseDate.getMonth() + 1).padStart(2, '0')}/${String(baseDate.getDate()).padStart(2, '0')}`
   const recentMonths = buildRecentMonths(latestYear, latestMonth, 24)
   const firstRecentMonth = recentMonths[0]
   const lastRecentMonth = recentMonths[recentMonths.length - 1]
@@ -743,6 +744,7 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
                 {SOURCE_LABELS[kpi.todaySource]}
               </div>
             </div>
+            <span className="kpi-eyebrow">당월 누적 평균</span>
             <div className="kpi-main-row">
               <strong>{formatCellValue(kpi.cumulativeValue, kpi.cumulativeStatus, kpi.currency)}</strong>
               <span
@@ -765,10 +767,11 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
                 이동 대비 {formatPercent(kpi.movingVs)}
               </em>
             ) : null}
+            <div className="kpi-today-box">
+              <span>기준일 환율 · {baseDateShort}</span>
+              <strong>{formatCellValue(kpi.todayValue, kpi.todayStatus, kpi.currency)}</strong>
+            </div>
             <div className="gauge-container">
-              <p className="kpi-today">
-                기준일 환율 {formatCellValue(kpi.todayValue, kpi.todayStatus, kpi.currency)}
-              </p>
               <div className="gauge-title">52주 범위 · 기준일 위치</div>
               <div className="gauge-labels">
                 <span>{formatCellValue(kpi.low52, kpi.low52 === null ? 'empty' : 'ok', kpi.currency)}</span>
