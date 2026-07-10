@@ -444,9 +444,14 @@ function renderTodayFocus(currencyDetails) {
   `
 }
 
-function renderCard(detail) {
+function renderCard(detail, baseDate) {
   const color = CARD_COLORS[detail.currency] ?? '#1f2a44'
   const sourceLabel = SOURCE_LABELS[detail.source] ?? detail.source
+  const baseDateShort = baseDate
+    .split('-')
+    .slice(1)
+    .map((part) => String(Number(part)).padStart(2, '0'))
+    .join('/')
   const momText =
     typeof detail.mom === 'number' ? `${detail.mom >= 0 ? '+' : ''}${detail.mom.toFixed(2)}% MoM` : 'MoM -'
   const momColor = typeof detail.mom === 'number' && detail.mom >= 0 ? '#a61b12' : '#1f5fbf'
@@ -462,15 +467,23 @@ function renderCard(detail) {
             <table role="presentation" style="width:100%;border-collapse:collapse;">
               <tr>
                 <td style="color:#344054;font-size:11px;font-weight:bold;">${detail.currency} / USD</td>
-                <td style="text-align:right;"><span title="${escapeHtml(detail.tag.description)}" style="display:inline-block;${tagStyle(detail.tag.tone)}border-radius:4px;padding:2px 6px;font-size:10px;font-weight:bold;">${escapeHtml(detail.tag.label)}</span></td>
+                <td style="text-align:right;"><span style="display:inline-block;border:1px solid #ccd6e6;border-radius:4px;background:#f8fafc;color:#1f5fbf;padding:2px 6px;font-size:10px;font-weight:bold;">${sourceLabel}</span></td>
               </tr>
             </table>
-            <div style="margin-top:5px;"><span style="display:inline-block;border:1px solid #ccd6e6;border-radius:4px;background:#f8fafc;color:#1f5fbf;padding:2px 6px;font-size:10px;font-weight:bold;">${sourceLabel}</span></div>
-            <div style="margin-top:6px;color:#111827;font-size:25px;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;">${formatRate(detail.mtdAverage)}</div>
-            <div style="margin-top:7px;color:${momColor};font-size:12px;font-weight:bold;">${momText}</div>
+            <div style="margin-top:5px;color:#8a94a3;font-size:10px;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;">Month-to-date average</div>
+            <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:2px;">
+              <tr>
+                <td style="color:#111827;font-size:22px;line-height:1.08;font-weight:700;font-variant-numeric:tabular-nums;">${formatRate(detail.mtdAverage)}</td>
+                <td style="text-align:right;vertical-align:middle;"><span title="${escapeHtml(detail.tag.description)}" style="display:inline-block;${tagStyle(detail.tag.tone)}border-radius:4px;padding:2px 6px;font-size:10px;font-weight:bold;">${escapeHtml(detail.tag.label)}</span></td>
+              </tr>
+            </table>
+            <div style="margin-top:6px;color:${momColor};font-size:12px;font-weight:bold;">${momText}</div>
             ${movingVsText ? `<div style="margin-top:4px;color:${movingVsColor};font-size:11px;font-weight:bold;">${movingVsText}</div>` : ''}
-            <div style="margin-top:13px;color:#5b6472;font-size:12px;font-variant-numeric:tabular-nums;">Base rate ${formatRate(detail.rate)}</div>
-            <div style="margin-top:5px;color:#667085;font-size:11px;font-weight:bold;">52-week range</div>
+            <div style="margin-top:8px;border:1px solid #d7e3f7;border-radius:4px;background:#f8fbff;padding:6px 8px;">
+              <div style="color:#175cd3;font-size:10px;font-weight:bold;">Base rate · ${baseDateShort}</div>
+              <div style="margin-top:2px;color:#111827;font-size:14px;line-height:1.08;font-weight:700;font-variant-numeric:tabular-nums;">${formatRate(detail.rate)}</div>
+            </div>
+            <div style="margin-top:8px;color:#667085;font-size:11px;font-weight:bold;">52-week range · base-date position</div>
             <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:3px;">
               <tr>
                 <td style="color:#5b6472;font-size:11px;font-weight:bold;font-variant-numeric:tabular-nums;">${formatRate(detail.low52)}</td>
@@ -491,7 +504,7 @@ function renderCard(detail) {
 function renderKpiSummary(currencyDetails, baseDate) {
   const cardRows = []
   for (let index = 0; index < currencyDetails.length; index += 3) {
-    cardRows.push(`<tr>${currencyDetails.slice(index, index + 3).map(renderCard).join('')}</tr>`)
+    cardRows.push(`<tr>${currencyDetails.slice(index, index + 3).map((detail) => renderCard(detail, baseDate)).join('')}</tr>`)
   }
 
   return `
