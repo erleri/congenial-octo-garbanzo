@@ -23,6 +23,7 @@ interface CurrencyDetailProps {
   currencyFilter: CurrencyFilter
   periodFrom: string
   periodTo: string
+  rangeNotice: string | null
 }
 
 interface DetailDotProps {
@@ -109,7 +110,13 @@ function renderLatestDetailDot({ cx, cy, payload }: DetailDotProps) {
   )
 }
 
-function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: CurrencyDetailProps) {
+function CurrencyDetail({
+  data,
+  currencyFilter,
+  periodFrom,
+  periodTo,
+  rangeNotice,
+}: CurrencyDetailProps) {
   const currency = currencyFilter === 'ALL' ? 'BRL' : (currencyFilter as CurrencyCode)
 
   const fromValue = periodFrom ? periodToNumber(periodFrom) : 0
@@ -311,6 +318,10 @@ function CurrencyDetail({ data, currencyFilter, periodFrom, periodTo }: Currency
           <p className="table-help">{currency} 기준 일별 환율과 기간 평균입니다.</p>
         </div>
       </div>
+
+      {rangeNotice ? (
+        <p className="inline-notice warning-notice">{rangeNotice}</p>
+      ) : null}
 
       <div className="chart-card">
         <h3>{periodFrom} ~ {periodTo} 일별 환율</h3>

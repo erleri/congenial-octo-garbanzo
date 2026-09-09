@@ -69,6 +69,7 @@ function App() {
     excelPriority,
     fillMissing,
     dailyRangeLoading,
+    dailyRangeNotice,
     filters,
     setFilters,
     refreshData,
@@ -238,6 +239,7 @@ function App() {
             currencyFilter={filters.currency}
             periodFrom={effectivePeriodFrom}
             periodTo={effectivePeriodTo}
+            rangeNotice={dailyRangeNotice}
           />
         )
       case 'moving':
@@ -272,6 +274,7 @@ function App() {
     businessPlanStatus,
     dataset,
     datasetSource,
+    dailyRangeNotice,
     effectivePeriodFrom,
     effectivePeriodTo,
     effectiveYearFrom,

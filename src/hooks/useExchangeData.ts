@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   fetchManualBackfillDataset,
   fetchRemoteExchangeData,
@@ -23,6 +23,7 @@ import {
 } from '../lib/businessPlanRemote'
 import { supabase } from '../lib/supabaseClient'
 import { validateExcelUpload } from '../lib/uploadValidation'
+import { dailyCoverageNotice } from '../lib/dailyCoverage'
 import type {
   BusinessPlan,
   BusinessPlanStatus,
@@ -79,6 +80,8 @@ function mergeDailyRows(
 
 export function useExchangeData() {
   const [dataset, setDataset] = useState<ExchangeRateDataset | null>(null)
+  const datasetRef = useRef<ExchangeRateDataset | null>(null)
+  useEffect(() => { datasetRef.current = dataset }, [dataset])
   const [datasetSource, setDatasetSource] = useState<DatasetSource>('none')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -91,6 +94,7 @@ export function useExchangeData() {
   const [businessPlanUserEmail, setBusinessPlanUserEmail] = useState<string | null>(null)
   const [fxMetadata, setFxMetadata] = useState<FxDatasetMetadata | null>(null)
   const [dailyRangeLoading, setDailyRangeLoading] = useState(false)
+  const [dailyRangeNotice, setDailyRangeNotice] = useState<string | null>(null)
 
   const [filters, setFilters] = useState<DashboardFilters>({
     currency: 'BRL',
@@ -133,7 +137,12 @@ export function useExchangeData() {
     periodFrom: string,
     periodTo: string,
   ) => {
-    if (!fxMetadata || currency === 'ALL' || !periodFrom || !periodTo) {
+    const activeDataset = datasetRef.current
+    if (currency === 'ALL' || !periodFrom || !periodTo || !activeDataset) {
+      return
+    }
+    if (!fxMetadata) {
+      setDailyRangeNotice(dailyCoverageNotice(activeDataset, currency, periodFrom, periodTo))
       return
     }
 
@@ -150,6 +159,7 @@ export function useExchangeData() {
     try {
       setDailyRangeLoading(true)
       const rows = await loadDailyYears(fxMetadata, currency, years)
+      setDailyRangeNotice(dailyCoverageNotice(mergeDailyRows(activeDataset, rows), currency, periodFrom, periodTo))
       setDataset((current) => current ? mergeDailyRows(current, rows) : current)
 
       const adjacentYears = [fromYear - 1, toYear + 1].filter(
@@ -157,8 +167,9 @@ export function useExchangeData() {
       )
       void loadDailyYears(fxMetadata, currency, adjacentYears).then((prefetched) => {
         setDataset((current) => current ? mergeDailyRows(current, prefetched) : current)
-      })
+      }).catch(() => { /* Optional prefetch failure must not interrupt the selected range. */ })
     } catch (rangeError) {
+      setDailyRangeNotice(dailyCoverageNotice(activeDataset, currency, periodFrom, periodTo))
       setError(
         rangeError instanceof Error
           ? `선택 기간 데이터를 불러오지 못했습니다. ${rangeError.message}`
@@ -512,6 +523,7 @@ export function useExchangeData() {
     excelPriority,
     fillMissing,
     dailyRangeLoading,
+    dailyRangeNotice,
     fxMetadata,
     filters,
     setFilters,
