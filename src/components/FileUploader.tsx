@@ -46,7 +46,7 @@ function FileUploader({
         <div className="inline-controls" style={{ marginBottom: 8 }}>
           <input
             type="file"
-            accept=".xlsx,.xls"
+            accept=".xlsx,.xls,.xlsm"
             onChange={(event) => {
               const file = event.target.files?.[0] ?? null
               if (file) {

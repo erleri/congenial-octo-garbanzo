@@ -253,7 +253,7 @@ function Admin({
         <div className="inline-controls" style={{ marginTop: 10 }}>
           <input
             type="file"
-            accept=".xlsx,.xls"
+            accept=".xlsx,.xls,.xlsm"
             onChange={async (event) => {
               const file = event.target.files?.[0] ?? null
               if (file) {

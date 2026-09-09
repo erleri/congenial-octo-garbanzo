@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx'
+import { validateExcelUpload } from './uploadValidation'
 import type {
   CurrencyCode,
   ExchangeRateDataset,
@@ -284,8 +285,14 @@ export async function parseExcelWorkbook(file: File): Promise<{
   rawSheets: RawSheet[]
   baseDate: string
 }> {
+  validateExcelUpload(file)
   const fileData = await readFileAsArrayBuffer(file)
-  const workbook = XLSX.read(fileData, { type: 'array' })
+  let workbook: XLSX.WorkBook
+  try {
+    workbook = XLSX.read(fileData, { type: 'array' })
+  } catch {
+    throw new Error('Excel 파일을 읽을 수 없습니다. 손상 여부와 파일 형식을 확인해 주세요.')
+  }
   const rawSheets = buildRawSheetsFromWorkbook(workbook)
 
   const summarySheet = workbook.Sheets.Summary
@@ -343,6 +350,10 @@ export async function parseExcelWorkbook(file: File): Promise<{
       `${row.currency}|${row.year}|${row.month}|${row.day}|${row.rateType}`,
       row,
     )
+  }
+
+  if (monthlyMap.size === 0 && dailyMap.size === 0) {
+    throw new Error('Excel 파일에서 환율 데이터를 찾지 못했습니다. Summary 또는 통화별 시트를 확인해 주세요.')
   }
 
   return {
