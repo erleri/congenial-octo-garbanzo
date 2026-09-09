@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import DatasetSourceBadge from './DatasetSourceBadge'
 import { fetchRawSheetsDataset } from '../lib'
 import {
   DATASET_SOURCE_LABELS,
@@ -224,7 +225,7 @@ function Admin({
           <p>이 브라우저에서만 확인하는 미리보기입니다. 운영 데이터나 일일 발송 메일에는 반영되지 않습니다.</p>
         </div>
         <div className="scope-card">
-          <span className="scope-badge scope-badge-operational">운영 데이터 확인됨</span>
+          <DatasetSourceBadge source={datasetSource} />
           <strong>현재 데이터 출처</strong>
           <p className="source-state">{DATASET_SOURCE_LABELS[datasetSource]}</p>
           <p>build, 기준일, 데이터 출처를 함께 보고 지금 화면의 기준을 확인합니다.</p>
