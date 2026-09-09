@@ -267,9 +267,11 @@ export async function loadBusinessPlanHistoryFromSupabase(
     throw new Error('Supabase is not configured.')
   }
 
+  const cursor = before ? JSON.parse(before) as { createdAt: string; changeGroup: string } : null
   const { data, error } = await supabase.rpc('get_business_plan_history', {
     p_period_month: periodMonth,
-    p_before: before,
+    p_before: cursor?.createdAt ?? null,
+    p_before_group: cursor?.changeGroup ?? null,
     p_limit: limit,
   })
 
@@ -281,14 +283,18 @@ export async function loadBusinessPlanHistoryFromSupabase(
   }
 
   const rows = (data ?? []) as BusinessPlanHistoryRow[]
-  const entries = groupBusinessPlanHistoryRows(rows)
-  const returnedGroups = [...new Map(
-    rows.map((row) => [row.change_group, row.created_at]),
-  ).values()].sort((a, b) => b.localeCompare(a))
+  return buildBusinessPlanHistoryPage(rows, limit)
+}
+
+export function buildBusinessPlanHistoryPage(rows: BusinessPlanHistoryRow[], limit = 20): BusinessPlanHistoryPage {
+  // RPC order is the database cursor order; do not re-sort using browser collation.
+  const returnedGroups = [...new Map(rows.map((row) => [row.change_group,
+    { createdAt: row.created_at, changeGroup: row.change_group },
+  ])).values()]
   return {
-    entries,
+    entries: groupBusinessPlanHistoryRows(rows),
     hasMore: returnedGroups.length >= limit,
-    nextCursor: returnedGroups.at(-1) ?? null,
+    nextCursor: returnedGroups.length ? JSON.stringify(returnedGroups.at(-1)) : null,
   }
 }
 

@@ -78,6 +78,9 @@ function App() {
     businessPlan,
     updateBusinessPlan,
     businessPlanStatus,
+    businessPlanHistory,
+    businessPlanHistoryStatus,
+    loadMoreBusinessPlanHistory,
     requestBusinessPlanAccess,
     signOutBusinessPlanAccess,
   } = useExchangeData()
@@ -249,6 +252,9 @@ function App() {
             businessPlan={businessPlan}
             onUpdatePlan={updateBusinessPlan}
             businessPlanStatus={businessPlanStatus}
+            businessPlanHistory={businessPlanHistory}
+            businessPlanHistoryStatus={businessPlanHistoryStatus}
+            onLoadMorePlanHistory={loadMoreBusinessPlanHistory}
             onRequestPlanAccess={requestBusinessPlanAccess}
             onSignOutPlanAccess={signOutBusinessPlanAccess}
           />
@@ -272,6 +278,9 @@ function App() {
   }, [
     businessPlan,
     businessPlanStatus,
+    businessPlanHistory,
+    businessPlanHistoryStatus,
+    loadMoreBusinessPlanHistory,
     dataset,
     datasetSource,
     dailyRangeNotice,
