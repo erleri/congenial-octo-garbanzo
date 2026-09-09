@@ -1,6 +1,11 @@
 # 1.x draft PR publication packet
 
-These are local branches, not published PRs. Non-interactive push was attempted on 2026-09-09 and failed because Git Credential Manager had no usable GitHub credential. No PR URL or CI success is claimed.
+Published as draft PRs on 2026-09-09 after user-completed Git Credential Manager authentication. All four branch pushes succeeded. No production merge, deploy or DB change was performed. CI was running at publication; this record does not claim CI completion.
+
+- [PR #6 — validation and upload](https://github.com/erleri/congenial-octo-garbanzo/pull/6); [preview](https://deploy-preview-6--latamforex.netlify.app) reported ready, visual smoke test still pending.
+- [PR #7 — plan storage](https://github.com/erleri/congenial-octo-garbanzo/pull/7).
+- [PR #8 — data fallback](https://github.com/erleri/congenial-octo-garbanzo/pull/8).
+- [PR #9 — admin history](https://github.com/erleri/congenial-octo-garbanzo/pull/9).
 
 | Order | Head | Review base | Title |
 | --- | --- | --- | --- |
@@ -13,7 +18,7 @@ Stacked bases keep each diff focused. Retarget subsequent PRs after their predec
 
 ## Publication
 
-Authenticate in a user PowerShell using `git credential-manager github login --browser`; do not paste access tokens into chat. Then push these four named branches (no force push) from this worktree and create draft PRs with the bases above. Authentication alone does not change the site. Push/PR publication may create previews, but must not deploy production or dispatch the email workflow.
+Publication is complete. Git is bundled in the local runtime and is not necessarily on a user's PowerShell PATH; use its verified absolute executable path if authentication is needed again. Do not paste access tokens into chat. Only push named review branches (no force push). Publication may create previews, but must not deploy production or dispatch the email workflow.
 
 ## PR bodies
 
