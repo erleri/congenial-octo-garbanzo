@@ -24,3 +24,14 @@ jobs:
       - name: Production dependency audit (known xlsx advisory)
         continue-on-error: true
         run: npm audit --omit=dev --audit-level=high
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.116.0
+      - run: supabase db start
+      - run: supabase test db --local
+      - run: node scripts/test-plan-rollout.mjs

@@ -19,6 +19,37 @@ function createEmptyBusinessPlan() {
   }
 }
 
+function isSchemaCompatibilityError(error) {
+  return ['42P01', '42703', 'PGRST202', 'PGRST204', 'PGRST205'].includes(error?.code)
+}
+
+async function loadCurrentRows(supabase, periodMonth) {
+  const currentResult = await supabase
+    .from('business_plan_current')
+    .select('period_month, plan_type, currency, rate_value, updated_at')
+    .eq('period_month', periodMonth)
+
+  if (!currentResult.error) {
+    return currentResult.data ?? []
+  }
+
+  if (!isSchemaCompatibilityError(currentResult.error)) {
+    throw currentResult.error
+  }
+
+  const legacyResult = await supabase
+    .from('business_plan_rates')
+    .select('period_month, plan_type, currency, rate_value, created_at')
+    .eq('period_month', periodMonth)
+    .order('created_at', { ascending: true })
+
+  if (legacyResult.error) {
+    throw legacyResult.error
+  }
+
+  return legacyResult.data ?? []
+}
+
 export async function loadBusinessPlanForEmail(dataset) {
   const supabaseUrl = process.env.VITE_SUPABASE_URL?.trim()
   const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY?.trim()
@@ -37,19 +68,11 @@ export async function loadBusinessPlanForEmail(dataset) {
   })
 
   try {
-    const { data, error } = await supabase
-      .from('business_plan_rates')
-      .select('period_month, plan_type, currency, rate_value, created_at')
-      .eq('period_month', periodMonth)
-      .order('created_at', { ascending: true })
-
-    if (error) {
-      throw error
-    }
+    const data = await loadCurrentRows(supabase, periodMonth)
 
     const plan = createEmptyBusinessPlan()
 
-    for (const row of data ?? []) {
+    for (const row of data) {
       if (!['leading', 'moving'].includes(row.plan_type) || !CURRENCIES.includes(row.currency)) {
         continue
       }
