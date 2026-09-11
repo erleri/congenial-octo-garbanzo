@@ -10,10 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-local
+dist-report
 dist-ssr
 email-chart.png
 email-chart-meta.json
 email-market-context.json
+fx-report-run.json
+fx-report-published.json
 public/email-preview.html
 *.local
 
