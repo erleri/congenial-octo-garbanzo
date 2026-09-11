@@ -8,7 +8,7 @@ This checklist tracks the remaining production setup needed for business plan ra
 - Production site responds at `https://latamforex.netlify.app/`.
 - Production `public/data.json` reports `baseDate = 2026-05-30`.
 - The latest checked `Daily Dashboard Email` run completed successfully, including API secret validation, market context creation, email composition, mailing-list validation, send, and artifact upload. That run used an older commit, so the new hybrid market context still needs the next run or a deliberate manual run to be confirmed in production email.
-- Supabase publishable config is present in the production bundle, and `business_plan_rates` can be read through the public REST API.
+- Supabase publishable config is present in the production bundle. At this historical checkpoint, `business_plan_rates` could still be read through the public REST API; the current-value projection and access-closure rollout supersede that contract.
 - No `service_role`, `sb_secret_...`, or literal `secret key` value pattern was found in the production bundle.
 
 ## Local Verification Notes
@@ -20,9 +20,9 @@ This checklist tracks the remaining production setup needed for business plan ra
 ## Supabase Business Plan Rates
 
 - [x] Run `supabase/migrations/20260504120000_business_plan_rates.sql` in the Supabase SQL Editor.
-- [ ] Add each editor email to `public.business_plan_admins` with `active = true`.
-- [ ] Confirm `public.business_plan_rates` can be read by anonymous and authenticated users. Anonymous read is verified; authenticated read still needs an admin/non-admin session check.
-- [ ] Confirm only active `business_plan_admins` can insert business plan rates.
+- [x] Confirm production has active editor entries in `public.business_plan_admins` without recording addresses in the repository.
+- [ ] Apply the separately approved `20260911133319_close_business_plan_history_access.sql` migration. Afterward, anonymous users must read only `business_plan_current`, never `business_plan_rates`.
+- [x] Confirm in the isolated DB that only active `business_plan_admins` can read history or insert business plan rates; repeat against the production Data API immediately after approval and application.
 
 ## Environment Variables
 
@@ -38,8 +38,8 @@ This checklist tracks the remaining production setup needed for business plan ra
 
 ## Production Verification
 
-- [ ] Open the production site and confirm the plan panel shows `운영 저장값 확인됨` when Supabase is configured.
-- [ ] Verify a non-admin or signed-out user sees the operational values as read-only.
+- [x] Open the production site and confirm the plan panel loads the Supabase operational current values.
+- [x] Verify a signed-out user sees the operational values as read-only, with disabled inputs/save and no admin history.
 - [ ] Request a login link from the plan modal and confirm the redirect returns to the app.
 - [ ] Sign in with an admin email and confirm the save button becomes enabled.
 - [ ] Save a small test change and confirm the success message says Supabase re-read verification succeeded.

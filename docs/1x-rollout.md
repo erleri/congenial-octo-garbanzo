@@ -21,7 +21,7 @@ Every PR must pass CI. Record actual checks rather than assuming a local PASS pr
 
 ## Rollback
 
-The access-closure SQL is intentionally outside `supabase/migrations`, in `supabase/checkpoints`. Ordinary migration application must only add the compatible structure. After preview and production reader verification, promote the closure using a new CLI-generated migration as a separately reviewed change. Do not apply it automatically with the additive change. The original candidate migration and original local database stay untouched.
+The additive structure and the access closure remain separate changes. The closure was promoted from `supabase/checkpoints` to the CLI-generated `20260911133319_close_business_plan_history_access.sql` only after the production frontend and email code paths were confirmed to read `business_plan_current`. The migration is still a separately reviewed production checkpoint and must not be applied merely because the branch is pushed or the PR is merged.
 
 - UI: restore the previous verified Netlify deploy.
 - Data: restore generator, sync/verification paths and dataset files together; retain the latest complete history for recovery.
@@ -78,6 +78,20 @@ The user explicitly approved the additive production checkpoint. The access-clos
 - The raw history table's existing public read contract is intentionally unchanged. It must be closed only through the separately reviewed checkpoint after production frontend and email current-value readers are reconfirmed.
 
 This database checkpoint does not by itself deploy the PR #9 frontend. The renamed migration files must pass clean CI before merge.
+
+## Access-closure candidate — 2026-09-11
+
+Branch: `codex/1x-plan-access-closure`, based on production merge `a764db9c65289515017e52c38bb98fefe6efbb71`. No production database policy was changed while preparing this candidate.
+
+- The browser and email readers both request `business_plan_current` first. Their legacy history fallback is limited to missing table/column/schema-cache errors; permission and connection failures are not treated as old-schema compatibility.
+- Supabase CLI generated `20260911133319_close_business_plan_history_access.sql`. It removes `anon` access to raw history, gives `authenticated` only SELECT/INSERT object privileges, and uses RLS so only active admins can read or insert. The service role keeps explicit SELECT/INSERT/UPDATE/DELETE privileges.
+- The former checkpoint file was removed after its SQL became a versioned migration. The existing migrations were not edited.
+- Clean local rebuild PASS through all seven migrations. `supabase test db --local` passed 11 pgTAP assertions, and the populated-history rollout test passed anon, non-admin, active-admin, service-role and current-value synchronization checks with transaction rollback.
+- Local DB lint reported no schema errors for `public` and `app_private`.
+- Node.js 20.19.0 `npm run check` passed typecheck, ESLint, 31 Vitest tests and production build. The existing large-chunk warning remains non-blocking.
+- Minimal local Auth/PostgREST/API services were started for an HTTP Data API probe. Anon current-value read returned 200; anon raw-history read returned 401; authenticated non-admin raw-history read returned 200 with no rows; active-admin and service-role history reads returned 200. A non-admin insert returned 403, while an active-admin insert returned 201 and immediately synchronized the public current value. All temporary rows and the temporary admin entry were deleted afterward.
+
+Production acceptance after approval: anon current-value read succeeds; anon raw-history access returns a privilege error; authenticated non-admin receives no raw history and cannot insert; active admin can read history and save; service-role synchronization remains intact; the five public screens and email current values remain unchanged. Do not restore public saver-email access as rollback.
 
 Non-blocking known warnings: production `xlsx` advisory; full dependency audit reports 17 findings (2 low, 3 moderate, 12 high); bundle chunk exceeds 500 kB. No automatic breaking dependency upgrade was attempted.
 
