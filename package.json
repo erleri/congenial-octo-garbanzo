@@ -13,6 +13,9 @@
     "verify:supabase": "node scripts/verify-fx-supabase.js",
     "test:verify-values": "node scripts/test-verify-values.js",
     "test:period-selection": "tsx scripts/test-period-selection.ts",
+    "typecheck": "tsc -b --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:local": "vite preview --host 127.0.0.1 --port 4173 --outDir dist-local"
@@ -39,6 +42,10 @@
     "tsx": "^4.21.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "ws": "8.21.0"
   }
 }

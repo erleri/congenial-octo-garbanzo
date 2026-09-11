@@ -22,6 +22,7 @@ import {
   signOutBusinessPlanUser,
 } from '../lib/businessPlanRemote'
 import { supabase } from '../lib/supabaseClient'
+import { validateExcelUpload } from '../lib/uploadValidation'
 import type {
   BusinessPlan,
   BusinessPlanStatus,
@@ -213,11 +214,9 @@ export function useExchangeData() {
     options: { excelPriority: boolean; fillMissing: boolean },
   ) => {
     try {
+      validateExcelUpload(file)
       setLoading(true)
       setError(null)
-      setExcelFile(file)
-      setExcelPriority(options.excelPriority)
-      setFillMissing(options.fillMissing)
 
       const [manualBackfill, supplementalHistory] = await Promise.all([
         fetchManualBackfillDataset(),
@@ -234,6 +233,9 @@ export function useExchangeData() {
       })
 
       await applyDataset(merged, 'excel')
+      setExcelFile(file)
+      setExcelPriority(options.excelPriority)
+      setFillMissing(options.fillMissing)
 
       return {
         type: 'success' as const,

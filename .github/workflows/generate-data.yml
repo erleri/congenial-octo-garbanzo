@@ -31,7 +31,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Validate required exchange API secrets
         run: node scripts/validate-api-keys.js
