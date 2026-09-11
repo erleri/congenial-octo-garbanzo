@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process'
 
 // Fixed local test container: never accepts a production URL or credentials.
 const expand = readFileSync('supabase/migrations/20260909105853_plan_current_expand.sql', 'utf8')
-const contract = readFileSync('supabase/checkpoints/20260909105855_plan_history_contract.sql', 'utf8')
+const contract = readFileSync('supabase/migrations/20260911133319_close_business_plan_history_access.sql', 'utf8')
 const sql = `begin;
 alter table public.business_plan_rates disable trigger sync_business_plan_current_after_insert;
 insert into public.business_plan_rates(period_month,plan_type,currency,rate_value,created_at)
