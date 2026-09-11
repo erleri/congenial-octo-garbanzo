@@ -40,6 +40,7 @@ const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
 const EMPTY_HISTORY: BusinessPlanHistoryStatus = {
   loading: false, loaded: false, hasMore: false, nextCursor: null, error: null,
 }
+const ADMIN_ACCESS_RECHECK_MS = 30_000
 const INITIAL_BUSINESS_PLAN_STATUS: BusinessPlanStatus = {
   configured: canUseRemoteBusinessPlan(),
   loading: false,
@@ -103,12 +104,12 @@ export function useExchangeData() {
   const [businessPlanHistory, setBusinessPlanHistory] = useState<BusinessPlanHistoryEntry[]>([])
   const [businessPlanHistoryStatus, setBusinessPlanHistoryStatus] = useState(EMPTY_HISTORY)
 
-  const clearPlanAccess = () => {
+  const clearPlanAccess = useCallback(() => {
     planEpoch.current += 1
     setBusinessPlanHistory([])
     setBusinessPlanHistoryStatus(EMPTY_HISTORY)
     setBusinessPlanStatus((prev) => ({ ...prev, canEdit: false, saving: false, lastUpdatedBy: null }))
-  }
+  }, [])
 
   const loadHistory = async (periodMonth: string, epoch: number, before: string | null = null) => {
     setBusinessPlanHistoryStatus((prev) => ({ ...prev, loading: true, error: null }))
@@ -570,7 +571,7 @@ export function useExchangeData() {
       window.removeEventListener('blur', onBlur)
       window.removeEventListener('focus', onFocus)
     }
-  }, [])
+  }, [clearPlanAccess])
 
   useEffect(() => {
     if (!dataset) {
@@ -580,6 +581,39 @@ export function useExchangeData() {
     void loadRemoteBusinessPlan(dataset, businessPlanUserEmail)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataset?.baseDate, businessPlanUserEmail, authRevision])
+
+  useEffect(() => {
+    if (!businessPlanStatus.canEdit || !businessPlanUserEmail) {
+      return undefined
+    }
+
+    let cancelled = false
+    const recheckAdminAccess = async () => {
+      if (document.visibilityState !== 'visible') {
+        return
+      }
+
+      try {
+        const stillActive = await loadBusinessPlanAdminAccess(businessPlanUserEmail)
+        if (!cancelled && !stillActive) {
+          clearPlanAccess()
+        }
+      } catch {
+        if (!cancelled) {
+          clearPlanAccess()
+        }
+      }
+    }
+
+    const intervalId = window.setInterval(() => {
+      void recheckAdminAccess()
+    }, ADMIN_ACCESS_RECHECK_MS)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(intervalId)
+    }
+  }, [businessPlanStatus.canEdit, businessPlanUserEmail, clearPlanAccess])
 
   return {
     dataset,

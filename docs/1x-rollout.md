@@ -45,7 +45,7 @@ Worktree: `latamfx-1x`; original `congenial-octo-garbanzo` and its applied local
 | Data | Public JSON 3,276,467 bytes; 8,800 daily rows vs 127,030 full rows; monthly/recent daily/moving equality and rendered dashboard text equality PASS | Five screens/mobile tables; email representative-value parity; real browser outage/cache paths |
 | History | 20 groups with identical timestamp; next-page boundary; no-change groups; legacy rows; revoked admin RPC tests PASS | Mounted UI logout/in-flight response race and actual admin workflow |
 
-History requests are invalidated on auth events/sign-out and details are hidden on window blur. Membership is rechecked on focus and each history page. External role revocation is enforced by the DB on the next request; an already focused, idle browser does not currently receive an instantaneous revocation event. Do not mark the strict immediate UI-revocation acceptance criterion complete until a notification/revalidation strategy is agreed and tested.
+History requests are invalidated on auth events/sign-out and details are hidden on window blur. Membership is rechecked on focus, each history page, and every 30 seconds while an active admin keeps the page visible. A failed recheck clears the sensitive history and editing state. This bounds focused-idle external revocation exposure to the next recheck; mounted UI verification is still required before production approval.
 
 Non-blocking known warnings: production `xlsx` advisory; full dependency audit reports 17 findings (2 low, 3 moderate, 12 high); bundle chunk exceeds 500 kB. No automatic breaking dependency upgrade was attempted.
 
