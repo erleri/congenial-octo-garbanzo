@@ -23,6 +23,30 @@ export type BusinessPlanRemoteLoadStatus = 'not_configured' | 'idle' | 'loading'
 export type BusinessPlanAdminAccessStatus = 'unknown' | 'checking' | 'allowed' | 'denied' | 'failed'
 export type BusinessPlanSaveStatus = 'idle' | 'saving' | 'verified' | 'unverified' | 'failed'
 
+export interface BusinessPlanHistoryChange {
+  currency: CurrencyCode
+  planType: BusinessPlanType
+  previousValue: number | null
+  nextValue: number | null
+}
+
+export interface BusinessPlanHistoryEntry {
+  changeSetId: string
+  legacy: boolean
+  periodMonth: string
+  createdAt: string
+  createdBy: string | null
+  changes: BusinessPlanHistoryChange[]
+}
+
+export interface BusinessPlanHistoryStatus {
+  loading: boolean
+  loaded: boolean
+  hasMore: boolean
+  nextCursor: string | null
+  error: string | null
+}
+
 export interface BusinessPlanStatus {
   configured: boolean
   loading: boolean
@@ -125,6 +149,16 @@ export interface ExchangeRateDataset {
   dailyRates: DailyRate[]
   movingComparison: MovingComparisonRow[]
   rawSheets?: RawSheet[]
+  coverage?: DatasetCoverage
+}
+
+export interface DatasetCoverage {
+  dailyFrom: string
+  dailyTo: string
+  monthlyFrom: string
+  monthlyTo: string
+  limitedDailyHistory: boolean
+  dataVersion: string
 }
 
 export type FxDataSourceMode = 'json' | 'supabase' | 'auto'

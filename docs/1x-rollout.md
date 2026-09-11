@@ -20,6 +20,8 @@ Every PR must pass CI. Record actual checks rather than assuming a local PASS pr
 
 ## Rollback
 
+The access-closure SQL is intentionally outside `supabase/migrations`, in `supabase/checkpoints`. Ordinary migration application must only add the compatible structure. After preview and production reader verification, promote the closure using a new CLI-generated migration as a separately reviewed change. Do not apply it automatically with the additive change. The original candidate migration and original local database stay untouched.
+
 - UI: restore the previous verified Netlify deploy.
 - Data: restore generator, sync/verification paths and dataset files together; retain the latest complete history for recovery.
 - DB: preserve all inserted history. Repair current-value synchronization using a reviewed forward migration. Do not automatically restore public access to saver email or raw history.
