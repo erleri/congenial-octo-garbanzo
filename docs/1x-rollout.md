@@ -43,9 +43,27 @@ Worktree: `latamfx-1x`; original `congenial-octo-garbanzo` and its applied local
 | Excel | Valid in-memory workbook, corrupt ZIP, unrelated workbook, extension/size tests PASS; hook commits upload options only after successful merge | Real user workbooks; failed upload preserves mounted UI state |
 | Plan storage | Additive local DB startup; 11 pgTAP assertions PASS; transaction-based historical backfill, contract, four-role check PASS | Preview/test Data API login, save, failed re-read, re-login; staged live reader verification |
 | Data | Public JSON 3,276,467 bytes; 8,800 daily rows vs 127,030 full rows; monthly/recent daily/moving equality and rendered dashboard text equality PASS | Five screens/mobile tables; email representative-value parity; real browser outage/cache paths |
-| History | 20 groups with identical timestamp; next-page boundary; no-change groups; legacy rows; revoked admin RPC tests PASS | Mounted UI logout/in-flight response race and actual admin workflow |
+| History | 20 groups with identical timestamp; next-page boundary; no-change groups; legacy rows; revoked admin RPC tests PASS | Preview mounted UI workflow completed 2026-09-11; production approval remains separate |
 
-History requests are invalidated on auth events/sign-out and details are hidden on window blur. Membership is rechecked on focus, each history page, and every 30 seconds while an active admin keeps the page visible. A failed recheck clears the sensitive history and editing state. This bounds focused-idle external revocation exposure to the next recheck; mounted UI verification is still required before production approval.
+History requests are invalidated on auth events/sign-out and details are hidden on window blur. Membership is rechecked on focus, each history page, and every 30 seconds while an active admin keeps the page visible. A failed recheck clears the sensitive history and editing state. This bounds focused-idle external revocation exposure to the next recheck; the mounted Preview verification is recorded below and production approval remains separate.
+
+## Supabase Preview mounted verification — 2026-09-11
+
+Target: draft PR #9 head `aa31b6b1e57343c1d6d0400ebba05f8567be2c64`, Supabase Preview project `umgguqeeeqkfavdgnote`. The production database, production Netlify deploy and production Auth redirect configuration were not changed.
+
+- The exact Preview DB build was served temporarily at `127.0.0.1:3000` because the Preview Auth project redirected its Magic Link to the configured localhost site URL. The user completed authentication; no token was copied or recorded.
+- Active admin recognition for the configured Preview test account PASS: the page reported `편집 가능` and displayed the admin-only history panel. The account address is intentionally omitted from the repository record.
+- No-change save PASS: one 22-row `change_set_id` was inserted, the operational current value was re-read successfully, and no empty history card was rendered.
+- Changed save PASS: USD leading was set to 1,350 in Preview only. A second 22-row change set was inserted, re-read succeeded, and the history card showed period, saver, previous value and new value.
+- External revocation PASS: setting the Preview admin row inactive changed the mounted page to read-only within the 30-second recheck window. The history panel disappeared, all 22 inputs were disabled and Save was disabled. Reactivation plus reload restored edit access and history.
+- Logout PASS: detailed history disappeared immediately and Save remained disabled; a new Magic Link login restored the admin view.
+- Pagination/legacy PASS: 21 identified no-change groups with one shared timestamp plus one legacy row were seeded in Preview. Page 1 retained `이전 이력 더 보기` after filtering no-change groups; page 2 showed the legacy badge and the original admin change without omission; the terminal page removed the button.
+- Cleanup PASS: exactly 507 identified test history rows and 22 current rows were removed. A separate verification query reported zero remaining rows for `2026-09`; the configured Preview admin row remains active. The mounted page returned to `기록 없음` with an empty history list.
+- Browser console warning/error review from the earlier exact preview smoke remained zero. GitHub Actions run `34598442999` had already passed both `verify` and `database` jobs for this head.
+- After recording this evidence, local `npm run check` on Node.js 20.19.0 passed typecheck, ESLint, all 31 Vitest tests and the production build. The existing bundle-size warning remains non-blocking.
+- Current Preview advisors: database/RLS findings requiring a code change were not reported. Auth configuration reports two warnings (leaked-password protection disabled and insufficient MFA options); the app uses Magic Links and this PR does not alter production Auth policy. Performance reports two unused-index INFO items; no index is removed based on a fresh Preview workload.
+
+This completes the mounted admin-history gates listed in PR #9. It does not authorize a production merge, production database change or Auth-setting change; those still require the user's explicit rollout approval.
 
 Non-blocking known warnings: production `xlsx` advisory; full dependency audit reports 17 findings (2 low, 3 moderate, 12 high); bundle chunk exceeds 500 kB. No automatic breaking dependency upgrade was attempted.
 
