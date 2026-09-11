@@ -346,6 +346,29 @@ function renderMarketContext(marketContext) {
   `
 }
 
+function renderFxReport(fxReport) {
+  const content = fxReport?.content
+  if (!content || !Array.isArray(content.executiveSummary)) {
+    return ''
+  }
+  const mode = fxReport.generationMode === 'ai_enhanced' ? 'AI-enhanced' : 'Automated analysis'
+  const summaries = content.executiveSummary.slice(0, 3)
+  const plan = Array.isArray(content.planObservations) ? content.planObservations[0]?.text : null
+  return `
+    <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 18px;border:1px solid #c7d7f5;border-left:4px solid #2563eb;background:#f7faff;border-radius:6px;">
+      <tr><td style="padding:13px 15px;">
+        <div style="margin:0 0 5px;color:#175cd3;font-size:11px;font-weight:bold;">LATAM FX 2.0 · ${escapeHtml(mode)} · ${escapeHtml(fxReport.baseDate ?? '')}</div>
+        <h3 style="margin:0 0 8px;font-size:15px;color:#111827;">${escapeHtml(content.headline ?? 'FX movement report')}</h3>
+        <ul style="margin:0 0 9px;padding-left:18px;color:#344054;font-size:13px;line-height:1.5;">
+          ${summaries.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}
+        </ul>
+        ${plan ? `<p style="margin:0;padding-top:8px;border-top:1px solid #d7e2f5;color:#344054;font-size:12px;line-height:1.45;"><strong>Plan watch:</strong> ${escapeHtml(plan)}</p>` : ''}
+        <p style="margin:8px 0 0;"><a href="${DASHBOARD_URL}#report" style="color:#175cd3;font-size:12px;font-weight:bold;">View detailed report</a></p>
+      </td></tr>
+    </table>
+  `
+}
+
 function renderUsdKrwAnchor(anchor) {
   const momText =
     typeof anchor.mom === 'number' ? `${anchor.mom >= 0 ? '+' : ''}${anchor.mom.toFixed(2)}% MoM` : 'MoM -'
@@ -525,6 +548,7 @@ function renderTagRuleFootnote() {
 export function composeEmailBody({
   dataset,
   marketContext,
+  fxReport = null,
   businessPlan = null,
   chartSrc = 'cid:fx-chart-image',
   includePreviewChrome = false,
@@ -559,6 +583,7 @@ export function composeEmailBody({
                   Source: ExchangeRate API, Alpha Vantage, adjusted data
                 </p>
                 ${renderCta('0 0 16px')}
+                ${renderFxReport(fxReport)}
                 ${renderMarketContext(marketContext)}
                 ${renderUsdKrwAnchor(getUsdKrwAnchor(dataset))}
                 ${renderTodayFocus(currencyDetails)}

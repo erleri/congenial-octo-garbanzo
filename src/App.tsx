@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { buildInfo } from './buildInfo'
 import Dashboard from './components/Dashboard'
+import FxReportSummary from './components/FxReportSummary'
 import { useExchangeData } from './hooks/useExchangeData'
 import {
   buildPeriodOptions,
@@ -18,11 +19,13 @@ const Admin = lazy(() => import('./components/Admin'))
 const CurrencyDetail = lazy(() => import('./components/CurrencyDetail'))
 const MonthlySummary = lazy(() => import('./components/MonthlySummary'))
 const MovingComparison = lazy(() => import('./components/MovingComparison'))
+const FxReports = lazy(() => import('./components/FxReports'))
 
-type ScreenKey = 'dashboard' | 'monthly' | 'currency' | 'moving' | 'admin'
+type ScreenKey = 'dashboard' | 'reports' | 'monthly' | 'currency' | 'moving' | 'admin'
 
 const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'dashboard', label: '대시보드' },
+  { key: 'reports', label: '리포트' },
   { key: 'monthly', label: '월별 이력' },
   { key: 'currency', label: '일별 추이' },
   { key: 'moving', label: '계획 대비' },
@@ -53,7 +56,7 @@ function formatBuildTime(value: string): string {
 
 function App() {
   const [isMailingDeepLink, setIsMailingDeepLink] = useState(window.location.hash === '#mailing')
-  const [screen, setScreen] = useState<ScreenKey>(isMailingDeepLink ? 'admin' : 'dashboard')
+  const [screen, setScreen] = useState<ScreenKey>(isMailingDeepLink ? 'admin' : window.location.hash === '#report' ? 'reports' : 'dashboard')
   const showHeaderFilters = ['monthly', 'currency'].includes(screen)
   const [monthlyCurrency, setMonthlyCurrency] = useState<DashboardFilters['currency']>('ALL')
   const [periodFrom, setPeriodFrom] = useState('')
@@ -91,6 +94,8 @@ function App() {
       setIsMailingDeepLink(nextIsMailingDeepLink)
       if (nextIsMailingDeepLink) {
         setScreen('admin')
+      } else if (window.location.hash === '#report') {
+        setScreen('reports')
       }
     }
 
@@ -224,7 +229,14 @@ function App() {
 
     switch (screen) {
       case 'dashboard':
-        return <Dashboard data={dataset} filters={filters} businessPlan={businessPlan} />
+        return (
+          <>
+            <FxReportSummary onOpen={() => { setScreen('reports'); window.location.hash = 'report' }} />
+            <Dashboard data={dataset} filters={filters} businessPlan={businessPlan} />
+          </>
+        )
+      case 'reports':
+        return <FxReports />
       case 'monthly':
         return (
           <MonthlySummary
@@ -270,6 +282,10 @@ function App() {
             excelPriority={excelPriority}
             fillMissing={fillMissing}
             initialMailingOpen={isMailingDeepLink}
+            canReviewReports={businessPlanStatus.canEdit}
+            reportAdminStatus={businessPlanStatus}
+            onRequestReportAccess={requestBusinessPlanAccess}
+            onSignOutReportAccess={signOutBusinessPlanAccess}
           />
         )
       default:

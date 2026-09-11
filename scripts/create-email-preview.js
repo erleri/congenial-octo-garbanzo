@@ -5,6 +5,7 @@ import { composeEmailBody, loadJson, wrapPreviewDocument } from './email-templat
 import { loadOperationalFxDataset } from './load-fx-dataset.js'
 
 const MARKET_CONTEXT_PATH = path.resolve('email-market-context.json')
+const FX_REPORT_PATH = path.resolve('fx-report-published.json')
 const CHART_PATH = path.resolve('email-chart.png')
 const PREVIEW_PATH = path.resolve('public/email-preview.html')
 
@@ -14,6 +15,7 @@ if (!dataset?.baseDate) {
 }
 
 const marketContext = loadJson(MARKET_CONTEXT_PATH, null)
+const fxReport = loadJson(FX_REPORT_PATH, null)
 const chartSrc = fs.existsSync(CHART_PATH)
   ? `data:image/png;base64,${fs.readFileSync(CHART_PATH).toString('base64')}`
   : ''
@@ -21,6 +23,7 @@ const businessPlan = await loadBusinessPlanForEmail(dataset)
 const { subject, html } = composeEmailBody({
   dataset,
   marketContext,
+  fxReport,
   businessPlan,
   chartSrc,
   includePreviewChrome: true,

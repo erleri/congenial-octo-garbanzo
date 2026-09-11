@@ -56,6 +56,16 @@ This checklist tracks the remaining production setup needed for business plan ra
 
 - [ ] Confirm the dashboard header stays factual and shows only the base date and active averaging period.
 - [ ] Confirm the generated email still uses the latest no-cost market context and chart notes after the next scheduled GitHub Actions run.
+
+## LATAM FX 2.0 Report Pilot
+
+- [ ] Apply `20260911143920_fx_report_storage.sql` to the separately approved database environment.
+- [ ] Add `OPENROUTER_API_KEY` as a GitHub Actions secret only.
+- [ ] Set the four `FX_REPORT_*` repository variables to the review-mode defaults documented in `docs/2x-rollout.md`.
+- [ ] Run the daily workflow manually and confirm the existing 1.x email still arrives.
+- [ ] Confirm an active admin can approve or reject a draft and a non-admin cannot read draft data.
+- [ ] Record ten consecutive trading-day outcomes without confidential data.
+- [ ] Request separate approval before changing publication mode to `automatic`.
 # Supabase 환율 데이터 병행 이전
 
 - [x] 운영 코드 기준 태그 `pre-supabase-fx-migration` 생성

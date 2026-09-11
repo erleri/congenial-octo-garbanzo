@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import DatasetSourceBadge from './DatasetSourceBadge'
+import FxReportAdmin from './FxReportAdmin'
 import { fetchRawSheetsDataset } from '../lib'
 import {
   DATASET_SOURCE_LABELS,
   type DatasetSource,
   type ExchangeRateDataset,
   type RawSheet,
+  type BusinessPlanStatus,
 } from '../types/exchangeRate'
 
 interface ActionNotice {
@@ -24,6 +26,10 @@ interface AdminProps {
   excelPriority: boolean
   fillMissing: boolean
   initialMailingOpen?: boolean
+  canReviewReports?: boolean
+  reportAdminStatus?: BusinessPlanStatus
+  onRequestReportAccess?: (email: string) => Promise<void>
+  onSignOutReportAccess?: () => Promise<void>
 }
 
 interface InlineNotice {
@@ -71,6 +77,10 @@ function Admin({
   excelPriority,
   fillMissing,
   initialMailingOpen = false,
+  canReviewReports = false,
+  reportAdminStatus,
+  onRequestReportAccess,
+  onSignOutReportAccess,
 }: AdminProps) {
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
@@ -82,6 +92,8 @@ function Admin({
   const [mailingList, setMailingList] = useState<string[]>([])
   const [newEmail, setNewEmail] = useState('')
   const [mailingNotice, setMailingNotice] = useState<InlineNotice | null>(null)
+  const [reportLoginEmail, setReportLoginEmail] = useState('')
+  const [reportLoginNotice, setReportLoginNotice] = useState<string | null>(null)
 
   const isLocalDev = useMemo(() => {
     const host = window.location.hostname
@@ -327,6 +339,29 @@ function Admin({
           <p className="table-help">원본 시트 데이터를 아직 불러오지 못했습니다.</p>
         ) : null}
       </div>
+
+      <div className="plan-auth-panel" style={{ marginTop: 12 }}>
+        <div className="panel-header-inline">
+          <div><strong>2.0 리포트 관리자 인증</strong><p className="table-help">계획환율과 동일한 active admin 권한을 사용합니다.</p></div>
+          {reportAdminStatus?.isAuthenticated ? <button type="button" className="quiet-button" onClick={() => void onSignOutReportAccess?.()}>로그아웃</button> : null}
+        </div>
+        <div className="plan-auth-grid">
+          <span>로그인</span><strong>{reportAdminStatus?.userEmail ?? '필요'}</strong>
+          <span>검토 권한</span><strong>{canReviewReports ? '허용' : '없음'}</strong>
+        </div>
+        {!reportAdminStatus?.isAuthenticated ? (
+          <div className="inline-controls plan-login-row">
+            <input type="email" value={reportLoginEmail} onChange={(event) => setReportLoginEmail(event.target.value)} placeholder="admin@example.com" aria-label="리포트 관리자 이메일" />
+            <button type="button" className="quiet-button" disabled={!reportLoginEmail.trim()} onClick={async () => {
+              try { await onRequestReportAccess?.(reportLoginEmail.trim()); setReportLoginNotice('로그인 링크를 이메일로 보냈습니다.') }
+              catch (loginError) { setReportLoginNotice(loginError instanceof Error ? loginError.message : '로그인 링크 전송에 실패했습니다.') }
+            }}>로그인 링크 받기</button>
+          </div>
+        ) : null}
+        {reportLoginNotice ? <p className="inline-notice info-notice">{reportLoginNotice}</p> : null}
+      </div>
+
+      <FxReportAdmin key={canReviewReports ? 'report-admin-active' : 'report-admin-locked'} canReview={canReviewReports} />
 
       <div className="table-card" style={{ marginTop: 12 }}>
         <h3>데이터 상태</h3>

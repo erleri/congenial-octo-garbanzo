@@ -12,6 +12,8 @@
 - 일별 추이: 선택 통화의 일별 환율 차트와 일별 표
 - 계획 대비: 월별 선행 환율/이동 환율과 실제 환율 비교
 - 관리: 데이터 상태 확인, Excel 업로드, CSV 내보내기, 메일링 리스트 관리
+- 리포트: 주요 6개 통화와 USD/KRW의 결정론적 변동 분석, 선택적 무료 AI 보강, 최근 30개 공개 이력
+- 리포트 검토: active admin 전용 승인·반려와 비공개 실행·검증 기록
 
 ## 운영 구조
 
@@ -24,6 +26,8 @@ Supabase 병행 이전을 지원하며 안정화 전까지 기존 JSON 경로도
 4. Netlify가 main 변경을 감지해 자동 배포합니다.
 5. 대시보드 메일링 워크플로는 배포용 화면을 캡처해 수신자에게 발송합니다.
 6. 계획 환율은 Supabase에 월별 운영 데이터로 저장합니다.
+7. 2.0 리포트는 GitHub Actions에서 자동 분석을 먼저 만들고, OpenRouter 무료 모델이 성공하면 검증된 문장만 선택적으로 사용합니다.
+8. 리포트 생성이나 AI 호출 실패는 기존 데이터 갱신·메일·배포를 중단하지 않습니다.
 
 ### 환율 데이터 소스 전환
 
@@ -90,6 +94,7 @@ VITE_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY
 VITE_FX_DATA_SOURCE
 SUPABASE_SERVICE_ROLE_KEY
+OPENROUTER_API_KEY
 SMTP_USERNAME
 SMTP_PASSWORD
 ```
@@ -98,6 +103,18 @@ SMTP_PASSWORD
 
 `SUPABASE_SERVICE_ROLE_KEY`는 GitHub Actions 동기화에서만 사용하며 Netlify 또는
 `VITE_` 환경변수로 노출하면 안 됩니다.
+
+`OPENROUTER_API_KEY`도 GitHub Actions Secret에만 저장합니다. 무료 AI가 실패하거나
+사용 불가능해지면 추가 과금 없이 결정론적 자동 분석을 사용합니다.
+
+GitHub repository variables의 초기값은 다음과 같습니다.
+
+```text
+FX_REPORT_ENABLED=true
+FX_REPORT_PUBLISH_MODE=review
+FX_REPORT_AI_MODE=optional
+FX_REPORT_AI_MODEL=openrouter/free
+```
 
 ## Supabase 환율 데이터
 
@@ -125,11 +142,24 @@ SMTP_PASSWORD
 
 상세 체크리스트는 `OPERATIONS_TODO.md`를 참고합니다.
 
+## LATAM FX 2.0 리포트
+
+1. `supabase/migrations/20260911143920_fx_report_storage.sql`을 테스트 DB에서 먼저 적용합니다.
+2. `npm run generate:report`로 AI 없이도 완성되는 `fx-report-run.json`을 확인합니다.
+3. GitHub Secret에 `OPENROUTER_API_KEY`를 추가합니다. 키가 없어도 자동 분석은 정상 동작합니다.
+4. 파일럿은 `FX_REPORT_PUBLISH_MODE=review`로 유지합니다.
+5. active admin이 관리 화면에서 초안을 승인하면 공개 리포트와 최근 30개 이력에 나타납니다.
+6. 10영업일 합격 후 별도 승인으로만 `automatic`으로 전환합니다.
+
+상세 적용·복구 절차는 `docs/2x-rollout.md`에 기록합니다.
+
 ## 검증 명령
 
 ```bash
 npx.cmd tsc -b --noEmit
 npm.cmd run lint
+npm.cmd run test
+npm.cmd run build
 ```
 
 참고: 이 로컬 Windows 환경에서는 Vite/Rolldown의 `spawn EPERM` 또는 명확한 에러 없는 build 실패가 발생한 이력이 있습니다. 운영 빌드는 Netlify/GitHub Actions 결과를 함께 확인합니다.
