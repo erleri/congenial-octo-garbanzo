@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 
-const DATA_PATH = path.resolve('public/data.json')
+const DATA_PATH = path.resolve('data/fx-full-history.json')
 
 function normalizeDaily(row) {
   const date = String(row.date ?? row.rate_date)
@@ -90,7 +90,7 @@ export async function loadOperationalFxDataset() {
         throw error
       }
       console.warn(
-        `Supabase FX data is unavailable; using public/data.json. ${
+        `Supabase FX data is unavailable; using data/fx-full-history.json. ${
           error instanceof Error ? error.message : String(error)
         }`,
       )

@@ -3,7 +3,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createClient } from '@supabase/supabase-js'
 
-const dataset = JSON.parse(fs.readFileSync(path.resolve('public/data.json'), 'utf8'))
+const dataset = JSON.parse(fs.readFileSync(path.resolve('data/fx-full-history.json'), 'utf8'))
 
 function requiredEnv(name) {
   const value = process.env[name]?.trim()

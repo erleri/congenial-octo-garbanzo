@@ -67,7 +67,7 @@ jobs:
             fetchedAt,
             dailyRows: (.dailyRates | length),
             monthlyRows: (.monthlyRates | length)
-          }' public/data.json
+          }' data/fx-full-history.json
 
       - name: Upload full exchange-rate history
         env:
@@ -89,9 +89,9 @@ jobs:
           {
             echo "## Supabase initial load completed"
             echo
-            echo "- Source: \`public/data.json\`"
-            echo "- Base date: \`$(jq -r '.baseDate' public/data.json)\`"
-            echo "- Daily rows: \`$(jq -r '.dailyRates | length' public/data.json)\`"
-            echo "- Monthly rows: \`$(jq -r '.monthlyRates | length' public/data.json)\`"
+            echo "- Source: \`data/fx-full-history.json\`"
+            echo "- Base date: \`$(jq -r '.baseDate' data/fx-full-history.json)\`"
+            echo "- Daily rows: \`$(jq -r '.dailyRates | length' data/fx-full-history.json)\`"
+            echo "- Monthly rows: \`$(jq -r '.monthlyRates | length' data/fx-full-history.json)\`"
             echo "- Verification: passed"
           } >> "$GITHUB_STEP_SUMMARY"

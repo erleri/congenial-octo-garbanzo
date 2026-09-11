@@ -39,7 +39,7 @@ jobs:
           VITE_EXCHANGERATE_API_KEY: ${{ secrets.VITE_EXCHANGERATE_API_KEY }}
           VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
 
-      - name: Generate public/data.json
+      - name: Generate full and fallback datasets
         run: npm run generate:data
         env:
           VITE_EXCHANGERATE_API_KEY: ${{ secrets.VITE_EXCHANGERATE_API_KEY }}
@@ -88,12 +88,12 @@ jobs:
 
       - name: Commit updated dataset
         run: |
-          if git diff --quiet -- public/data.json data/alpha-vantage-history.json; then
+          if git diff --quiet -- public/data.json data/fx-full-history.json data/alpha-vantage-history.json; then
             echo "No dataset changes"
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add public/data.json data/alpha-vantage-history.json
+            git add public/data.json data/fx-full-history.json data/alpha-vantage-history.json
             git commit -m "chore: refresh static exchange data"
             git push
           fi

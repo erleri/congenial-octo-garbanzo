@@ -31,6 +31,20 @@ type InitialSupabaseDataset = {
   stale: boolean
 }
 
+export type InitialExchangeDatasetResult = {
+  dataset: ExchangeRateDataset
+  source: 'supabase' | 'static'
+  metadata: FxDatasetMetadata | null
+  stale: boolean
+}
+
+type InitialDatasetLoaders = {
+  mode: FxDataSourceMode
+  supabaseConfigured: boolean
+  loadSupabase: () => Promise<InitialSupabaseDataset>
+  loadStatic: () => Promise<ExchangeRateDataset | null>
+}
+
 const pendingDailyRequests = new Map<string, Promise<DailyRate[]>>()
 const dailyMemoryCache = new Map<string, DailyRate[]>()
 let initialSupabaseDatasetPromise: Promise<InitialSupabaseDataset> | null = null
@@ -163,7 +177,8 @@ async function performSupabaseInitialLoad(): Promise<InitialSupabaseDataset> {
         return {
           dataset: {
             ...staticDataset,
-            monthlyRates: cachedMonthly,
+            monthlyRates: staticDataset.coverage?.dataVersion === cachedMetadata.dataVersion
+              ? cachedMonthly : staticDataset.monthlyRates,
           },
           metadata: cachedMetadata,
           stale: true,
@@ -258,20 +273,23 @@ export async function loadDailyYears(
   return chunks.flat()
 }
 
-export async function loadInitialExchangeDataset(): Promise<{
-  dataset: ExchangeRateDataset
-  source: 'supabase' | 'static'
-  metadata: FxDatasetMetadata | null
-  stale: boolean
-}> {
-  const mode = getFxDataSourceMode()
-  if (mode === 'supabase' && !isSupabaseConfigured) {
+export async function selectInitialExchangeDataset({
+  mode,
+  supabaseConfigured,
+  loadSupabase,
+  loadStatic,
+}: InitialDatasetLoaders): Promise<InitialExchangeDatasetResult> {
+  if (mode === 'supabase' && !supabaseConfigured) {
     throw new Error('VITE_FX_DATA_SOURCE=supabase이지만 Supabase 연결 정보가 없습니다.')
   }
-  if (mode !== 'json' && isSupabaseConfigured) {
+
+  if (mode !== 'json' && supabaseConfigured) {
     try {
-      const result = await loadSupabaseInitialDataset()
-      return { ...result, source: 'supabase' }
+      const result = await loadSupabase()
+      if (mode === 'supabase' && result.stale) {
+        throw new Error('Supabase 연결을 확인하지 못했습니다.')
+      }
+      return { ...result, source: result.stale ? 'static' : 'supabase' }
     } catch (error) {
       if (mode === 'supabase') {
         throw error
@@ -279,9 +297,19 @@ export async function loadInitialExchangeDataset(): Promise<{
     }
   }
 
-  const dataset = await fetchStaticDataset()
+  const dataset = await loadStatic()
   if (!dataset) {
     throw new Error('정적 환율 데이터를 불러오지 못했습니다.')
   }
-  return { dataset, source: 'static', metadata: null, stale: false }
+
+  return { dataset, source: 'static', metadata: null, stale: mode === 'auto' && supabaseConfigured }
+}
+
+export function loadInitialExchangeDataset(): Promise<InitialExchangeDatasetResult> {
+  return selectInitialExchangeDataset({
+    mode: getFxDataSourceMode(),
+    supabaseConfigured: isSupabaseConfigured,
+    loadSupabase: loadSupabaseInitialDataset,
+    loadStatic: fetchStaticDataset,
+  })
 }

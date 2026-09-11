@@ -5,6 +5,7 @@ import {
   fetchAlphaVantageFXDaily,
 } from '../src/lib/api.ts'
 import { fetchRemoteExchangeData } from '../src/lib/merger.ts'
+import { FULL_DATASET_PATH, STATIC_FALLBACK_PATH, writeDatasetFiles } from './dataset-files.ts'
 
 type RepoSupplementalCache = {
   fetchedAt: string
@@ -37,7 +38,6 @@ async function loadRepoBackfillCache(cachePath: string): Promise<RepoBackfillCac
 }
 
 async function main() {
-  const outputPath = resolve(process.cwd(), 'public', 'data.json')
   const rawSheetsOutputPath = resolve(process.cwd(), 'public', 'raw-sheets.json')
   const supplementalOutputPath = resolve(process.cwd(), 'public', 'alpha-vantage-history.json')
   const supplementalCachePath = resolve(process.cwd(), 'data', 'alpha-vantage-history.json')
@@ -68,12 +68,11 @@ async function main() {
   const coreDataset = { ...dataset }
   delete coreDataset.rawSheets
 
-  await mkdir(dirname(outputPath), { recursive: true })
   await mkdir(dirname(rawSheetsOutputPath), { recursive: true })
   await mkdir(dirname(supplementalOutputPath), { recursive: true })
   await mkdir(dirname(supplementalCachePath), { recursive: true })
   await mkdir(dirname(rawSheetsRepoPath), { recursive: true })
-  await writeFile(outputPath, `${JSON.stringify(coreDataset, null, 2)}\n`, 'utf8')
+  const { fullDataset, staticFallback } = await writeDatasetFiles(coreDataset)
   await writeFile(
     rawSheetsOutputPath,
     `${JSON.stringify({ rawSheets }, null, 2)}\n`,
@@ -95,13 +94,16 @@ async function main() {
     'utf8',
   )
 
-  console.log(`Generated ${outputPath}`)
+  console.log(`Generated ${FULL_DATASET_PATH}`)
+  console.log(`Generated ${STATIC_FALLBACK_PATH}`)
+  console.log(`Full daily rows: ${fullDataset.dailyRates.length}`)
+  console.log(`Fallback daily rows: ${staticFallback.dailyRates.length}`)
   console.log(`Generated ${rawSheetsOutputPath}`)
   console.log(`Generated ${supplementalOutputPath}`)
   console.log(`Updated ${rawSheetsRepoPath}`)
   console.log(`Updated ${supplementalCachePath}`)
-  console.log(`Base date: ${coreDataset.baseDate}`)
-  console.log(`Fetched at: ${coreDataset.fetchedAt}`)
+  console.log(`Base date: ${fullDataset.baseDate}`)
+  console.log(`Fetched at: ${fullDataset.fetchedAt}`)
 
   if (repoBackfillCache?.ratesByDate) {
     const targetCurrencies = ['GTQ', 'PYG', 'UYU']

@@ -3,7 +3,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
 
-const DATA_PATH = path.resolve('public/data.json')
+const DATA_PATH = path.resolve('data/fx-full-history.json')
 const BATCH_SIZE = 500
 
 function requiredEnv(name) {
@@ -49,7 +49,7 @@ async function main() {
       },
     },
   )
-  const dataVersion = crypto.createHash('sha256').update(raw).digest('hex')
+  const dataVersion = dataset.coverage?.dataVersion || crypto.createHash('sha256').update(raw).digest('hex')
   const now = new Date().toISOString()
   const { data: previousState } = await supabase
     .from('fx_dataset_state')
