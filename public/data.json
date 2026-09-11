@@ -1,6 +1,6 @@
 {
   "baseDate": "2026-09-11",
-  "fetchedAt": "2026-09-11T10:31:16.328Z",
+  "fetchedAt": "2026-09-11T11:52:38.430Z",
   "dailyRates": [
     {
       "currency": "ARS",
@@ -151195,6 +151195,6 @@
     "monthlyFrom": "2010-01-01",
     "monthlyTo": "2026-12-01",
     "limitedDailyHistory": true,
-    "dataVersion": "1b99c4118ad5a5cb4e897a32d41a0f6cb9d52efddf63627d798b107244070479"
+    "dataVersion": "e54d76620d1d9e2a8db4bae840d979c7cdaa6f3aea17bbeb31a2071f7bbe49f2"
   }
 }
