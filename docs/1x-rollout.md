@@ -65,6 +65,20 @@ Target: draft PR #9 head `aa31b6b1e57343c1d6d0400ebba05f8567be2c64`, Supabase Pr
 
 This completes the mounted admin-history gates listed in PR #9. It does not authorize a production merge, production database change or Auth-setting change; those still require the user's explicit rollout approval.
 
+## Production DB additive checkpoint — 2026-09-11
+
+The user explicitly approved the additive production checkpoint. The access-closure SQL remained excluded.
+
+- Preflight: the history RPC was absent; `business_plan_rates` had 154 rows, `business_plan_current` had 88 rows, both tables had RLS enabled, and two active admin rows existed.
+- Applied `admin_history_pagination` as production migration `20260911131646`. Verification: the RPC exists as security invoker, anon has no execute privilege, authenticated has execute privilege, and data row counts did not change.
+- Applied `optimize_business_plan_rls` as production migration `20260911131718`. Verification: the admin lookup and both affected policies use statement-scoped claim/function evaluation; history/current/admin counts remained 154/88/2.
+- Repository migration filenames were aligned to the versions assigned by the production migration service. Line-by-line comparison confirmed that SQL contents did not change.
+- Role verification PASS without business-data writes: anon could read 88 current rows but could not execute history RPC; a simulated authenticated non-admin received zero history rows; a simulated active admin received one 22-row change group; service role retained visibility of 154 history rows and insert privilege.
+- Production advisors after the migration: performance findings 0. Security reported the existing Auth warning for leaked-password protection being disabled; the 1.x administrator flow uses Magic Links and no production Auth setting was changed in this checkpoint.
+- The raw history table's existing public read contract is intentionally unchanged. It must be closed only through the separately reviewed checkpoint after production frontend and email current-value readers are reconfirmed.
+
+This database checkpoint does not by itself deploy the PR #9 frontend. The renamed migration files must pass clean CI before merge.
+
 Non-blocking known warnings: production `xlsx` advisory; full dependency audit reports 17 findings (2 low, 3 moderate, 12 high); bundle chunk exceeds 500 kB. No automatic breaking dependency upgrade was attempted.
 
 ## Preserved data audit
