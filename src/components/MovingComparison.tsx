@@ -4,6 +4,8 @@ import { buildMovingComparisonRows } from '../lib/moving'
 import { CURRENCIES } from '../types/exchangeRate'
 import type {
   BusinessPlan,
+  BusinessPlanHistoryEntry,
+  BusinessPlanHistoryStatus,
   BusinessPlanStatus,
   CurrencyCode,
   ExchangeRateDataset,
@@ -13,10 +15,13 @@ import type {
 interface MovingComparisonProps {
   data: ExchangeRateDataset
   businessPlan: BusinessPlan
+  businessPlanHistory: BusinessPlanHistoryEntry[]
+  businessPlanHistoryStatus: BusinessPlanHistoryStatus
   onUpdatePlan: (plan: BusinessPlan) => Promise<{ type: 'success' | 'warning'; text: string }>
   businessPlanStatus: BusinessPlanStatus
   onRequestPlanAccess: (email: string) => Promise<void>
   onSignOutPlanAccess: () => Promise<void>
+  onLoadMorePlanHistory: () => Promise<void>
 }
 
 const COLUMNS: Array<{ key: MovingColumn; label: string }> = [
@@ -136,10 +141,13 @@ function getPlanStatusSummary(status: BusinessPlanStatus): string {
 function MovingComparison({
   data,
   businessPlan,
+  businessPlanHistory,
+  businessPlanHistoryStatus,
   onUpdatePlan,
   businessPlanStatus,
   onRequestPlanAccess,
   onSignOutPlanAccess,
+  onLoadMorePlanHistory,
 }: MovingComparisonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [tempPlan, setTempPlan] = useState<BusinessPlan>(businessPlan)
@@ -320,6 +328,77 @@ function MovingComparison({
           <p>운영 데이터가 아닐 때는 보고용 참고값으로만 사용하세요.</p>
         </div>
       </div>
+
+      {businessPlanStatus.canEdit ? (
+        <section className="table-card" style={{ marginBottom: 12 }}>
+          <div className="panel-header-inline">
+            <div>
+              <h3>계획 환율 변경 이력</h3>
+              <p className="table-help">관리자에게만 저장자와 상세 변경값을 표시합니다.</p>
+            </div>
+            {businessPlanHistoryStatus.loading ? <span className="scope-badge">불러오는 중</span> : null}
+          </div>
+
+          {businessPlanHistoryStatus.error ? (
+            <p className="inline-notice error-notice">{businessPlanHistoryStatus.error}</p>
+          ) : null}
+
+          {!businessPlanHistoryStatus.loading && businessPlanHistoryStatus.loaded && businessPlanHistory.length === 0 ? (
+            <p className="table-help">표시할 변경 이력이 없거나 아직 이력 migration이 적용되지 않았습니다.</p>
+          ) : null}
+
+          {businessPlanHistory.map((entry) => (
+            <div key={entry.changeSetId} className="scope-card" style={{ marginTop: 10 }}>
+              <div className="panel-header-inline">
+                <div>
+                  <strong>{formatStatusDateTime(entry.createdAt)}</strong>
+                  <p className="table-help" style={{ margin: '4px 0 0' }}>
+                    {entry.createdBy ?? '저장자 정보 없음'} · {entry.periodMonth.slice(0, 7)}
+                  </p>
+                </div>
+                {entry.legacy ? <span className="scope-badge scope-badge-readonly">기존 이력</span> : null}
+              </div>
+              <div className="table-scroll" style={{ marginTop: 8 }}>
+                <table className="dense-table">
+                  <thead>
+                    <tr>
+                      <th>통화</th>
+                      <th>유형</th>
+                      <th>이전값</th>
+                      <th>신규값</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {entry.changes.map((change) => {
+                      const formatCurrency = change.currency === 'USD' ? 'KRW' : change.currency
+                      return (
+                        <tr key={`${entry.changeSetId}-${change.planType}-${change.currency}`}>
+                          <td>{change.currency === 'USD' ? 'USD (KRW)' : change.currency}</td>
+                          <td>{change.planType === 'leading' ? '선행' : '이동'}</td>
+                          <td>{formatCellValue(change.previousValue, change.previousValue === null ? 'empty' : 'ok', formatCurrency)}</td>
+                          <td>{formatCellValue(change.nextValue, change.nextValue === null ? 'empty' : 'ok', formatCurrency)}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+
+          {businessPlanHistoryStatus.hasMore ? (
+            <button
+              type="button"
+              className="quiet-button"
+              style={{ marginTop: 12 }}
+              disabled={businessPlanHistoryStatus.loading}
+              onClick={() => void onLoadMorePlanHistory()}
+            >
+              이전 이력 더 보기
+            </button>
+          ) : null}
+        </section>
+      ) : null}
 
       <div className="plan-auth-panel" style={{ marginBottom: 12 }}>
         <div className="plan-auth-grid">

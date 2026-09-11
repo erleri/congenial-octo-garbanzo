@@ -17,6 +17,7 @@ import {
   getBusinessPlanPeriodMonth,
   loadBusinessPlanAdminAccess,
   loadBusinessPlanFromSupabase,
+  loadBusinessPlanHistoryFromSupabase,
   requestBusinessPlanLogin,
   saveBusinessPlanToSupabase,
   signOutBusinessPlanUser,
@@ -26,6 +27,8 @@ import { validateExcelUpload } from '../lib/uploadValidation'
 import { dailyCoverageNotice } from '../lib/dailyCoverage'
 import type {
   BusinessPlan,
+  BusinessPlanHistoryEntry,
+  BusinessPlanHistoryStatus,
   BusinessPlanStatus,
   DashboardFilters,
   DatasetSource,
@@ -34,6 +37,10 @@ import type {
 } from '../types/exchangeRate'
 
 const INITIAL_BUSINESS_PLAN: BusinessPlan = { leading: {}, moving: {} }
+const EMPTY_HISTORY: BusinessPlanHistoryStatus = {
+  loading: false, loaded: false, hasMore: false, nextCursor: null, error: null,
+}
+const ADMIN_ACCESS_RECHECK_MS = 30_000
 const INITIAL_BUSINESS_PLAN_STATUS: BusinessPlanStatus = {
   configured: canUseRemoteBusinessPlan(),
   loading: false,
@@ -92,6 +99,43 @@ export function useExchangeData() {
   const [businessPlanStatus, setBusinessPlanStatus] =
     useState<BusinessPlanStatus>(INITIAL_BUSINESS_PLAN_STATUS)
   const [businessPlanUserEmail, setBusinessPlanUserEmail] = useState<string | null>(null)
+  const planEpoch = useRef(0)
+  const [authRevision, setAuthRevision] = useState(0)
+  const [businessPlanHistory, setBusinessPlanHistory] = useState<BusinessPlanHistoryEntry[]>([])
+  const [businessPlanHistoryStatus, setBusinessPlanHistoryStatus] = useState(EMPTY_HISTORY)
+
+  const clearPlanAccess = useCallback(() => {
+    planEpoch.current += 1
+    setBusinessPlanHistory([])
+    setBusinessPlanHistoryStatus(EMPTY_HISTORY)
+    setBusinessPlanStatus((prev) => ({ ...prev, canEdit: false, saving: false, lastUpdatedBy: null }))
+  }, [])
+
+  const loadHistory = async (periodMonth: string, epoch: number, before: string | null = null) => {
+    setBusinessPlanHistoryStatus((prev) => ({ ...prev, loading: true, error: null }))
+    try {
+      // Re-check active membership on every page, not just initial login.
+      if (!await loadBusinessPlanAdminAccess(businessPlanUserEmail)) {
+        if (epoch === planEpoch.current) clearPlanAccess()
+        return
+      }
+      const page = await loadBusinessPlanHistoryFromSupabase(periodMonth, before)
+      if (epoch !== planEpoch.current) return
+      setBusinessPlanHistory((prev) => before
+        ? [...new Map([...prev, ...page.entries].map((entry) => [entry.changeSetId, entry])).values()]
+        : page.entries)
+      setBusinessPlanHistoryStatus({ ...page, loaded: true, loading: false, error: null })
+    } catch (historyError) {
+      if (epoch !== planEpoch.current) return
+      setBusinessPlanHistory([])
+      setBusinessPlanHistoryStatus({ ...EMPTY_HISTORY, error: historyError instanceof Error ? historyError.message : '변경 이력을 불러오지 못했습니다.' })
+    }
+  }
+
+  const loadMoreBusinessPlanHistory = async () => {
+    if (!businessPlanStatus.canEdit || businessPlanHistoryStatus.loading || !businessPlanHistoryStatus.hasMore || !businessPlanStatus.periodMonth) return
+    await loadHistory(businessPlanStatus.periodMonth, planEpoch.current, businessPlanHistoryStatus.nextCursor)
+  }
   const [fxMetadata, setFxMetadata] = useState<FxDatasetMetadata | null>(null)
   const [dailyRangeLoading, setDailyRangeLoading] = useState(false)
   const [dailyRangeNotice, setDailyRangeNotice] = useState<string | null>(null)
@@ -270,6 +314,8 @@ export function useExchangeData() {
     data: ExchangeRateDataset,
     userEmail: string | null,
   ) => {
+    clearPlanAccess()
+    const epoch = planEpoch.current
     const periodMonth = getBusinessPlanPeriodMonth(data.baseDate)
 
     if (!canUseRemoteBusinessPlan()) {
@@ -314,8 +360,10 @@ export function useExchangeData() {
         adminAccessStatus = 'failed'
       }
 
+      if (epoch !== planEpoch.current) return
       setBusinessPlan(remotePlan.plan)
       await saveBusinessPlanToCache(remotePlan.plan)
+      if (epoch !== planEpoch.current) return
       setBusinessPlanStatus((prev) => ({
         ...prev,
         loading: false,
@@ -330,8 +378,10 @@ export function useExchangeData() {
         lastSaveMessage: null,
         error: null,
       }))
+      if (canEdit) void loadHistory(periodMonth, epoch)
     } catch (remoteError) {
       const cachedPlan = await loadBusinessPlanFromCache()
+      if (epoch !== planEpoch.current) return
       if (cachedPlan) {
         setBusinessPlan(cachedPlan)
       }
@@ -353,6 +403,7 @@ export function useExchangeData() {
   }
 
   const updateBusinessPlan = async (newPlan: BusinessPlan) => {
+    const epoch = planEpoch.current
     if (!dataset) {
       throw new Error('Exchange data is not loaded yet.')
     }
@@ -375,8 +426,10 @@ export function useExchangeData() {
         newPlan,
         businessPlanUserEmail,
       )
+      if (epoch !== planEpoch.current) throw new Error('로그인 상태가 변경되었습니다. 운영 값을 다시 확인해 주세요.')
       setBusinessPlan(saved.plan)
       await saveBusinessPlanToCache(saved.plan)
+      if (epoch !== planEpoch.current) throw new Error('로그인 상태가 변경되었습니다.')
       setBusinessPlanStatus((prev) => ({
         ...prev,
         saving: false,
@@ -393,6 +446,7 @@ export function useExchangeData() {
         error: null,
       }))
 
+      void loadHistory(businessPlanStatus.periodMonth, epoch)
       return saved.verificationStatus === 'verified'
         ? {
             type: 'success' as const,
@@ -403,6 +457,7 @@ export function useExchangeData() {
             text: `저장 요청은 완료됐지만 운영 데이터 확인은 실패했습니다.${saved.verificationMessage ? ` (${saved.verificationMessage})` : ''}`,
           }
     } catch (saveError) {
+      if (epoch !== planEpoch.current) throw saveError
       setBusinessPlanStatus((prev) => ({
         ...prev,
         saving: false,
@@ -421,6 +476,7 @@ export function useExchangeData() {
   }
 
   const signOutBusinessPlanAccess = async () => {
+    clearPlanAccess()
     await signOutBusinessPlanUser()
   }
 
@@ -485,8 +541,9 @@ export function useExchangeData() {
 
     let isMounted = true
 
+    const sessionEpoch = planEpoch.current
     void supabase.auth.getSession().then(({ data: sessionData }) => {
-      if (!isMounted) {
+      if (!isMounted || sessionEpoch !== planEpoch.current) {
         return
       }
 
@@ -496,14 +553,25 @@ export function useExchangeData() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      clearPlanAccess()
       setBusinessPlanUserEmail(session?.user.email?.toLowerCase() ?? null)
+      setAuthRevision((revision) => revision + 1)
     })
+
+    // Hide sensitive details while unattended; revalidate membership on return.
+    const onBlur = () => clearPlanAccess()
+    const onFocus = () => setAuthRevision((revision) => revision + 1)
+    window.addEventListener('blur', onBlur)
+    window.addEventListener('focus', onFocus)
 
     return () => {
       isMounted = false
+      planEpoch.current += 1
       subscription.unsubscribe()
+      window.removeEventListener('blur', onBlur)
+      window.removeEventListener('focus', onFocus)
     }
-  }, [])
+  }, [clearPlanAccess])
 
   useEffect(() => {
     if (!dataset) {
@@ -512,7 +580,40 @@ export function useExchangeData() {
 
     void loadRemoteBusinessPlan(dataset, businessPlanUserEmail)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataset?.baseDate, businessPlanUserEmail])
+  }, [dataset?.baseDate, businessPlanUserEmail, authRevision])
+
+  useEffect(() => {
+    if (!businessPlanStatus.canEdit || !businessPlanUserEmail) {
+      return undefined
+    }
+
+    let cancelled = false
+    const recheckAdminAccess = async () => {
+      if (document.visibilityState !== 'visible') {
+        return
+      }
+
+      try {
+        const stillActive = await loadBusinessPlanAdminAccess(businessPlanUserEmail)
+        if (!cancelled && !stillActive) {
+          clearPlanAccess()
+        }
+      } catch {
+        if (!cancelled) {
+          clearPlanAccess()
+        }
+      }
+    }
+
+    const intervalId = window.setInterval(() => {
+      void recheckAdminAccess()
+    }, ADMIN_ACCESS_RECHECK_MS)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(intervalId)
+    }
+  }, [businessPlanStatus.canEdit, businessPlanUserEmail, clearPlanAccess])
 
   return {
     dataset,
@@ -533,6 +634,9 @@ export function useExchangeData() {
     businessPlan,
     updateBusinessPlan,
     businessPlanStatus,
+    businessPlanHistory,
+    businessPlanHistoryStatus,
+    loadMoreBusinessPlanHistory,
     requestBusinessPlanAccess,
     signOutBusinessPlanAccess,
   }
