@@ -85,6 +85,7 @@ export async function loadFxReportRuns(limit = 20): Promise<FxReportRun[]> {
   const { data, error } = await supabase
     .from('fx_report_runs')
     .select('id, base_date, attempt, schema_version, generation_mode, publish_mode, status, evidence, deterministic_content, ai_candidate, selected_content, ai_provider, ai_model, validation, error_message, created_at, published_at')
+    .eq('status', 'pending_review')
     .order('created_at', { ascending: false })
     .limit(limit)
   if (error) {
@@ -100,8 +101,4 @@ export async function reviewFxReport(runId: string, decision: 'approved' | 'reje
     p_run_id: runId, p_decision: decision, p_reason: reason || null,
   })
   if (error) throw error
-}
-
-export function clearFxReportPrivateState(): void {
-  // Private report data lives only in component state; this explicit hook documents the boundary.
 }

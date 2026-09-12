@@ -79,6 +79,12 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           FX_EMAIL_DATA_SOURCE: auto
 
+      - name: Sync FX 2.0 UI feature flag
+        continue-on-error: true
+        run: node scripts/write-fx-report-config.js
+        env:
+          FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED || 'false' }}
+
       - name: Generate optional FX 2.0 report
         continue-on-error: true
         run: npm run generate:report
@@ -116,12 +122,12 @@ jobs:
 
       - name: Commit updated dataset
         run: |
-          if git diff --quiet -- public/data.json data/fx-full-history.json data/alpha-vantage-history.json; then
+          if git diff --quiet -- public/data.json data/fx-full-history.json data/alpha-vantage-history.json src/generated/fxReportConfig.ts; then
             echo "No dataset changes"
           else
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add public/data.json data/fx-full-history.json data/alpha-vantage-history.json
+            git add public/data.json data/fx-full-history.json data/alpha-vantage-history.json src/generated/fxReportConfig.ts
             git commit -m "chore: refresh static exchange data"
             git push
           fi

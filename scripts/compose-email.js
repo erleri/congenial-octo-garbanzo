@@ -5,6 +5,7 @@ import { composeEmailBody, loadJson } from './email-template.js'
 import { loadOperationalFxDataset } from './load-fx-dataset.js'
 
 const MARKET_CONTEXT_PATH = path.resolve('email-market-context.json')
+const FX_REPORT_PATH = path.resolve('fx-report-published.json')
 
 const dataset = await loadOperationalFxDataset()
 if (!dataset?.baseDate) {
@@ -12,8 +13,9 @@ if (!dataset?.baseDate) {
 }
 
 const marketContext = loadJson(MARKET_CONTEXT_PATH, null)
+const fxReport = loadJson(FX_REPORT_PATH, null)
 const businessPlan = await loadBusinessPlanForEmail(dataset)
-const { subject, html } = composeEmailBody({ dataset, marketContext, businessPlan })
+const { subject, html } = composeEmailBody({ dataset, marketContext, businessPlan, fxReport })
 const outputPath = process.env.GITHUB_OUTPUT
 
 if (outputPath) {

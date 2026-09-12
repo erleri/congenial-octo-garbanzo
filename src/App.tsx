@@ -1,6 +1,8 @@
-import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import { buildInfo } from './buildInfo'
 import Dashboard from './components/Dashboard'
+import FxReportSummary from './components/FxReportSummary'
+import { fxReportConfig } from './generated/fxReportConfig'
 import { useExchangeData } from './hooks/useExchangeData'
 import {
   buildPeriodOptions,
@@ -18,11 +20,14 @@ const Admin = lazy(() => import('./components/Admin'))
 const CurrencyDetail = lazy(() => import('./components/CurrencyDetail'))
 const MonthlySummary = lazy(() => import('./components/MonthlySummary'))
 const MovingComparison = lazy(() => import('./components/MovingComparison'))
+const FxReports = lazy(() => import('./components/FxReports'))
+const REPORT_FEATURE_ENABLED = fxReportConfig.enabled
 
-type ScreenKey = 'dashboard' | 'monthly' | 'currency' | 'moving' | 'admin'
+type ScreenKey = 'dashboard' | 'reports' | 'monthly' | 'currency' | 'moving' | 'admin'
 
 const SCREEN_OPTIONS: Array<{ key: ScreenKey; label: string }> = [
   { key: 'dashboard', label: '대시보드' },
+  ...(REPORT_FEATURE_ENABLED ? [{ key: 'reports' as const, label: '리포트' }] : []),
   { key: 'monthly', label: '월별 이력' },
   { key: 'currency', label: '일별 추이' },
   { key: 'moving', label: '계획 대비' },
@@ -53,13 +58,25 @@ function formatBuildTime(value: string): string {
 
 function App() {
   const [isMailingDeepLink, setIsMailingDeepLink] = useState(window.location.hash === '#mailing')
-  const [screen, setScreen] = useState<ScreenKey>(isMailingDeepLink ? 'admin' : 'dashboard')
+  const [screen, setScreen] = useState<ScreenKey>(
+    isMailingDeepLink ? 'admin' : REPORT_FEATURE_ENABLED && window.location.hash === '#report' ? 'reports' : 'dashboard',
+  )
   const showHeaderFilters = ['monthly', 'currency'].includes(screen)
   const [monthlyCurrency, setMonthlyCurrency] = useState<DashboardFilters['currency']>('ALL')
   const [periodFrom, setPeriodFrom] = useState('')
   const [periodTo, setPeriodTo] = useState('')
   const [yearFrom, setYearFrom] = useState<number | null>(null)
   const [yearTo, setYearTo] = useState<number | null>(null)
+
+  const selectScreen = useCallback((nextScreen: ScreenKey) => {
+    const resolvedScreen = nextScreen === 'reports' && !REPORT_FEATURE_ENABLED ? 'dashboard' : nextScreen
+    setScreen(resolvedScreen)
+    if (resolvedScreen === 'reports') {
+      window.location.hash = 'report'
+    } else if (window.location.hash === '#report' || window.location.hash === '#mailing') {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`)
+    }
+  }, [])
 
   const {
     dataset,
@@ -91,6 +108,10 @@ function App() {
       setIsMailingDeepLink(nextIsMailingDeepLink)
       if (nextIsMailingDeepLink) {
         setScreen('admin')
+      } else if (REPORT_FEATURE_ENABLED && window.location.hash === '#report') {
+        setScreen('reports')
+      } else {
+        setScreen('dashboard')
       }
     }
 
@@ -224,7 +245,14 @@ function App() {
 
     switch (screen) {
       case 'dashboard':
-        return <Dashboard data={dataset} filters={filters} businessPlan={businessPlan} />
+        return (
+          <>
+            {REPORT_FEATURE_ENABLED ? <FxReportSummary onOpen={() => selectScreen('reports')} /> : null}
+            <Dashboard data={dataset} filters={filters} businessPlan={businessPlan} />
+          </>
+        )
+      case 'reports':
+        return REPORT_FEATURE_ENABLED ? <FxReports /> : null
       case 'monthly':
         return (
           <MonthlySummary
@@ -270,6 +298,11 @@ function App() {
             excelPriority={excelPriority}
             fillMissing={fillMissing}
             initialMailingOpen={isMailingDeepLink}
+            canReviewReports={businessPlanStatus.canEdit}
+            reportAdminStatus={businessPlanStatus}
+            onRequestReportAccess={requestBusinessPlanAccess}
+            onSignOutReportAccess={signOutBusinessPlanAccess}
+            reportEnabled={REPORT_FEATURE_ENABLED}
           />
         )
       default:
@@ -295,6 +328,7 @@ function App() {
     isMailingDeepLink,
     monthlyCurrency,
     requestBusinessPlanAccess,
+    selectScreen,
     screen,
     signOutBusinessPlanAccess,
     updateBusinessPlan,
@@ -317,7 +351,7 @@ function App() {
               key={option.key}
               type="button"
               className={screen === option.key ? 'tab active' : 'tab'}
-              onClick={() => setScreen(option.key)}
+              onClick={() => selectScreen(option.key)}
             >
               {option.label}
             </button>
