@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url'
 
 const OUTPUT_PATH = path.resolve('src/generated/fxReportConfig.ts')
 
-export function reportFeatureEnabled(value, fallback = true) {
+export function reportFeatureEnabled(value, fallback = false) {
   const normalized = String(value ?? '').trim().toLowerCase()
   if (!normalized) return fallback
   if (normalized === 'true') return true

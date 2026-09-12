@@ -116,6 +116,7 @@ FX_REPORT_AI_MODE=optional
 FX_REPORT_AI_MODEL=openrouter/free
 ```
 
+병합 시 저장소 기본값은 안전하게 `false`입니다. 파일럿 시작 체크포인트에서 repository variable을 `true`로 설정합니다.
 `FX_REPORT_ENABLED`는 일일 워크플로가 `src/generated/fxReportConfig.ts`에도 동기화합니다.
 긴급 중단 시 값을 `false`로 바꾸고 워크플로를 수동 실행하면 생성 중단과 UI 비활성화가 같은 커밋으로 배포됩니다.
 

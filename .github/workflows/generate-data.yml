@@ -83,7 +83,7 @@ jobs:
         continue-on-error: true
         run: node scripts/write-fx-report-config.js
         env:
-          FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED || 'true' }}
+          FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED || 'false' }}
 
       - name: Generate optional FX 2.0 report
         continue-on-error: true

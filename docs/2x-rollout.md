@@ -23,13 +23,14 @@
 1. Apply `20260912021010_fx_report_storage.sql` and `20260912021458_lock_fx_report_reviews_append_only.sql` only after the database PR is approved.
 2. Verify explicit grants and RLS with anon, authenticated non-admin, active admin, and service role.
 3. Add GitHub Secret `OPENROUTER_API_KEY`; never record its value in the repository or issue logs.
-4. Set repository variables:
+4. Merge and deploy the UI while the committed `FX_REPORT_ENABLED` default remains `false`; confirm the five 1.x screens are unchanged.
+5. At the pilot-start checkpoint, set repository variables:
    - `FX_REPORT_ENABLED=true`
    - `FX_REPORT_PUBLISH_MODE=review`
    - `FX_REPORT_AI_MODE=optional`
    - `FX_REPORT_AI_MODEL=openrouter/free`
-5. Run `Daily Dashboard Email` manually once. Confirm the legacy email still arrives, a private pending run appears in Supabase, and no private run file is uploaded as an Actions artifact.
-6. Sign in as an active admin, review the candidate, approve it, and confirm the public dashboard and `#report` show only sanitized content.
+6. Run `Daily Dashboard Email` manually once. Confirm the legacy email still arrives, a private pending run appears in Supabase, and no private run file is uploaded as an Actions artifact.
+7. Sign in as an active admin, review the candidate, approve it, and confirm the public dashboard and `#report` show only sanitized content.
 
 ## Ten-trading-day pilot log
 
