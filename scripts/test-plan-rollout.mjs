@@ -1,9 +1,19 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
+import path from 'node:path'
+
+function readMigration(name) {
+  const directory = path.resolve('supabase/migrations')
+  const matches = readdirSync(directory).filter((file) => file.endsWith(`_${name}.sql`))
+  if (matches.length !== 1) {
+    throw new Error(`Expected one ${name} migration, found ${matches.length}.`)
+  }
+  return readFileSync(path.join(directory, matches[0]), 'utf8')
+}
 
 // Fixed local test container: never accepts a production URL or credentials.
-const expand = readFileSync('supabase/migrations/20260909105853_plan_current_expand.sql', 'utf8')
-const contract = readFileSync('supabase/migrations/20260911133319_close_business_plan_history_access.sql', 'utf8')
+const expand = readMigration('plan_current_expand')
+const contract = readMigration('close_business_plan_history_access')
 const sql = `begin;
 alter table public.business_plan_rates disable trigger sync_business_plan_current_after_insert;
 insert into public.business_plan_rates(period_month,plan_type,currency,rate_value,created_at)
