@@ -107,6 +107,20 @@ SMTP_PASSWORD
 `OPENROUTER_API_KEY`도 GitHub Actions Secret에만 저장합니다. 무료 AI가 실패하거나
 사용 불가능해지면 추가 과금 없이 결정론적 자동 분석을 사용합니다.
 
+무료 모델은 최종 보고서 문장을 직접 작성하지 않습니다. 모델은 기존 `factId`와
+`evidenceId`의 우선순위 및 제한된 해석 태그만 반환하며, 숫자·방향·링크와 공개
+한국어 문장은 코드가 조립합니다. 다음 명령은 API 키 없이 40개 고정 상황에 대한
+하드 게이트와 품질 점수(최소 80점)를 검증합니다.
+
+```powershell
+npm run eval:report
+```
+
+키 등록 후 실제 무료 모델은 GitHub Actions의 `FX Report Free-Model Evaluation`을
+수동 실행해 한 번에 최대 5개 fixture만 비공개 평가합니다. 이 실행은 보고서를
+게시하거나 운영 테이블에 저장하지 않으며 결과 artifact에는 키나 모델 원문을
+포함하지 않습니다.
+
 GitHub repository variables의 초기값은 다음과 같습니다.
 
 ```text

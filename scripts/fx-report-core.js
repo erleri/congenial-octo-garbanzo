@@ -1,6 +1,21 @@
 const PRIMARY_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN']
 const ANOMALY_CURRENCIES = ['GTQ', 'PYG', 'UYU', 'CNY']
 const ALL_REPORT_CURRENCIES = [...PRIMARY_CURRENCIES, ...ANOMALY_CURRENCIES]
+const EDITORIAL_CONTEXT_TAGS = [
+  'broad_usd',
+  'local_factor_possible',
+  'policy_possible',
+  'commodity_possible',
+  'risk_sentiment_possible',
+  'insufficient_evidence',
+]
+const EDITORIAL_SCENARIO_TAGS = [
+  'direction_persistence',
+  'volatility_range',
+  'news_divergence',
+  'plan_gap',
+  'usd_krw_spillover',
+]
 const FORBIDDEN_AI_PATTERNS = [
   /<\/?[a-z][^>]*>/i,
   /(?:매수|매도|투자\s*권고|목표\s*환율|목표가)/,
@@ -11,6 +26,7 @@ const FORBIDDEN_AI_PATTERNS = [
   /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,
   /(?:will|guaranteed|certain to)\s+(?:rise|fall)/i,
   /\b(?:buy|sell)\b/i,
+  /(?:ignore\s+(?:all\s+)?previous\s+instructions|system\s+prompt|reveal\s+secrets)/i,
   /\d/,
 ]
 
@@ -297,87 +313,236 @@ export function buildDeterministicReport(evidence) {
   }
 }
 
-function allAiTexts(candidate) {
-  return [
-    candidate?.headline,
-    ...(candidate?.executiveSummary ?? []),
-    ...(candidate?.keyMoves ?? []).map((item) => item.text),
-    ...(candidate?.planObservations ?? []).map((item) => item.text),
-    ...(candidate?.scenarios ?? []),
-    ...(candidate?.limitations ?? []),
-  ].filter((value) => typeof value === 'string')
+function factCurrencyCode(currency) {
+  return currency === 'USD/KRW' ? 'USD' : currency
 }
 
-function isReportShape(candidate) {
-  const strings = (value, min = 0, max = Infinity) => Array.isArray(value) && value.length >= min && value.length <= max && value.every((item) => typeof item === 'string')
-  const statements = (value) => Array.isArray(value) && value.length <= 3 && value.every((item) =>
-    item && typeof item === 'object' && (item.currency === null || typeof item.currency === 'string') &&
-    typeof item.text === 'string' && strings(item.factIds) && strings(item.evidenceIds),
-  )
-  return Boolean(
-    candidate && typeof candidate === 'object' &&
-    typeof candidate.headline === 'string' &&
-    strings(candidate.executiveSummary, 1, 3) &&
-    statements(candidate.keyMoves) &&
-    statements(candidate.planObservations) &&
-    strings(candidate.scenarios, 1, 3) &&
-    ['high', 'medium', 'low'].includes(candidate.confidence) &&
-    strings(candidate.limitations, 0, 3)
-  )
-}
-
-export function validateAiReport(candidate, evidence) {
-  const errors = []
-  if (!isReportShape(candidate)) errors.push('schema')
-  const factIds = new Set(evidence.facts.map((item) => item.id))
-  const factsById = new Map(evidence.facts.map((item) => [item.id, item]))
-  const evidenceIds = new Set(evidence.news.map((item) => item.id))
-  const currencies = new Set(evidence.metrics.map((item) => item.currency))
-
-  for (const item of [...(candidate?.keyMoves ?? []), ...(candidate?.planObservations ?? [])]) {
-    if (item.currency !== null && !currencies.has(item.currency)) errors.push('currency')
-    if (!Array.isArray(item.factIds) || item.factIds.some((id) => !factIds.has(id))) errors.push('fact_id')
-    if (!Array.isArray(item.evidenceIds) || item.evidenceIds.some((id) => !evidenceIds.has(id))) errors.push('evidence_id')
-    if (item.currency && item.factIds?.some((id) => factsById.get(id)?.currency !== item.currency)) errors.push('fact_currency')
-    if (item.evidenceIds?.length && !item.factIds?.length) errors.push('unsupported_causality')
+function contextSentence(tag, hasEvidence) {
+  if (!hasEvidence || tag === 'insufficient_evidence') return '확인 가능한 뉴스 근거가 제한적이므로 가격 흐름을 중심으로 확인합니다.'
+  const sentences = {
+    broad_usd: '선별된 달러 관련 뉴스는 광범위한 외환시장 배경으로 함께 확인합니다.',
+    local_factor_possible: '선별된 현지 뉴스는 가능한 배경으로 함께 확인합니다.',
+    policy_possible: '선별된 정책 관련 뉴스는 가능한 배경으로 함께 확인합니다.',
+    commodity_possible: '선별된 원자재 관련 뉴스는 가능한 배경으로 함께 확인합니다.',
+    risk_sentiment_possible: '선별된 위험선호 관련 뉴스는 가능한 배경으로 함께 확인합니다.',
   }
+  return sentences[tag] ?? sentences.local_factor_possible
+}
 
-  for (const text of allAiTexts(candidate)) {
-    if (text.length > 320) errors.push('length')
-    if (FORBIDDEN_AI_PATTERNS.some((pattern) => pattern.test(text))) errors.push('forbidden_content')
-    if (/\b[A-Z]{3}(?:\/[A-Z]{3})?\b/g.test(text)) {
-      const mentioned = text.match(/\b[A-Z]{3}(?:\/[A-Z]{3})?\b/g) ?? []
-      if (mentioned.some((code) => !currencies.has(code))) errors.push('currency')
+const SCENARIO_SENTENCES = {
+  direction_persistence: '최근 변동 방향이 이어지는지 다음 영업일 가격을 확인합니다.',
+  volatility_range: '단기 변동성이 통상 범위로 돌아오는지 함께 확인합니다.',
+  news_divergence: '가격과 뉴스 흐름이 엇갈리면 인과관계를 확대 해석하지 않습니다.',
+  plan_gap: '계획환율 편차가 확대되는 통화는 월 누적 평균과 함께 재확인합니다.',
+  usd_krw_spillover: 'USD/KRW 움직임이 중남미 통화 환산 결과에 미치는 범위를 함께 확인합니다.',
+}
+
+function planObservationFromFact(item, evidence) {
+  const factItem = evidence.facts.find((entry) => entry.id === item.factId)
+  const metric = evidence.metrics.find((entry) => entry.currency === factItem?.currency)
+  if (!factItem || !metric) return null
+  const planType = factItem.horizon === 'leading_plan_delta' ? '선행 계획환율' : '이동 계획환율'
+  return {
+    currency: factItem.currency,
+    text: `${factItem.currency} 현재값은 ${planType} 대비 ${formatPct(factItem.value)} 편차입니다.`,
+    factIds: [factItem.id],
+    evidenceIds: [],
+  }
+}
+
+export function renderEditorialReport(evidence, decision) {
+  const firstLead = evidence.facts.find((item) => item.id === decision.leadFactIds[0])
+  const firstMetric = evidence.metrics.find((item) => item.currency === firstLead?.currency)
+  const headline = firstMetric
+    ? movementHeadline(firstMetric)
+    : '당일 환율 변동을 판단할 수 있는 데이터가 충분하지 않습니다.'
+  const keyMoves = decision.keyMoves.map((item) => {
+    const metric = evidence.metrics.find((entry) => entry.currency === item.currency)
+    const baseText = metric
+      ? `${metric.currency}는 전일 대비 ${formatPct(metric.dayPct)}, 5영업일 대비 ${formatPct(metric.fiveDayPct)}를 기록했습니다.`
+      : `${item.currency}의 최신 가격 흐름을 확인합니다.`
+    return {
+      currency: item.currency,
+      text: `${baseText} ${contextSentence(item.contextTag, item.evidenceIds.length > 0)}`,
+      factIds: item.factIds,
+      evidenceIds: item.evidenceIds,
     }
-  }
+  })
+  const planObservations = decision.planSelections
+    .map((item) => planObservationFromFact(item, evidence))
+    .filter(Boolean)
+  const anomalyCount = evidence.metrics.filter((metric) => Math.abs(metric.volatilityZ ?? 0) >= 2).length
 
+  return {
+    headline,
+    executiveSummary: [
+      headline,
+      anomalyCount
+        ? `통상 변동 범위를 벗어난 움직임이 ${anomalyCount}개 통화에서 감지됐습니다.`
+        : '통상 변동 범위를 크게 벗어난 움직임은 제한적입니다.',
+      keyMoves.some((item) => item.evidenceIds.length)
+        ? '선별 뉴스는 가능한 배경으로만 제시하며 가격 움직임의 직접 원인으로 단정하지 않습니다.'
+        : '확인 가능한 뉴스 근거가 제한적이므로 가격 데이터 중심으로 해석했습니다.',
+    ],
+    keyMoves,
+    planObservations: planObservations.length
+      ? planObservations
+      : [{ currency: null, text: '비교 가능한 계획환율이 없거나 AI가 우선 관찰 대상으로 선택하지 않았습니다.', factIds: [], evidenceIds: [] }],
+    scenarios: decision.scenarioTags.map((tag) => SCENARIO_SENTENCES[tag]),
+    confidence: evidence.confidence,
+    limitations: [
+      '이 보고서는 관찰된 환율과 공개 뉴스에 대한 자동 분석이며 전망이나 투자 권고가 아닙니다.',
+      evidence.news.length ? '뉴스는 가능한 배경이며 환율 변동의 직접 원인을 증명하지 않습니다.' : '확인 가능한 뉴스 근거가 제한적입니다.',
+    ],
+  }
+}
+
+function editorialDecisionShape(candidate) {
+  const exactKeys = (value, keys) => value && typeof value === 'object' && !Array.isArray(value) &&
+    Object.keys(value).every((key) => keys.includes(key)) && keys.every((key) => key in value)
+  return Boolean(
+    exactKeys(candidate, ['leadFactIds', 'keyMoves', 'planSelections', 'scenarioTags', 'editorNote']) &&
+    Array.isArray(candidate.leadFactIds) && candidate.leadFactIds.length >= 1 && candidate.leadFactIds.length <= 3 && candidate.leadFactIds.every((id) => typeof id === 'string') &&
+    Array.isArray(candidate.keyMoves) && candidate.keyMoves.length >= 1 && candidate.keyMoves.length <= 3 && candidate.keyMoves.every((item) =>
+      exactKeys(item, ['currency', 'factIds', 'evidenceIds', 'contextTag']) && typeof item.currency === 'string' &&
+      Array.isArray(item.factIds) && item.factIds.length >= 1 && item.factIds.length <= 3 && item.factIds.every((id) => typeof id === 'string') &&
+      Array.isArray(item.evidenceIds) && item.evidenceIds.length <= 2 && item.evidenceIds.every((id) => typeof id === 'string') &&
+      EDITORIAL_CONTEXT_TAGS.includes(item.contextTag)) &&
+    Array.isArray(candidate.planSelections) && candidate.planSelections.length <= 3 && candidate.planSelections.every((item) =>
+      exactKeys(item, ['factId']) && typeof item.factId === 'string') &&
+    Array.isArray(candidate.scenarioTags) && candidate.scenarioTags.length >= 1 && candidate.scenarioTags.length <= 3 && candidate.scenarioTags.every((tag) => EDITORIAL_SCENARIO_TAGS.includes(tag)) &&
+    typeof candidate.editorNote === 'string' && candidate.editorNote.length <= 240
+  )
+}
+
+export function validateEditorialDecision(candidate, evidence) {
+  const errors = []
+  if (!editorialDecisionShape(candidate)) errors.push('schema')
+  const factsById = new Map(evidence.facts.map((item) => [item.id, item]))
+  const newsById = new Map(evidence.news.map((item) => [item.id, item]))
+  const currencies = new Set(evidence.metrics.map((item) => item.currency))
+  const leadIds = Array.isArray(candidate?.leadFactIds) ? candidate.leadFactIds : []
+  const keyMoves = Array.isArray(candidate?.keyMoves) ? candidate.keyMoves : []
+  const planSelections = Array.isArray(candidate?.planSelections) ? candidate.planSelections : []
+  const scenarioTags = Array.isArray(candidate?.scenarioTags) ? candidate.scenarioTags : []
+  if (leadIds.some((id) => !factsById.has(id))) errors.push('fact_id')
+  if (new Set(leadIds).size !== leadIds.length) errors.push('duplicate_selection')
+  if (leadIds.some((id) => factsById.get(id)?.horizon !== 'day')) errors.push('lead_horizon')
+  const moveFactIds = new Set(keyMoves.flatMap((item) => Array.isArray(item?.factIds) ? item.factIds : []))
+  if (leadIds.some((id) => !moveFactIds.has(id))) errors.push('lead_coverage')
+
+  for (const item of keyMoves) {
+    const itemFactIds = Array.isArray(item?.factIds) ? item.factIds : []
+    const itemEvidenceIds = Array.isArray(item?.evidenceIds) ? item.evidenceIds : []
+    if (!currencies.has(item?.currency)) errors.push('currency')
+    if (itemFactIds.some((id) => !factsById.has(id))) errors.push('fact_id')
+    if (itemFactIds.some((id) => factsById.get(id)?.currency !== item?.currency)) errors.push('fact_currency')
+    if (itemFactIds.some((id) => String(factsById.get(id)?.horizon).includes('plan_delta'))) errors.push('move_horizon')
+    if (itemEvidenceIds.some((id) => !newsById.has(id))) errors.push('evidence_id')
+    if (new Set(itemFactIds).size !== itemFactIds.length) errors.push('duplicate_selection')
+    if (new Set(itemEvidenceIds).size !== itemEvidenceIds.length) errors.push('duplicate_selection')
+    for (const id of itemEvidenceIds) {
+      const codes = newsById.get(id)?.currencies ?? []
+      if (!codes.includes(factCurrencyCode(item?.currency)) && !codes.includes('USD')) errors.push('evidence_currency')
+    }
+    if (item?.contextTag !== 'insufficient_evidence' && !itemEvidenceIds.length) errors.push('unsupported_context')
+    if (item?.contextTag === 'insufficient_evidence' && itemEvidenceIds.length) errors.push('unsupported_context')
+  }
+  const selectedPlanIds = planSelections.map((item) => item?.factId)
+  if (new Set(selectedPlanIds).size !== selectedPlanIds.length) errors.push('duplicate_selection')
+  for (const item of planSelections) {
+    const selected = factsById.get(item?.factId)
+    if (!selected) errors.push('fact_id')
+    else if (!['leading_plan_delta', 'moving_plan_delta'].includes(selected.horizon)) errors.push('plan_horizon')
+  }
+  if (new Set(scenarioTags).size !== scenarioTags.length) errors.push('duplicate_selection')
+  if (FORBIDDEN_AI_PATTERNS.some((pattern) => pattern.test(candidate?.editorNote ?? ''))) errors.push('forbidden_content')
   return { valid: errors.length === 0, errors: [...new Set(errors)] }
 }
 
+export function scoreEditorialDecision(candidate, evidence) {
+  const validation = validateEditorialDecision(candidate, evidence)
+  if (!validation.valid) return { score: 0, passed: false, threshold: 80, breakdown: {}, errors: validation.errors }
+  const rankedDayFacts = evidence.metrics
+    .filter((item) => Number.isFinite(item.dayPct))
+    .sort((a, b) => Math.abs(b.dayPct) - Math.abs(a.dayPct))
+    .slice(0, 3)
+    .map((item) => `fact-${item.currency.toLowerCase()}-day`)
+  const overlap = candidate.leadFactIds.filter((id) => rankedDayFacts.includes(id)).length
+  const relevance = Math.round(25 * (overlap / Math.max(1, Math.min(3, rankedDayFacts.length))))
+  const keyCurrencies = candidate.keyMoves.map((item) => item.currency)
+  const grounding = candidate.keyMoves.every((item) => item.contextTag === 'insufficient_evidence' || item.evidenceIds.length) ? 25 : 0
+  const nonRepetition = new Set(keyCurrencies).size === keyCurrencies.length && new Set(candidate.leadFactIds).size === candidate.leadFactIds.length ? 15 : 0
+  const hasPlanData = evidence.facts.some((item) => ['leading_plan_delta', 'moving_plan_delta'].includes(item.horizon))
+  const usefulness = (candidate.scenarioTags.length >= 2 ? 10 : 5) + (!hasPlanData || candidate.planSelections.length ? 10 : 0)
+  const rendered = renderEditorialReport(evidence, candidate)
+  const publicTexts = [rendered.headline, ...rendered.executiveSummary, ...rendered.keyMoves.map((item) => item.text), ...rendered.scenarios]
+  const readability = publicTexts.every((text) => typeof text === 'string' && text.length > 0 && text.length <= 320) && new Set(publicTexts).size >= publicTexts.length - 1 ? 15 : 0
+  const score = relevance + grounding + nonRepetition + usefulness + readability
+  return {
+    score,
+    passed: score >= 80,
+    threshold: 80,
+    breakdown: { relevance, grounding, nonRepetition, usefulness, readability },
+    errors: score >= 80 ? [] : ['quality_score'],
+  }
+}
+
+export function buildBaselineEditorialDecision(evidence) {
+  const ranked = evidence.metrics
+    .filter((item) => Number.isFinite(item.dayPct))
+    .sort((a, b) => Math.abs(b.dayPct) - Math.abs(a.dayPct))
+    .slice(0, 3)
+  const planSelections = evidence.facts
+    .filter((item) => item.horizon === 'moving_plan_delta')
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+    .slice(0, 3)
+    .map((item) => ({ factId: item.id }))
+  return {
+    leadFactIds: ranked.map((item) => `fact-${item.currency.toLowerCase()}-day`),
+    keyMoves: ranked.map((item) => {
+      const evidenceIds = relatedNewsIds(evidence.news, item.currency)
+      return {
+        currency: item.currency,
+        factIds: [`fact-${item.currency.toLowerCase()}-day`, `fact-${item.currency.toLowerCase()}-five_day`].filter((id) => evidence.facts.some((factItem) => factItem.id === id)),
+        evidenceIds,
+        contextTag: evidenceIds.length ? 'local_factor_possible' : 'insufficient_evidence',
+      }
+    }),
+    planSelections,
+    scenarioTags: ['direction_persistence', 'volatility_range', ...(planSelections.length ? ['plan_gap'] : [])].slice(0, 3),
+    editorNote: '가격 변동폭과 계획환율 편차를 기준으로 우선순위를 정했습니다.',
+  }
+}
+
 export const FX_REPORT_PRIMARY_CURRENCIES = PRIMARY_CURRENCIES
-export const FX_REPORT_JSON_SCHEMA = {
+export const FX_EDITORIAL_DECISION_JSON_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['headline', 'executiveSummary', 'keyMoves', 'planObservations', 'scenarios', 'confidence', 'limitations'],
+  required: ['leadFactIds', 'keyMoves', 'planSelections', 'scenarioTags', 'editorNote'],
   properties: {
-    headline: { type: 'string', maxLength: 160 },
-    executiveSummary: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string', maxLength: 240 } },
-    keyMoves: { type: 'array', maxItems: 3, items: { $ref: '#/$defs/item' } },
-    planObservations: { type: 'array', maxItems: 3, items: { $ref: '#/$defs/item' } },
-    scenarios: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string', maxLength: 240 } },
-    confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
-    limitations: { type: 'array', maxItems: 3, items: { type: 'string', maxLength: 240 } },
+    leadFactIds: { type: 'array', minItems: 1, maxItems: 3, uniqueItems: true, items: { type: 'string' } },
+    keyMoves: { type: 'array', minItems: 1, maxItems: 3, items: { $ref: '#/$defs/move' } },
+    planSelections: { type: 'array', maxItems: 3, items: { $ref: '#/$defs/plan' } },
+    scenarioTags: { type: 'array', minItems: 1, maxItems: 3, uniqueItems: true, items: { type: 'string', enum: EDITORIAL_SCENARIO_TAGS } },
+    editorNote: { type: 'string', maxLength: 240 },
   },
   $defs: {
-    item: {
+    move: {
       type: 'object', additionalProperties: false,
-      required: ['currency', 'text', 'factIds', 'evidenceIds'],
+      required: ['currency', 'factIds', 'evidenceIds', 'contextTag'],
       properties: {
-        currency: { type: ['string', 'null'] },
-        text: { type: 'string', maxLength: 320 },
-        factIds: { type: 'array', items: { type: 'string' } },
-        evidenceIds: { type: 'array', items: { type: 'string' } },
+        currency: { type: 'string' },
+        factIds: { type: 'array', minItems: 1, maxItems: 3, uniqueItems: true, items: { type: 'string' } },
+        evidenceIds: { type: 'array', maxItems: 2, uniqueItems: true, items: { type: 'string' } },
+        contextTag: { type: 'string', enum: EDITORIAL_CONTEXT_TAGS },
       },
+    },
+    plan: {
+      type: 'object', additionalProperties: false,
+      required: ['factId'],
+      properties: { factId: { type: 'string' } },
     },
   },
 }
+export const FX_REPORT_JSON_SCHEMA = FX_EDITORIAL_DECISION_JSON_SCHEMA

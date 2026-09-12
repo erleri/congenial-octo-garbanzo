@@ -46,7 +46,7 @@ export default function FxReportAdmin({ canReview }: Props) {
       {!pending.length ? <p className="table-help">검토 대기 중인 리포트가 없습니다.</p> : null}
       {pending.map((run) => (
         <article className="report-review-item" key={run.id}>
-          <div className="report-review-meta"><strong>{run.baseDate} · attempt {run.attempt}</strong><span>{run.generationMode === 'ai_enhanced' ? `AI 보강 · ${run.aiModel ?? '-'}` : '자동 분석'}</span><span>{run.validation.valid ? '검증 통과' : `검증 실패: ${run.validation.errors.join(', ')}`}</span></div>
+          <div className="report-review-meta"><strong>{run.baseDate} · attempt {run.attempt}</strong><span>{run.generationMode === 'ai_enhanced' ? `AI 보강 · ${run.aiModel ?? '-'}` : '자동 분석'}</span><span>{run.validation.valid ? '검증 통과' : `검증 실패: ${run.validation.errors.join(', ')}`}</span>{run.validation.quality ? <span>품질 {run.validation.quality.score}/100</span> : null}</div>
           {run.errorMessage ? <p className="inline-notice warning-notice">AI 보강 미사용: {run.errorMessage}</p> : null}
           {run.aiCandidate ? (
             <div className="report-candidate-grid">

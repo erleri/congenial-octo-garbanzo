@@ -1,0 +1,39 @@
+name: FX Report Free-Model Evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      fixture_limit:
+        description: Number of fixed fixtures to evaluate (maximum 5)
+        required: true
+        default: '5'
+        type: choice
+        options: ['1', '2', '3', '4', '5']
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - run: npm ci
+      - name: Evaluate constrained editor without publishing
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          FX_REPORT_AI_MODEL: ${{ vars.FX_REPORT_AI_MODEL || 'openrouter/free' }}
+        run: node scripts/evaluate-fx-report.js --live --limit=${{ inputs.fixture_limit }}
+      - name: Upload evaluation artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fx-report-free-model-eval-${{ github.run_id }}
+          path: fx-report-eval.json
+          if-no-files-found: warn
+          retention-days: 30

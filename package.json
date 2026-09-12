@@ -11,6 +11,8 @@
     "generate:data": "tsx scripts/generate-data.ts",
     "generate:report": "node scripts/create-fx-report.js",
     "persist:report": "node scripts/persist-fx-report.js",
+    "eval:report": "node scripts/evaluate-fx-report.js",
+    "eval:report:live": "node scripts/evaluate-fx-report.js --live --limit=5",
     "generate:fallback": "tsx scripts/build-static-fallback.ts",
     "sync:supabase": "node scripts/sync-fx-to-supabase.js",
     "verify:supabase": "node scripts/verify-fx-supabase.js",
@@ -18,7 +20,7 @@
     "test:period-selection": "tsx scripts/test-period-selection.ts",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run eval:report && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:local": "vite preview --host 127.0.0.1 --port 4173 --outDir dist-local"

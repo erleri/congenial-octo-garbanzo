@@ -3,6 +3,19 @@ import type { CurrencyCode } from './exchangeRate'
 export type FxReportGenerationMode = 'deterministic' | 'ai_enhanced'
 export type FxReportConfidence = 'high' | 'medium' | 'low'
 export type FxReportRunStatus = 'pending_review' | 'published' | 'rejected' | 'superseded' | 'failed'
+export type FxEditorialContextTag =
+  | 'broad_usd'
+  | 'local_factor_possible'
+  | 'policy_possible'
+  | 'commodity_possible'
+  | 'risk_sentiment_possible'
+  | 'insufficient_evidence'
+export type FxEditorialScenarioTag =
+  | 'direction_persistence'
+  | 'volatility_range'
+  | 'news_divergence'
+  | 'plan_gap'
+  | 'usd_krw_spillover'
 
 export interface FxReportFact {
   id: string
@@ -64,6 +77,30 @@ export interface FxReportContent {
   limitations: string[]
 }
 
+export interface FxEditorialMoveSelection {
+  currency: CurrencyCode | 'USD/KRW'
+  factIds: string[]
+  evidenceIds: string[]
+  contextTag: FxEditorialContextTag
+}
+
+export interface FxEditorialDecision {
+  leadFactIds: string[]
+  keyMoves: FxEditorialMoveSelection[]
+  planSelections: Array<{ factId: string }>
+  scenarioTags: FxEditorialScenarioTag[]
+  /** Administrator-only rationale. It is never rendered into the public report. */
+  editorNote: string
+}
+
+export interface FxEditorialQualityScore {
+  score: number
+  passed: boolean
+  threshold: 80
+  breakdown: Partial<Record<'relevance' | 'grounding' | 'nonRepetition' | 'usefulness' | 'readability', number>>
+  errors: string[]
+}
+
 export interface PublishedFxReport {
   baseDate: string
   runId: string
@@ -80,6 +117,7 @@ export interface FxReportValidation {
   errors: string[]
   aiValid?: boolean
   aiErrors?: string[]
+  quality?: FxEditorialQualityScore
 }
 
 export interface FxReportRun {

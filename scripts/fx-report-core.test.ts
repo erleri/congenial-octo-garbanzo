@@ -3,7 +3,6 @@ import {
   buildDeterministicReport,
   buildFxReportEvidence,
   normalizeNewsEvidence,
-  validateAiReport,
 } from './fx-report-core.js'
 
 function dataset() {
@@ -75,42 +74,4 @@ describe('FX report evidence', () => {
     const evidence = buildFxReportEvidence({ baseDate: '2026-09-07', fetchedAt: '', dailyRates: rows })
     expect(evidence.metrics.find((row) => row.currency === 'BRL')?.dayPct).toBe(10)
   })
-})
-
-describe('AI report validation', () => {
-  const evidence = buildFxReportEvidence(dataset(), {}, articles)
-  const validCandidate = {
-    headline: '중남미 통화 흐름은 혼조로 관찰됩니다.',
-    executiveSummary: ['주요 통화의 방향성이 엇갈렸습니다.'],
-    keyMoves: [{ currency: 'BRL', text: '헤알 움직임을 우선 확인합니다.', factIds: ['fact-brl-day'], evidenceIds: ['news-1'] }],
-    planObservations: [],
-    scenarios: ['다음 영업일에도 방향성과 변동성 범위를 함께 확인합니다.'],
-    confidence: 'medium',
-    limitations: ['뉴스는 가능한 배경으로만 해석했습니다.'],
-  }
-
-  it('accepts grounded qualitative output and rejects numeric or unknown claims', () => {
-    expect(validateAiReport(validCandidate, evidence).valid).toBe(true)
-    expect(validateAiReport({ ...validCandidate, headline: 'BRL 3% 상승' }, evidence)).toMatchObject({ valid: false })
-    const unknown = { ...validCandidate, keyMoves: [{ ...validCandidate.keyMoves[0], factIds: ['fact-made-up'] }] }
-    expect(validateAiReport(unknown, evidence).errors).toContain('fact_id')
-    const crossCurrency = { ...validCandidate, keyMoves: [{ ...validCandidate.keyMoves[0], factIds: ['fact-mxn-day'] }] }
-    expect(validateAiReport(crossCurrency, evidence).errors).toContain('fact_currency')
-    const malformed = { ...validCandidate, keyMoves: [{ currency: 'BRL', factIds: [], evidenceIds: [] }] }
-    expect(validateAiReport(malformed, evidence).errors).toContain('schema')
-  })
-
-  it('rejects AI-authored direction, direct causality, disguised numbers, URLs, and email addresses', () => {
-    const forbidden = [
-      'BRL은 상승 흐름입니다.',
-      '정책 발표 때문에 움직였습니다.',
-      '두 배 확대될 수 있습니다.',
-      'https://example.com을 확인합니다.',
-      'analyst@example.com에 문의합니다.',
-    ]
-    for (const headline of forbidden) {
-      expect(validateAiReport({ ...validCandidate, headline }, evidence).errors).toContain('forbidden_content')
-    }
-  })
-
 })
