@@ -116,6 +116,9 @@ FX_REPORT_AI_MODE=optional
 FX_REPORT_AI_MODEL=openrouter/free
 ```
 
+`FX_REPORT_ENABLED`는 일일 워크플로가 `src/generated/fxReportConfig.ts`에도 동기화합니다.
+긴급 중단 시 값을 `false`로 바꾸고 워크플로를 수동 실행하면 생성 중단과 UI 비활성화가 같은 커밋으로 배포됩니다.
+
 ## Supabase 환율 데이터
 
 초기 설정:
@@ -144,7 +147,7 @@ FX_REPORT_AI_MODEL=openrouter/free
 
 ## LATAM FX 2.0 리포트
 
-1. `supabase/migrations/20260911143920_fx_report_storage.sql`을 테스트 DB에서 먼저 적용합니다.
+1. `supabase/migrations/20260912021010_fx_report_storage.sql`과 `20260912021458_lock_fx_report_reviews_append_only.sql`을 테스트 DB에서 먼저 적용합니다.
 2. `npm run generate:report`로 AI 없이도 완성되는 `fx-report-run.json`을 확인합니다.
 3. GitHub Secret에 `OPENROUTER_API_KEY`를 추가합니다. 키가 없어도 자동 분석은 정상 동작합니다.
 4. 파일럿은 `FX_REPORT_PUBLISH_MODE=review`로 유지합니다.

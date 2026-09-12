@@ -7,7 +7,7 @@ interface Props { canReview: boolean }
 
 export default function FxReportAdmin({ canReview }: Props) {
   const [runs, setRuns] = useState<FxReportRun[]>([])
-  const [reason, setReason] = useState('')
+  const [reasons, setReasons] = useState<Record<string, string>>({})
   const [working, setWorking] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
 
@@ -27,8 +27,13 @@ export default function FxReportAdmin({ canReview }: Props) {
   const decide = async (run: FxReportRun, decision: 'approved' | 'rejected') => {
     try {
       setWorking(run.id); setNotice(null)
-      await reviewFxReport(run.id, decision, reason)
-      setReason(''); await reload(); setNotice(decision === 'approved' ? '리포트를 공개했습니다.' : '리포트를 반려했습니다.')
+      await reviewFxReport(run.id, decision, reasons[run.id] ?? '')
+      setReasons((current) => {
+        const next = { ...current }
+        delete next[run.id]
+        return next
+      })
+      await reload(); setNotice(decision === 'approved' ? '리포트를 공개했습니다.' : '리포트를 반려했습니다.')
     } catch (error) {
       setNotice(error instanceof Error ? error.message : '검토 결과를 저장하지 못했습니다.')
     } finally { setWorking(null) }
@@ -43,9 +48,25 @@ export default function FxReportAdmin({ canReview }: Props) {
         <article className="report-review-item" key={run.id}>
           <div className="report-review-meta"><strong>{run.baseDate} · attempt {run.attempt}</strong><span>{run.generationMode === 'ai_enhanced' ? `AI 보강 · ${run.aiModel ?? '-'}` : '자동 분석'}</span><span>{run.validation.valid ? '검증 통과' : `검증 실패: ${run.validation.errors.join(', ')}`}</span></div>
           {run.errorMessage ? <p className="inline-notice warning-notice">AI 보강 미사용: {run.errorMessage}</p> : null}
-          <FxReportContentView content={run.selectedContent} evidence={run.evidence} />
+          {run.aiCandidate ? (
+            <div className="report-candidate-grid">
+              <section className="report-candidate-panel">
+                <h4>자동 분석판</h4>
+                <FxReportContentView content={run.deterministicContent} evidence={run.evidence} />
+              </section>
+              <section className="report-candidate-panel selected">
+                <h4>AI 보강 후보 · 게시 선택본</h4>
+                <FxReportContentView content={run.aiCandidate} evidence={run.evidence} />
+              </section>
+            </div>
+          ) : (
+            <section className="report-candidate-panel selected">
+              <h4>자동 분석판 · 게시 선택본</h4>
+              <FxReportContentView content={run.selectedContent} evidence={run.evidence} />
+            </section>
+          )}
           <div className="report-review-actions">
-            <input maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} placeholder="반려 사유 (선택)" aria-label="반려 사유" />
+            <input maxLength={500} value={reasons[run.id] ?? ''} onChange={(event) => setReasons((current) => ({ ...current, [run.id]: event.target.value }))} placeholder="반려 사유 (선택)" aria-label={`${run.baseDate} 반려 사유`} />
             <button type="button" className="quiet-button" disabled={working === run.id} onClick={() => void decide(run, 'rejected')}>반려</button>
             <button type="button" className="header-refresh-button" disabled={working === run.id || !run.validation.valid} onClick={() => void decide(run, 'approved')}>승인·공개</button>
           </div>

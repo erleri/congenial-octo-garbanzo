@@ -1,15 +1,15 @@
 # Operations TODO
 
-This checklist tracks the remaining production setup needed for business plan rates.
+This checklist tracks the remaining production setup for LATAM FX 1.x operations and the 2.0 report pilot.
 
-## Verified on 2026-05-30
+## Verified on 2026-09-12
 
-- GitHub `main` is deployed on Netlify with build commit `ee404d2`.
+- GitHub `main` is deployed on Netlify at commit `3266256` (migration-version alignment on top of the report foundation).
 - Production site responds at `https://latamforex.netlify.app/`.
-- Production `public/data.json` reports `baseDate = 2026-05-30`.
-- The latest checked `Daily Dashboard Email` run completed successfully, including API secret validation, market context creation, email composition, mailing-list validation, send, and artifact upload. That run used an older commit, so the new hybrid market context still needs the next run or a deliberate manual run to be confirmed in production email.
-- Supabase publishable config is present in the production bundle. At this historical checkpoint, `business_plan_rates` could still be read through the public REST API; the current-value projection and access-closure rollout supersede that contract.
-- No `service_role`, `sb_secret_...`, or literal `secret key` value pattern was found in the production bundle.
+- Production reports `baseDate = 2026-09-11` from the Supabase operational data source.
+- The existing dashboard loaded all five 1.x screens with no browser console errors after PR 13 deployment.
+- Production Supabase contains the report storage and append-only review migrations; anon, authenticated non-admin, active admin, revoked admin with the same JWT, and service role passed rollback-only role smoke tests.
+- Report tables are empty at this checkpoint. No real OpenRouter request has been made because `OPENROUTER_API_KEY` is not yet configured.
 
 ## Local Verification Notes
 
@@ -21,7 +21,7 @@ This checklist tracks the remaining production setup needed for business plan ra
 
 - [x] Run `supabase/migrations/20260504120000_business_plan_rates.sql` in the Supabase SQL Editor.
 - [x] Confirm production has active editor entries in `public.business_plan_admins` without recording addresses in the repository.
-- [ ] Apply the separately approved `20260911133319_close_business_plan_history_access.sql` migration. Afterward, anonymous users must read only `business_plan_current`, never `business_plan_rates`.
+- [x] Apply `20260911135121_close_business_plan_history_access.sql`. Anonymous users read only `business_plan_current`, never `business_plan_rates`.
 - [x] Confirm in the isolated DB that only active `business_plan_admins` can read history or insert business plan rates; repeat against the production Data API immediately after approval and application.
 
 ## Environment Variables
@@ -59,7 +59,8 @@ This checklist tracks the remaining production setup needed for business plan ra
 
 ## LATAM FX 2.0 Report Pilot
 
-- [ ] Apply `20260911143920_fx_report_storage.sql` to the separately approved database environment.
+- [x] Apply `20260912021010_fx_report_storage.sql` and `20260912021458_lock_fx_report_reviews_append_only.sql` to production.
+- [x] Verify report storage with rollback-only tests for anon, non-admin, active admin, revoked admin, and service role.
 - [ ] Add `OPENROUTER_API_KEY` as a GitHub Actions secret only.
 - [ ] Set the four `FX_REPORT_*` repository variables to the review-mode defaults documented in `docs/2x-rollout.md`.
 - [ ] Run the daily workflow manually and confirm the existing 1.x email still arrives.

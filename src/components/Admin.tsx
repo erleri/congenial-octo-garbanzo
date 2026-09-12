@@ -30,6 +30,7 @@ interface AdminProps {
   reportAdminStatus?: BusinessPlanStatus
   onRequestReportAccess?: (email: string) => Promise<void>
   onSignOutReportAccess?: () => Promise<void>
+  reportEnabled?: boolean
 }
 
 interface InlineNotice {
@@ -81,6 +82,7 @@ function Admin({
   reportAdminStatus,
   onRequestReportAccess,
   onSignOutReportAccess,
+  reportEnabled = false,
 }: AdminProps) {
   const [localExcelPriority, setLocalExcelPriority] = useState(excelPriority)
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
@@ -340,6 +342,7 @@ function Admin({
         ) : null}
       </div>
 
+      {reportEnabled ? <>
       <div className="plan-auth-panel" style={{ marginTop: 12 }}>
         <div className="panel-header-inline">
           <div><strong>2.0 리포트 관리자 인증</strong><p className="table-help">계획환율과 동일한 active admin 권한을 사용합니다.</p></div>
@@ -362,6 +365,7 @@ function Admin({
       </div>
 
       <FxReportAdmin key={canReviewReports ? 'report-admin-active' : 'report-admin-locked'} canReview={canReviewReports} />
+      </> : null}
 
       <div className="table-card" style={{ marginTop: 12 }}>
         <h3>데이터 상태</h3>
