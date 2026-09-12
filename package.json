@@ -7,6 +7,7 @@
     "dev": "vite --configLoader native",
     "dev:local": "vite --configLoader native --host 127.0.0.1 --port 5173",
     "build": "tsc -b && vite build",
+    "verify:bundle": "node scripts/verify-bundle-boundary.js",
     "build:local": "tsc -b && vite build --configLoader native --emptyOutDir false --outDir dist-local",
     "generate:data": "tsx scripts/generate-data.ts",
     "generate:report": "node scripts/create-fx-report.js",
@@ -18,7 +19,7 @@
     "test:period-selection": "tsx scripts/test-period-selection.ts",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
-    "check": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm run verify:bundle",
     "lint": "eslint .",
     "preview": "vite preview",
     "preview:local": "vite preview --host 127.0.0.1 --port 4173 --outDir dist-local"
@@ -45,7 +46,7 @@
     "tsx": "^4.21.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.10",
+    "vite": "8.0.16",
     "vitest": "^3.2.4"
   },
   "overrides": {
