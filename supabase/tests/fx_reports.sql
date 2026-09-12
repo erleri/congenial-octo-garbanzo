@@ -1,5 +1,5 @@
 begin;
-select plan(15);
+select plan(18);
 
 select ok(
   not (
@@ -21,6 +21,21 @@ select ok(
       and p.proname = 'review_fx_report'
   ),
   'privileged review implementation stays in the private schema'
+);
+
+select ok(
+  not has_table_privilege('service_role', 'public.fx_report_reviews', 'UPDATE'),
+  'service role cannot update append-only reviews'
+);
+
+select ok(
+  not has_table_privilege('service_role', 'public.fx_report_reviews', 'DELETE'),
+  'service role cannot delete append-only reviews'
+);
+
+select ok(
+  not has_table_privilege('service_role', 'public.fx_report_reviews', 'TRUNCATE'),
+  'service role cannot truncate append-only reviews'
 );
 
 insert into public.business_plan_admins(email, active)
