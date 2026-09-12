@@ -63,7 +63,7 @@ grant select on table public.fx_reports to anon, authenticated;
 grant select on table public.fx_report_runs to authenticated;
 grant select on table public.fx_report_reviews to authenticated;
 grant select, insert, update, delete on table public.fx_report_runs to service_role;
-grant select, insert, update, delete on table public.fx_report_reviews to service_role;
+grant select, insert on table public.fx_report_reviews to service_role;
 grant select, insert, update, delete on table public.fx_reports to service_role;
 grant usage, select on sequence public.fx_report_reviews_id_seq to service_role;
 
@@ -82,7 +82,7 @@ on public.fx_report_reviews for select
 to authenticated
 using ((select app_private.is_business_plan_admin()));
 
-create or replace function public.review_fx_report(
+create or replace function app_private.review_fx_report(
   p_run_id uuid,
   p_decision text,
   p_reason text default null
@@ -150,6 +150,24 @@ begin
 
   return v_run;
 end;
+$$;
+
+revoke all on function app_private.review_fx_report(uuid, text, text)
+  from public, anon, authenticated;
+grant execute on function app_private.review_fx_report(uuid, text, text)
+  to authenticated;
+
+create or replace function public.review_fx_report(
+  p_run_id uuid,
+  p_decision text,
+  p_reason text default null
+)
+returns public.fx_report_runs
+language sql
+security invoker
+set search_path = ''
+as $$
+  select app_private.review_fx_report(p_run_id, p_decision, p_reason);
 $$;
 
 revoke all on function public.review_fx_report(uuid, text, text) from public, anon;

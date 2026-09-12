@@ -1,5 +1,27 @@
 begin;
-select plan(12);
+select plan(15);
+
+select ok(
+  not (
+    select p.prosecdef
+    from pg_catalog.pg_proc p
+    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'public'
+      and p.proname = 'review_fx_report'
+  ),
+  'public review RPC is security invoker'
+);
+
+select ok(
+  (
+    select p.prosecdef
+    from pg_catalog.pg_proc p
+    join pg_catalog.pg_namespace n on n.oid = p.pronamespace
+    where n.nspname = 'app_private'
+      and p.proname = 'review_fx_report'
+  ),
+  'privileged review implementation stays in the private schema'
+);
 
 insert into public.business_plan_admins(email, active)
 values ('report-admin@example.test', true);
@@ -77,6 +99,11 @@ insert into public.fx_report_runs(
   '{"valid":true,"errors":[]}'
 );
 set local role service_role;
+select ok(
+  not has_table_privilege(current_user, 'public.fx_report_reviews', 'UPDATE')
+    and not has_table_privilege(current_user, 'public.fx_report_reviews', 'DELETE'),
+  'service role cannot rewrite or delete append-only reviews'
+);
 select lives_ok(
   $$select public.publish_fx_report_system('10000000-0000-0000-0000-000000000002')$$,
   'service role can publish automatically'
