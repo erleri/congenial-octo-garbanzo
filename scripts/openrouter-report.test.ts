@@ -38,4 +38,31 @@ describe('OpenRouter FX report enhancement', () => {
     await expect(enhanceReportWithOpenRouter({ apiKey: 'test', evidence, fetchImpl, timeoutMs: 100 })).rejects.toThrow('rate limited')
     expect(fetchImpl).toHaveBeenCalledTimes(2)
   })
+
+  it('preserves the actual model and raw response when validation rejects a candidate', async () => {
+    const invalidCandidate = { ...candidate, headline: 'BRL은 상승했습니다.' }
+    const raw = JSON.stringify(invalidCandidate)
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ model: 'example/rejected-free-model:free', choices: [{ message: { content: raw } }] }),
+    })
+    await expect(enhanceReportWithOpenRouter({ apiKey: 'test', evidence, fetchImpl, timeoutMs: 100 })).rejects.toMatchObject({
+      model: 'example/rejected-free-model:free',
+      raw,
+      validation: { valid: false },
+    })
+  })
+
+  it('classifies malformed structured output without retrying', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ model: 'example/free-model:free', choices: [{ message: { content: '{not-json' } }] }),
+    })
+    await expect(enhanceReportWithOpenRouter({ apiKey: 'test', evidence, fetchImpl, timeoutMs: 100 })).rejects.toMatchObject({
+      model: 'example/free-model:free',
+      raw: '{not-json',
+      validation: { valid: false, errors: ['invalid_json'] },
+    })
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+  })
 })

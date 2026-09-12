@@ -100,4 +100,17 @@ describe('AI report validation', () => {
     expect(validateAiReport(malformed, evidence).errors).toContain('schema')
   })
 
+  it('rejects AI-authored direction, direct causality, disguised numbers, URLs, and email addresses', () => {
+    const forbidden = [
+      'BRL은 상승 흐름입니다.',
+      '정책 발표 때문에 움직였습니다.',
+      '두 배 확대될 수 있습니다.',
+      'https://example.com을 확인합니다.',
+      'analyst@example.com에 문의합니다.',
+    ]
+    for (const headline of forbidden) {
+      expect(validateAiReport({ ...validCandidate, headline }, evidence).errors).toContain('forbidden_content')
+    }
+  })
+
 })

@@ -117,6 +117,8 @@ async function main() {
       validation = { ...result.validation, aiValid: true, aiErrors: [] }
     } catch (error) {
       aiError = error instanceof Error ? error.message : String(error)
+      aiModel = typeof error?.model === 'string' ? error.model : null
+      rawAiResponse = typeof error?.raw === 'string' ? error.raw : null
       const aiValidation = error?.validation ?? { valid: false, errors: ['openrouter_failure'] }
       validation = { valid: true, errors: [], aiValid: false, aiErrors: aiValidation.errors }
       console.warn(`AI enhancement was skipped; deterministic report remains active. ${aiError}`)

@@ -218,6 +218,5 @@ jobs:
             email-chart.png
             email-chart-meta.json
             email-market-context.json
-            fx-report-run.json
             fx-report-published.json
           if-no-files-found: warn
