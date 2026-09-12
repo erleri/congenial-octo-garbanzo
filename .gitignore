@@ -17,6 +17,7 @@ email-chart-meta.json
 email-market-context.json
 fx-report-run.json
 fx-report-published.json
+fx-report-model-evaluation/
 public/email-preview.html
 *.local
 

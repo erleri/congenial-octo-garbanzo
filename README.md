@@ -113,7 +113,7 @@ GitHub repository variables의 초기값은 다음과 같습니다.
 FX_REPORT_ENABLED=true
 FX_REPORT_PUBLISH_MODE=review
 FX_REPORT_AI_MODE=optional
-FX_REPORT_AI_MODEL=openrouter/free
+FX_REPORT_AI_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free
 ```
 
 병합 시 저장소 기본값은 안전하게 `false`입니다. 파일럿 시작 체크포인트에서 repository variable을 `true`로 설정합니다.
@@ -153,6 +153,10 @@ FX_REPORT_AI_MODEL=openrouter/free
 3. GitHub Secret에 `OPENROUTER_API_KEY`를 추가합니다. 키가 없어도 자동 분석은 정상 동작합니다.
 4. 파일럿은 `FX_REPORT_PUBLISH_MODE=review`로 유지합니다.
 5. active admin이 관리 화면에서 초안을 승인하면 공개 리포트와 최근 30개 이력에 나타납니다.
+
+Nemotron 3 Ultra 무료 엔드포인트는 JSON Schema `response_format` 대신 강제 tool call로 동일한 리포트 스키마를 제출합니다. 모든 결과는 기존 수치·근거·금지표현 검증을 통과해야 채택되며, 누락되거나 잘못된 tool call은 자동 분석판으로 안전하게 폴백됩니다.
+
+모델 비교는 GitHub Actions의 `Evaluate FX Report Models`를 수동 실행합니다. 이 워크플로는 최근 1~20개 영업일을 Ultra와 Super로 비교해 블라인드 검토 문서와 별도 매핑을 artifact로 만들 뿐, Supabase 저장·사이트 게시·메일 발송은 수행하지 않습니다. 과거 뉴스와 계획환율은 재구성하지 않으므로 문장 품질과 검증 통과율을 중심으로 평가합니다.
 6. 10영업일 합격 후 별도 승인으로만 `automatic`으로 전환합니다.
 
 상세 적용·복구 절차는 `docs/2x-rollout.md`에 기록합니다.

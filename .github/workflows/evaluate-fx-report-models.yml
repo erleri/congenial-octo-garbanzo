@@ -1,0 +1,50 @@
+name: Evaluate FX Report Models
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: Number of recent business dates to compare (1-20)
+        required: true
+        default: '10'
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+
+jobs:
+  blind-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run model comparison without publishing
+        run: npm run evaluate:report-models
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          FX_REPORT_EVAL_DAYS: ${{ inputs.days }}
+          FX_REPORT_EVAL_MODELS: nvidia/nemotron-3-ultra-550b-a55b:free,nvidia/nemotron-3-super-120b-a12b:free
+
+      - name: Upload blind review and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fx-report-model-evaluation-${{ github.run_id }}
+          path: fx-report-model-evaluation/
+          if-no-files-found: warn
+          retention-days: 14
+
