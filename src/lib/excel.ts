@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx'
+import type * as Xlsx from 'xlsx'
 import { validateExcelUpload } from './uploadValidation'
 import type {
   CurrencyCode,
@@ -18,6 +18,14 @@ import {
   getStatus,
 } from './utils'
 
+type XlsxModule = typeof import('xlsx')
+let xlsxModulePromise: Promise<XlsxModule> | null = null
+
+function loadXlsxModule(): Promise<XlsxModule> {
+  xlsxModulePromise ??= import('xlsx')
+  return xlsxModulePromise
+}
+
 export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -27,10 +35,13 @@ export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   })
 }
 
-export function buildRawSheetsFromWorkbook(workbook: XLSX.WorkBook): RawSheet[] {
+export function buildRawSheetsFromWorkbook(
+  workbook: Xlsx.WorkBook,
+  xlsx: Pick<XlsxModule, 'utils'>,
+): RawSheet[] {
   return workbook.SheetNames.map((sheetName) => {
     const sheet = workbook.Sheets[sheetName]
-    const rows = XLSX.utils.sheet_to_json<(string | number | null)[]>(sheet, {
+    const rows = xlsx.utils.sheet_to_json<(string | number | null)[]>(sheet, {
       header: 1,
       raw: true,
       defval: null,
@@ -69,7 +80,7 @@ export function buildRawSheetsFromWorkbook(workbook: XLSX.WorkBook): RawSheet[] 
  * Gets value from a cell, accounting for merged cells.
  */
 function getCellValue(
-  sheet: XLSX.WorkSheet,
+  sheet: Xlsx.WorkSheet,
   rows: (string | number | null)[][],
   R: number,
   C: number
@@ -90,7 +101,7 @@ function getCellValue(
  * Detects the mapping between column index and {year, month}.
  */
 function detectColumnMapping(
-  sheet: XLSX.WorkSheet,
+  sheet: Xlsx.WorkSheet,
   rows: (string | number | null)[][]
 ): Map<number, { year: number; month: number }> {
   const mapping = new Map<number, { year: number; month: number }>();
@@ -286,18 +297,19 @@ export async function parseExcelWorkbook(file: File): Promise<{
   baseDate: string
 }> {
   validateExcelUpload(file)
+  const xlsx = await loadXlsxModule()
   const fileData = await readFileAsArrayBuffer(file)
-  let workbook: XLSX.WorkBook
+  let workbook: Xlsx.WorkBook
   try {
-    workbook = XLSX.read(fileData, { type: 'array' })
+    workbook = xlsx.read(fileData, { type: 'array' })
   } catch {
     throw new Error('Excel 파일을 읽을 수 없습니다. 손상 여부와 파일 형식을 확인해 주세요.')
   }
-  const rawSheets = buildRawSheetsFromWorkbook(workbook)
+  const rawSheets = buildRawSheetsFromWorkbook(workbook, xlsx)
 
   const summarySheet = workbook.Sheets.Summary
   const summaryRows = summarySheet
-    ? XLSX.utils.sheet_to_json<(string | number | null)[]>(summarySheet, {
+    ? xlsx.utils.sheet_to_json<(string | number | null)[]>(summarySheet, {
         header: 1,
         raw: true,
         defval: null,
@@ -317,7 +329,7 @@ export async function parseExcelWorkbook(file: File): Promise<{
       return []
     }
 
-    const rows = XLSX.utils.sheet_to_json<(string | number | null)[]>(sheet, {
+    const rows = xlsx.utils.sheet_to_json<(string | number | null)[]>(sheet, {
       header: 1,
       raw: true,
       defval: null,

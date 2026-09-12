@@ -30,7 +30,7 @@ The additive structure and the access closure remain separate changes. The closu
 
 ## Dependency exception
 
-The npm xlsx 0.18.5 package has known prototype-pollution and ReDoS advisories without an npm-provided fix. Extension, 25 MB size and parsing checks reduce accidental bad uploads but do not remove parser vulnerabilities. Accept only trusted workbooks. Production npm audit remains visible and non-blocking for this known exception.
+The npm xlsx 0.18.5 package has known prototype-pollution and ReDoS advisories without an npm-provided fix. Extension, 25 MB size and parsing checks reduce accidental bad uploads but do not remove parser vulnerabilities. Accept only trusted workbooks. The parser is loaded only after upload validation and is no longer part of the initial application chunk. Production npm audit remains visible and non-blocking for this known exception.
 
 ## Local verification record — 2026-09-09
 
@@ -93,7 +93,7 @@ Branch: `codex/1x-plan-access-closure`, based on production merge `a764db9c65289
 
 Production acceptance after approval: anon current-value read succeeds; anon raw-history access returns a privilege error; authenticated non-admin receives no raw history and cannot insert; active admin can read history and save; service-role synchronization remains intact; the five public screens and email current values remain unchanged. Do not restore public saver-email access as rollback.
 
-Non-blocking known warnings: production `xlsx` advisory; full dependency audit reports 17 findings (2 low, 3 moderate, 12 high); bundle chunk exceeds 500 kB. No automatic breaking dependency upgrade was attempted.
+Non-blocking known warnings after dependency and bundle hardening: production audit reports only the `xlsx` advisory; the full development audit reports 8 package findings (1 low, 2 moderate, 5 high) in `xlsx`, Vitest, Puppeteer and their tooling dependencies. The initial chunk remains above Vite's generic 500 kB warning, but moving `xlsx` behind upload-time loading reduced it from about 1.14 MB/346 kB gzip to about 804 kB/232 kB gzip. The build enforces an 850,000-byte regression ceiling and requires a separate lazy `xlsx` chunk. No forced or breaking dependency upgrade was attempted.
 
 ## Preserved data audit
 
