@@ -34,4 +34,5 @@ jobs:
           version: 2.116.0
       - run: supabase db start
       - run: supabase test db --local
+      - run: supabase db advisors --local --fail-on error
       - run: node scripts/test-plan-rollout.mjs
