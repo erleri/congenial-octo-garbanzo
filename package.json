@@ -9,6 +9,8 @@
     "build": "tsc -b && vite build",
     "build:local": "tsc -b && vite build --configLoader native --emptyOutDir false --outDir dist-local",
     "generate:data": "tsx scripts/generate-data.ts",
+    "generate:report": "node scripts/create-fx-report.js",
+    "persist:report": "node scripts/persist-fx-report.js",
     "generate:fallback": "tsx scripts/build-static-fallback.ts",
     "sync:supabase": "node scripts/sync-fx-to-supabase.js",
     "verify:supabase": "node scripts/verify-fx-supabase.js",

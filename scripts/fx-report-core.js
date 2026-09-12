@@ -4,6 +4,11 @@ const ALL_REPORT_CURRENCIES = [...PRIMARY_CURRENCIES, ...ANOMALY_CURRENCIES]
 const FORBIDDEN_AI_PATTERNS = [
   /<\/?[a-z][^>]*>/i,
   /(?:매수|매도|투자\s*권고|목표\s*환율|목표가)/,
+  /(?:상승|하락|강세|약세|오름|내림)/,
+  /(?:때문에|로\s*인해|의\s*영향으로|덕분에)/,
+  /(?:한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|십|백|천)\s*(?:퍼센트|프로|배)(?![가-힣A-Za-z])/,
+  /https?:\/\/|www\./i,
+  /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i,
   /(?:will|guaranteed|certain to)\s+(?:rise|fall)/i,
   /\b(?:buy|sell)\b/i,
   /\d/,

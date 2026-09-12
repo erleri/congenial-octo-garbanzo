@@ -79,6 +79,34 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           FX_EMAIL_DATA_SOURCE: auto
 
+      - name: Generate optional FX 2.0 report
+        continue-on-error: true
+        run: npm run generate:report
+        env:
+          VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          FX_EMAIL_DATA_SOURCE: auto
+          FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED || 'true' }}
+          FX_REPORT_PUBLISH_MODE: ${{ vars.FX_REPORT_PUBLISH_MODE || 'review' }}
+          FX_REPORT_AI_MODE: ${{ vars.FX_REPORT_AI_MODE || 'optional' }}
+          FX_REPORT_AI_MODEL: ${{ vars.FX_REPORT_AI_MODEL || 'openrouter/free' }}
+
+      - name: Store optional FX 2.0 report
+        continue-on-error: true
+        shell: bash
+        run: |
+          if [ -f fx-report-run.json ]; then
+            npm run persist:report
+          else
+            echo "FX 2.0 report artifact is absent; preserving the 1.x flow."
+          fi
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
       - name: Compose email metadata
         id: email
         run: node scripts/compose-email.js
@@ -190,4 +218,5 @@ jobs:
             email-chart.png
             email-chart-meta.json
             email-market-context.json
+            fx-report-published.json
           if-no-files-found: warn
