@@ -1,19 +1,7 @@
 {
-  "baseDate": "2026-09-12",
-  "fetchedAt": "2026-09-12T04:38:23.518Z",
+  "baseDate": "2026-09-13",
+  "fetchedAt": "2026-09-13T04:51:38.984Z",
   "dailyRates": [
-    {
-      "currency": "ARS",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 1325,
-      "status": "ok",
-      "source": "IMPUTED",
-      "imputationMethod": "FFILL"
-    },
     {
       "currency": "ARS",
       "year": 2025,
@@ -4797,22 +4785,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 1508.66040386,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "ARS",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 1.0496150943396227,
+      "value": 1512.67205701,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "ARS",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 1508.62432247,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "ARS",
@@ -9597,22 +9585,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 0.8888147865478374,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "BRL",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 5.4281,
+      "value": 0.8891902181353697,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "ARS",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 0.8890109966171982,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "BRL",
@@ -14397,22 +14385,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 5.1024,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "BRL",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 256.2111972881856,
+      "value": 5.1108,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "BRL",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 5.1053,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "BRL",
@@ -19197,22 +19185,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 262.80175502312636,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "CLP",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 967.8,
+      "value": 263.1786014596541,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "BRL",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 262.704172612775,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "CLP",
@@ -23997,22 +23985,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 942.37674203,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "CLP",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 1.4370117792932424,
+      "value": 940.93680848,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "CLP",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 942.45303648,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "CLP",
@@ -28797,22 +28785,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 1.4229125306525368,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "COP",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 4041.5,
+      "value": 1.4294830260842004,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "CLP",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 1.4230773953991727,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "COP",
@@ -33597,22 +33585,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 3080.92916319,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "COP",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 0.34411480885809725,
+      "value": 3102.696311,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "COP",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 3076.44830482,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "COP",
@@ -38397,22 +38385,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 0.4352322315134338,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "GTQ",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 7.660210293303819,
+      "value": 0.4335110695724162,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "COP",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 0.4359519418345862,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "GTQ",
@@ -43197,22 +43185,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 7.63262838,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "GTQ",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 181.55376246207194,
+      "value": 7.63750568,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "GTQ",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 7.62844791,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "GTQ",
@@ -47997,22 +47985,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 175.6825575765815,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "MXN",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 18.5998,
+      "value": 176.1115804944318,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "GTQ",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 175.81343259640872,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "MXN",
@@ -52797,22 +52785,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 16.9724,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "MXN",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 74.77177173948108,
+      "value": 16.9771,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "MXN",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 16.9639,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "MXN",
@@ -57597,22 +57585,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 79.00589632756711,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "PYG",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 7285.263157894737,
+      "value": 79.22750035871852,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "MXN",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 79.06104212121033,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "PYG",
@@ -62397,22 +62385,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 5919.26328433,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "PYG",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 0.1908977026441266,
+      "value": 5891.48487038,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "PYG",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 5931.01400289,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "PYG",
@@ -67197,22 +67185,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 0.22653489301275073,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "PEN",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 3.521,
+      "value": 0.22830461690606776,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "PYG",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 0.22613057594982622,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "PEN",
@@ -71997,22 +71985,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 3.35481659,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "PEN",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 394.98437943765975,
+      "value": 3.35504012,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "PEN",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 3.35457455,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "PEN",
@@ -76797,22 +76785,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 399.69984613376437,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "CNY",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 7.1838,
+      "value": 400.9052494847663,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "PEN",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 399.8073652708061,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "CNY",
@@ -81597,22 +81585,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 6.7253,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "CNY",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 193.5939196525516,
+      "value": 6.7082,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "CNY",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 6.7309,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "CNY",
@@ -86397,22 +86385,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 199.38436572792293,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "UYU",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 40.11011301072153,
+      "value": 200.50880956739516,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "CNY",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 199.2576939844597,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "UYU",
@@ -91197,22 +91185,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "LOCAL_PER_USD",
-      "value": 40.20527424,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "UYU",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 34.67305114867794,
+      "value": 40.27477455,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "UYU",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 40.30547218,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "UYU",
@@ -95997,22 +95985,22 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 33.35183505590733,
-      "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
-    },
-    {
-      "currency": "USD",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "LOCAL_PER_USD",
-      "value": 1,
+      "value": 33.396914355663355,
       "status": "ok",
       "source": "IMPUTED",
       "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "UYU",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 33.275472036412694,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "USD",
@@ -100799,20 +100787,20 @@
       "rateType": "LOCAL_PER_USD",
       "value": 1,
       "status": "ok",
-      "source": "API",
-      "imputationMethod": "NONE"
+      "source": "IMPUTED",
+      "imputationMethod": "FFILL"
     },
     {
       "currency": "USD",
-      "year": 2025,
-      "month": 8,
-      "day": 9,
-      "date": "2025-08-09",
-      "rateType": "KRW",
-      "value": 1390.74,
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "LOCAL_PER_USD",
+      "value": 1,
       "status": "ok",
-      "source": "IMPUTED",
-      "imputationMethod": "FFILL"
+      "source": "API",
+      "imputationMethod": "NONE"
     },
     {
       "currency": "USD",
@@ -105597,7 +105585,19 @@
       "day": 12,
       "date": "2026-09-12",
       "rateType": "KRW",
-      "value": 1340.91967483,
+      "value": 1345.05319634,
+      "status": "ok",
+      "source": "IMPUTED",
+      "imputationMethod": "FFILL"
+    },
+    {
+      "currency": "USD",
+      "year": 2026,
+      "month": 9,
+      "day": 13,
+      "date": "2026-09-13",
+      "rateType": "KRW",
+      "value": 1341.18361244,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -109609,7 +109609,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 1510.4113666824999,
+      "value": 1510.582490446923,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -109619,7 +109619,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 0.8946725695861809,
+      "value": 0.8942659433260695,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -113689,7 +113689,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 5.118483333333333,
+      "value": 5.1181153846153835,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -113699,7 +113699,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 264.0085388420752,
+      "value": 263.9371911657081,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -117769,7 +117769,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 934.0294194633333,
+      "value": 934.5666258838462,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -117779,7 +117779,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 1.4467838392565218,
+      "value": 1.4454656893776228,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -121849,7 +121849,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 3137.801608810833,
+      "value": 3134.7565198738457,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -121859,7 +121859,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 0.43067495459429717,
+      "value": 0.4309484796173181,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -125929,7 +125929,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 7.6324289625,
+      "value": 7.632497904615385,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -125939,7 +125939,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 177.0499927803514,
+      "value": 176.9878745291135,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -130009,7 +130009,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 16.947458333333334,
+      "value": 16.949084615384617,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -130019,7 +130019,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 79.73549823191321,
+      "value": 79.70066345656309,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -134089,7 +134089,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 5928.939448620833,
+      "value": 5926.962228645385,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -134099,7 +134099,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 0.2279261939564093,
+      "value": 0.22792420210154268,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -138169,7 +138169,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 3.3562055674999995,
+      "value": 3.3560972992307687,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -138179,7 +138179,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 402.6293666891847,
+      "value": 402.5050129916942,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -142249,7 +142249,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 6.713725000000001,
+      "value": 6.713730769230771,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -142259,7 +142259,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 201.2760597309965,
+      "value": 201.20729650737616,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -146329,7 +146329,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "LOCAL_PER_USD",
-      "value": 40.22574939333334,
+      "value": 40.23722809307693,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -146339,7 +146339,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 33.59330592594275,
+      "value": 33.572324803652435,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -150419,7 +150419,7 @@
       "year": 2026,
       "month": 9,
       "rateType": "KRW",
-      "value": 1351.31692873,
+      "value": 1350.8554060546155,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -150687,17 +150687,17 @@
     {
       "label": "12일",
       "values": {
-        "KRW": 1340.91967483,
-        "BRL": 5.1024,
-        "COP": 3080.92916319,
-        "CLP": 942.37674203,
-        "PEN": 3.35481659,
-        "ARS": 1508.66040386,
-        "MXN": 16.9724,
-        "PYG": 5919.26328433,
-        "GTQ": 7.63262838,
-        "UYU": 40.20527424,
-        "CNY": 6.7253,
+        "KRW": 1345.05319634,
+        "BRL": 5.1108,
+        "COP": 3102.696311,
+        "CLP": 940.93680848,
+        "PEN": 3.35504012,
+        "ARS": 1512.67205701,
+        "MXN": 16.9771,
+        "PYG": 5891.48487038,
+        "GTQ": 7.63750568,
+        "UYU": 40.27477455,
+        "CNY": 6.7082,
         "OIL": null
       },
       "isPercent": false
@@ -150705,17 +150705,17 @@
     {
       "label": "13일",
       "values": {
-        "KRW": null,
-        "BRL": null,
-        "COP": null,
-        "CLP": null,
-        "PEN": null,
-        "ARS": null,
-        "MXN": null,
-        "PYG": null,
-        "GTQ": null,
-        "UYU": null,
-        "CNY": null,
+        "KRW": 1341.18361244,
+        "BRL": 5.1053,
+        "COP": 3076.44830482,
+        "CLP": 942.45303648,
+        "PEN": 3.35457455,
+        "ARS": 1508.62432247,
+        "MXN": 16.9639,
+        "PYG": 5931.01400289,
+        "GTQ": 7.62844791,
+        "UYU": 40.30547218,
+        "CNY": 6.7309,
         "OIL": null
       },
       "isPercent": false
@@ -151047,17 +151047,17 @@
     {
       "label": "평균(실적)",
       "values": {
-        "KRW": 1351.31692873,
-        "BRL": 5.118483333333333,
-        "COP": 3137.801608810833,
-        "CLP": 934.0294194633333,
-        "PEN": 3.3562055674999995,
-        "ARS": 1510.4113666824999,
-        "MXN": 16.947458333333334,
-        "PYG": 5928.939448620833,
-        "GTQ": 7.6324289625,
-        "UYU": 40.22574939333334,
-        "CNY": 6.713725000000001,
+        "KRW": 1350.8554060546155,
+        "BRL": 5.1181153846153835,
+        "COP": 3134.7565198738457,
+        "CLP": 934.5666258838462,
+        "PEN": 3.3560972992307687,
+        "ARS": 1510.582490446923,
+        "MXN": 16.949084615384617,
+        "PYG": 5926.962228645385,
+        "GTQ": 7.632497904615385,
+        "UYU": 40.23722809307693,
+        "CNY": 6.713730769230771,
         "OIL": null
       },
       "isPercent": false
@@ -151065,17 +151065,17 @@
     {
       "label": "누적(1월~현재)",
       "values": {
-        "KRW": 1461.6804279269518,
-        "BRL": 5.1480540681003575,
-        "COP": 3497.645927805297,
-        "CLP": 904.4977853049776,
-        "PEN": 3.3973402847332306,
-        "ARS": 1441.6704010611606,
-        "MXN": 17.373817450930193,
-        "PYG": 6264.540709038285,
-        "GTQ": 7.63983174731981,
-        "UYU": 39.791921132596755,
-        "CNY": 6.824591745178359,
+        "KRW": 1461.6291476296867,
+        "BRL": 5.148013184909475,
+        "COP": 3497.307584590076,
+        "CLP": 904.5574749072568,
+        "PEN": 3.3973282549255384,
+        "ARS": 1441.6894148127633,
+        "MXN": 17.37399814893589,
+        "PYG": 6264.321017929902,
+        "GTQ": 7.639839407554853,
+        "UYU": 39.79319654367938,
+        "CNY": 6.824592386203999,
         "OIL": null
       },
       "isPercent": false
@@ -151119,17 +151119,17 @@
     {
       "label": "이동",
       "values": {
-        "KRW": 1416.5442877882797,
-        "BRL": 5.12791164874552,
-        "COP": 3179.8906079213534,
-        "CLP": 928.0253255411112,
-        "PEN": 3.3761877162634413,
-        "ARS": 1497.855491249328,
-        "MXN": 17.163224820788532,
-        "PYG": 5986.12635375447,
-        "GTQ": 7.629348171263441,
-        "UYU": 40.19408254648746,
-        "CNY": 6.742127688172043,
+        "KRW": 1416.3904468964847,
+        "BRL": 5.12778899917287,
+        "COP": 3178.8755782756903,
+        "CLP": 928.2043943479489,
+        "PEN": 3.3761516268403646,
+        "ARS": 1497.9125325041357,
+        "MXN": 17.163766914805624,
+        "PYG": 5985.467280429322,
+        "GTQ": 7.62937115196857,
+        "UYU": 40.19790877973532,
+        "CNY": 6.7421296112489655,
         "OIL": null
       },
       "isPercent": false
@@ -151137,17 +151137,17 @@
     {
       "label": "이동 대비",
       "values": {
-        "KRW": 0.048269475258910545,
-        "BRL": 0.0018420135024737419,
-        "COP": 0.013413530986897359,
-        "CLP": -0.006428163607171871,
-        "PEN": 0.005953791673829507,
-        "ARS": -0.00831288462874182,
-        "MXN": 0.012731495378915618,
-        "PYG": 0.009645385254683227,
-        "GTQ": -0.00040364492767576003,
-        "UYU": -0.0007872282635740838,
-        "CNY": 0.004230540895261845,
+        "KRW": 0.048513734740326164,
+        "BRL": 0.0018900735584360037,
+        "COP": 0.014074157952024949,
+        "CLP": -0.006807681078789182,
+        "PEN": 0.005975490524125283,
+        "ARS": -0.008387465115552032,
+        "MXN": 0.012666306428498248,
+        "PYG": 0.00987100128649017,
+        "GTQ": -0.00040966308617317845,
+        "UYU": -0.0009771874258001582,
+        "CNY": 0.004229964381107985,
         "OIL": null
       },
       "isPercent": true
@@ -151173,28 +151173,28 @@
     {
       "label": "전년 동월 대비",
       "values": {
-        "KRW": 0.03423020944756731,
-        "BRL": -0.09046838524683698,
-        "COP": -0.1524370046750816,
-        "CLP": -0.0539590031676731,
-        "PEN": -0.06363901219278462,
-        "ARS": 0.22291322047892184,
-        "MXN": -0.11044135331120417,
-        "PYG": -0.19300131604675902,
-        "GTQ": -0.005746120536407048,
-        "UYU": -0.04411930927259866,
-        "CNY": -0.05493275851157197,
+        "KRW": 0.034193925433929524,
+        "BRL": -0.09047560827793333,
+        "COP": -0.1525189933025355,
+        "CLP": -0.053896572046493785,
+        "PEN": -0.06364232779901471,
+        "ARS": 0.22292934910873116,
+        "MXN": -0.11043210137369185,
+        "PYG": -0.19302961667462237,
+        "GTQ": -0.00574512362722611,
+        "UYU": -0.04408867137445453,
+        "CNY": -0.0549326697425501,
         "OIL": null
       },
       "isPercent": true
     }
   ],
   "coverage": {
-    "dailyFrom": "2025-08-09",
-    "dailyTo": "2026-09-12",
+    "dailyFrom": "2025-08-10",
+    "dailyTo": "2026-09-13",
     "monthlyFrom": "2010-01-01",
     "monthlyTo": "2026-12-01",
     "limitedDailyHistory": true,
-    "dataVersion": "f8278fdb5a5cd39506105f697f3ac4d6094365f08917f7b2f5e47abfec5f77c0"
+    "dataVersion": "551d7df98ae96ca15a9e9ffdd643fae5dca0510fab7f4d3ec13177279cc69222"
   }
 }
