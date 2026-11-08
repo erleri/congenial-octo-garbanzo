@@ -15,7 +15,7 @@ import {dashboardReferenceState} from './dashboard-reference-state.js'
 import {eventTrialEndpointPreflight} from './lifecycle-control.js'
 import {callOpenRouterStream,reconcileGenerationCost} from './openrouter-stream.js'
 import {NEWS_REVIEW_POLICY} from './news-model-review.js'
-import {operatingResultState} from './operating-result.js'
+import {operatingResultState,referenceReadiness} from './operating-result.js'
 import {createOfficialInputLoader} from './official-input-loader.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
 import {withOfficialInputCache} from './official-input-cache.js'
@@ -31,9 +31,10 @@ export function automaticReferenceCalendars(dataset,asOf) {
    :{status:'unverified',reason:state.status==='late'?'dashboard_reference_update_due':'dashboard_reference_invalid',referenceState:state}]
  }))
 }
-export async function operatingEntry({action='inspect',input,env=process.env,workspace=process.cwd(),store,
+export async function operatingEntry({action='inspect',input,requireReady=false,env=process.env,workspace=process.cwd(),store,
  asOf=new Date().toISOString(),fetchImpl=fetch,transport,acquire}={}) {
  if(!['inspect','draft-policy','draft-trial','draft-recurring','configure-policy','plan','execute'].includes(action))throw Error('operating_action_required')
+ if(requireReady&&action!=='plan')throw Error('reference_readiness_is_plan_only')
  const root=await fs.realpath(workspace),privateRoot=path.join(root,'.local-reports/private')
  const readPrivate=async file=>{
   const target=await fs.realpath(path.resolve(root,file)),relative=path.relative(privateRoot,target),stat=await fs.stat(target)
@@ -133,14 +134,15 @@ export async function operatingEntry({action='inspect',input,env=process.env,wor
  if(workflow&&env.FX_REPORT_DATA_REFRESH==='not_confirmed')for(const calendar of Object.values(calendars)){
   calendar.status='unverified';calendar.reason='upstream_fx_refresh_not_confirmed'
  }
- return runOperatingCycle({dataset,asOf:operatingAsOf,store,sourcePlan,sourceRegister,registry,processingRules,env,
+ const result=await runOperatingCycle({dataset,asOf:operatingAsOf,store,sourcePlan,sourceRegister,registry,processingRules,env,
   calendarByCurrency:calendars,
   mode:workflow?'live':manifest?.mode??'saved',capturesByCurrency,execute:action==='execute',
   acquire:acquire??(args=>acquireRuntimeResearch({...args,fetchImpl,officialInputLoader})),...adapters})
+ return requireReady?{...result,referenceReadiness:referenceReadiness(result)}:result
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1])).href){
- const {values}=parseArgs({options:{action:{type:'string',default:'inspect'},input:{type:'string'}},strict:true})
- operatingEntry(values).then(async result=>{
+ const {values}=parseArgs({options:{action:{type:'string',default:'inspect'},input:{type:'string'},'require-ready':{type:'boolean',default:false}},strict:true})
+ operatingEntry({action:values.action,input:values.input,requireReady:values['require-ready']}).then(async result=>{
   const outcome=operatingResultState(result)
   console.log(JSON.stringify({...result,operatingOutcome:outcome}))
   if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,
