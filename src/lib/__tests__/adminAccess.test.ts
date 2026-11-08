@@ -31,6 +31,12 @@ function fixture() {
 afterEach(() => vi.useRealTimers())
 
 describe('one administrator session for reports and plan history', () => {
+  it('keeps the exact review request through the shared email-link login',async()=>{
+    const f=fixture(),search='?review=report%3A91000000-0000-0000-0000-000000000001&reviewVersion='+'a'.repeat(64)
+    vi.stubGlobal('window',{location:{origin:'https://latamforex.netlify.app',href:'https://latamforex.netlify.app/'+search+'#admin'}})
+    await f.controller.login('admin@example.test')
+    expect(f.client.auth.signInWithOtp).toHaveBeenCalledWith({email:'admin@example.test',options:{emailRedirectTo:'https://latamforex.netlify.app/'+search+'#admin'}})
+  })
   it('uses the existing email-link method and the same origin, without a password request', async () => {
     const f = fixture()
     vi.stubGlobal('window', { location: { origin: 'http://127.0.0.1:4176' } })

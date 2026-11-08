@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { withConnectionDeadline } from './reports/connection-deadline'
 import { sendAdminLoginLink } from './appClient'
+import {reviewLoginReturn} from './review-request.js'
 
 export type AdminPhase = 'checking' | 'signed_out' | 'active' | 'denied' | 'unavailable' | 'paused'
 export interface AdminSnapshot {
@@ -72,7 +73,7 @@ export function createAdminAccess(getClient: () => Promise<SupabaseClient>) {
     refresh,
     async login(email: string) {
       const client = await getClient()
-      await sendAdminLoginLink(client, email, window.location.origin)
+      await sendAdminLoginLink(client,email,window.location.origin,reviewLoginReturn(window.location.origin,window.location.href))
       // Sending a link alone is not a new login. If sign-out failed, keep the
       // old session hidden until the verification link reloads the application.
     },

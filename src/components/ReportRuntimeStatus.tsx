@@ -2,6 +2,7 @@ import {useEffect,useState} from 'react'
 import {getReportClient} from '../lib/reports/client'
 import {withConnectionDeadline} from '../lib/reports/connection-deadline'
 import ReportSourceManagement from './ReportSourceManagement'
+import type {InboxItem} from './AdminReviewInbox'
 
 interface Status {enabled:boolean;reviewEnabled:boolean;writer:string;monthlyLimitUsd:number;confirmedUsd:number;reservedUsd:number;unresolvedCalls:number;monthBasis:string;checks?:{currency:string;checkedAt:string;result:{status:string;baseDate:string|null;sources?:{sourceId:string;statuses:string[]}[]}}[]}
 interface OperatingStatus {policyState:string;policyRevision:number|null;externalProcessingConfigured:boolean;recurringBudgetConfigured:boolean;cases:{currency:string;state:string;updatedAt:string;status:string|null;runId:string|null;testOnly?:boolean;sourceIssues?:{sourceId:string;status:string}[]}[]}
@@ -24,7 +25,7 @@ Object.assign(statusLabels,{collection_returned_not_approved:'자료 수집 완�
  official_current_definition_edition_or_terms_hold:'새 지표 정의·수정본·이용 조건 확인 필요',
  official_emec_release_not_found:'EMEC 일부 조회 월의 발표 자료 미확보',official_inpc_release_not_found:'INPC 일부 조회 월의 발표 자료 미확보',
  inegi_credentials_missing:'INEGI 인증 설정 누락'})
-export default function ReportRuntimeStatus() {
+export default function ReportRuntimeStatus({focus=null}:{focus?:InboxItem|null}) {
  const [status,setStatus]=useState<Status|null>(null),[failed,setFailed]=useState(false)
  const [operating,setOperating]=useState<OperatingStatus|null>(null)
  const [monitors,setMonitors]=useState<SourceMonitor[]|null>(null)
@@ -51,7 +52,7 @@ export default function ReportRuntimeStatus() {
  },[])
  if(failed)return <p role="status">리포트 생성 연결 상태를 확인하지 못했습니다. 새 저장 구조의 적용 여부와 관리자 권한을 확인해 주세요.</p>
  if(!status)return <p>리포트 생성 상태를 확인하는 중입니다.</p>
- return <div className="runtime-status" role="status">
+ return <div className="runtime-status" role="status" id={focus?.kind==='incident'?`review-target-${focus.target_id}`:undefined} tabIndex={-1}>
   <p><strong>새 리포트 생성 {status.enabled?'활성':'중지'}</strong> · 집필 {status.writer} · 자동 내용 검토 {status.reviewEnabled?'활성':'중지'}</p>
   <p>새 생성 경로 · 이번 달 확인 비용 ${status.confirmedUsd.toFixed(3)} · 미확정 예약 ${status.reservedUsd.toFixed(3)} · 한도 ${status.monthlyLimitUsd.toFixed(2)} <small>({status.monthBasis})</small></p>
   {status.unresolvedCalls>0&&<p>비용 확인이 필요한 호출 {status.unresolvedCalls}건 — 추가 생성을 보류합니다.</p>}
@@ -62,7 +63,7 @@ export default function ReportRuntimeStatus() {
   {status.checks?.length?<ul>{status.checks.map(c=><li key={c.currency}>{c.currency} · {statusLabels[c.result.status]??'확인 필요'} · {c.result.baseDate??'기준일 미확인'}
    {c.result.sources?.some(s=>s.statuses?.some(code=>statusLabels[code]))&&<details><summary>공식 자료·조회 상태</summary><ul>{c.result.sources.flatMap(s=>(s.statuses??[]).filter(code=>statusLabels[code]).map(code=><li key={`${s.sourceId}-${code}`}>{s.sourceId} · {statusLabels[code]}</li>))}</ul></details>}
   </li>)}</ul>:<p>새 실행 기록 수신 전입니다.</p>}
-  <ReportSourceManagement/>
+  <ReportSourceManagement focus={focus}/>
   {monitors===null?<p className="table-help">출처 후보 관리 기록을 확인하지 못했습니다.</p>:monitors.some(m=>m.candidates.length||m.attentionRequired)&&<details><summary>뉴스 출처 후보·지속 장애</summary>
    <p className="table-help">후보는 리포트 근거로 사용하지 않습니다. 등록 출처의 처리는 계속됩니다. 수집 상태는 내용 검토 결과와 구분합니다.</p>
    <ul>{monitors.filter(m=>m.candidates.length||m.attentionRequired).map(m=><li key={m.currency}><strong>{m.currency}</strong> · {m.gaps.map(g=>gapLabels[g]??'자료 확인 필요').join(' · ')||'기존 출처 수집 유지'}

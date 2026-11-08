@@ -15,7 +15,7 @@ async function rpc(name:string,args:Record<string,unknown>){
   if(result.error)throw result.error
  },6000)
 }
-function PolicyRow({policy,terms,now,onSaved}:{policy:SourcePolicy;terms?:SourceTerms;now:number;onSaved:()=>Promise<void>}){
+function PolicyRow({policy,terms,now,onSaved,focused=false}:{policy:SourcePolicy;terms?:SourceTerms;now:number;onSaved:()=>Promise<void>;focused?:boolean}){
  const [scopes,setScopes]=useState(policy.action==='prepare'?allScopes:policy.scopes),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
  const current=terms?.status==='available'&&terms.url===policy.termsUrl&&Date.parse(terms.checkedAt)<=now&&now-Date.parse(terms.checkedAt)<86400000
  const change=(key:keyof SourceScopes,value:boolean)=>{
@@ -28,11 +28,11 @@ function PolicyRow({policy,terms,now,onSaved}:{policy:SourcePolicy;terms?:Source
   catch{setMessage('결정을 저장하지 못했습니다. 권한·이용 조건·다른 관리자의 변경을 새로 확인해 주세요.')}
   finally{setBusy(false)}
  }
- return <li className="source-management-row"><p><strong>{policy.currency} · {policy.publisher}</strong> · {sourcePolicyStatus(policy,terms,now)}</p>
+ return <li className="source-management-row" id={`review-target-${policy.id}`} tabIndex={-1}><p><strong>{policy.currency} · {policy.publisher}</strong> · {sourcePolicyStatus(policy,terms,now)}</p>
   <p>{policy.host}{policy.pathPrefix} · 자체 무료 기사에 한함</p>
   <a href={policy.termsUrl} target="_blank" rel="noopener noreferrer">검토할 이용 조건</a>
   {terms&&<p className="table-help">최근 확인: {new Date(terms.checkedAt).toLocaleString('ko-KR')} · {terms.status==='available'?'내용 확보':'조회 실패'}</p>}
-  <details><summary>기준 확인·변경</summary>
+  <details open={focused||undefined}><summary>기준 확인·변경</summary>
    {terms?.excerpt&&<blockquote>{terms.excerpt}</blockquote>}
    <p className="table-help">조건 원문에서 아래 범위를 확인한 뒤 적용합니다. 자동 조회 성공 자체가 이용 허가는 아닙니다. 전재·유료·제한 기사는 별도 제외합니다.</p>
    <fieldset disabled={busy}><legend>재사용할 처리 범위</legend>{(Object.keys(labels) as (keyof SourceScopes)[]).map(k=><label key={k} style={{display:'block'}}><input type="checkbox" checked={scopes[k]} onChange={e=>change(k,e.target.checked)}/>{labels[k]}</label>)}</fieldset>
@@ -44,7 +44,7 @@ function PolicyRow({policy,terms,now,onSaved}:{policy:SourcePolicy;terms?:Source
   </details>{message&&<p role="status">{message}</p>}
  </li>
 }
-export default function ReportSourceScopeManagement({proofs,policies,terms,now,onSaved}:{proofs:Candidate[];policies:SourcePolicy[];terms:SourceTerms[];now:number;onSaved:()=>Promise<void>}){
+export default function ReportSourceScopeManagement({proofs,policies,terms,now,onSaved,focusId=null}:{proofs:Candidate[];policies:SourcePolicy[];terms:SourceTerms[];now:number;onSaved:()=>Promise<void>;focusId?:string|null}){
  const candidates=proofs.filter(p=>p.status!=='exclude'&&p.publisher&&p.articleChecks?.ownArticle&&p.articleChecks.freeAccess&&p.articleChecks.bodyVerified)
  const [binding,setBinding]=useState(''),[prefix,setPrefix]=useState('/'),[url,setUrl]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
  const proof=candidates.find(p=>p.binding===binding),existing=policies.find(p=>p.currency===proof?.currency&&p.host===proof?.host&&p.pathPrefix===prefix)
@@ -57,7 +57,7 @@ export default function ReportSourceScopeManagement({proofs,policies,terms,now,o
  }
  return <section aria-label="매체별 재사용 기준"><h4>매체별 재사용 기준</h4>
   <p className="table-help">한 번 검토한 기준을 같은 매체·섹션의 다음 기사에 적용합니다. 기사 한 건의 허가를 매체 전체로 확대하지 않습니다.</p>
-  <ul>{policies.map(p=><PolicyRow key={`${p.id}:${p.revision}`} policy={p} terms={terms.find(t=>t.policyId===p.id)} now={now} onSaved={onSaved}/>)}</ul>
+  <ul>{policies.map(p=><PolicyRow key={`${p.id}:${p.revision}`} policy={p} focused={focusId===p.id} terms={terms.find(t=>t.policyId===p.id)} now={now} onSaved={onSaved}/>)}</ul>
   <details><summary>매체·섹션 기준 준비</summary>
    <label>확인된 기사<select aria-label="확인된 기사" value={binding} disabled={busy} onChange={e=>{setBinding(e.target.value);setUrl('');setPrefix('/')}}><option value="">선택</option>{candidates.map(p=><option value={p.binding} key={p.binding}>{p.currency} · {p.publisher} · {new URL(p.url).pathname}</option>)}</select></label>
    <label>적용 경로<input value={prefix} onChange={e=>setPrefix(e.target.value)} maxLength={160} disabled={busy}/></label>

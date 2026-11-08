@@ -34,6 +34,15 @@ class FakeSMTP:
 
 
 class SMTPOutcomes(unittest.TestCase):
+    def test_admin_review_digest_has_no_chart_dependency(self):
+        request = {**REQUEST, "payload": {**REQUEST["payload"], "version": "admin-review-email/1"}}
+        request.pop("chartBase64")
+        smtp = FakeSMTP()
+        result = send_email(request, smtp_factory=lambda *_args, **kwargs: smtp,
+                            credentials=("sender@example.invalid", "synthetic-password"))
+        self.assertEqual(result["status"], "accepted")
+        self.assertEqual(len(list(smtp.message.walk())), 3)
+
     def call(self, fake):
         return send_email(REQUEST, smtp_factory=lambda *_args, **kwargs: fake,
                           credentials=("sender@example.invalid", "synthetic-password"))

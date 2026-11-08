@@ -1,8 +1,9 @@
 import { isSupabaseConfigured, supabase } from './supabaseClient'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
-export async function sendAdminLoginLink(client: SupabaseClient, email: string, origin: string) {
-  const { error } = await client.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: origin } })
+export async function sendAdminLoginLink(client: SupabaseClient, email: string, origin: string, returnUrl=origin) {
+  if(new URL(returnUrl).origin!==origin)throw Error('same_origin_login_return_required')
+  const { error } = await client.auth.signInWithOtp({ email: email.trim(), options: { emailRedirectTo: returnUrl } })
   if (error) throw error
 }
 
