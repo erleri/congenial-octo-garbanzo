@@ -47,7 +47,18 @@ type InitialDatasetLoaders = {
 
 const pendingDailyRequests = new Map<string, Promise<DailyRate[]>>()
 const dailyMemoryCache = new Map<string, DailyRate[]>()
-let initialSupabaseDatasetPromise: Promise<InitialSupabaseDataset> | null = null
+// A refresh re-reads the operating store; a rejected older request cannot evict
+// a newer request. No provider fetch or new price selection takes place here.
+export function refreshableDatasetLoader<T>(load:()=>Promise<T>) {
+  let current:Promise<T>|null=null
+  return (refresh=false):Promise<T>=>{
+    if(!current||refresh){
+      const next=Promise.resolve().then(load).catch(error=>{if(current===next)current=null;throw error})
+      current=next
+    }
+    return current
+  }
+}
 
 export function getFxDataSourceMode(): FxDataSourceMode {
   const raw = import.meta.env.VITE_FX_DATA_SOURCE?.trim().toLowerCase()
@@ -189,15 +200,8 @@ async function performSupabaseInitialLoad(): Promise<InitialSupabaseDataset> {
   }
 }
 
-export function loadSupabaseInitialDataset(): Promise<InitialSupabaseDataset> {
-  if (!initialSupabaseDatasetPromise) {
-    initialSupabaseDatasetPromise = performSupabaseInitialLoad().catch((error) => {
-      initialSupabaseDatasetPromise = null
-      throw error
-    })
-  }
-  return initialSupabaseDatasetPromise
-}
+const loadSupabaseSnapshot=refreshableDatasetLoader(performSupabaseInitialLoad)
+export function loadSupabaseInitialDataset(refresh=false): Promise<InitialSupabaseDataset> {return loadSupabaseSnapshot(refresh)}
 
 function dailyRequestKey(
   metadata: FxDatasetMetadata,
@@ -305,11 +309,11 @@ export async function selectInitialExchangeDataset({
   return { dataset, source: 'static', metadata: null, stale: mode === 'auto' && supabaseConfigured }
 }
 
-export function loadInitialExchangeDataset(): Promise<InitialExchangeDatasetResult> {
+export function loadInitialExchangeDataset({refresh=false}:{refresh?:boolean}={}): Promise<InitialExchangeDatasetResult> {
   return selectInitialExchangeDataset({
     mode: getFxDataSourceMode(),
     supabaseConfigured: isSupabaseConfigured,
-    loadSupabase: loadSupabaseInitialDataset,
+    loadSupabase: ()=>loadSupabaseInitialDataset(refresh),
     loadStatic: fetchStaticDataset,
   })
 }

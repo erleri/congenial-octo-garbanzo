@@ -169,6 +169,21 @@ it('discovers only official COP PDF routes and bounds body size before extractio
  expect(r.inputNetworkCalls).toBe(2);expect(r.inputIssues).toEqual(['official_document_too_large'])
  expect(fetchImpl.mock.calls[1][0]).toBe(cop().url);expect(extractPdf).not.toHaveBeenCalled()
 })
+it('preserves a successfully captured original on extraction failure for exact offline repair, without approving its numbers',async()=>{
+ const raw='%PDF-synthetic\n%%EOF',extractPdf=vi.fn(async()=>{throw Error('untrusted_parser_error_text')})
+ const fetchImpl=vi.fn(async(url:string)=>url.includes('/index.php/')
+  ?new Response('<a href="/files/operaciones/EMC/bol-EMC-ago2026.pdf">Boletín</a>')
+  :new Response(raw))
+ const r=await collectOfficialCountryInputs({currency:'COP',asOf,fetchImpl,extractPdf,now:()=>asOf})
+ expect(r.inputIssues).toEqual(['official_pdf_extraction_failed'])
+ const saved=r.countryOfficialInputs.proofs.find(p=>p.id==='cop-emc')
+ expect(saved).toMatchObject({sha256:sha(raw),rawBase64:Buffer.from(raw).toString('base64'),extractionFailure:'official_pdf_extraction_failed'})
+ expect(saved).not.toHaveProperty('extraction')
+ expect(JSON.stringify(r)).not.toContain('untrusted_parser_error_text')
+ expect(admit('COP',r.countryOfficialInputs.proofs).admitted).toEqual([])
+ expect(fetchImpl).toHaveBeenCalledTimes(2)
+})
+
 it('reuses country input in the existing official collector without duplicate retail network requests',async()=>{
  const [sourcePlan,sourceRegister]=['six-currency-explanation-sources-20261027.json','six-currency-source-register-20261027.json'].map(f=>JSON.parse(fs.readFileSync('docs/2.0/'+f,'utf8')))
  const fetchImpl=vi.fn(()=>{throw Error('offline only')})

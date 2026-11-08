@@ -54,7 +54,9 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
    ...(cached.claimTypingReview?{claimTypingReview:cached.claimTypingReview}:{}),
    ...(savedSourceReviews.length?{savedSourceReviews}:{}),...(acquisitionError?{acquisitionError}:{})})
   const cadence=publicationsByCurrency[currency]?evaluatePublicationCadence({snapshot,asOf:cutoff,calendar,publications:publicationsByCurrency[currency],eventCandidateIds}):null
-  const row={currency,status,acquisitionError,correctionCheck,candidates:collection.reviewQueue.length,cadenceStatus:cadence?.status??'history_unavailable',researchWindow,researchFeedback,
+  const publicationDecision=cadence?{status:cadence.status,cumulativePct:cadence.cumulativePct,thresholdPct:cadence.thresholdPct,
+   periodicDueDate:cadence.periodicDueDate,dataHolds:cadence.dataHolds,comparisonHolds:cadence.comparisonHolds,comparisonDetails:cadence.comparisonDetails}:null
+  const row={currency,status,acquisitionError,correctionCheck,candidates:collection.reviewQueue.length,cadenceStatus:cadence?.status??'history_unavailable',publicationDecision,researchWindow,researchFeedback,
    referenceStatus:calendar.reason??calendar.referenceState?.status??calendar.status,
    sourceStates:(collection.outcomes??[]).map(o=>({sourceId:o.sourceId,status:o.status})),
    lookupFailures:(collection.outcomes??[]).filter(o=>['access_failed','extraction_failed','discovery_incomplete'].includes(o.status))

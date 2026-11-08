@@ -6,6 +6,8 @@
 | --- | --- | --- |
 | 대상 | BRL·MXN·COP·PEN·CLP·ARS. 앱과 메일의 표시 순서는 보존 | `shared-price-contract.js` / `currencyReportAccess.ts` / `delivery-core.js` |
 | 대표 환율 | 대시보드의 고정 기준환율·변화율·차트 사용. 회사 환율과 동일성은 사용자 확인 전 가정 | `REPORT_REFERENCE_POLICY` |
+| 채택값 보존 | 첫 채택한 날짜·통화·가격 종류의 값과 확인된 출처를 보존. 이후 다른 역사값은 변경 제안으로 기록하며 자동 교체하지 않음. 로컬 구현, 운영 반영 전 | `scripts/dashboard-reference-archive.ts`, [운영 방식](operations.md#일별-채택-환율과-출처-보존--로컬-구현) |
+| 과거 채택값 복구 | 실제 배포 이력의 전체 저장본과 공개 리포트의 날짜·단위·전일값·변화율·전체 차트를 대조한 복구 기록만 허용. 이미 고정한 값과 충돌하면 중단. 원고·발행 기준점 재설정과 출처 추정 금지 | `dashboard-reference-recovery.ts`, `prepare-reference-recovery.ts` |
 | 기사 가격 | 종가·장중·FIX·평균·호가를 보조 맥락으로 구분. 대표 환율을 기사 숫자로 교체하지 않음 | `shared-price-contract.js`, 가격·기간 검사 |
 | 발행 판단 | 마지막 유효 공개본 대비 절대 누적 변화 2%, 미발행 14일 뒤 첫 한국 월요일 점검. 첫 기준점·사건·정정은 별도 판정 | `publication-cadence.js` |
 | 휴일·새 뉴스 | 기존 저장 환율의 전일값 처리 재사용. 주말 새 뉴스 조사와 가격 갱신을 분리 | `dashboard-reference-state.js`, `operating-entry.js` |

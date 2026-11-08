@@ -136,6 +136,26 @@ it('bounds live official acquisition to registered API/PDF/terms URLs, hides cre
  expect(failed).toHaveBeenCalledTimes(4);expect(unavailable.inputState).toBe('official_inputs_partial')
  expect(unavailable.inputIssues).toContain('official_series_unavailable_no_release_fetch')
 })
+it('recognizes an official missing-file HTML page returned with HTTP 200 and never passes it to the PDF extractor',async()=>{
+ const extractPdf=vi.fn(()=>{throw Error('not_a_pdf')})
+ const fetchImpl=vi.fn(async url=>{
+  if(String(url).includes('/INDICATOR/')){
+   const d=INEGI_REPORT_INDICATORS.find(d=>String(url).includes('/'+d.indicatorId+'/'))
+   return new Response(JSON.stringify({Series:[{INDICADOR:d.indicatorId,FREQ:'8',UNIT:d.unitCode,NOTE:'',SOURCE:d.sourceCodes,LASTUPDATE:'21/10/2026',
+    OBSERVATIONS:[{TIME_PERIOD:'2026/08',COBER_GEO:'00',OBS_VALUE:'103'}]}]}))
+  }
+  if(String(url)===INEGI_NUMERIC_USE.url)return new Response('synthetic terms')
+  return new Response('<html><title>Página no encontrada</title></html>',{status:200,headers:{'content-type':'text/html'}})
+ })
+ const loader=createOfficialInputLoader({workspace:process.cwd(),env:{GITHUB_ACTIONS:'true',INEGI_INDICATORS_TOKEN:'synthetic-token-only-1234567890'},fetchImpl,extractPdf})
+ const result=await loader({currency:'MXN',mode:'live',asOf,now:()=>asOf})
+ expect(result.officialDocuments).toEqual([])
+ expect(result.releaseLookups.every(r=>r.status==='not_found')).toBe(true)
+ expect(result.inputIssues).toContain('official_emec_release_not_found')
+ expect(result.inputIssues).not.toContain('official_emec_release_or_extraction_failed')
+ expect(extractPdf).not.toHaveBeenCalled()
+})
+
 it('includes actual official editions in operating identity while ignoring a recapture clock',()=>{
  const country={collection:{originals:[]},officialBackground:{admission:projectedAdmission()}}
  const recaptured=structuredClone(country);recaptured.officialBackground.admission.admitted[0].collectedAt=asOf

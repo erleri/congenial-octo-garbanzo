@@ -56,7 +56,8 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
    if(!sources.has(item.sourceId))sources.set(item.sourceId,new Set())
    sources.get(item.sourceId).add(item.status)
   }
-  const result={status:row.status,baseDate:dataset.baseDate,dataStatus:row.referenceStatus??'unverified',qualityStatus:'not_evaluated',
+  const dataStatus=row.publicationDecision?.comparisonHolds.length?'published_reference_conflict':row.referenceStatus??'unverified'
+  const result={status:row.status,baseDate:dataset.baseDate,dataStatus,qualityStatus:'not_evaluated',
    candidates:row.candidates,officialAdmission:row.officialBackground?.admissionStatus??'not_attempted',
    sources:[...sources].slice(0,24).map(([sourceId,statuses])=>({sourceId,statuses:[...statuses].slice(0,6)}))}
   await store.supplyCheck({key:fingerprint({currency:row.currency,checkedAt:prepared.asOf,result}),currency:row.currency,checkedAt:prepared.asOf,result})

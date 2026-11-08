@@ -9,6 +9,24 @@ import {automaticReferenceCalendars} from './operating-entry.js'
 import {operatingResultState} from './operating-result.js'
 import {NEWS_EVENT_DATE_VERSION} from './news-event-date.js'
 import {bindSelectedOriginalReview} from './selected-source-collection.js'
+import {buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
+
+it('surfaces a changed published reference in both free results and admin supply status without rebasing or spending',async()=>{
+ const f=await operatingFixture(),currency='BRL',calendar=f.calendarByCurrency[currency]
+ const old=buildSharedDashboardPriceSnapshot({dataset:f.dataset,currency,asOf:f.asOf,calendar})
+ const actual=old.current.value;old.current.value=actual-1
+ old.series=old.series.map(p=>p.date===old.current.date&&p.currency===currency&&p.rateType==='LOCAL_PER_USD'?{...p,value:actual-1}:p)
+ const saved=structuredClone(old),context={task:{currency,baseDate:f.dataset.baseDate,purpose:'periodic',snapshot:old}}
+ f.store.history=async c=>c===currency?[{currency,baseDate:f.dataset.baseDate,publishedAt:f.asOf,report:{id:'published-brl-reference',currency},
+  runtimeContext:{...context,serializedRuntimeContext:JSON.stringify(context)}}]:[]
+ f.store.supplyCheck=vi.fn(async()=>{})
+ const result=await runOperatingCycle({...f,execute:false})
+ expect(result.modelCalls).toBe(0)
+ expect(result.collectionResults.find(r=>r.currency===currency).publicationDecision).toMatchObject({status:'data_wait',cumulativePct:null,
+  comparisonHolds:['anchor_value_revised'],comparisonDetails:[{publishedValue:actual-1,currentHistoryValue:actual}]})
+ expect(f.store.supplyCheck.mock.calls.find(([r])=>r.currency===currency)[0].result.dataStatus).toBe('published_reference_conflict')
+ expect(old).toEqual(saved)
+})
 
 it('uses the same free section filter in planning and execution without suppressing other countries',async()=>{
  const f=await operatingFixture(),collection=f.collections.ARS,previous=collection.originals[0]

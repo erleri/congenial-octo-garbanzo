@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { createClient } from '@supabase/supabase-js'
+import {recoverySyncRows,dailySyncKey,monthlySyncKey} from './fx-recovery-sync.js'
 
 const DATA_PATH = path.resolve('data/fx-full-history.json')
 const BATCH_SIZE = 500
@@ -89,12 +90,14 @@ async function main() {
     imputation_method: row.imputationMethod,
     updated_at: now,
   }))
+  const recovered=recoverySyncRows(dataset)
+  const recoveryDaily=new Set(recovered.daily.map(dailySyncKey)),recoveryMonthly=new Set(recovered.monthly.map(monthlySyncKey))
   const dailyRows = isFullSync
     ? allDailyRows
-    : allDailyRows.filter((row) => row.rate_date >= incrementalStartText)
+    : allDailyRows.filter((row) => row.rate_date >= incrementalStartText||recoveryDaily.has(`${row.currency}|${row.rate_type}|${row.rate_date}`))
   const monthlyRows = isFullSync
     ? allMonthlyRows
-    : allMonthlyRows.filter((row) => row.period_month >= monthlyStart)
+    : allMonthlyRows.filter((row) => row.period_month >= monthlyStart||recoveryMonthly.has(`${row.currency}|${row.rate_type}|${row.period_month}`))
 
   const stateBase = {
     dataset_key: 'primary',

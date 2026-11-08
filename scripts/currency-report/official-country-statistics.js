@@ -118,7 +118,8 @@ function parsedJson(profile,proof,proofs,asOf) {
  }
  if(profile.id==='pen-card-rate'){
   if(url.hostname!=='estadisticas.bcrp.gob.pe'||!/^\/estadisticas\/series\/api\/PN07845NM-PN07846NM-PN07847NM\/json\/\d{4}-\d{2}\/\d{4}-\d{2}\/esp$/.test(url.pathname))throw Error('official_product_url_mismatch')
-  return parseRegisteredStatistic({kind:'bcrp_credit_json'},text,asOf.slice(0,10)).observations.filter(o=>o.seriesId===profile.seriesId)
+  const parsed=parseRegisteredStatistic({kind:'bcrp_credit_json'},text,asOf.slice(0,10))
+  return parsed.observations.filter(o=>o.seriesId===profile.seriesId).map(o=>({...o,transportWarnings:parsed.transportWarnings}))
  }
  if(profile.id==='ars-supermarket'){
   if(proof.url!=='https://infra.datos.gob.ar/catalog/sspm/dataset/455/distribution/455.1/download/ventas-totales-supermercados-2.csv')throw Error('official_product_url_mismatch')
@@ -170,6 +171,7 @@ export function reviewCountryOfficialInputs({currency,inputs,asOf}) {
     usePolicy:{version:OFFICIAL_COUNTRY_VERSION,reviewedOn:'2026-11-01',termsUrl:profile.termsUrl,licence:profile.licence,
      credit:profile.credit,transformation:attribution,reviewBasis:profile.useReview,numericOnly:true,local_analysis:'allowed',external_model:'allowed',public_display:'pending'}})
    row.status='numeric_candidate';row.period=period
+   if(latest.transportWarnings?.length)row.transportWarnings=latest.transportWarnings
   }catch(e){row.reason=/^[a-z0-9_]+$/.test(e.message)?e.message:'official_profile_extraction_failed'}
  }
  return {rows,candidates}
