@@ -2,6 +2,15 @@ name: Daily Dashboard Email
 
 on:
   workflow_dispatch:
+    inputs:
+      run_scope:
+        description: daily = existing email run; data-check = FX refresh and free report checks only (no mail/models)
+        type: choice
+        required: true
+        default: daily
+        options:
+          - daily
+          - data-check
   schedule:
     # 09:15 KST every day.
     - cron: '15 0 * * *'
@@ -21,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       dataset_ref: ${{ steps.data_commit.outputs.sha }}
+      run_scope: ${{ steps.run_scope.outputs.scope }}
 
     steps:
       - name: Check out repository
@@ -34,6 +44,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Validate requested run scope
+        id: run_scope
+        run: node scripts/daily-run-scope.js
+        env:
+          FX_REQUESTED_RUN_SCOPE: ${{ inputs.run_scope || '' }}
 
       - name: Validate required exchange API secrets
         run: node scripts/validate-api-keys.js
@@ -50,6 +66,10 @@ jobs:
       - name: Sync exchange rates to Supabase
         run: |
           if [ -z "$SUPABASE_SERVICE_ROLE_KEY" ]; then
+            if [ "$FX_DATA_CHECK_ONLY" = "true" ]; then
+              echo "Data-check requires the configured Supabase connection; sync was not performed." >&2
+              exit 1
+            fi
             echo "SUPABASE_SERVICE_ROLE_KEY is not configured; keeping JSON-only operation."
             exit 0
           fi
@@ -58,6 +78,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FX_DATA_CHECK_ONLY: ${{ steps.run_scope.outputs.scope == 'data-check' && 'true' || 'false' }}
 
       - name: Read dataset metadata
         id: dataset
@@ -74,6 +95,7 @@ jobs:
           echo "fetched_at=$FETCHED_AT" >> "$GITHUB_OUTPUT"
 
       - name: Create market context
+        if: steps.run_scope.outputs.scope != 'data-check'
         run: node scripts/create-market-context.js
         env:
           VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
@@ -89,7 +111,7 @@ jobs:
 
       - name: Generate optional FX 2.0 report
         # Keep same-day enrichment intact for the separately approved automatic mode.
-        if: vars.FX_REPORT_PUBLISH_MODE == 'automatic' && vars.FX_REPORT_GENERATOR != 'currency'
+        if: steps.run_scope.outputs.scope != 'data-check' && vars.FX_REPORT_PUBLISH_MODE == 'automatic' && vars.FX_REPORT_GENERATOR != 'currency'
         continue-on-error: true
         run: npm run generate:report
         env:
@@ -105,7 +127,7 @@ jobs:
           FX_REPORT_AI_MODEL: ${{ vars.FX_REPORT_AI_MODEL || 'openrouter/free' }}
 
       - name: Store optional FX 2.0 report
-        if: vars.FX_REPORT_PUBLISH_MODE == 'automatic' && vars.FX_REPORT_GENERATOR != 'currency'
+        if: steps.run_scope.outputs.scope != 'data-check' && vars.FX_REPORT_PUBLISH_MODE == 'automatic' && vars.FX_REPORT_GENERATOR != 'currency'
         continue-on-error: true
         shell: bash
         run: |
@@ -119,6 +141,7 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Compose email metadata
+        if: steps.run_scope.outputs.scope != 'data-check'
         id: email
         run: node scripts/compose-email.js
         env:
@@ -143,9 +166,11 @@ jobs:
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Install Puppeteer browser
+        if: steps.run_scope.outputs.scope != 'data-check'
         run: npx puppeteer browsers install chrome
 
       - name: Create email chart
+        if: steps.run_scope.outputs.scope != 'data-check'
         run: node scripts/create-email-chart.js
         env:
           FX_EMAIL_REPORT_MODE: ${{ steps.email.outputs.report_mode }}
@@ -154,6 +179,7 @@ jobs:
           FX_EMAIL_DATA_SOURCE: auto
 
       - name: Validate mailing list
+        if: steps.run_scope.outputs.scope != 'data-check'
         id: mailing
         run: |
           if [ ! -f "data/mailing_list.json" ]; then
@@ -172,7 +198,7 @@ jobs:
           echo "emails=$EMAILS" >> "$GITHUB_OUTPUT"
 
       - name: Send dashboard email
-        if: steps.mailing.outputs.emails != '' && steps.email.outputs.delivery_mode == 'legacy'
+        if: steps.run_scope.outputs.scope != 'data-check' && steps.mailing.outputs.emails != '' && steps.email.outputs.delivery_mode == 'legacy'
         env:
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
@@ -229,7 +255,7 @@ jobs:
       # Opt-in only. The default legacy sender above remains exclusive.
       # Plan performs reads only; the explicit send approval is a release setting.
       - name: Send approved-report dashboard email
-        if: steps.mailing.outputs.emails != '' && steps.email.outputs.report_mode != 'legacy' && steps.email.outputs.mail_hold != 'true'
+        if: steps.run_scope.outputs.scope != 'data-check' && steps.mailing.outputs.emails != '' && steps.email.outputs.report_mode != 'legacy' && steps.email.outputs.mail_hold != 'true'
         timeout-minutes: 15
         continue-on-error: ${{ steps.email.outputs.delivery_mode != 'approved' }}
         env:
@@ -248,7 +274,7 @@ jobs:
           fi
 
       - name: Upload dashboard artifacts
-        if: always()
+        if: always() && steps.run_scope.outputs.scope != 'data-check'
         uses: actions/upload-artifact@v4
         with:
           name: daily-dashboard-email-${{ steps.dataset.outputs.base_date || github.run_id }}
@@ -264,7 +290,8 @@ jobs:
   optional-review-report:
     needs: generate-data-and-send-email
     if: >-
-      ${{ always() && !cancelled() && vars.FX_REPORT_PUBLISH_MODE != 'automatic'
+      ${{ always() && !cancelled() && needs.generate-data-and-send-email.outputs.run_scope != 'data-check'
+          && vars.FX_REPORT_PUBLISH_MODE != 'automatic'
           && vars.FX_REPORT_GENERATOR != 'currency'
           && vars.FX_REPORT_OPERATIONAL_HOLD != 'true'
           && needs.generate-data-and-send-email.outputs.dataset_ref != '' }}
@@ -312,15 +339,20 @@ jobs:
   currency-review-report:
     needs: generate-data-and-send-email
     if: >-
-      ${{ always() && !cancelled() && vars.FX_REPORT_GENERATOR == 'currency'
+      ${{ always() && !cancelled() && (
+          (needs.generate-data-and-send-email.outputs.run_scope == 'data-check'
+            && needs.generate-data-and-send-email.result == 'success'
+            && needs.generate-data-and-send-email.outputs.dataset_ref != '')
+          || (needs.generate-data-and-send-email.outputs.run_scope != 'data-check'
+          && vars.FX_REPORT_GENERATOR == 'currency'
           && vars.FX_REPORT_ENABLED == 'true'
           && vars.FX_REPORT_OPERATIONAL_HOLD != 'true'
-          && (vars.FX_REPORT_PUBLISH_MODE == 'review' || vars.FX_REPORT_PUBLISH_MODE == '') }}
+          && (vars.FX_REPORT_PUBLISH_MODE == 'review' || vars.FX_REPORT_PUBLISH_MODE == '')) ) }}
     runs-on: ubuntu-latest
     # Up to 60 x 120s model requests, collection/setup, and safe checkpointing.
     # The coordinator stops starting requests before its own 138-minute limit.
-    timeout-minutes: 150
-    continue-on-error: true
+    timeout-minutes: ${{ needs.generate-data-and-send-email.outputs.run_scope == 'data-check' && 20 || 150 }}
+    continue-on-error: ${{ needs.generate-data-and-send-email.outputs.run_scope != 'data-check' }}
     permissions:
       contents: read
     env:
@@ -354,12 +386,15 @@ jobs:
         run: python -c "import pypdf; assert pypdf.__version__ == '6.10.0'; print('Official PDF extractor ready')"
       - run: npm ci
       - name: Inspect operating supply without model requests
-        if: vars.FX_REPORT_EXECUTION_MODE != 'execute'
+        if: needs.generate-data-and-send-email.outputs.run_scope != 'data-check' && vars.FX_REPORT_EXECUTION_MODE != 'execute'
         run: npm run report:operate -- --action plan
+      - name: Check data-only report readiness without model requests
+        if: needs.generate-data-and-send-email.outputs.run_scope == 'data-check'
+        run: npm run report:operate -- --action plan --require-ready
       # A missing/other mode remains plan. No inline interpolation into a shell
       # command; changing this variable alone cannot bypass the DB policy.
       - name: Process authorized original reviews and currency drafts
-        if: vars.FX_REPORT_EXECUTION_MODE == 'execute'
+        if: needs.generate-data-and-send-email.outputs.run_scope != 'data-check' && vars.FX_REPORT_EXECUTION_MODE == 'execute'
         run: npm run report:operate -- --action execute
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
