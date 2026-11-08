@@ -10,7 +10,10 @@ import {savedSourceReview} from './operating-source-cache.js'
 import {sourceContinuation} from './research-continuation.js'
 import {inspectNewsPreselection} from './news-preselection.js'
 
-export async function reviewRuntimeSources({collection,asOf,registry,processingRules,saved=[],extract,compare,admitNotes,onlySaved=false}) {
+export async function reviewRuntimeSources({collection,asOf,registry,processingRules,saved=[],extract,compare,admitNotes,onlySaved=false,dispatchCardBindings}) {
+ if(dispatchCardBindings!==undefined&&(!Array.isArray(dispatchCardBindings)
+  ||new Set(dispatchCardBindings).size!==dispatchCardBindings.length
+  ||dispatchCardBindings.some(b=>!collection.reviewQueue.some(c=>c.binding===b))))throw Error('bound_source_dispatch_required')
  collection=collectionAtReviewCutoff({collection,asOf})
  const sourceUse=processingRules?applyMaterialProcessing({collection,legacyRegistry:registry,rules:processingRules,evaluatedOn:asOf.slice(0,10)})
   :applyOriginalUsePolicies({collection,registry,evaluatedOn:asOf.slice(0,10)})
@@ -41,6 +44,9 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
     items.push({cardBinding:card.binding,status:'exact_saved_review_reused_not_new_verification'});continue
    }
    if(onlySaved){items.push({cardBinding:card.binding,status:'pending_original_review_not_admitted',modelCalls:0,costUsd:0});continue}
+   if(dispatchCardBindings&&!dispatchCardBindings.includes(card.binding)){
+    items.push({cardBinding:card.binding,status:'source_budget_deferred',modelCalls:0,costUsd:0});continue
+   }
    if(card.materialKind!=='article'){
     items.push({cardBinding:card.binding,status:'automatic_statistic_review_adapter_required'});continue
    }

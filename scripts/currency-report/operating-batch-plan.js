@@ -11,6 +11,7 @@ import {prepareOriginalNewsCase} from './original-news-pipeline.js'
 import {writerProfile} from './writer-policy.js'
 import {savedSourceReview} from './operating-source-cache.js'
 import {inspectNewsPreselection} from './news-preselection.js'
+import {budgetedSourceDispatch} from './budgeted-source-dispatch.js'
 
 export const OPERATING_PLAN_VERSION='operating-batch-plan/1'
 export const OPERATING_DESTINATION=Object.freeze({endpoint:'https://openrouter.ai/api/v1/chat/completions',
@@ -52,7 +53,8 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
  assertPolicy(policy)
  if(!Array.isArray(countries)||countries.length!==6||REPORT_CURRENCIES.some(c=>countries.filter(r=>r.currency===c).length!==1))
   throw Error('complete_country_operating_input_required')
- const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister),holds=[],rows=[],privateCountries=[],plans=[]
+ const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister),holds=[],rows=[],privateCountries=[]
+ let plans=[]
  if(policy.sourceCatalogBinding!==catalog.catalogId)holds.push('source_configuration_changed')
  if(policy.processingRulesBinding!==fingerprint(processingRules))holds.push('processing_configuration_changed')
  if(!['operator_configured','trial_configured'].includes(policy.state)||policy.externalTransmissionAuthorization!=='approved_by_operator')holds.push('external_processing_configuration_pending')
@@ -75,7 +77,9 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
   }
   const collection=collectionAtReviewCutoff({collection:country.collection,asOf})
   if(collection.currency!==currency)throw Error('collection_country_changed')
-  if(country.acquisitionError)row.holds.push('source_acquisition_failed')
+  if(country.acquisitionError){row.holds.push('source_acquisition_failed')
+   if(['published_history_unavailable','correction_storage_failed','correction_history_unavailable','supply_status_storage_failed'].includes(country.acquisitionError))row.holds.push(country.acquisitionError)
+  }
   const sourceUse=applyMaterialProcessing({collection,legacyRegistry:registry,rules:processingRules,evaluatedOn:asOf.slice(0,10)})
   const seen=new Set()
   for(const card of collection.reviewQueue){
@@ -113,21 +117,42 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
   row.purpose=cadence?.anchorId===null?'initial_check':cadence?.triggers?.includes('cumulative')?'market':cadence?.triggers?.includes('periodic')?'periodic':'unverified'
   row.caseId=cadence?.caseId??null
   row.status=row.holds.length?'country_preparation_hold':row.noReportDue?'no_report_due':'planned'
-  // Preserve the coordinator's conservative six writer/reviewer slots. A
-  // held country does not consume them; this is an upper bound, not a charge.
-  row.maximumUsd=(row.sourceMaxNano+2*writerProfile('sol').perCallUsd*1e9)/1e9
+  if(row.status!=='planned'){row.maxCalls=0;row.sourceMaxNano=0}
+  row.maximumUsd=row.status==='planned'?(row.sourceMaxNano+2*writerProfile('sol').perCallUsd*1e9)/1e9:0
   privateCountries.push({...structuredClone(country),collection,
    preparation:{status:row.status,holds:[...row.holds]}})
   rows.push(row)
  }
- const sourceNano=rows.reduce((n,r)=>n+r.sourceMaxNano,0),maximumUsd=rows.reduce((n,r)=>n+Math.round(r.maximumUsd*1e9),0)/1e9,maxCalls=rows.reduce((n,r)=>n+r.maxCalls,0)
+ const writerCallAllowance=2*rows.filter(r=>r.status==='planned').length
+ const writerReserveUsd=writerCallAllowance*writerProfile('sol').perCallUsd
+ if(policy.state==='operator_configured'){
+  const dispatch=budgetedSourceDispatch(rows,plans,{...policy.limits,writerUsd:writerReserveUsd,writerCalls:writerCallAllowance})
+  for(const row of rows){
+   for(const source of row.sources)if(dispatch.deferred.has(source.planBinding))source.status='source_budget_deferred'
+   if(row.status==='planned'){
+    const selected=row.sources.filter(s=>dispatch.selected.has(s.planBinding))
+    row.sourceMaxNano=selected.reduce((n,s)=>n+Math.ceil(s.maximumUsd*1e9),0)
+    row.maxCalls=2+2*selected.length
+    row.maximumUsd=(row.sourceMaxNano+2*writerProfile('sol').perCallUsd*1e9)/1e9
+    const country=privateCountries.find(c=>c.currency===row.currency)
+    const dispatchCardBindings=selected.map(s=>s.cardBinding)
+    const deferredCardBindings=row.sources.filter(s=>s.status==='source_budget_deferred').map(s=>s.cardBinding)
+    Object.assign(country.preparation,{dispatchCardBindings,deferredCardBindings,
+     ...(deferredCardBindings.length?{dispatchBinding:fingerprint({dispatchCardBindings,deferredCardBindings})}:{})})
+   }
+  }
+  plans=plans.filter(p=>dispatch.selected.has(p.binding))
+ }
+ const sourceNano=rows.reduce((n,r)=>n+r.sourceMaxNano,0),maximumUsd=rows.reduce((n,r)=>n+Math.round(r.maximumUsd*1e9),0)/1e9,
+  maxCalls=Math.max(12,rows.reduce((n,r)=>n+r.maxCalls,0))
  if(maximumUsd>policy.limits.batchUsd)holds.push('batch_cost_exceeds_configuration')
  if(maxCalls>policy.limits.maxCalls)holds.push('batch_call_count_exceeds_configuration')
  if(rows.every(r=>r.holds.length))holds.push('no_eligible_country_input')
  // This remains an unapproved candidate. It cannot waive missing explicit
  // transmission consent or turn one approved test into a recurring budget.
  const authorizationCandidate={version:'operational-report-batch-approval/1',authorized:false,maxReports:6,budgetUsd:policy.limits.batchUsd,
-  maxCalls,sourceBudgetUsd:sourceNano/1e9,sourcePlanBindings:plans.map(p=>p.binding),datasetBinding:fingerprint(dataset),
+  maxCalls,sourceBudgetUsd:sourceNano/1e9,sourcePlanBindings:plans.map(p=>p.binding),writerCallAllowance,writerReserveUsd,
+  sourceMaxCalls:2*plans.length,datasetBinding:fingerprint(dataset),
   rulesBinding:fingerprint(processingRules),countriesBinding:fingerprint(privateCountries),asOf,policyBinding:policy.binding}
  const result={version:OPERATING_PLAN_VERSION,status:holds.length?'configuration_or_input_hold':'ready_for_authorized_executor',
   holds:[...new Set(holds)],policyBinding:policy.binding,rows,sourceMaximumUsd:sourceNano/1e9,maximumUsd,maxCalls,

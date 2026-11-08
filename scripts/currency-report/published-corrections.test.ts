@@ -99,6 +99,8 @@ it('runs correction recording before paid eligibility and even when an old batch
  await runOperatingCycle({...f,send,execute:false})
  expect(record).toHaveBeenCalledTimes(12)
  f.store.recordCorrections=async()=>{throw Error('offline')}
- expect(await runOperatingCycle({...f,send,execute:true})).toMatchObject({status:'correction_recording_required',modelCalls:0})
+ const failed=await runOperatingCycle({...f,send,execute:true})
+ expect(failed.modelCalls).toBe(0)
+ expect(failed.collectionResults.every(r=>r.acquisitionError==='correction_storage_failed')).toBe(true)
  expect(send).not.toHaveBeenCalled();expect(f.store.jobs).toHaveLength(0)
 })

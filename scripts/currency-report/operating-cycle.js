@@ -11,7 +11,7 @@ import {evaluatePublicationCadence} from './publication-cadence.js'
 import {recoverOperatingCalls} from './operating-recovery.js'
 import {runtimeMode} from './runtime.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
-import {reuseOperatingSources,operatingSourceRecords,operatingMaterialHash} from './operating-source-cache.js'
+import {reuseOperatingSources,operatingSourceRecords,operatingMaterialHash,persistDeferredSources} from './operating-source-cache.js'
 import {researchFeedback} from './research-continuation.js'
 import {classifyCountryRefresh,frozenSourceReviewHolds} from './operating-refresh.js'
 import {operatingCheckpoint} from './operating-checkpoint.js'
@@ -19,6 +19,8 @@ import {retainRegisteredResearch} from './retained-research.js'
 export {operatingMaterialHash} from './operating-source-cache.js'
 
 const safeReason=error=>/^[a-z0-9_]+$/.test(error?.message??'')?error.message:'operating_execution_hold'
+const stopsCycle=result=>result.modelCalls===null||['cost_reconciliation_required','operating_batch_busy',
+ 'operating_lease_expired','operating_execution_hold'].includes(result.status)
 const executionRows=result=>{
  const seen=new Set()
  while(result&&!result.rows&&!seen.has(result)){seen.add(result);result=result.previousResult}
@@ -45,28 +47,19 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
    const feedback=researchFeedback(cached)
    const acquired=await (acquire??acquireRuntimeResearch)({...args,researchNeeds:feedback})
    if(!acquired.collection)return acquired
-   const collection=retainRegisteredResearch({collection:acquired.collection,cache:cached,asOf:acquired.completedAt??asOf,sourcePlan,sourceRegister})
+   const collection=retainRegisteredResearch({collection:acquired.collection,cache:cached,asOf:acquired.completedAt??asOf,sourcePlan,sourceRegister,
+    requestedPeriods:acquired.researchWindow?.dates})
    return {...acquired,...reuseOperatingSources(collection,cached,policy.processingRulesBinding),researchFeedback:feedback}
   }})
- const correctionHolds=prepared.collectionResults.filter(r=>['correction_storage_failed','correction_storage_unavailable','correction_history_unavailable','correction_input_check_failed'].includes(r.correctionCheck?.status))
- if(correctionHolds.length)configurationHolds.push('correction_recording_required')
- if(store.supplyCheck)for(const row of prepared.collectionResults){
-  const sources=new Map()
-  for(const item of [...(row.sourceStates??[]),...(row.officialBackground?.states??[]).flatMap(s=>s.sourceStates??[])]){
-   if(!sources.has(item.sourceId))sources.set(item.sourceId,new Set())
-   sources.get(item.sourceId).add(item.status)
-  }
-  const dataStatus=row.publicationDecision?.comparisonHolds.length?'published_reference_conflict':row.referenceStatus??'unverified'
-  const result={status:row.status,baseDate:dataset.baseDate,dataStatus,qualityStatus:'not_evaluated',
-   candidates:row.candidates,officialAdmission:row.officialBackground?.admissionStatus??'not_attempted',
-   sources:[...sources].slice(0,24).map(([sourceId,statuses])=>({sourceId,statuses:[...statuses].slice(0,6)}))}
-  await store.supplyCheck({key:fingerprint({currency:row.currency,checkedAt:prepared.asOf,result}),currency:row.currency,checkedAt:prepared.asOf,result})
- }
+ // Country history/correction/status availability holds are already bound to
+ // that country's preparation. Shared policy/accounting errors remain global.
+ const correctionHolds=[]
  const freshKey=fingerprint({version:'operating-cycle/2',reference:operatingReferenceIdentity(dataset,prepared.privateCountries,asOf),policy:policy.binding,
   countries:prepared.privateCountries.map(c=>({currency:c.currency,material:operatingMaterialHash(c)})),
   // A recovered preparation hold is new eligibility, even when neither FX nor
   // article bytes changed. Country case locks still prevent duplicate writing.
-  decisions:prepared.rows.map(r=>({currency:r.currency,caseId:r.caseId,status:r.status,holds:[...r.holds].sort()}))})
+  decisions:prepared.rows.map(r=>({currency:r.currency,caseId:r.caseId,status:r.status,holds:[...r.holds].sort(),
+   dispatch:prepared.privateCountries.find(c=>c.currency===r.currency)?.preparation?.dispatchBinding??null}))})
  // Accounting recovery is independent from a usable new article/price. It is
  // still opt-in execution under the configured policy, never part of plan.
  const recovery=execute&&!configurationHolds.length&&!dispatchHolds.length?await recoverOperatingCalls({store,reconcile}):null
@@ -102,7 +95,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
   try{return await send(args)}catch(error){spending.unknown=true;throw error}
  }:send
  const common={dataset,asOf,freshKey,refreshed:prepared,policy,configured,configurationHolds,correctionHolds,recovery,
-  store:budgetedStore,sourcePlan,sourceRegister,registry,processingRules,env,execute,preflightSource,preflightWriter,
+  store:budgetedStore,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,preflightSource,preflightWriter,
   send:guardedSend,reconcile,dispatchHolds,clock,deadlineMs,owner,testOnly}
  const results=[],owned=new Map(),freshCandidates=new Set(recoveredCountries)
  for(const previous of queue){
@@ -111,9 +104,9 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
   for(const row of result.rows??[])if(row.continuation?.resumeExact)owned.set(row.currency,previous.batch_key)
   for(const row of result.deferredCountries??[])if(/_superseded$/.test(row.reason))freshCandidates.add(row.currency)
   // A missing checkpoint cannot prove which countries are free to continue.
-  if(spending.unknown||result.modelCalls===null||['cost_reconciliation_required','operating_batch_busy','operating_lease_expired'].includes(result.status))break
+  if(spending.unknown||stopsCycle(result))break
  }
- const unresolved=spending.unknown||results.some(r=>r.modelCalls===null||['cost_reconciliation_required','operating_batch_busy','operating_lease_expired'].includes(r.status))
+ const unresolved=spending.unknown||results.some(stopsCycle)
  const hasWaiting=results.some(r=>r.status==='paused')
  const availableFresh=[...freshCandidates].some(currency=>!owned.has(currency))
  // An unfinished country owns only its original envelope. A positively changed
@@ -128,7 +121,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
   if(rows.has(row.currency)&&(row.status==='country_owned_by_prior_batch'||owned.has(row.currency)&&owned.get(row.currency)!==result.batchKey))continue
   rows.set(row.currency,row)
  }
- const recoveryRequired=spending.unknown||results.some(r=>r.modelCalls===null||['cost_reconciliation_required','operating_batch_busy','operating_lease_expired'].includes(r.status))
+ const recoveryRequired=spending.unknown||results.some(stopsCycle)
  return {version:'operational-report-cycle/2',status:recoveryRequired?'cost_or_execution_recovery_required':results.some(r=>r.status==='paused')?'paused':'completed_with_country_results',
   batchKey:results[0]?.batchKey??freshKey,rows:[...rows.values()],executionBatches:results,
   collectionResults:prepared.collectionResults,modelCalls:spending.calls,confirmedUsd:spending.confirmedNano/1e9,
@@ -137,7 +130,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
 }
 
 async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,configured,configurationHolds,correctionHolds,recovery,
- store,sourcePlan,sourceRegister,registry,processingRules,env,execute,preflightSource,preflightWriter,send,reconcile,
+ store,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,preflightSource,preflightWriter,send,reconcile,
  dispatchHolds,clock,deadlineMs,owner,testOnly,key,previous,owned}) {
  let prepared=refreshed,executionDataset=dataset
  const deferredFreshMaterial=!!previous&&key!==freshKey
@@ -191,6 +184,7 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   budgetNano:Math.round(policy.limits.batchUsd*1e9),maxCalls:policy.limits.maxCalls})
  if(!batch.claimed)return {...summary,status:batch.reason}
  let currentCase=null,deadlineHeld=false
+ const callsBefore=spending.calls,costBefore=spending.confirmedNano
  const heartbeat=async result=>store.batchCheckpoint({key,owner,state:'running',result:operatingCheckpoint(result,key)})
  const scoped={...store,reserve:async request=>{
   if(clock()+125000>=deadlineMs){deadlineHeld=true;return {reserved:false,reason:'execution_time_budget_wait'}}
@@ -208,6 +202,10 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
     const planned=prepared.rows.find(row=>row.currency===country.currency)
     if(!planned||planned.status!=='planned')return {claimed:false,reason:planned?.status??'country_preparation_hold'}
     if(clock()+125000>=deadlineMs){deadlineHeld=true;return {claimed:false,reason:'execution_time_budget_wait'}}
+    // Store private unreviewed backlog before this country's first POST.
+    // A temporary write failure pauses this country through beforeCountry's
+    // availability guard; it must not block other countries' valid work.
+    await persistDeferredSources([country],store,policy.processingRulesBinding)
     const publications=runtimePublications(await store.history(country.currency),country.currency)
     if(publications.some(p=>Date.parse(p.publishedAt)>Date.parse(prepared.asOf)))return {claimed:false,reason:'new_publication_superseded_frozen_input'}
     const snapshot=buildSharedDashboardPriceSnapshot({dataset:executionDataset,currency:country.currency,asOf:prepared.asOf,calendar:country.calendar})
@@ -237,6 +235,7 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
     }
     const materialHash=operatingMaterialHash(country)
     currentCase=fingerprint({caseId:cadence.caseId,materialHash,rules:policy.processingRulesBinding,authorization:policy.binding,
+     ...(country.preparation?.dispatchBinding?{dispatch:country.preparation.dispatchBinding}:{}),
      reference:operatingReferenceIdentity(executionDataset,[country],prepared.asOf),
      ...(testOnly?{syntheticBatch:key}:{} )})
     await heartbeat({status:'checking_country',currency:country.currency})
@@ -268,8 +267,10 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   return {...outcome,status:state==='completed'?result.status:state,batchKey:key,deferredFreshMaterial,
    deferredCountries:[...countryChanges].map(([currency,reason])=>({currency,reason})),manualEdits:0}
  }catch(error){
+  const accounted=!spending.unknown
   const result={status:'operating_execution_hold',reason:safeReason(error),holds:[safeReason(error)],
-   modelCalls:null,costUsd:null,collectionResults:refreshed.collectionResults,publicationApproved:false}
+   modelCalls:accounted?spending.calls-callsBefore:null,costUsd:accounted?(spending.confirmedNano-costBefore)/1e9:null,
+   collectionResults:refreshed.collectionResults,publicationApproved:false}
   await store.batchCheckpoint({key,owner,state:'paused',result:operatingCheckpoint(result,key)})
   return {...result,batchKey:key}
  }

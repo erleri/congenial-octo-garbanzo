@@ -5,7 +5,7 @@ import {buildSharedDashboardPriceSnapshot,REPORT_CURRENCIES} from './shared-pric
 import {evaluatePublicationCadence,koreaDate} from './publication-cadence.js'
 import {compileResearchSourceCatalog,planResearchSourceSelection,countryNewsCollectionSources} from './research-source-selection.js'
 import {collectSelectedResearch,collectionAtReviewCutoff} from './selected-source-collection.js'
-import {prepareCountryNewsPool} from './country-news-pool.js'
+import {prepareCountryNewsPool,partitionReviewedNewsBatch} from './country-news-pool.js'
 import {prepareRuntimeTask} from './runtime.js'
 import {assertStagedRuntimeInput} from './runtime-store.js'
 import {validDate} from './core.js'
@@ -273,7 +273,7 @@ export async function supplyRuntimeInput({dataset,currency,asOf,calendar,comment
       result.commentaryTarget=commentaryTarget
       current=recontextualizeSupplyCache({handoff:current,snapshot,commentaryTarget,asOf})}
     }
-    batches.push({collection:reviewCollection,receipts:reviewed.receipts??[],newsResponses:reviewed.newsResponses??[],materialInputs:reviewed.materialInputs??[]})
+    batches.push(...partitionReviewedNewsBatch({collection:reviewCollection,receipts:reviewed.receipts??[],newsResponses:reviewed.newsResponses??[],materialInputs:reviewed.materialInputs??[]}))
     if(reviewed.newPaidCostUsd===null){result.status='source_cost_unresolved';result.holds=['retain_reservation_no_writer_call'];return finish()}
    }
   }catch(error){result.status='collection_or_review_hold';result.holds=[reason(error)];return finish()}

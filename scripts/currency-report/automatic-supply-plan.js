@@ -3,12 +3,13 @@
 // acquisition is an explicit caller choice; saved mode is the default.
 import {REPORT_CURRENCIES,buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
 import {evaluatePublicationCadence} from './publication-cadence.js'
-import {runtimePublications} from './runtime-store.js'
+import {runtimePublications,isFatalRuntimeStoreError} from './runtime-store.js'
 import {acquireRuntimeResearch,previousWeekdayTarget,emptySupplyCache,latestCollectedCommentaryTarget} from './runtime-supply.js'
 import {operatingMaterialHash,newMaterialCandidates,newOfficialMaterialCandidates} from './operating-source-cache.js'
 import {prepareOperatingBatch} from './operating-batch-plan.js'
 import {recordPublishedCorrections} from './published-corrections.js'
 import {collectionDiagnostics} from './collection-diagnostics.js'
+import {fingerprint} from './research-harness.js'
 
 export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store,policy,sourcePlan,sourceRegister,registry,processingRules,
  cachedByCurrency={},mode='saved',capturesByCurrency={},acquire=acquireRuntimeResearch,checkpoint=async()=>{}}) {
@@ -25,6 +26,11 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
   try{
    historyRows=await store.history(currency)
    try{publicationsByCurrency[currency]=runtimePublications(historyRows,currency)}catch{acquisitionError='published_anchor_snapshot_unavailable'}
+  }catch(error){
+   if(isFatalRuntimeStoreError(error))throw error
+   acquisitionError='published_history_unavailable'
+  }
+  try{
    // Free discovery is independent of price/cadence eligibility. Failed or old
    // reference data still blocks paid writing, not collection of new evidence.
    {
@@ -45,15 +51,15 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
      ...(newStatistics.length?{officialBackground}:{} )}).slice(0,40)}`]
    }
   }catch(error){
+   if(isFatalRuntimeStoreError(error))throw error
    acquisitionError=/^[a-z0-9_]+$/.test(error.message??'')?error.message:'automatic_collection_failed'
    status='collection_or_history_failed'
   }
   const correctionCheck=historyRows?await recordPublishedCorrections({currency,history:historyRows,collection,
    admission:officialBackground?.admission,asOf:cutoff},store):{status:'correction_history_unavailable'}
   const handoff=cached.handoff??emptySupplyCache({snapshot,commentaryTarget:target,asOf})
-  countries.push({currency,calendar,commentaryTarget:target,handoff,collection,eventCandidateIds,officialBackground,
-   ...(cached.claimTypingReview?{claimTypingReview:cached.claimTypingReview}:{}),
-   ...(savedSourceReviews.length?{savedSourceReviews}:{}),...(acquisitionError?{acquisitionError}:{})})
+  if(['correction_storage_failed','correction_storage_unavailable','correction_history_unavailable','correction_input_check_failed'].includes(correctionCheck.status))
+   acquisitionError??=correctionCheck.status
   const cadence=publicationsByCurrency[currency]?evaluatePublicationCadence({snapshot,asOf:cutoff,calendar,publications:publicationsByCurrency[currency],eventCandidateIds}):null
   const publicationDecision=cadence?{status:cadence.status,cumulativePct:cadence.cumulativePct,thresholdPct:cadence.thresholdPct,
    periodicDueDate:cadence.periodicDueDate,dataHolds:cadence.dataHolds,comparisonHolds:cadence.comparisonHolds,comparisonDetails:cadence.comparisonDetails}:null
@@ -69,6 +75,24 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
     admissionReasons:[...new Set((officialBackground.admission?.rows??[]).map(r=>r.reason).filter(Boolean))]}:null,
    newMaterialMeaning:'research_candidate_not_verified_important_event'}
   row.newMaterialCandidates=eventCandidateIds.length
+  if(store.supplyCheck){
+   const sources=new Map()
+   for(const item of [...row.sourceStates,...(row.officialBackground?.states??[]).flatMap(s=>s.sourceStates??[])]){
+    if(!sources.has(item.sourceId))sources.set(item.sourceId,new Set())
+    sources.get(item.sourceId).add(item.status)
+   }
+   const result={status:row.status,baseDate:dataset.baseDate,
+    dataStatus:row.publicationDecision?.comparisonHolds.length?'published_reference_conflict':row.referenceStatus,
+    qualityStatus:'not_evaluated',candidates:row.candidates,officialAdmission:row.officialBackground?.admissionStatus??'not_attempted',
+    sources:[...sources].slice(0,24).map(([sourceId,statuses])=>({sourceId,statuses:[...statuses].slice(0,6)}))}
+   try{await store.supplyCheck({key:fingerprint({currency,checkedAt:cutoff,result}),currency,checkedAt:cutoff,result})}
+   catch(error){if(isFatalRuntimeStoreError(error))throw error
+    acquisitionError??='supply_status_storage_failed';row.supplyStatus='storage_failed'}
+  }
+  row.acquisitionError=acquisitionError
+  countries.push({currency,calendar,commentaryTarget:target,handoff,collection,eventCandidateIds,officialBackground,
+   ...(cached.claimTypingReview?{claimTypingReview:cached.claimTypingReview}:{}),
+   ...(savedSourceReviews.length?{savedSourceReviews}:{}),...(acquisitionError?{acquisitionError}:{})})
   collectionResults.push(row);await checkpoint(currency,'collection-state',row)
  }
  const prepared=prepareOperatingBatch({policy,dataset,countries,asOf:cutoff,publicationsByCurrency,sourcePlan,sourceRegister,registry,processingRules,

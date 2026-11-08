@@ -11,6 +11,21 @@ import {marketCalendarDate} from './market-calendar.js'
 import {articleOriginHints} from './news-publisher-access.js'
 
 export const COUNTRY_NEWS_POOL_VERSION='country-news-pool/1'
+// Partition assembly work, not article text. Original-backed receipts bind to
+// each unchanged card/original; legacy model responses bind to a full job and
+// must never be silently rebound by partitioning their collection.
+export function partitionReviewedNewsBatch(batch){
+ if(batch.collection.reviewQueue.length<=24)return [batch]
+ if(batch.newsResponses?.length)throw Error('saved_response_partition_requires_exact_collection')
+ const groups=[]
+ for(let index=0;index<batch.collection.reviewQueue.length;index+=24){
+  const reviewQueue=batch.collection.reviewQueue.slice(index,index+24),bindings=new Set(reviewQueue.map(c=>c.binding)),ids=new Set(reviewQueue.map(c=>c.originalId))
+  groups.push({...batch,collection:{...batch.collection,reviewQueue,originals:batch.collection.originals.filter(o=>ids.has(o.id))},
+   receipts:(batch.receipts??[]).filter(r=>bindings.has(r.cardBinding)),
+   materialInputs:(batch.materialInputs??[]).filter(r=>bindings.has(r.cardBinding))})
+ }
+ return groups
+}
 const stamp=v=>typeof v==='string'&&validDate(v.slice(0,10))&&/(Z|[+-]\d{2}:\d{2})$/.test(v)&&Number.isFinite(Date.parse(v))
 const rows=c=>[...Object.values(c.sections).flat(),...c.archive,...c.held]
 const seal=c=>{delete c.binding;c.binding=fingerprint(c);return c}

@@ -5,7 +5,7 @@ import {FX_REPORT_PRIORITY_VERSION} from './fx-report-priority.js'
 import {NEWS_EVENT_DATE_VERSION} from './news-event-date.js'
 import {ORIGINAL_NEWS_PIPELINE_VERSION} from './original-news-pipeline.js'
 import {RESEARCH_CONTINUATION_VERSION,sourceContinuation} from './research-continuation.js'
-import {SOURCE_REVIEW_VALIDITY_VERSION,effectiveSourceReview} from './source-review-validity.js'
+import {SOURCE_REVIEW_VALIDITY_VERSION,effectiveSourceReview,isUnreviewedSourceCapture} from './source-review-validity.js'
 import {RUNTIME_ASSEMBLY_VERSION} from './runtime-assembly.js'
 export const newsEdition=original=>({url:original.url,identity:fingerprint({blocks:original.blocks,
  publishedAt:original.metadata?.publishedAt??null,modifiedAt:original.metadata?.modifiedAt??null})})
@@ -74,8 +74,41 @@ export function operatingSourceKey(original,rulesBinding) {
   bodyHash:fingerprint(original.blocks),metadata:original.metadata,
   originHints:original.originHints,rulesBinding})
 }
-const reviewRecordKey=r=>fingerprint({version:'operating-source-review-record/3',sourceKey:r.sourceKey,
- cardBinding:r.card.binding,reviewBinding:fingerprint(r.review)})
+const reviewRecordKey=r=>isUnreviewedSourceCapture(r)?fingerprint({version:'unreviewed-source-capture/1',sourceKey:r.sourceKey})
+ :fingerprint({version:'operating-source-review-record/3',sourceKey:r.sourceKey,cardBinding:r.card.binding,reviewBinding:fingerprint(r.review)})
+export function unreviewedSourceCapture(collection,cardBinding,rulesBinding){
+ const card=collection.reviewQueue.find(c=>c.binding===cardBinding)
+ if(!card)throw Error('queued_source_card_required')
+ const {original}=validateSelectedReviewCard(collection,card)
+ const record={kind:'unreviewed_source_capture',sourceKey:operatingSourceKey(original,rulesBinding),
+  currency:collection.currency,rulesBinding,original,card,
+  review:{cardBinding:card.binding,heldStatus:'unreviewed_capture',validity:{state:'unreviewed'},
+   meaning:'durable_body_only_no_extraction_comparison_or_publication_approval'}}
+ return {...record,key:reviewRecordKey(record)}
+}
+export async function persistDeferredSources(countries,store,rulesBinding){
+ for(const country of countries){
+  const deferred=country.preparation?.deferredCardBindings??[]
+  if(!deferred.length)continue
+  if(!store.sourceCache||!store.saveSourceReview)throw Error('durable_source_backlog_store_required')
+  const cached=await store.sourceCache(country.currency,rulesBinding)
+  for(const binding of deferred){
+   const record=unreviewedSourceCapture(country.collection,binding,rulesBinding)
+   if(cached.some(r=>(r.sourceKey??r.key)===record.sourceKey))continue
+   try{await store.saveSourceReview(record);cached.push(record)}catch(error){
+    if(error.code!=='22023')throw error
+    // A concurrent free/executing runner may have stored the same edition
+    // under its original capture clock. Verify the winner before accepting it.
+    const latest=await store.sourceCache(country.currency,rulesBinding)
+    const winner=latest.find(r=>r.key===record.key)
+    if(!winner||reviewRecordKey(winner)!==winner.key||operatingSourceKey(winner.original,rulesBinding)!==record.sourceKey)throw error
+    validateSelectedReviewCard({version:collectionVersion,originals:[winner.original],reviewQueue:[winner.card]},winner.card)
+    cached.push(winner)
+   }
+  }
+ }
+}
+const collectionVersion='selected-source-collection/1'
 export function reuseOperatingSources(collection,cache,rulesBinding) {
  const copy=structuredClone(collection),savedSourceReviews=[],replacements=new Map()
  copy.reviewRevalidations=[]
@@ -91,6 +124,7 @@ export function reuseOperatingSources(collection,cache,rulesBinding) {
   }
   const prior=effective.record
   if(!prior)continue
+  if(effective.state==='unreviewed')continue
   if(effective.state==='withdrawn'){
    copy.reviewRevalidations.push({cardBinding:card.binding,priorKeys:effective.priorKeys,reason:'withdrawn'})
    savedSourceReviews.push({cardBinding:card.binding,heldStatus:'source_review_withdrawn',holds:['source_review_withdrawn']});continue

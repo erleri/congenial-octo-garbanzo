@@ -1,5 +1,6 @@
 // Free change detection, not semantic entailment or permission to edit/publish.
 import {fingerprint} from './research-harness.js'
+import {isFatalRuntimeStoreError} from './runtime-store.js'
 import {reviewClaims} from './claim-review.js'
 import {newsEdition} from './operating-source-cache.js'
 import {validateSelectedReviewCard} from './selected-source-collection.js'
@@ -117,5 +118,6 @@ export async function recordPublishedCorrections(args,store){
  try{
   const result=await store.recordCorrections({currency:args.currency,checkedAt:args.asOf,candidates:scan.candidates,coverage:scan.coverage})
   return {status:scan.status,candidates:scan.candidates.length,stored:result.inserted,duplicates:result.duplicates,coverage:scan.coverage}
- }catch{return {status:'correction_storage_failed',candidates:scan.candidates.length,coverage:scan.coverage}}
+ }catch(error){if(isFatalRuntimeStoreError(error))throw error
+  return {status:'correction_storage_failed',candidates:scan.candidates.length,coverage:scan.coverage}}
 }

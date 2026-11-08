@@ -20,15 +20,18 @@ const preserveOrder=(value,field)=>({...value,[field]:JSON.stringify(value)})
 // provider messages/details out of execution records and never retry here.
 const validityReads=new Set(['currency_report_operating_source_cache','load_currency_report_runtime_input'])
 const temporaryCodes=new Set(['PGRST001','PGRST002','PGRST003','08000','08001','08003','08006','53300','57P01','57P02','57P03'])
-class RuntimeStoreError extends Error {
+export class RuntimeStoreError extends Error {
  constructor(operation,error,status){
   super(`runtime_store_${operation}_failed`)
   this.operation=operation
+  this.code=error?.code??null
   this.temporary=temporaryCodes.has(error?.code)||!error?.code&&(
    [502,503,504].includes(status)||status===0&&/^(?:TypeError: fetch failed|AbortError:|TimeoutError:)/.test(error?.message??''))
  }
 }
 export const isTemporaryRuntimeReadError=error=>error instanceof RuntimeStoreError&&error.temporary&&validityReads.has(error.operation)
+export const isFatalRuntimeStoreError=error=>error instanceof RuntimeStoreError&&!error.temporary
+export const isTemporaryRuntimeStoreError=error=>error instanceof RuntimeStoreError&&error.temporary
 
 export function assertRuntimeDestination(url,mode,env={}) {
  if(mode==='local')return assertLocalApi(url)

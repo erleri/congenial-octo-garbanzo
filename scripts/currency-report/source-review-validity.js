@@ -1,9 +1,14 @@
 // Service-owned immutable history and currently effective judgments are distinct.
 export const SOURCE_REVIEW_VALIDITY_VERSION='source-review-validity/1'
+export const isUnreviewedSourceCapture=record=>record?.kind==='unreviewed_source_capture'&&record.review?.validity?.state==='unreviewed'
 const groupKey=r=>r.sourceKey??r.key??r.original?.url
 export function effectiveSourceReview(records,{pipelineVersion}={}) {
- const unique=[...new Map(records.map(r=>[r.key??r,r])).values()]
+ let unique=[...new Map(records.map(r=>[r.key??r,r])).values()]
  if(!unique.length)return {state:'missing',records:[],priorKeys:[]}
+ // A durable queued body is not a semantic judgment. Real review history,
+ // including withdrawals/conflicts, always takes precedence over captures.
+ if(unique.some(r=>!isUnreviewedSourceCapture(r)))unique=unique.filter(r=>!isUnreviewedSourceCapture(r))
+ else return {state:'unreviewed',record:unique[0],records:unique,priorKeys:[]}
  const keys=new Set(unique.map(r=>r.key).filter(Boolean)),superseded=new Set()
  for(const record of unique){
   const links=record.review?.validity?.supersedes??[]
