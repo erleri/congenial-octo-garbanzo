@@ -1,0 +1,44 @@
+{
+  "version": "generation-wire-and-card-policy/1",
+  "checkedOn": "2026-10-27",
+  "scope": "Local common Claude generation and reviewed source-card preparation. No paid generation or deployment.",
+  "providerBasis": {
+    "url": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+    "finding": "Claude does not support maxItems; minItems supports only 0 and 1. Closed objects, null, anyOf and local references are supported. Simply restoring maxItems is not a compatible fix.",
+    "liveProviderTest": false
+  },
+  "wireContract": {
+    "version": "generation-wire/1",
+    "profile": "anthropic",
+    "drivers": "Closed object of at most three slots, first required non-null; no fourth key allowed.",
+    "watch": "Closed object with zero to two optional slots, bounded by the full local schema.",
+    "implications": "Empty object in the managed Claude wire contract; decoded to the existing empty array.",
+    "decode": "Only contiguous filled slots are converted in order. Extra, missing or gapped slots are rejected. Never trim, invent, repair or rewrite prose.",
+    "ledgerTargets": "Finite enum of existing normalized title/text locations. Full ledger coverage and source-reference validation still run locally.",
+    "otherConstraints": "Unsupported length/pattern/reference-array limits remain in the unchanged full local validator and an explicit plan audit list. They are not falsely claimed as provider-enforced.",
+    "budgetAndTransport": "No limit increase, retries or automatic model fallback. Wire checks follow budget/duplicate guards and precede provider connection."
+  },
+  "cardPolicy": {
+    "authoringVersion": "note-authoring/1",
+    "reasoningVersion": "report-reasoning/2",
+    "promptVersion": "currency-input/8",
+    "editorialVersion": "currency-editorial/7",
+    "sameSpeakerCondition": "Match the already-reviewed eventKey, independenceKey and attribution. Inline the qualification with its related explanation; do not infer expert disagreement.",
+    "reviewRequiredSignal": "A same-speaker condition labelled with the known priority-dispute expression is held for card review, not declared false or silently rewritten. This narrow signal is not a universal semantic classifier.",
+    "conflicts": "Explicit contradicts evidence still requires adjudication and is never hidden by condition grouping.",
+    "sampleRevision": "A separate input-card copy removes the unsupported priority-disagreement characterization. Existing source, manuscript and cost records remain unchanged."
+  },
+  "inputFactoring": {
+    "version": "notes-reference/2",
+    "method": "Exactly identical allowed-use and scope-rule values are sent once with references. Distinct rules are not merged; reconstruction is tested for equality.",
+    "preparedExampleMaximumUsd": 0.248692,
+    "actualCalls": 0
+  },
+  "verification": {
+    "storedFourDriverOutput": "Still rejected; no repair or retroactive approval.",
+    "normalStoredManuscript": "Synthetic slot-format replay reconstructs the exact same content. A replay-only ledger version refresh does not reuse old approvals.",
+    "semanticStatus": "unverified",
+    "publicationApproved": false,
+    "remaining": "No real provider request or new generated-quality evaluation in this change."
+  }
+}

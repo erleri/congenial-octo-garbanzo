@@ -1,0 +1,25 @@
+{
+  "version": "fx-cause-validation/1",
+  "date": "2026-10-27",
+  "newSyntheticTests": 8,
+  "fullSuite": {
+    "files": 90,
+    "declared": 524,
+    "executed": 631,
+    "parameterExpansions": 107,
+    "failed": 0
+  },
+  "typecheck": "passed",
+  "lint": "passed",
+  "productionBuild": "passed",
+  "reportBuild": "passed",
+  "bundleBoundary": "passed",
+  "browserFilesScanned": 33,
+  "protectedFilesUnchanged": 44,
+  "privateManuscriptsUnchanged": 40,
+  "testsAreReportQualitySamples": false,
+  "actualWriterQualityTrial": "not_run_source_use_hold",
+  "newApiCostUsd": 0,
+  "publicationApproved": false,
+  "productionChanged": false
+}

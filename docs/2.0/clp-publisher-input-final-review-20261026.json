@@ -1,0 +1,88 @@
+{
+  "version": "publisher-input-final-review/1",
+  "reviewedOn": "2026-10-26",
+  "reviewMethod": "same_agent_follow_up_review; not blind, not a separate independent evaluator",
+  "document": "clp-publisher-input-final-review-20261026.md",
+  "input": {
+    "path": ".local-reports/private/publisher-admission-cJEoyg/review-input.json",
+    "sha256": "b8482a552a53665451e225e879876dcf68adab97ad3614f7719c8a7e6514ac74",
+    "receipt": ".local-reports/private/publisher-receipt-7Wu5r9/receipt.json",
+    "receiptFileSha256": "1e13496ae9ed7258cb62c4859a3af765f2566b04258debb9a9a3552c16a8db78",
+    "reportDate": "2026-10-26",
+    "priceSessionDate": "2026-10-23"
+  },
+  "verdict": {
+    "status": "hold_for_input_corrections_and_source_use_basis",
+    "inScopeInterpretation": "Useful for a limited attributed market-context brief after corrections; not established direct causality.",
+    "writingValue": "manual_research_candidate_only",
+    "independentReviewComplete": false,
+    "qualityScore": null,
+    "paidCallAuthorized": false,
+    "publicationApproved": false,
+    "correctedInputCreated": false
+  },
+  "findings": [
+    {"id": "F01", "classification": "required_input_correction", "claimId": "clp-close-report", "sourceId": "local-0bb70e0037ab", "passageIds": ["p1", "p2"], "reason": "상승 마감 보도와 최종 양방향 호가가 양쪽 호가 모두의 전일 대비 상승을 입증하지는 않는다. BCCh 방법 비교도 기사 구절만의 주장이 아니다.", "replacement": "Emol의 23일 마감 보도는 칠레 시장의 달러가 상승 마감했다고 전하고, 매수·매도 마감 호가를 제시했다.", "methodologyAction": "BCCh 평균과 기사 호가의 차이는 검증된 가격 메타데이터의 표시 범위로 분리"},
+    {"id": "F02", "classification": "required_input_correction", "claimId": "clp-morning-dollar", "sourceId": "local-9764d3b9895f", "passageIds": ["p3", "p4"], "reason": "오전 기사라는 사실을 기술주 조정 자체의 시각으로 확대하지 않는다.", "replacement": "23일 오전 보도에서 XTB의 Emanoelle Santos는 기술주 조정이 미국 국채 수요를 늘려 수익률을 낮추고 글로벌 달러를 약화시켰다고 해석했다."},
+    {"id": "F03", "classification": "required_attribution_projection_completion", "claimId": "clp-novelty-counter", "sourceId": "local-e54350ed90a1", "passageIds": ["p18", "p28", "p30"], "reason": "원문 전체의 인용 주체는 맞지만 전달 발췌에 이름·기관의 완전한 근거가 빠졌다.", "action": "p18을 귀속 확인 근거로 추가. 인접 구조적 경제 주장까지 채택하지 않음."}
+  ],
+  "unchangedSupportedClaims": [
+    {"claimId": "clp-energy-channel", "basis": "Capitaria Lucas Santillán의 출처 귀속 해석; 영향 규모나 실제 수입가격 전가를 입증하지 않음"},
+    {"claimId": "clp-copper-counter", "basis": "XTB Emanoelle Santos의 정성적 상쇄 해석; 상쇄 크기를 입증하지 않음"}
+  ],
+  "editorialOnly": [
+    "유가 압력과 구리의 상쇄를 함께 배치하고 오전 달러 약세는 직접 약세 원인처럼 나열하지 않음",
+    "PKF 이견은 입력에 보존하되 본문의 경고 분량을 자동 강제하지 않음",
+    "코드가 제공하는 가격 기준·날짜 설명을 문단마다 반복하지 않음"
+  ],
+  "priceAssessment": {
+    "ruleVersion": "generation-decision/2",
+    "asOf": "2026-10-26T10:52:20.650Z",
+    "seriesCount": 15,
+    "overallStatus": "partial",
+    "dailyPct": 0.38212815990592564,
+    "fiveObservationPct": 0.8862629246676468,
+    "dailyFloor": 0.75,
+    "fiveFloor": 2,
+    "baselineCounts": {"daily": 13, "five": 9},
+    "twentyObservationStatus": "insufficient_window",
+    "interpretation": "일간·5일은 최소 조사 기준 미달. 과거 60구간 분포 및 20일 계산은 미완료이므로 전체 변동성이나 조용한 날 판정으로 확대하지 않음."
+  },
+  "noveltyAssessment": {
+    "reviewedPriorFiles": [
+      {"id": "CLP-2026-10-05-1791383294191", "status": "rejected", "topic": "정부 외화 공급 신호"},
+      {"id": "CLP-2026-10-09-1791893507884", "fileStatus": "pending_review", "historicalLocalDbApproval": "documented in local-editorial-approval-20261013.md, not freshly queried"},
+      {"id": "CLP-2026-10-15-1792145210900", "status": "pending_review", "topic": "소매·관련 상품군·실질 시간당 보수"}
+    ],
+    "historyCompleteness": "not_verified",
+    "actualLatestPublishedStateRead": false,
+    "newEventConfirmed": false,
+    "reason": "저장 비교 원고와는 주제가 다르지만 전일 기사에도 유가·위험회피가 있어 23일 새 사건을 확정하지 않는다."
+  },
+  "sourceUseAssessment": {
+    "source": "Emol / Empresa El Mercurio S.A.P.",
+    "html": "https://www.emol.com/terminos/terminosycondiciones.aspx",
+    "linkedPdf": "https://digital.elmercurio.com/assets/docs/TERMINOS%20Y%20CONDICIONES%20GENERALES%20DE%20USO%20v2023.pdf",
+    "savedPdf": ".local-reports/private/emol-terms-review-kjPXoQ/terms.pdf",
+    "pdfSha256": "f132e145c3e7373a061d1fffe008a7aa4a18bbf244ee97c01a88a7a4db1c577a",
+    "relevantSections": ["1 scope", "2 materials", "5 user obligations", "7 links", "11 no grant of rights"],
+    "readPages": [1, 2, 3, 4, 5, 6, 8, 9],
+    "visuallyCheckedPages": [2, 6],
+    "status": "permission_or_compatible_use_basis_not_established",
+    "notClaimed": ["specific AI inference prohibition", "conclusive legal infringement finding", "all independently obtained public facts are unusable"],
+    "automaticUseApproved": false,
+    "operationalDecision": "현재 기사의 반복 수집·외부 모델 전송·공개 사용을 승인하지 않음. 별도 허가·적용 근거 또는 적합한 대체 출처 확인 필요.",
+    "bcchTermsUnchanged": true
+  },
+  "verification": {
+    "expectedInputAndReceiptHashes": "recorded above; checked without modifying either file",
+    "originalHtmlHashes": "checked against saved capture ledger",
+    "scopeCompilerReplay": "same receipt and packet reproduce the saved input",
+    "fullTestsAndBuild": "not rerun; review documents only, no application or generator code changes",
+    "previous607Cases": "historical implementation validation, not new semantic-review results",
+    "operations": "unchanged",
+    "modelCalls": 0,
+    "newGenerationApiCostUsd": 0,
+    "externalReads": "official terms search/read and one successful public PDF download; no new market-article collection"
+  }
+}

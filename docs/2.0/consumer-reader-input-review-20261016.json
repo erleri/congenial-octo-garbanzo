@@ -1,0 +1,38 @@
+{
+  "version": "consumer-reader-input-review/1",
+  "date": "2026-10-16",
+  "scope": "로컬 생성 입력 개선·저장 입력 재생. 새 모델 호출이나 기존 원고 편집은 포함하지 않음.",
+  "baselineReportId": "CLP-2026-10-15-1792075926349",
+  "inputVersion": "consumer-context/2",
+  "changes": [
+    "readerContent에 독자의 질문·검증된 비교 결론·사실 및 출처 ID를 연결한다.",
+    "editorialConstraints에 중요한 적용 조건과 검토 제약을 분리한다. 본문으로 복사되던 explanatoryUse는 새 입력에서 제거한다.",
+    "보고서 기준일·통계 대상 월·출처별 발표일·미상인 발표시각을 timing으로 구분한다.",
+    "새 소비 입력에 한해 첫 문장에서 새로운 발표를 요구하던 지시를 확인된 비교 결론을 요구하는 지시로 교체한다.",
+    "제목·요약도 지표의 변화율·전년동월비 기준을 유지하도록 한다. 수치와 날짜는 기존 코드 소유 표시 계약을 유지한다."
+  ],
+  "compatibility": {
+    "legacyContext": "consumer-context/1 재구성과 검증 지원",
+    "savedLegacyRequestMessagesIdentical": true,
+    "factsUnchanged": true,
+    "originalReportAndCostRecordsHashUnchanged": true,
+    "publicSchemaAndUIUnchanged": true
+  },
+  "verification": {
+    "relatedTests": {"files": 3, "passed": 26},
+    "typecheck": "passed",
+    "changedSourcesLint": "passed",
+    "reportBuild": "passed",
+    "savedInputReplay": "passed, fetch disabled",
+    "newGeneratedProseQuality": "not_tested"
+  },
+  "knownLimits": [
+    "입력 분리가 실제 원고 품질 향상을 보장하지는 않는다. 다음 승인된 생성 결과로 별도 평가해야 한다.",
+    "실질 시간당 보수의 전월비는 아직 새 사실 ID로 채택하지 않았다. 월간 추세 설명을 자동 추가하지 않는다.",
+    "영업 의미는 기존 drivers 본문 안에서 설명한다. implications 출력 구조 확대는 이번 범위에 포함하지 않는다."
+  ],
+  "modelCalls": 0,
+  "costUsd": 0,
+  "productionChanged": false,
+  "publicationApproved": false
+}

@@ -1,0 +1,26 @@
+.published-currency-reports { min-height: 0; padding: 20px; border-radius: 8px; }
+.published-currency-reports .brief-list-card h2 { font-size: 21px; margin: 12px 0; }
+.published-currency-reports .report-navigation { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:12px; margin-bottom:10px; }
+.published-currency-reports .report-navigation .currency-tabs { flex-wrap:wrap; min-width:0; margin-bottom:0; }
+.published-currency-reports .report-status-refresh { display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:36px; padding:7px 10px; border:1px solid transparent; border-radius:6px; background:transparent; box-shadow:none; color:var(--muted); font-size:12px; font-weight:600; line-height:1.25; white-space:nowrap; appearance:none; }
+.published-currency-reports .report-status-refresh svg { flex-shrink:0; }
+.published-currency-reports .report-status-refresh:hover { color:var(--ink); background:#e8ede7; }
+@media(max-width:520px) { .published-currency-reports .report-navigation { grid-template-columns:1fr; gap:4px; } .published-currency-reports .report-status-refresh { justify-self:end; min-height:44px; } }
+@media(max-width:520px) { .published-currency-reports { padding: 12px; } }
+@media print { .app-shell:has(.published-currency-reports) .top-header, .app-shell:has(.published-currency-reports)>.notice { display: none!important; } .published-currency-reports { padding: 0; } }
+.report-history-filters,.report-detail-links,.report-neighbors { display:flex; flex-wrap:wrap; gap:16px; align-items:center; margin:20px 0; }
+.report-history-filters label { display:flex; align-items:center; gap:8px; font-size:14px; }
+.report-history-filters select { padding:9px; border:1px solid #c6d4d1; border-radius:6px; background:white; }
+.published-currency-reports .report-history-list { display:block; list-style:none; padding:0; margin:20px 0; }
+.published-currency-reports .report-history-list li { display:grid; grid-template-columns:105px minmax(0,1fr); gap:20px; border-bottom:1px solid #d9e2df; padding:24px 0; }
+.published-currency-reports .report-history-list time { color:#526461; font-variant-numeric:tabular-nums; padding-top:5px; }
+.published-currency-reports .report-history-list h2 { font-size:20px; line-height:1.5; margin:3px 0 8px; }
+.published-currency-reports .report-history-list p { font-size:14px; line-height:1.7; margin:0; }
+.report-kind,.report-list-end { color:#647873; font-size:13px; }
+.report-neighbors { justify-content:space-between; }
+.report-neighbors button,.report-more { border:1px solid #b8cbc5; background:#f4f8f6; padding:12px 18px; border-radius:6px; }
+.report-neighbors button:disabled { opacity:.5; }
+.report-more { display:block; margin:20px auto; }
+.report-detail-links a { font-size:14px; }
+@media(max-width:520px) { .published-currency-reports .report-history-list li { grid-template-columns:1fr; gap:6px; padding:18px 0; } .published-currency-reports .report-history-list h2 { font-size:18px; } .report-neighbors button { flex:1; padding:10px; } }
+@media print { .report-navigation,.report-detail-links,.report-neighbors,.currency-tabs,.report-status-refresh,.report-history-filters,.report-more,.report-origin-return { display:none!important; } }

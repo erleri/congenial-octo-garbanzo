@@ -13,6 +13,9 @@ function dataset() {
   for (let day = 0; day < 407; day += 1) {
     const date = new Date(start)
     date.setUTCDate(date.getUTCDate() + day)
+    // Horizon assertions use independent business observations. Weekend
+    // imputation is exercised separately below, not mixed into this baseline.
+    if ([0, 6].includes(date.getUTCDay())) continue
     const iso = date.toISOString().slice(0, 10)
     for (const [index, currency] of currencies.entries()) {
       const isUsd = currency === 'USD'
@@ -38,13 +41,17 @@ describe('FX report evidence', () => {
   it('calculates required horizons, plan deltas, USD/KRW, and anomaly currencies', () => {
     const evidence = buildFxReportEvidence(dataset(), { leading: { BRL: 5 }, moving: { BRL: 5 } }, articles)
     const brl = evidence.metrics.find((row) => row.currency === 'BRL')
-    expect(brl?.dayPct).not.toBeNull()
-    expect(brl?.fiveDayPct).not.toBeNull()
-    expect(brl?.mtdPct).not.toBeNull()
-    expect(brl?.thirtyDayPct).not.toBeNull()
-    expect(brl?.percentile52w).not.toBeNull()
-    expect(brl?.movingPlanDeltaPct).not.toBeNull()
-    expect(evidence.metrics.some((row) => row.currency === 'USD/KRW')).toBe(true)
+    // Independent date/value anchors for the linear synthetic dataset.
+    // Five and thirty business observations end on Sep 4 and Jul 31;
+    // this legacy report uses Sep 1 for MTD, not the new packet's Aug 31.
+    expect(brl?.latest).toBe(5.812)
+    expect(brl?.dayPct).toBeCloseTo((5.812 / 5.810 - 1) * 100, 4)
+    expect(brl?.fiveDayPct).toBeCloseTo((5.812 / 5.798 - 1) * 100, 4)
+    expect(brl?.mtdPct).toBeCloseTo((5.812 / 5.792 - 1) * 100, 4)
+    expect(brl?.thirtyDayPct).toBeCloseTo((5.812 / 5.728 - 1) * 100, 4)
+    expect(brl?.percentile52w).toBe(100)
+    expect(brl?.movingPlanDeltaPct).toBeCloseTo((5.812 / 5 - 1) * 100, 4)
+    expect(evidence.metrics.find(row => row.currency === 'USD/KRW')?.latest).toBe(1340.6)
     expect(evidence.metrics.some((row) => row.currency === 'CNY')).toBe(true)
   })
 

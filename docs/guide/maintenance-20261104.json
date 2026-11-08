@@ -1,0 +1,61 @@
+{
+  "version": "maintenance-closeout/1",
+  "date": "2026-11-04",
+  "scope": "local_cleanup_not_production_release",
+  "tests": {
+    "files": 180,
+    "passed": 1292,
+    "failed": 0,
+    "metadataDuplicateNames": 0,
+    "identicalTestBodies": 0,
+    "tautologicalAssertions": 0,
+    "smtpMockTests": 5
+  },
+  "preservation": {
+    "filesChecked": 29050,
+    "unexpectedChanges": [],
+    "missing": [],
+    "activeDevLogAppendOnly": true
+  },
+  "metrics": {
+    "workspaceRemovedBytes": 453438299,
+    "archivedOriginalBytes": 244096342,
+    "reproducibleDependencyBytes": 209341957,
+    "baselineArchiveBytes": 757524352,
+    "currentDistBytes": 24947432,
+    "privateCurrentBytes": 2821787200,
+    "initialJsBytes": 466502,
+    "productionDbBytes": 32140435,
+    "sampleActionsArtifactBytes": 165140,
+    "sampleActionsArtifactRun": 41592475870,
+    "cloudAccountQuota": "not_verified",
+    "productionDataDeletion": 0
+  },
+  "changes": {
+    "sharedRequestBudgetExtracted": true,
+    "legacyImportPreserved": true,
+    "serverCurrencyListsUnified": 3,
+    "publicInterfacesChanged": false,
+    "reportPromptsChanged": false,
+    "migrationsChanged": false
+  },
+  "prohibitedActions": {
+    "paidModelCalls": 0,
+    "emailsSent": 0,
+    "productionWrites": 0,
+    "pushes": 0,
+    "deployments": 0
+  },
+  "limits": [
+    "Current production browser showed cached data; refresh was not executed.",
+    "Live account quota/total Actions storage not verified.",
+    "No fresh real login/revocation, A4 dialog or DB migration rehearsal: unchanged code with existing evidence and offline regression.",
+    "Static graph and duplicate scan do not establish complete semantic uniqueness."
+  ],
+  "documentation": {
+    "entryDocuments": 13,
+    "localLinksChecked": 299,
+    "brokenLinks": 0,
+    "inventoryDocuments": 258
+  }
+}

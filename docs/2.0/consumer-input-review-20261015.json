@@ -1,0 +1,69 @@
+{
+  "task": "확보한 월별 자료의 영업 환경 설명을 기존 생성 입력에 연결",
+  "reviewDate": "2026-10-15",
+  "status": "local_input_prepared_not_generated",
+  "version": "consumer-context/1",
+  "scope": "검토된 CLP 2026-08 정의와 통계 3개에 한정한 선택적 연결. 다른 통화·다음 월에 자동 승인하지 않음.",
+  "sourceReview": "chile-monthly-reuse-review-20261015.json",
+  "explanationDesign": [
+    {
+      "id": "retail-category",
+      "readerQuestion": "전체 소매와 전자·가정용·기술제품군의 흐름은 같은가?",
+      "supported": "동일 월·실질·계절조정 전 전년동월비의 높고 낮음 비교. 수치에 따라 높음·낮음·같음을 코드가 구분.",
+      "readerValue": "전체 소매 흐름을 관련 상품군의 대리 지표로 사용하지 않고, 확인된 상품군 자체의 관측을 제시.",
+      "inlineCondition": "전자·가정용·기술제품군은 넓은 품목 분류.",
+      "notSupported": ["TV 단독 또는 가전 판매수량", "특정 회사 셀아웃·점유율", "전체 소매를 상품군이 주도했다는 순위·기여도 주장"]
+    },
+    {
+      "id": "pay-retail",
+      "readerQuestion": "시간당 보수 변화와 함께 확인할 수 있는 소매 실측 정보는 무엇인가?",
+      "supported": "같은 달 실질 시간당 보수와 소매 활동의 전년동월비를 별도 관측으로 병행 제시.",
+      "readerValue": "보수만으로 소비를 추정하지 않고, 소매 활동 자료를 함께 확인.",
+      "inlineCondition": "월 보수가 같아도 계약시간이 줄면 시간당 지표가 상승할 수 있음.",
+      "notSupported": ["가구별 월 소득·구매력 증가 확정", "보수 증가가 판매 증가를 초래했다는 인과", "서로 다른 기준년 지수 수준의 직접 비교", "한 달로 지속적 추세·향후 수요 확정"]
+    }
+  ],
+  "implementation": {
+    "module": "scripts/currency-report/consumer-context.js",
+    "writer": "scripts/currency-report/economic-update.js",
+    "entry": "prepareConsumerContext(packet, {period, asOf, statistics})",
+    "attachment": "반환 packet을 사용하고 dossier.consumerContext에 반환 context를 명시적으로 연결. 기존 economicUpdateRequest가 재검증 후 입력에 투영.",
+    "defaultBehavior": "consumerContext 미첨부 시 기존 생성 요청·프롬프트 유지.",
+    "binding": ["기간·출처 가용성·재사용 검토", "승인된 원문 주장과 숫자 일치", "단위·모집단·계절조정·기준년", "원본 문서 식별 및 동일 PDF 중복 구분", "packet과 dossier의 근거 범위 일치", "기존 fact ID 충돌·설명 변조 차단"],
+    "factAliases": ["consumer_pay_yoy", "consumer_retail_yoy", "consumer_category_yoy"],
+    "factLabels": "코드가 대상 월·지표명·비교 기간·값·실질·계절조정 전·잠정치 표시를 생성.",
+    "prompt": "두 비교 후보를 최대 분량으로 강제하지 않음. 조건은 본문에, 제외 범위는 검토용에 분리. 근거 연결 문장에는 필요한 양쪽 출처 지정.",
+    "privacy": "로컬 receipt·추출 감사 메타데이터는 writer의 sourceType에 넣지 않고 기관·공식 통계 분류만 투영. 키·환경 파일을 읽지 않음.",
+    "watch": "기존 검토된 watchCandidates만 사용. 이번 월별 자료로 새 일정이나 관찰 후보를 만들지 않음."
+  },
+  "realLocalReplay": {
+    "output": ".local-reports/private/consumer-input-T7M0X9/prepared.json",
+    "inputDate": "2026-10-15",
+    "statisticPeriod": "2026-08",
+    "priceSnapshot": "없음: 이전 환율·차트를 현재 날짜로 복사하지 않은 통계 입력 전용",
+    "result": "두 설명 후보·세 수치 참조·근거 연결 준비 완료",
+    "eventGate": "economic_source_review_required: 실제 신규 사건·집필 자격을 가정하지 않아 호출 요청은 생성하지 않음",
+    "publicDistributionApproved": false,
+    "currentRemotePdfHashVerified": false,
+    "sourceLimitation": "앞서 확보한 원본을 사용. 직전 재다운로드 실패와 수집시각을 그대로 보존.",
+    "recordsPreservedByHash": 6
+  },
+  "verification": {
+    "newCases": 6,
+    "totalCasesPassed": 528,
+    "testFiles": 76,
+    "declaredTests": 429,
+    "parameterExpansions": 99,
+    "exactDuplicateNamesOrBodies": 0,
+    "realAiQualityTested": false,
+    "syntheticIntegration": "실제 economicUpdateRequest에 선택 입력 연결·기본 입력 불변·미충족 사건 gate·누락/상이한 근거 차단을 검증",
+    "initialTestEnvironmentFailure": "OS 임시폴더 rename EPERM으로 검사 시작 실패. 기존 workspace TEMP 설정 후 재실행 통과.",
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed; 기존 610337바이트 entry 경고 유지",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed"
+  },
+  "boundaries": {"networkCalls": 0, "paidCalls": 0, "newApiCostUsd": 0, "existingManuscriptsChanged": false, "productionChanged": false, "dbChanged": false, "remotePush": false},
+  "next": "추가된 입력의 표현 범위를 검토한 후, 실제 작성 대상의 신규성·핵심 질문·가격 스냅샷을 확정. 추가 유료 생성은 별도 승인."
+}

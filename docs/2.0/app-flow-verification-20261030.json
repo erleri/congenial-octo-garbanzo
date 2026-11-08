@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-30",
+  "scope": "existing app local flow verification; no product code changes",
+  "preservation": {
+    "originalDatabaseRowsUnchanged": true,
+    "originalFilesUnchanged": 617,
+    "fixtureRetainedWithdrawn": true,
+    "reviewDecisions": [
+      "approved",
+      "withdrawn"
+    ],
+    "privatePacketPreserved": true,
+    "newModelCalls": 0,
+    "newCostUsd": 0
+  },
+  "tests": {
+    "unitFiles": 4,
+    "unitCasesPassed": 17,
+    "pgTapFiles": 5,
+    "pgTapCasesPassed": 74,
+    "allDbTestsRolledBack": true
+  },
+  "browser": {
+    "verified": [
+      "currency-card-to-report",
+      "claim-to-expanded-evidence",
+      "six-currency-list-and-switch",
+      "unpublished-empty-state",
+      "synthetic-admin-approval",
+      "signed-out-public-read",
+      "logout-clears-private-workspace",
+      "cached-read-during-REST-outage",
+      "uncached-error-not-empty-during-outage",
+      "admin-hides-private-during-outage",
+      "retry-after-service-restoration",
+      "synthetic-withdrawal-hides-public-content",
+      "direct-date-never-silently-selects-latest",
+      "browser-back",
+      "monthly-and-daily-tables",
+      "plan-read-only-configuration-notice"
+    ],
+    "actualManuscriptApproval": false,
+    "syntheticQualityScoresOnly": true,
+    "desktopOnly": true
+  },
+  "findings": [
+    {
+      "id": "U01",
+      "status": "open",
+      "scope": "public state and wording",
+      "detail": "withdrawn, unknown-date and never-published reports share an inaccurate empty message"
+    },
+    {
+      "id": "U02",
+      "status": "open",
+      "scope": "administrator connection notice",
+      "detail": "previous connection failure notice remains after successful reload"
+    },
+    {
+      "id": "U03",
+      "status": "existing_gap",
+      "detail": "safe public investigation status summary not wired"
+    },
+    {
+      "id": "U04",
+      "status": "existing_gap",
+      "detail": "correction relation and rejected/failed history presentation"
+    },
+    {
+      "id": "U05",
+      "status": "existing_gap",
+      "detail": "production provider and final combined administrator navigation"
+    },
+    {
+      "id": "U06",
+      "status": "visual_improvement",
+      "detail": "1265px desktop screenshot shows excessive header navigation and refresh-button wrapping; include in UI2.0 layout review"
+    }
+  ],
+  "faultInjection": {
+    "container": "supabase_rest_latamfx-2x-isolated",
+    "method": "temporary stop/start; database and auth containers kept running",
+    "restored": true,
+    "browserRetrySucceeded": true
+  },
+  "screenshots": [
+    "artifacts/app-flow-approved-20261030.png",
+    "artifacts/app-flow-cache-20261030.png",
+    "artifacts/app-flow-withdrawn-20261030.png"
+  ],
+  "next": "UI2.0 structure review — Astra High; include U01-U05 in subsequent Sol implementation",
+  "paidCalls": 0,
+  "newCostUsd": 0,
+  "productionChanges": 0
+}

@@ -1,0 +1,54 @@
+{
+  "version": "saved-material-gap-judgment/1",
+  "checkedOn": "2026-10-29",
+  "reviewOrigin": "same_assistant_nonblind",
+  "scope": "stored_materials_only_no_new_legal_permission_or_source_verification",
+  "referenceDate": "2026-10-28",
+  "commentaryDate": "2026-10-27",
+  "handoff": ".local-reports/private/six-currency-preparation-nlTEGm",
+  "commonDecisions": [
+    "대표 숫자는 기존 대시보드 기준환율이다. 기사 가격 쌍이나 종가 인증을 새 필수 조건으로 요구하지 않는다.",
+    "원문이 해당 시장 움직임과 요인을 연결하면 실명 전문가의 귀속 해석으로 검토할 수 있다. 요인별 기여도나 독립적 인과 입증까지 요구하지 않는다.",
+    "기사 최초 게시일·수정일·수집일은 해설 대상 거래일과 다르다. 다른 날의 설명을 현재 원인으로 승격하지 않는다.",
+    "시각 정밀도가 부족하면 입증 가능한 일간 귀속 해석 범위로 제한한다. 다중 출처의 사건 순서를 합성하거나 기준환율 수치의 직접 원인을 주장할 때는 별도 대응 근거가 필요하다.",
+    "선택 소비 배경의 사용 미확정과 시장 설명의 준비 상태를 분리한다. 소비 자료 제외로 설명을 만들어 채우거나 시장 근거 부족을 해결했다고 표시하지 않는다.",
+    "원문 반복 수집·원문 모델 전송·독립 사실/견해 카드 전송·공개 표시는 서로 다른 용도다. 기존 pending은 금지 확정도 허용 확정도 아니다."
+  ],
+  "countries": {
+    "COP": {
+      "decision": "selected_day_explanation_missing_in_reviewed_saved_materials",
+      "supported": "DANE 8월 실질 소매 잠정치 배경. 9/24 현지 달러 수급 설명은 해당 역사 사례에 한정.",
+      "notCurrent": "10/26 La República와 Infobae의 시장/국제 달러 해설. Infobae의 10/27 수정시각을 10/27 거래 설명으로 읽지 않는다.",
+      "next": "10/27 COP 현지 변동에 연결된 취재 또는 실명 해석을 등록 출처에서 확보한다. 없으면 새 원인 리포트 보류. 일반 달러 배경이나 소비 지표로 대체하지 않는다."
+    },
+    "PEN": {
+      "decision": "attributed_explanation_supported_candidate_admission_pending",
+      "source": "https://www.revistaeconomia.com/sol-retrocede-025-frente-al-dolar-mientras-la-bolsa-de-lima-avanza-122/",
+      "savedOriginal": ".local-reports/private/pen-brl-followup-20261028-t943Dh/pen-market-extracted.json",
+      "supported": "Felipe Mendoza / EBC Financial Group는 10/27 솔 약세를 설명하며 글로벌 달러 강세와 미국 금리 결정 전 경계감을 제시한다. 그 견해로 귀속할 수 있으며 확정 원인이나 기여 순위로 바꾸지 않는다.",
+      "priceScope": "시가 3.4408에서 종가 3.4496까지 약 0.256%다. 전일비가 아니며 대표 기준환율을 대체하지 않는다.",
+      "retiredRequirement": "PEN_price_pair_and_shared_price_adapter_missing은 현재 공통 기준환율 정책에서 집필 필수 조건이 아니다. 기존 후보 기록 자체는 보존한다.",
+      "next": "Revista Economía의 반복 수집 등록과 자체 사실·견해 카드 용도 판단을 분리해 마감한다. INEI 외부 입력 pending은 별도로 유지하며 시장 전용 준비 사본에서는 선택 제외할 수 있다.",
+      "notGranted": "이번 저장 원문 대조는 매체 이용 허가·자동 수집 승인·카드 외부 전송 승인을 부여하지 않는다."
+    },
+    "ARS": {
+      "decision": "selected_day_explanation_missing_in_reviewed_saved_materials",
+      "supported": "INDEC 8월 슈퍼마켓 배경. Infobae의 Cocos/Puente 견해는 10/26 도매시장 맥락으로 보존.",
+      "priceScope": "도매·소매·MEP·CCL·blue를 혼합하지 않는다. 별도 BCRA 가격을 사용하지 않는 기본 경로에 BCRA API 이용 문제를 필수 차단 사유로 추가하지 않는다.",
+      "next": "10/27 설명을 확보할 때 어느 환율 시장에 대한 해석인지 먼저 확인한다. 10/26 브라질 충격 설명이 다음 날에도 지속됐다고 임의 연장하지 않는다."
+    }
+  },
+  "completionBoundary": "자료 공백의 종류와 제거할 불필요한 조건을 판단했다. 세 통화 입력 마감 또는 자동 집필 성공은 아니다. 날짜를 바꾼 역사 재생은 현재 자료 공백 해소와 별도다.",
+  "nextOrder": [
+    "PEN 후보의 수집 등록·카드 용도 확인 및 선택 소비 배경 분리",
+    "COP·ARS 대상 거래일의 시장 해설 보강; 미확보면 이유를 남기고 보류",
+    "공통 준비 경로로 저장 재생하고 6통화 표 갱신",
+    "준비된 입력만 별도 예산 승인 후 실제 품질 시험"
+  ],
+  "networkCalls": 0,
+  "modelCalls": 0,
+  "newPaidCostUsd": 0,
+  "publicationApproved": false,
+  "productionChanged": false,
+  "manuscriptsChanged": false
+}

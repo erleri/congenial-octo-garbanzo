@@ -4,6 +4,7 @@ import fs from 'fs'
 import { execSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import type { ServerResponse } from 'node:http'
+import { rawSheetAssetsPlugin } from './scripts/raw-sheet-assets.js'
 
 const mailingListPath = fileURLToPath(new URL('./data/mailing_list.json', import.meta.url))
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -43,13 +44,16 @@ const appBuiltAt = new Date().toISOString()
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: { fs: { deny: ['**/.env*', '**/.git/**', '**/.local-reports/**', '**/data/mailing_list.json', '*.{crt,pem}'] } },
   define: {
+    __LOCAL_CURRENCY_REPORTS__: false,
     __APP_COMMIT__: JSON.stringify(appCommit),
     __APP_BRANCH__: JSON.stringify(appBranch),
     __APP_BUILT_AT__: JSON.stringify(appBuiltAt),
   },
   plugins: [
     react(),
+    rawSheetAssetsPlugin(),
     {
       name: 'local-mailing-list-api',
       configureServer(server) {

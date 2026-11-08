@@ -1,0 +1,154 @@
+{
+  "version": "data-lifecycle-design/1",
+  "date": "2026-10-29",
+  "title": "LATAM FX 공통 데이터 운영 정책",
+  "status": "design_baseline_not_enforced",
+  "scope": "운영 데이터 계획 2단계. 기존 자료를 조사해 설계 기준을 고정한다. 저장·삭제·권한·운영 동작은 아직 변경하지 않는다.",
+  "baseline": "production-baseline-20261029.json",
+  "currencies": ["BRL", "MXN", "COP", "PEN", "CLP", "ARS"],
+  "execution": {"productCodeChanged": false, "productionChanged": false, "deletionEnabled": false, "migrationEnabled": false, "paidCalls": 0},
+  "decisionLevels": [
+    ["사용자 확정", "6통화 공통 기준, 대시보드 기준환율 재사용, 기존 원고·환율 보존, 새 유료 시험 별도 승인, 운영 반영 보류"],
+    ["이번 설계 기준", "자료 판본·사용 범위·승인 연결, 공개 허용 필드, 정정 우선, 기존 서비스 자원 보호. 다음 단계 구현의 기준이며 구현 완료가 아님"],
+    ["제안 수치", "보존 일수·캐시 시간·경보 비율·복구 목표. 예행연습과 실측 후 적용 값을 확정하며 현재 실행 설정으로 읽지 않음"],
+    ["운영 전 미확인", "계정별 월 사용량·남은 한도, 백업 실재/복원, 권한별 통합 시험, 기존 생성기와 새 생성기 전환"]
+  ],
+  "rules": [
+    {"id":"D01","title":"기존 서비스 보호","text":"환율 갱신·계획환율 저장·기존 메일의 저장 구조와 작업은 보존한다. 리포트 수집/집필 실패·할당량 소진은 새 리포트 작업만 멈춘다. 기존 생성기가 이미 운영 중이므로 새 생성기 전환 시 같은 발행 사건의 중복 실행을 차단한다."},
+    {"id":"D02","title":"하나의 자료와 그 판본 구분","text":"논리 자료 ID와 변경 불가능한 판본 ID를 따로 둔다. 원본 바이트 해시·파서 버전·정제 결과 해시·수집 기록을 보존한다. 같은 URL의 수정본은 새 판본이며 같은 해시라는 이유로 출처·이용 범위를 합치지 않는다."},
+    {"id":"D03","title":"시간의 의미 보존","text":"기준일, 공급자 관측시각, 기사 현지 거래일/가격 종류, 사건시각, 발표시각, 지표 대상 기간, 수집시각, 검토시각을 분리한다. 시각이 없으면 null과 정밀도(date_only/unknown)를 기록한다. 수집시각으로 관측시각을 대체하지 않는다."},
+    {"id":"D04","title":"용도별 사용 범위","text":"원문·독립 사실 카드·귀속 견해·공식 통계마다 로컬 분석, 외부 모델 입력, 공개 표시를 별도로 판정한다. 저장·백업 허용 범위와 보존 종료 조건도 연결한다. 기사 무료 접근, 출처 표기, 카드 허용, ZDR를 다른 용도의 허가로 승격하지 않는다. 미확인은 해당 동작을 보류하며 법적 허가가 확정됐다고 표시하지 않는다."},
+    {"id":"D05","title":"자료 상태와 게시 자격 분리","text":"조회 성공/실패, 추출 완전성, 이용 범위, 내용 지지, 자료 신선도, 집필 자격, 비용, 게시 승인은 별도 상태다. 성공한 HTTP 응답이나 존재하는 근거 ID만으로 내용 검토를 통과시키지 않는다. 외부 텍스트는 신뢰하지 않는 데이터이며 지시문으로 실행하지 않는다."},
+    {"id":"D06","title":"참조와 승인 고정","text":"가격 스냅샷→자료 판본→카드→집필 입력→원고 판본→검토→공개 결과를 정확한 ID/해시로 연결한다. 새 원문·카드·지침·원고가 바뀌면 영향받는 검토의 유효성을 다시 판단한다. 기존 승인을 새 내용에 복사하지 않는다. 자료 수정이 과거 발행 당시 판단을 자동으로 오답으로 만드는 것은 아니다."},
+    {"id":"D07","title":"공개 허용 목록","text":"공개 응답은 허용 필드를 새 객체로 구성한다. 미래의 내부 필드가 자동 공개되지 않게 한다. 로컬 reviewable 파일은 검토용이며 공개 승인 증거가 아니다. 공개 응답·빌드·Actions artifact·브라우저 캐시 모두 같은 공개 경계를 적용한다."},
+    {"id":"D08","title":"최소 권한과 즉시 차단","text":"공개/일반 로그인 사용자는 승인 공개본만 읽는다. active admin만 비공개 검토 자료를 읽고 승인/반려/철회를 수행한다. 민감한 요청마다 서버가 현재 관리자 상태를 확인한다. 로그아웃·권한 해제 시 메모리와 진행 중 응답을 폐기한다. service role은 서버 전용이며 DB 자체에서는 광범위한 권한이 있으므로 전용 작업 경로로 사용을 제한한다."},
+    {"id":"D09","title":"중복과 불완전 저장","text":"환경·통화·발행 사건·입력 해시·지침/모델 버전으로 실행을 식별하고 호출 전 예약한다. 통신 단절/시간 초과는 미실행을 뜻하지 않는다. 비용 미확인 예약은 유지하고 자동 재시도하지 않는다. 파일/DB의 해시와 참조가 모두 완성된 묶음만 집필/승인 대상으로 삼는다."},
+    {"id":"D10","title":"보존과 삭제","text":"보관 기한은 검토 시작 시점이지 무조건 삭제 시점이 아니다. 채택 근거·대기 원고·정정/분쟁·미확인 비용·검증된 복구 묶음·기존 보존 요청을 참조 검사한다. 단, 보존 요청은 이용 조건의 삭제 의무를 무효화하지 않는다. 충돌하면 재사용/공개를 중지하고 허용된 최소 기록과 조치 결정을 남긴다. 자동 삭제는 별도 승인 전 꺼 둔다."},
+    {"id":"D11","title":"정정 우선","text":"철회/정정 상태를 원고와 별도 판본으로 관리한다. 이미 알려진 철회는 새 조회 실패나 오래된 캐시로 되살리지 않는다. 오프라인 기기의 즉시 회수는 보장할 수 없으므로 확인 시각과 만료 정책을 표시한다. 새 정정본은 새 검토·승인을 거친다."},
+    {"id":"D12","title":"사용량과 복구","text":"DB·파일·전송·Actions·배포·모델 비용을 따로 계측한다. 월 한도 미확인은 여유로 처리하지 않는다. 기존 서비스와 정정 작업에 먼저 자원을 남긴다. DB와 파일을 같은 목록으로 백업/복원하며 이전 DB 전체 복원으로 이후 계획환율 저장이나 철회 기록을 잃지 않는다."}
+  ],
+  "dataClasses": [
+    {"id":"fx_reference","name":"기준환율·공개 폴백","existing":"운영 Supabase와 data/fx-full-history.json, public/data.json","target":"기존 경로 유지. 리포트가 사용한 값·차트 범위·공급자 메타데이터를 고정 스냅샷으로 참조","access":"기존 공개 정책 유지","retention":"기존 이력 자동 삭제/이전 없음. 새 스냅샷은 채택 원고와 연결","rules":["D01","D03","D06"]},
+    {"id":"business_plan","name":"계획환율 현재값·변경 이력","existing":"현재값과 관리자 이력 분리","target":"현재 경로 유지. 리포트에는 사용한 공개 현재값만 고정","access":"이메일 없는 현재값 공개, 저장자·이력은 active admin","retention":"감사·저장 이력 보존, 과거 DB 복원으로 덮어쓰지 않음","rules":["D01","D08","D12"]},
+    {"id":"source_blob","name":"기사·PDF·API 원시 응답","existing":"로컬 비공개 파일. Supabase Storage 미사용","target":"허용된 자료만 비공개 파일 저장소 후보. DB에는 메타데이터·권한·참조. 이번에 새 저장소 도입 안 함","access":"서버/권한 있는 검토자. 원문은 공개 빌드/공개 artifact 제외","retention":"미채택 자료 30일 검토 제안. 채택 자료는 허용 범위와 참조 수명으로 결정","rules":["D02","D04","D10"]},
+    {"id":"evidence_card","name":"사실·견해·지표 카드","existing":"원문·해시에 연결된 로컬 카드와 이용/내용 검토","target":"공통 장부에 판본·귀속·역할·기간·원문 지지 연결. 같은 내용의 반복 복제 대신 참조","access":"전체 카드는 비공개. 공개용 출처 요지는 별도 허용 목록","retention":"미사용 90일 검토 제안. 발행 근거는 공개 수명과 정정 추적에 맞춰 보존","rules":["D02","D04","D05","D06"]},
+    {"id":"writer_run","name":"AI 입력·원문 응답·실패 진단","existing":"로컬 실행 기록 및 운영 legacy fx_report_runs","target":"새 실행 장부와 비공개 큰 응답 파일 참조. 이전 실행은 덮어쓰지 않음","access":"서버/active admin만. 키·요청 인증 헤더는 저장 금지","retention":"상세 응답은 실행 종료 후 90일 검토 제안. 채택 원고 재현·미확인 비용은 별도 보호","rules":["D06","D08","D09","D10"]},
+    {"id":"review_cost","name":"승인·정정·비용 요약 장부","existing":"로컬 승인/비용 및 DB 검토 이력","target":"추가 기록 방식. 실행 ID·해시·결정·실제비용/예약·사유. 원문 전체 복제하지 않음","access":"비공개. 공개에는 개인 식별 없는 게시/정정 상태만","retention":"최소 기록 24개월 검토 제안. 미해결 비용·정정 또는 공개본 참조 시 연장","rules":["D06","D09","D10","D11"]},
+    {"id":"published_report","name":"공개 리포트·근거 표시","existing":"A안·공개 타입·로컬 DB 공개 투영 함수. 실제 운영 공개본은 기준선상 0건","target":"승인된 정확한 원고 판본에서만 생성. 목록과 상세 분리, 원고·차트는 발행 당시 고정","access":"공개 허용 필드만","retention":"최근 30개는 화면 조회 개수이지 삭제 정책 아님. 과거본은 날짜 유지, 철회 시 본문 제공 중지","rules":["D06","D07","D11"]},
+    {"id":"temp_cache","name":"임시 다운로드·중간 파일·캐시","existing":"로컬 및 브라우저 캐시","target":"작업별 임시 영역, 공개 캐시와 관리자 메모리 분리","access":"원문/초안은 공용 캐시 금지","retention":"작업 종료 후 임시 파일 7일 검토 제안, 미완료 실행 제외. 공개 캐시 별도 만료","rules":["D07","D09","D10","D11"]},
+    {"id":"secrets_recipients","name":"API 키·수신자·관리자 식별","existing":"로컬 비밀 설정과 서버 설정. 공개 저장소 메일링 경로 추적 사실 발견","target":"키는 서버 비밀 설정. 수신자는 별도 비공개 운영 설정으로 이전 계획. 내용 확인/승인 전 변경 안 함","access":"모델·공개 로그·브라우저·디자인 파일 전달 금지. 감사용 관리자 식별도 접근 제한","retention":"필요 최소 기간/범위. 공개 저장소 이력 제거는 별도 검토, 이번 이력 재작성 없음","rules":["D07","D08","D10"]},
+    {"id":"backup","name":"DB·파일 복구본","existing":"실제 사용 가능한 운영 백업/복원 미확인","target":"암호화된 독립 보관 + 동일 시점 목록/해시. 인증 설정·비밀값은 별도 복구 절차","access":"복구 담당자 한정, 공개 Git/Actions를 백업 저장소로 사용하지 않음","retention":"일별 7개+주별 4개 제안. 파일 자체의 허용 범위/삭제 조건도 적용","rules":["D04","D10","D12"]}
+  ],
+  "identity": [
+    ["자료", "resourceId(논리 ID), revisionId, sourceId, canonicalUrl, originalHash, extractedHash, parserVersion, captureId. URL 정규화는 인증/추적값 제거와 콘텐츠 식별을 구분하며 query를 일괄 삭제하지 않음"],
+    ["시간·가격", "referenceDate, observedAt/precision/timezone, sourceTradingDate, priceType, publishedAt, eventAt, referencePeriod, collectedAt, lastCheckedAt. 없는 시각은 보완 추정 금지"],
+    ["사용 범위", "기존 source-use/1의 local_analysis·external_model·public_display와 조건 유지. storageScope·retentionUntil·backupScope·termsVersion·reviewedAt·nextReviewAt을 후속 계약으로 연결. 저장 가능과 최신 집필 사용 가능은 별개"],
+    ["신선도", "expectedReleaseCalendar, nextExpectedRelease, supersedes, revisionStatus. 월간 최신 공표 자료는 전월/전전월이어도 소비 배경 가능. 당일 환율 원인으로 승격 불가. 발표가 지연되면 failed가 아니라 release_pending 등으로 분리"],
+    ["참조", "fromId/fromRevision → toId/toRevision, 용도, claimId, 영향 범위. 원문 해시는 동일성 증거이지 문장 지지·이용권 증명이 아님"],
+    ["실행", "environment, currency, eventId, requestHash, ruleVersion, modelProfileVersion, attemptId, idempotencyKey, reservation, actualCost 또는 unknown. 같은 입력의 동시 예약은 하나만 허용"],
+    ["완료", "파일 업로드/해시 확인 → DB 참조/장부 준비 → complete 상태. 서비스 간 단일 트랜잭션으로 가정하지 않으며 실패 시 incomplete로 남기고 읽기 차단"],
+    ["검토/승인", "reviewId, reviewer identity(비공개), contentHash, inputHash, sourcePolicyVersion, decision, reason, reviewedAt. 표시 본문 변경은 새 판본과 새 승인; 공개 문구를 직접 덮어쓰지 않음"]
+  ],
+  "stateAxes": [
+    ["수집", "not_requested / collected / partial / fetch_failed / extraction_failed"],
+    ["자료 적합성", "current / historical_context / superseded / timing_unknown / release_pending"],
+    ["용도별 사용", "allowed / pending / denied — 기존 source-use/1 재사용"],
+    ["내용 지지", "unreviewed / supported / partly_supported / unsupported"],
+    ["집필", "eligible / insufficient_evidence / duplicate / no_new_interpretation / blocked"],
+    ["실행·비용", "reserved / running / complete / failed / outcome_unknown; 비용 confirmed / unknown"],
+    ["공개", "draft / pending_review / published / correction_pending / withdrawn / superseded"],
+    ["보관", "active / archived / expiry_review / deletion_pending / deleted_metadata_only"]
+  ],
+  "publicProjection": {
+    "reuse":"CurrencyReport 기본 구조와 URL·A안 유지. 기존 DB 공개 필드 투영 함수를 우선 재사용하고 파일 제공 경로와 같은 계약으로 맞춘다.",
+    "list":["id","currency","baseDate","observedDate","publishedAt","generationMode","purpose","title","summary","publicationState","revisionId"],
+    "detail":["기존 schemaVersion과 표현 버전","title·summary·change·drivers·implications·watch·limitations","코드가 고정한 facts와 series","기준환율 공급자/정의·실제 알려진 관측/갱신 정보","공개 허용된 출처 URL·매체·발표일·대상기간·필수 귀속/가공 표시·자체 요지","개인 정보 없는 정정 연결·게시 상태 확인시각"],
+    "exclude":["원문 HTML/PDF/모델 원시 응답","전체 입력 패킷·프롬프트·내부 주장/검토 장부","reviewer_email·수신자·계정 ID","키·토큰·인증 query·서명 URL","내부 오류 스택·로컬 경로","comparison의 비용·임시 점수·reviewNotes","원고에 사용하지 않은 전체 카드 집합"],
+    "compatibility":"새 상태/판본/캐시 확인 정보는 별도 응답 메타데이터 계약으로 설계하고 기존 CurrencyReport 내용은 유지한다. 알 수 없는 공개 필드는 조용히 복사하지 않으며 projection 실패 시 공개를 보류한다. 내부 타입을 그대로 직렬화하지 않는다."
+  },
+  "retention": {
+    "mode":"proposal_dry_run_only",
+    "numericDefaults":[
+      {"classId":"temp_cache","days":7,"clock":"작업 완료 시각","action":"삭제 후보 검토"},
+      {"classId":"source_blob","days":30,"clock":"수집 완료 시각","action":"미채택·미참조 원문에 한정한 삭제 후보 검토"},
+      {"classId":"evidence_card","days":90,"clock":"마지막 사용/미채택 결정 시각","action":"미참조 카드의 축약·보존 검토"},
+      {"classId":"writer_run","days":90,"clock":"실행 종료와 비용 확정 중 늦은 시각","action":"상세 입력/응답의 축약 검토. 활성/미확인 비용은 기산 안 함"},
+      {"classId":"review_cost","months":24,"clock":"최종 종결 시각","action":"최소 감사·비용 기록의 필요성 재검토. 자동 파기 안 함"}
+    ],
+    "holdReasons":["published_dependency","pending_review_dependency","correction_or_dispute","unresolved_cost","active_execution","restore_manifest_dependency","explicit_preserve_request"],
+    "decisionOrder":["저장/백업 금지 또는 의무 삭제 조건 확인 → 충돌 시 재사용 차단 및 별도 처리","실행/승인/정정/비용과 연결된 보호 참조 확인","기한과 참조가 모두 정리된 대상만 dry-run 목록으로 산출","대상별 ID·예상 확보 바이트·영향 원고·복구 가능성을 검토","삭제 별도 승인 후 최소 메타데이터와 삭제 사유/시각 남김","백업·CDN·내보낸 사본에 같은 삭제/정정 정책 전달"],
+    "rawEvidenceExpiry":"원문을 계속 저장할 수 없으면 허용된 자체 카드·출처·검토 범위·해시만 보존하고 재현 수준을 partial로 낮춘다. 핵심 주장을 재검토할 수 없어 신뢰가 깨지면 해당 원고를 정정대기로 전환한다. 해시만으로 원문 검증이 유지된다고 주장하지 않는다.",
+    "legacy":"기존 원고·근거·비용 기록에는 일괄 만료 규칙을 소급 실행하지 않는다. 사용권 충돌이 확인된 개별 자료는 별도 최소 조치를 검토한다. 과거 코드 지침과 당시 승인 버전은 그대로 추적한다."
+  },
+  "correctionAndCache": [
+    ["정정 접수", "영향받는 주장·원고 판본을 연결한다. 중대한 알려진 오류는 추천/본문 제공을 중지하고 correction_pending 또는 withdrawn을 표시한다. 자료 수정의 영향이 없는 원고까지 일괄 철회하지 않는다."],
+    ["상태 제공", "공개 가능한 최소 정정 목록을 본문과 별도로 제공한다. 본문 조회 실패 시 마지막 확인 상태와 로컬에 이미 알려진 철회를 우선한다. 목록이 갱신되지 않았다고 철회 기록을 비우지 않는다."],
+    ["캐시 수치 제안", "접속 중 상태 확인 유효기간 15분, 장애 중 공개 본문 최대 24시간. 이후 본문 대신 제목·기준일·확인 불가 안내. 24시간은 보고서 나이가 아니라 마지막 게시 상태 확인 후 시간이다. 값은 구현/부하 검증 후 확정한다."],
+    ["화면 표시", "기준일과 마지막 상태 확인시각을 따로 표시한다. 알려진 철회본은 유효기간 안에서도 숨긴다. 오프라인 기기를 즉시 무효화할 수 있다고 보장하지 않는다."],
+    ["관리자", "초안·원문·검토 결과를 localStorage/공용 캐시에 보관하지 않는다. 로그아웃/권한 해제 후 늦게 도착한 요청 결과도 폐기한다. 원문 조회는 인증 재검사 경로를 우선하며 서명 URL은 즉시 권한 회수 수단으로 보지 않는다."]
+  ],
+  "capacityAndRecovery": [
+    ["GitHub", "코드·설정·migration·작은 정제 fixture를 유지한다. 전체 환율 이력의 현행 커밋 방식은 복구 대안 검증 전 유지. 로컬 실험 약895MB를 운영/Git으로 통째로 옮기지 않는다. 공개 repo의 메일링 경로는 내용 최소 확인 후 비공개 설정 이전을 별도 변경으로 준비한다."],
+    ["Actions", "성공 여부·시간·대상 수·정제 진단만 artifact로 내보낸다. 원문/초안/비용 원시 로그와 비밀값은 제외한다. artifact 보관기간은 새 작업 14일 제안이며 현재 운영 90일 artifact 설정을 이번에 변경하지 않는다. artifact를 독립 백업으로 간주하지 않는다."],
+    ["Netlify", "UI·최소 폴백만 배포한다. public/raw-sheets.json은 관리 화면 의존을 대체한 후에만 제외한다. 리포트 게시를 매번 앱 전체 배포와 연결하지 않되 기존 FX 배포를 함께 바꾸지 않는다. 실제 압축 전송량과 원본 바이트를 분리한다."],
+    ["Supabase DB·파일", "구조화 메타데이터/공개본은 DB, 허용된 큰 본문은 비공개 파일 후보. DB 인덱스·파일·백업·전송을 각각 계측한다. 같은 파일 바이트를 공유해도 출처별 권리/메타데이터는 분리한다. 모든 참조가 끝나기 전 공용 객체를 삭제하지 않는다."],
+    ["한도 제안", "검증된 각 월 한도의 70% 경보, 85%에서 새 2.0 수집/생성 보류, 월말 예상 초과도 경보. 1.x·정정·관리 조회에 별도 여유를 둔다. 과금 계측과 물리 크기를 섞지 않는다. 한도/현재 사용량 미확인 시 신규 운영 2.0 활성화를 보류한다. 로컬 저장 자료 검토는 계속 가능하다."],
+    ["적체", "삭제 불가 기록이 늘면 강제 삭제 대신 새 수집을 중지하고 미해결 비용/대기 검토를 정리한다. 통화별 최대 후보 수·응답 크기·실행 시간·중복 예약을 기존 상한과 통일한다. 출처별 갱신 주기와 조건부 조회를 사용하며 무조건 매번 원문 전체를 재수집하지 않는다."],
+    ["백업 목표 제안", "일별 DB와 허용 파일 목록 백업, 일별7개·주별4개. 복구시점 목표 24시간/복구시간 목표 4시간은 검증할 초안이며 보장값이 아니다. 계획환율의 하루 손실을 허용한다는 뜻이 아니며, 승인된 신규 저장을 복구 시 재결합하는 절차가 필요하다. 손실 허용 여부/담당자/보관 위치는 운영 전 확정한다."],
+    ["복원", "별도 환경에 DB+파일+판본 목록을 복원해 해시·참조·권한·공개 투영·최신 철회 장부를 확인한다. 운영 전체 DB 덮어쓰기는 금지. 기존 서비스의 새 쓰기를 보존하는 복구 계획과 새 공개본 차단 절차를 사용한다. 정리 전/후 백업의 삭제 예정 원문도 재노출하지 않는다."],
+    ["책임", "서비스 소유자가 보관/예산/복구 목표를 승인하고, 기술 운영 담당자가 계측·백업·복원 증거를 관리하며, 콘텐츠 검토 담당자가 사용 범위·정정 영향을 결정한다. 실제 담당자 배정은 미확정이며 자동 삭제·운영 활성화 전 필수다."]
+  ],
+  "countryBoundary": {
+    "common":"위 ID·권한·보존·승인·정정·비용 기준은 6통화에 동일하게 적용한다.",
+    "allowedDifferences":["등록 출처와 이용 조건/귀속 요구","보조 시장 가격 정의 및 거래일","발표/거래 달력·시간대","지표 계열·단위·대상 기간·수정 방식"],
+    "forbiddenDifferences":["특정 국가만 내용 검토 생략","기사 가격으로 대시보드 기준환율 몰래 대체","기사 부족을 소비 통계로 당일 원인 인증","과거 수동 카드 승인으로 새로운 원문/판본 자동 승인"],
+    "snapshot":"기존 6통화 준비 결과는 당시 저장 자료의 상태다. 이번 정책 문서로 국가별 집필 자격·실제 모델 품질·공개 승인을 승격하지 않는다."
+  },
+  "implementationMap": [
+    {"id":"I01","area":"사용 범위","reuse":["scripts/currency-report/source-use.js","scripts/currency-report/original-news-use-policy.js"],"finding":"3용도·해시·전달 조건 검사는 존재. 저장/백업 기한의 공통 장부는 별도 필요","next":"기존 검사를 호출하는 자료 장부에 저장·보관 조건 연결. 매체별 승인 판단 자체를 새 정규식으로 대체하지 않음"},
+    {"id":"I02","area":"공개 투영","reuse":["scripts/currency-report/storage.js","supabase/migrations/20261011023007_currency_report_review_storage.sql","src/types/currencyReport.ts"],"finding":"DB에는 공개 필드 구성 함수가 이미 있다. 로컬 projectPublicReport는 제외 후 나머지를 복사하며 comparison 검토 정보도 타입에 포함","next":"기존 DB/공개 타입과 호환되는 명시적 허용 목록을 공통화. 로컬 검토용 응답은 별도 유지. 새 비공개 필드 주입 시험"},
+    {"id":"I03","area":"권한·정정 캐시","reuse":["src/lib/fxReportRemote.ts","src/lib/currencyReportAccess.ts","supabase/migrations/20261011023007_currency_report_review_storage.sql"],"finding":"legacy 캐시는 실패 시 기간 확인 없이 반환. 로컬 currency DB에는 철회와 active admin 검사 존재","next":"legacy와 새 통화별 경로를 구분해 적용. 상태 판본/만료/철회 우선 처리, 로그아웃·권한변경·동시승인 통합 검증"},
+    {"id":"I04","area":"실행·비용","reuse":["scripts/currency-report/lifecycle-control.js","scripts/currency-report/shared-writer.js"],"finding":"명시적 승인·요청 해시·예산·중복·미확인 비용 방어 존재","next":"기존 방어 유지하고 저장 완료 상태/공통 참조 장부 연결. 비용 장부를 새 버전에서 초기화하지 않음"},
+    {"id":"I05","area":"운영 전환","reuse":[".github/workflows/generate-data.yml","src/components/Admin.tsx"],"finding":"기존 리포트 생성 작업이 운영 중이며 raw-sheets 관리 의존 존재","next":"새 2.0 작업은 독립 자원 상한으로 분리. 운영 승인 시 단일 생성 주체 전환, 기존 관리/메일 회귀와 복구 증거 확보"}
+  ],
+  "scenarios": [
+    {"id":"S01","case":"같은 URL의 기사 본문 수정","rules":["D02","D06"],"expected":"새 판본·영향 주장 재검토. 이전 원고/승인 덮어쓰기 없음"},
+    {"id":"S02","case":"같은 전문가 발언이 두 매체에 재인용","rules":["D02","D05"],"expected":"관련성 그룹으로 묶되 두 독립 확인으로 세지 않음. 각 출처/권리 유지"},
+    {"id":"S03","case":"8월 소비지표가 10월 최신 발표","rules":["D03","D05"],"expected":"8월 대상 소비 배경으로 표시. 10월 일간 환율의 직접 원인으로 사용 금지"},
+    {"id":"S04","case":"기사에 현지 종가가 없음","rules":["D01","D03"],"expected":"대시보드 기준환율 유지. 기사 수치 없이 지지되는 시장 해설만 사용, 종가 추정 금지"},
+    {"id":"S05","case":"카드 외부 입력 허용, 원문은 미확인","rules":["D04"],"expected":"허용된 카드만 입력. 원문/번역문으로 우회하지 않음"},
+    {"id":"S06","case":"공식 파일 다운로드 성공, 추출 실패","rules":["D05","D09"],"expected":"extraction_failed; 최신 정상 카드로 승격 금지. 다른 통화 준비는 계속"},
+    {"id":"S07","case":"임시 파일 7일 경과, 작업은 실행 중","rules":["D09","D10"],"expected":"삭제 후보 제외, 적체 경보"},
+    {"id":"S08","case":"미채택 원문 30일 경과, 발행본이 뒤늦게 참조","rules":["D06","D10"],"expected":"현재 참조를 재검사해 삭제 보류. 예전 dry-run 목록만으로 삭제 금지"},
+    {"id":"S09","case":"공개본 근거인데 원문 보관 허용기간 만료","rules":["D04","D10","D11"],"expected":"무기한 보존으로 우회하지 않음. 허용 최소 기록·재현 수준 변경, 핵심 신뢰 손상 시 공개 보류와 조치 기록"},
+    {"id":"S10","case":"비용 미확인 응답이 90일 경과","rules":["D09","D10"],"expected":"예약/최소 영수증 보호. 허용되는 상세 응답만 보존, 재호출 금지"},
+    {"id":"S11","case":"새 내부 필드에 관리자 이메일 추가","rules":["D07"],"expected":"명시 공개 목록에서 제외. REST/파일/캐시/빌드/이미지 진단 경로 모두 확인"},
+    {"id":"S12","case":"로그아웃 뒤 느린 초안 조회 도착","rules":["D08"],"expected":"응답 폐기, 캐시 재노출 금지, 다음 서버 요청도 현재 권한 재검사"},
+    {"id":"S13","case":"승인 버튼 동시 실행","rules":["D06","D08","D09"],"expected":"같은 원고 판본에 하나의 공개 반영, 나머지는 명시 중복 결과"},
+    {"id":"S14","case":"원문 파일 업로드 성공, DB 장부 저장 실패","rules":["D09"],"expected":"고아 파일은 미완료로 추적, 집필/공개 금지. 정리 예행연습 대상으로만 분류"},
+    {"id":"S15","case":"철회 인지 후 DB 장애 발생","rules":["D11"],"expected":"캐시의 이전 정상본을 제공하지 않음. 최소 철회 상태 유지"},
+    {"id":"S16","case":"오프라인 동안 서버에서 철회","rules":["D11"],"expected":"즉시 회수 불가능함을 인정. 마지막 확인/만료 표시, 재연결 시 상태 우선, 만료 후 본문 중지"},
+    {"id":"S17","case":"DB 여유 있으나 월 전송량 한도 임박","rules":["D12"],"expected":"다른 자원 수치로 정상 판정하지 않음. 새 2.0 수집/생성 보류, 기존 서비스 여유 우선"},
+    {"id":"S18","case":"같은 데이터로 기존 생성기와 새 생성기 동시 실행","rules":["D01","D09"],"expected":"환경/발행 사건의 단일 생성 주체를 확인. 중복 과금·중복 승인 차단"},
+    {"id":"S19","case":"백업 뒤 새 계획환율 저장과 리포트 철회 발생","rules":["D01","D11","D12"],"expected":"과거 DB 전체 덮어쓰기 금지. 별도 복원 검증 후 최신 저장/철회를 보존하는 복구"},
+    {"id":"S20","case":"30개 이력 조회 제한에 과거 보고서가 밀림","rules":["D06","D10"],"expected":"조회 페이지에서만 제외, 원고/근거 자동 삭제 없음"},
+    {"id":"S21","case":"익명 사용자가 reviewable 파일 주소를 요청","rules":["D07","D08"],"expected":"운영 공개 경로에서 제공 금지. 파일 존재나 로컬 검토 성공을 승인으로 사용하지 않음"},
+    {"id":"S22","case":"원문 삭제 후 오래된 백업을 복원","rules":["D10","D11","D12"],"expected":"삭제/철회 장부를 먼저 재결합, 재사용·공개 전에 삭제 정책 재적용"},
+    {"id":"S23","case":"주요 출처 이용 조건 변경","rules":["D04","D06"],"expected":"새 용도 사용을 보류하고 영향 범위를 검토. 관련 없는 국가/공개본까지 무조건 중지하지 않음"},
+    {"id":"S24","case":"보호 자료 증가로 용량이 계속 늘어남","rules":["D10","D12"],"expected":"보호 규칙을 무시해 지우지 않음. 새 수집 제한·중복 제거·허용 최소 기록·운영 판단으로 해소"}
+  ],
+  "nextSteps": [
+    ["3A Sol High", "새 저장만 공통 자료/판본/참조 장부와 complete 표식을 적용. 기존 reader 호환, 원고/비용 일괄 이전 없음"],
+    ["3B Sol High", "공개 허용 목록을 기존 DB 투영과 파일 경로에 통일. 검토용 응답과 공개용 응답 분리"],
+    ["3C Sol High", "로컬 DB에서 활성 관리자·동시 승인·불완전 저장·철회 캐시·오래된 승인 재사용을 검증"],
+    ["4~5단계", "실측 자원 상한과 삭제 없는 보존 예행연습, 백업/복원/원시표 대체 검증. 그 전 자동 삭제 구현·실행은 후순위"],
+    ["운영 전", "월 한도·잔여량, 백업/복구 책임과 목표, 공개 수신자 경로, 정기 실행 지연, 기존/새 생성기 전환을 마감한 뒤 별도 운영 승인"]
+  ],
+  "sources": [
+    {"title":"Supabase Storage 접근 모델","url":"https://supabase.com/docs/guides/storage/buckets/fundamentals","usedFor":"공개 버킷은 조회 권한 검사를 우회한다. 비공개 다운로드는 인증 또는 한시적 서명 URL 경로다."},
+    {"title":"Supabase 백업","url":"https://supabase.com/docs/guides/platform/backups","usedFor":"Free 별도 내보내기/외부 백업 권고, DB 백업과 Storage 본문 복구 분리."},
+    {"title":"Supabase Storage 스키마","url":"https://supabase.com/docs/guides/storage/schema/design","usedFor":"Storage SQL 메타데이터 직접 삭제로 파일을 정리하지 않으며 파일 작업은 API 사용."},
+    {"title":"GitHub Actions artifacts","url":"https://docs.github.com/en/actions/concepts/workflows-and-actions/workflow-artifacts","usedFor":"artifact는 작업 결과 보관/전달용이며 워크플로 실행 삭제 시 함께 삭제된다. 독립 복구본과 구분."}
+  ],
+  "verificationScope": "문서 구조·참조·정책 충돌 점검과 24개 예상 동작 검토만 수행. 위 사례는 실제 장애 시험/구현 통과 수가 아니며 실제 모델 품질 또는 법적 허가를 증명하지 않는다."
+}

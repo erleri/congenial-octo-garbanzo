@@ -1,0 +1,150 @@
+{
+  "version": "periodic-editorial-samples/1",
+  "artifactKind": "editorial_comparison_not_report",
+  "createdOn": "2026-10-27",
+  "currency": "CLP",
+  "historicalCase": true,
+  "actualPublication": false,
+  "aiGenerated": false,
+  "paidCalls": 0,
+  "publicationApproved": false,
+  "registerInReportProvider": false,
+  "scope": "동일한 저장 자료를 사용한 편집 비교",
+  "scenarioNotice": "세 예시는 저장 가격·당일 근거를 사용하지만, 이전 발행 내용과 자료 제한은 비교를 위한 가정이다.",
+  "price": {
+    "previousObservationDate": "2026-08-27",
+    "previousEffectiveDate": "2026-08-28",
+    "previousValue": 925.25,
+    "currentObservationDate": "2026-09-10",
+    "currentEffectiveDate": "2026-09-11",
+    "currentValue": 937.17,
+    "changePct": 1.288300459335301,
+    "displayChange": "+1.29%",
+    "unit": "CLP per USD",
+    "direction": "현지통화 약세 방향",
+    "provider": "Banco Central de Chile",
+    "seriesId": "F073.TCO.PRE.Z.D",
+    "priceKind": "거래 가중평균",
+    "observedAt": null,
+    "baselinePublicationAssumed": true,
+    "historicalAvailabilityVerified": false
+  },
+  "scopeNotes": [
+    "8월 27일을 이전 보고서의 가격 기준으로 선택한 것은 가정이다. 해당 날짜의 실제 공개본은 없다.",
+    "정기 점검본의 콘텐츠 비교이며 월요일 발행 주기 재현이 아니다. 9월 10일은 목요일이고 당시 실제 발행을 주장하지 않는다.",
+    "두 가격은 보존된 BCCh 표와 기존 날짜 매핑으로 재확인했다. 기사 마감 호가와 합치지 않았다.",
+    "자료는 나중에 수집된 저장본이다. 당시 실시간 이용 가능성, 새 기사 수집, 공식 일정 확인을 수행하지 않았다.",
+    "기사 해석은 해당 매체·전문가에게 귀속한다. 8월 27일~9월 10일 전체 변화의 원인 또는 기여도를 입증한 것으로 확대하지 않는다.",
+    "모든 샘플은 Codex가 직접 편집했다. Sol 등 유료 집필 모델의 새 출력이 아니다.",
+    "실제 독자 점수·최종 공개 표현·이용 범위·게시 승인은 미검증이다."
+  ],
+  "sources": [
+    {
+      "id": "P",
+      "label": "BCCh · Dólar observado",
+      "url": "https://si3.bcentral.cl/estadisticas/Principal1/Metodologias/EC/PARIDADES/Dolar_observado.pdf",
+      "urlRole": "산정 방법 설명; 가격 저장본은 별도 로컬 검토 기록에 연결",
+      "period": "2026-08-27 / 2026-09-10 거래일",
+      "support": "925.25 → 937.17, 동일 시리즈·단위의 비교와 변화율"
+    },
+    {
+      "id": "E",
+      "label": "Emol · Lucas Santillán / Capitaria",
+      "url": "https://www.emol.com/noticias/Economia/2026/09/10/1211142/dolar-mercado-cambiario-local.html",
+      "period": "2026-09-10 당일 시장 해석",
+      "noteId": "news-emol-20260910/n0",
+      "support": "구리 조정·유가·미국 금리 기대와 칠레 달러 강세를 연결한 전문가 견해"
+    },
+    {
+      "id": "D",
+      "label": "Diario Financiero · Juan Pablo Iturriaga / Vantrust Capital",
+      "url": "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-h9i5c",
+      "period": "2026-09-10 당일 시장 해석",
+      "noteId": "news-df-20260910/n1",
+      "support": "미국 국채의 투자 매력이 자금을 미국으로 유인해 달러 압력을 지지하는 경로"
+    }
+  ],
+  "samples": [
+    {
+      "id": "periodic-demo-normal",
+      "label": "A · 정상 점검",
+      "scenario": "가상의 이전 메모가 구리와 미국 금리를 함께 다뤘고, 이번에는 두 설명에 해당하는 당일 근거를 모두 제공한 경우. 시장이 조용했다거나 2주 내내 같은 원인이 지속됐다는 뜻은 아니다.",
+      "assumedPriorExplanation": "구리의 페소 지지력과 미국 금리의 달러 유인 경로를 함께 살핀다.",
+      "includedSourceIds": ["P", "E", "D"],
+      "title": "달러당 페소 +1.29%… 구리·미국 금리 두 경로를 점검",
+      "summary": "달러당 페소 값은 비교 기준보다 1.29% 높아졌습니다. 확인한 당일 시장 해석은 구리의 페소 지지력과 미국 금리의 달러 유인 경로를 함께 다룹니다.",
+      "summarySourceIds": ["P", "E", "D"],
+      "sections": [
+        {
+          "heading": "구리와 대외 압력을 함께 본 해석",
+          "text": "Emol에서 Capitaria의 Lucas Santillán은 구리 조정에 따른 페소 지지력 약화에 유가와 미국 금리 기대의 대외 압력이 겹쳤다고 설명했습니다.",
+          "sourceIds": ["E"],
+          "kind": "attributed_interpretation"
+        },
+        {
+          "heading": "미국 국채의 자금 유인 경로도 확인",
+          "text": "DF에서 Vantrust Capital의 Juan Pablo Iturriaga는 미국 국채의 투자 매력이 자금을 미국으로 유인하는 경로를 짚었습니다. 두 경로를 함께 보던 가상의 이전 메모는 이번 자료에서도 점검 틀로 사용할 수 있습니다.",
+          "sourceIds": ["D"],
+          "kind": "attributed_interpretation_and_scenario_comparison"
+        }
+      ],
+      "watch": "후속 시장 보도에서 구리 조정과 미국 금리 경로가 어떻게 평가되는지 확인합니다.",
+      "watchKind": "editorial_question_not_scheduled_event",
+      "reviewNote": "정상은 제공한 근거와 질문의 연결이 정상이라는 뜻이다. 시장 전체의 무변화나 실제 게시 자격을 뜻하지 않는다."
+    },
+    {
+      "id": "periodic-demo-change",
+      "label": "B · 설명 변화",
+      "scenario": "가상의 이전 메모는 구리만 다뤘다고 설정한다. 실제로 그런 보고서가 발행됐다는 기록이나 원인이 시간에 따라 바뀌었다는 증거는 없다. 이번 자료로 설명 범위를 넓히는 편집 사례다.",
+      "assumedPriorExplanation": "구리 조정과 페소 지지력의 관계를 중심으로 살핀다.",
+      "includedSourceIds": ["P", "E", "D"],
+      "title": "구리 중심 설명에 미국 금리 경로를 더하다",
+      "summary": "구리를 중심으로 보던 가상의 이전 메모에 미국 금리 여건을 추가했습니다. 달러당 페소 값은 비교 기준보다 1.29% 높습니다.",
+      "summarySourceIds": ["P", "D"],
+      "sections": [
+        {
+          "heading": "달라지는 것은 설명의 범위",
+          "text": "Iturriaga는 미국 국채의 매력이 자금을 미국으로 유인하며 달러 압력을 지지한다고 설명했습니다. 구리 가격뿐 아니라 자금이 향하는 금융 여건도 살펴볼 경로로 추가됩니다.",
+          "sourceIds": ["D"],
+          "kind": "attributed_interpretation_and_scenario_comparison"
+        },
+        {
+          "heading": "구리 설명을 없애지는 않는다",
+          "text": "Santillán은 구리 조정과 유가·미국 금리 기대를 함께 거론했습니다. 따라서 이번 점검은 구리 설명을 금리 설명으로 교체하는 대신, 상품 가격과 금융 여건을 함께 보도록 범위를 넓힙니다.",
+          "sourceIds": ["E"],
+          "kind": "attributed_interpretation_and_scenario_comparison"
+        }
+      ],
+      "watch": "후속 자료에서 구리와 미국 금리 경로 각각을 지지하는 설명이 추가되는지 확인합니다.",
+      "watchKind": "editorial_question_not_scheduled_event",
+      "reviewNote": "설명 틀의 확장과 시장의 실제 원인 전환을 구분한다. 두 요인의 기여도·전체 우선순위를 만들지 않았다."
+    },
+    {
+      "id": "periodic-demo-partial",
+      "label": "C · 일부 근거 부족",
+      "scenario": "자료 부족 처리를 비교하기 위해 P와 D만 제공한다. Emol 카드와 DF의 구리 관련 다른 카드는 샘플 입력에서 제외했으며 원본은 그대로 보존했다. 실제 수집 장애를 주장하지 않는다.",
+      "assumedPriorExplanation": "구리의 페소 지지력과 미국 금리의 달러 유인 경로를 함께 살핀다.",
+      "includedSourceIds": ["P", "D"],
+      "title": "미국 금리 해석은 확인, 구리의 역할은 재확인",
+      "summary": "가격 비교와 미국 금리의 자금 유인 해석까지 확인했습니다. 이번 제한된 자료만으로 구리 설명의 상태를 갱신하지는 않습니다.",
+      "summarySourceIds": ["P", "D"],
+      "sections": [
+        {
+          "heading": "확인한 부분",
+          "text": "달러당 페소 값은 925.25에서 937.17로 1.29% 높아졌습니다. DF의 Iturriaga는 미국 국채의 투자 매력이 자금을 미국으로 유인해 달러 압력을 지지한다고 설명했습니다.",
+          "sourceIds": ["P", "D"],
+          "kind": "fact_and_attributed_interpretation"
+        },
+        {
+          "heading": "열어 두는 질문",
+          "text": "가상의 이전 메모에 있던 구리 설명은 재확인 대상으로 남깁니다. 구리의 영향이 사라졌다는 판단으로 바꾸지 않고, 가격 비교와 확인된 금리 해석까지만 전달합니다.",
+          "sourceIds": [],
+          "kind": "declared_input_gap_not_market_claim"
+        }
+      ],
+      "watch": "구리 조정과 페소 지지력의 관계를 다룬 근거가 확보되면 해당 설명을 다시 검토합니다.",
+      "watchKind": "editorial_question_not_scheduled_event",
+      "reviewNote": "사실 중심의 제한된 점검본 후보다. 공개 적합성은 별도 검토하며, 자료 부족을 무변화로 처리하지 않는다."
+    }
+  ]
+}

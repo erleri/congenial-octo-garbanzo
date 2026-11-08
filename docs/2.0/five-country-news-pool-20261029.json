@@ -1,0 +1,446 @@
+{
+  "version": "five-country-news-pool-closeout/1",
+  "asOf": "2026-10-29T02:51:12.974Z",
+  "codeBaseline": {
+    "branch": "codex/2.0-local-experience",
+    "head": "b08305e",
+    "commitCreated": false,
+    "reason": "Pre-existing mixed changes preserved; no broad staging or remote operation."
+  },
+  "commonPolicy": "same_reference_price_date_scope_role_source_use_and_review_contract_for_all_six",
+  "frozenCase": {
+    "referenceDate": "2026-10-28",
+    "commentaryDate": "2026-10-27",
+    "currentMarketReport": false
+  },
+  "currencies": [
+    {
+      "currency": "BRL",
+      "reviewBriefFile": ".local-reports\\private\\five-country-news-pool-20261029\\BRL-writing-brief.json",
+      "sourcePoolDirectory": ".local-reports/private/country-news-pool-tfcLCS",
+      "status": "review_brief_prepared_not_executable",
+      "referenceSnapshotUnchanged": true,
+      "referenceDate": "2026-10-28",
+      "commentaryDate": "2026-10-27",
+      "claims": 7,
+      "referencePrice": 5.3484,
+      "materialBytes": 18904,
+      "generationAdapter": "shared_basis_to_existing_generation_and_validation_contract_not_compiled",
+      "request": null,
+      "exactTrialBudgetUsd": null,
+      "contentReview": "pending_separate_claim_and_mechanism_review",
+      "publicationApproved": false,
+      "paidCallAuthorized": false,
+      "connected": [
+        "CNN Brasil (시장·귀속 해석)",
+        "Agência Brasil/EBC (8월 소매 배경)"
+      ],
+      "newNotes": 0,
+      "outcome": "기존 시장 설명 유지. 공식 기사 게시일의 날짜 정밀도 차이로 빠졌던 8월 소비 배경을 복원.",
+      "remaining": "소비 통계는 10월 환율의 직접 원인이 아님. CNN/Reuters 전재와 발언자 중복 보존."
+    },
+    {
+      "currency": "COP",
+      "reviewBriefFile": ".local-reports\\private\\five-country-news-pool-20261029\\COP-writing-brief.json",
+      "sourcePoolDirectory": ".local-reports/private/country-news-pool-ieLsNJ",
+      "status": "review_brief_prepared_not_executable",
+      "referenceSnapshotUnchanged": true,
+      "referenceDate": "2026-10-28",
+      "commentaryDate": "2026-10-27",
+      "claims": 6,
+      "referencePrice": 3149.32853592,
+      "materialBytes": 18335,
+      "generationAdapter": "shared_basis_to_existing_generation_and_validation_contract_not_compiled",
+      "request": null,
+      "exactTrialBudgetUsd": null,
+      "contentReview": "pending_separate_claim_and_mechanism_review",
+      "publicationApproved": false,
+      "paidCallAuthorized": false,
+      "connected": [
+        "La República (시장·달러 배경)",
+        "Valora Analitik (기술적 해석·필자 유가 견해)",
+        "DANE (8월 소매)"
+      ],
+      "newNotes": 0,
+      "outcome": "새로 확보한 Valora와 기존 사용 기사가 같음을 확인해 기존 카드 재사용.",
+      "remaining": "기술 분석팀 견해와 필자의 유가 설명을 분리. 실제 수급·기여도를 추가하지 않음."
+    },
+    {
+      "currency": "PEN",
+      "reviewBriefFile": ".local-reports\\private\\five-country-news-pool-20261029\\PEN-writing-brief.json",
+      "sourcePoolDirectory": ".local-reports/private/country-news-pool-Ft11z9",
+      "status": "review_brief_prepared_not_executable",
+      "referenceSnapshotUnchanged": true,
+      "referenceDate": "2026-10-28",
+      "commentaryDate": "2026-10-27",
+      "claims": 2,
+      "referencePrice": 3.45142483,
+      "materialBytes": 10278,
+      "generationAdapter": "shared_basis_to_existing_generation_and_validation_contract_not_compiled",
+      "request": null,
+      "exactTrialBudgetUsd": null,
+      "contentReview": "pending_separate_claim_and_mechanism_review",
+      "publicationApproved": false,
+      "paidCallAuthorized": false,
+      "connected": [
+        "Revista Economía (시장·귀속 해석)"
+      ],
+      "newNotes": 0,
+      "outcome": "추가 6기사는 가격 나열·다른 날짜·시점 혼재 때문에 원인 근거로 채택하지 않음.",
+      "remaining": "당일 원인은 기존 한 매체에 의존. 소비 배경 공백 유지; INEI 자동 복원 안 함."
+    },
+    {
+      "currency": "ARS",
+      "reviewBriefFile": ".local-reports\\private\\five-country-news-pool-20261029\\ARS-writing-brief.json",
+      "sourcePoolDirectory": ".local-reports/private/country-news-pool-Z5axqI",
+      "status": "review_brief_prepared_not_executable",
+      "referenceSnapshotUnchanged": true,
+      "referenceDate": "2026-10-28",
+      "commentaryDate": "2026-10-27",
+      "claims": 5,
+      "referencePrice": 1538.21130951,
+      "materialBytes": 17148,
+      "generationAdapter": "shared_basis_to_existing_generation_and_validation_contract_not_compiled",
+      "request": null,
+      "exactTrialBudgetUsd": null,
+      "contentReview": "pending_separate_claim_and_mechanism_review",
+      "publicationApproved": false,
+      "paidCallAuthorized": false,
+      "connected": [
+        "Infobae (도매시장 해설)",
+        "iProfesional (구매력의 조건부 경로)",
+        "INDEC (8월 슈퍼마켓)"
+      ],
+      "newNotes": 1,
+      "outcome": "Andrés Méndez/AMF Economía의 소득·국내 물가와 구매력 접근성에 관한 요지 1개 추가.",
+      "remaining": "소비 배경 전용. 실질환율·명목 도매·소매·CCL·blue와 서로 다른 기간을 섞지 않음."
+    },
+    {
+      "currency": "MXN",
+      "reviewBriefFile": ".local-reports\\private\\five-country-news-pool-20261029\\MXN-writing-brief.json",
+      "sourcePoolDirectory": ".local-reports/private/country-news-pool-Rd2jMS",
+      "status": "review_brief_prepared_not_executable",
+      "referenceSnapshotUnchanged": true,
+      "referenceDate": "2026-10-28",
+      "commentaryDate": "2026-10-27",
+      "claims": 10,
+      "referencePrice": 18.6735,
+      "materialBytes": 25343,
+      "generationAdapter": "shared_basis_to_existing_generation_and_validation_contract_not_compiled",
+      "request": null,
+      "exactTrialBudgetUsd": null,
+      "contentReview": "pending_separate_claim_and_mechanism_review",
+      "publicationApproved": false,
+      "paidCallAuthorized": false,
+      "connected": [
+        "El Economista (시장·귀속 해석)",
+        "Forbes México (당일 달러·금리차 전망)",
+        "INEGI (8월 소매·9월 물가)"
+      ],
+      "newNotes": 2,
+      "outcome": "당일 거래 막바지 달러 강세·상대 금리차 전망 요지 2개 추가. Reuters 정보 출처 보존.",
+      "remaining": "기사 장중/막바지 호가를 기준환율·FIX·확정 종가로 쓰지 않음. El Financiero 판본 시각 충돌 보류."
+    },
+    {
+      "currency": "CLP",
+      "reviewBriefFile": ".local-reports\\private\\five-country-news-pool-20261029\\CLP-writing-brief.json",
+      "sourcePoolDirectory": ".local-reports/private/country-news-pool-lLHMzb",
+      "status": "review_brief_prepared_not_executable",
+      "referenceSnapshotUnchanged": true,
+      "referenceDate": "2026-10-28",
+      "commentaryDate": "2026-10-27",
+      "claims": 7,
+      "referencePrice": 985.91438166,
+      "materialBytes": 18656,
+      "generationAdapter": "shared_basis_to_existing_generation_and_validation_contract_not_compiled",
+      "request": null,
+      "exactTrialBudgetUsd": null,
+      "contentReview": "pending_separate_claim_and_mechanism_review",
+      "publicationApproved": false,
+      "paidCallAuthorized": false,
+      "connected": [
+        "Emol (기존 2기사)",
+        "BioBioChile (당일 귀속 요지)"
+      ],
+      "newNotes": 0,
+      "outcome": "직전 완료 사본을 같은 검토용 입력 계약에 재생. 이번에는 새 기사/원고 생성 없음.",
+      "remaining": "동일 전문가 발언을 복수 독립 견해로 계산하지 않음. 소비 배경의 선택 제외 유지."
+    }
+  ],
+  "originalReview": {
+    "newSavedArticles": 17,
+    "method": "current_Codex_agent_not_independent_or_unattended_model",
+    "independentModelReview": false,
+    "unattendedModelReview": false,
+    "dispositions": [
+      {
+        "currency": "BRL",
+        "sourceId": "brl-cnn",
+        "url": "https://www.cnnbrasil.com.br/economia/money/mercado/mercado-financeiro-ibovespa-dolar-27-outubro-2026/",
+        "disposition": "reuse_existing_notes",
+        "reason": "동일한 기존 CNN/Reuters 기사다. 당일 조정과 전일 선거 충격·예정 금리 결정을 구분해 재사용하며 새 독립 근거로 늘리지 않는다."
+      },
+      {
+        "currency": "COP",
+        "sourceId": "cop-valora",
+        "url": "https://www.valoraanalitik.com/dolar-colombia-reboto-este-martes-27/",
+        "disposition": "reuse_existing_notes",
+        "reason": "기존 Valora와 같은 기사다. 기술적 지지 해석과 유가의 수출국 통화 제약 설명을 구분하며 실제 수급 기여도를 추가하지 않는다."
+      },
+      {
+        "currency": "MXN",
+        "sourceId": "mxn-forbes",
+        "url": "https://forbes.com.mx/peso-cede-ante-avance-global-del-dolar/",
+        "disposition": "new_authored_notes",
+        "reason": "거래 막바지의 페소 약세와 글로벌 달러/상대금리 전망의 연결을 지지한다. Reuters 정보표시를 보존하며 확정 종가·실제 금리 인상을 주장하지 않는다."
+      },
+      {
+        "currency": "MXN",
+        "sourceId": "mxn-forbes",
+        "url": "https://forbes.com.mx/peso-cae-ante-la-cautela-previo-a-decisiones-de-tasas-de-bancos-centrales/",
+        "disposition": "supported_but_not_prioritized",
+        "reason": "같은 Reuters 정보의 당일 오전 해설이다. 후반 거래 기사를 우선하고 매체/기사 수를 독립 확인 횟수로 세지 않는다. 원문이 아무 설명도 없다고 판정한 것은 아니다."
+      },
+      {
+        "currency": "MXN",
+        "sourceId": "mxn-forbes",
+        "url": "https://forbes.com.mx/peso-se-beneficia-del-hundimiento-del-real-brasileno/",
+        "disposition": "no_relevant_support",
+        "reason": "본문은 월요일 26일의 브라질발 자금 재배분과 페소 강세를 설명한다. 화요일 27일 약세 원인으로 바꾸지 않는다."
+      },
+      {
+        "currency": "MXN",
+        "sourceId": "mxn-elfinanciero",
+        "url": "https://www.elfinanciero.com.mx/mercados/2026/10/27/peso-dolar-tipo-de-cambio-hoy-27-de-octubre-de-2026/",
+        "disposition": "insufficient_information",
+        "reason": "당일 달러 강세 설명은 있으나 수정시각이 게시시각보다 빠른 판본 메타데이터 충돌이 있다. FIX/종가/은행 판매호가도 분리해야 하므로 새 입력은 보류한다."
+      },
+      {
+        "currency": "MXN",
+        "sourceId": "mxn-elfinanciero",
+        "url": "https://www.elfinanciero.com.mx/mercados/2026/10/26/peso-dolar-tipo-de-cambio-precio-hoy-26-de-octubre-de-2026/",
+        "disposition": "no_relevant_support",
+        "reason": "26일의 지역 자금 재배분 해석이다. 기사 안의 서로 다른 가격 표기도 기준환율로 가져오지 않고 27일 원인으로 전용하지 않는다."
+      },
+      {
+        "currency": "MXN",
+        "sourceId": "mxn-elfinanciero",
+        "url": "https://www.elfinanciero.com.mx/mercados/2026/10/22/peso-dolar-tipo-de-cambio-precio-hoy-22-de-octubre-de-2026/",
+        "disposition": "no_relevant_support",
+        "reason": "22일의 지정학/물가 발표 해설로 이번 27일과 다르다. 수정시각이 게시시각보다 빠른 기록도 따로 보존한다."
+      },
+      {
+        "currency": "ARS",
+        "sourceId": "ars-iprofesional",
+        "url": "https://www.iprofesional.com/finanzas/467534-el-bcra-corto-racha-de-compras-y-el-tesoro-vendio-100-millones-dolares-para-contener-el-dolar",
+        "disposition": "no_relevant_support",
+        "reason": "26일 헤지/결제 수요와 재무부 달러 매각 해석이다. 27일 도매 달러 하락의 실제 원인으로 사용하지 않는다."
+      },
+      {
+        "currency": "ARS",
+        "sourceId": "ars-iprofesional",
+        "url": "https://www.iprofesional.com/finanzas/467618-el-dolar-sigue-al-alza-pero-esta-en-el-nivel-mas-bajo-en-10-anos",
+        "disposition": "new_authored_notes",
+        "reason": "월간·장기 실질환율과 여러 가격 종류가 섞여 있다. 당일 원인/가격은 제외하고 Méndez의 소득·물가와 구매 접근성에 관한 조건부 설명 한 개만 소비 배경으로 선택한다."
+      },
+      {
+        "currency": "ARS",
+        "sourceId": "ars-iprofesional",
+        "url": "https://www.iprofesional.com/finanzas/467526-brecha-dolar-ccl-salto-brasil-alerta-oficial-octubre-2026",
+        "disposition": "no_relevant_support",
+        "reason": "26일 소매·도매·CCL 격차 및 브라질 충격 기사다. 27일 도매 달러 움직임이나 단일 환율 값으로 합치지 않는다."
+      },
+      {
+        "currency": "PEN",
+        "sourceId": "pen-andina",
+        "url": "https://andina.pe/agencia/noticia-cual-es-cotizacion-del-dolar-hoy-martes-27-octubre-2026-1097476.aspx",
+        "disposition": "insufficient_information",
+        "reason": "게시시각이 추출되지 않았고 본문은 오늘의 개장/은행/병행시장 가격 나열이다. URL 날짜를 거래일/발표 증거로 쓰거나 지역 변동성 언급을 구체적 원인으로 확대하지 않는다."
+      },
+      {
+        "currency": "PEN",
+        "sourceId": "pen-andina",
+        "url": "https://andina.pe/agencia/noticia-cual-es-cotizacion-del-dolar-hoy-lunes-26-octubre-del-2026-1097359.aspx",
+        "disposition": "insufficient_information",
+        "reason": "게시시각 미확인과 가격 나열만 확보됐다. 다른 날짜의 개장/은행/병행 가격을 27일 원인 또는 기준환율로 사용하지 않는다."
+      },
+      {
+        "currency": "PEN",
+        "sourceId": "pen-elcomercio",
+        "url": "https://elcomercio.pe/economia/mercados/precio-del-dolar-en-peru-hoy-lunes-26-de-agosto-en-cuanto-abrio-el-tipo-de-cambio-lbposting-noticia/",
+        "disposition": "insufficient_information",
+        "reason": "URL의 월과 게시 메타데이터가 다르고 선택 본문은 가격 요약뿐이다. 사건일과 설명 범위를 확정할 수 없어 원인 근거로 선택하지 않는다."
+      },
+      {
+        "currency": "PEN",
+        "sourceId": "pen-elcomercio",
+        "url": "https://elcomercio.pe/economia/mercados/precio-del-dolar-en-peru-a-cuanto-esta-el-dolar-este-domingo-25-de-octubre-2026-tipo-de-cambio-segun-bcrp-tasa-cotizacion-compra-y-venta-segun-bcrp-dolares-a-soles-sbs-ocona-lbposting-noticia/",
+        "disposition": "no_relevant_support",
+        "reason": "25일 표시와 매수/매도 가격 나열이다. 당일 27일의 원인 설명이나 같은 기준의 가격 쌍을 입증하지 않는다."
+      },
+      {
+        "currency": "PEN",
+        "sourceId": "pen-elcomercio",
+        "url": "https://elcomercio.pe/economia/mercados/precio-del-dolar-hoy-en-peru-2026-a-cuanto-esta-el-dolar-este-sabado-24-de-octubre-tipo-de-cambio-segun-bcrp-tasa-cotizacion-compra-y-venta-segun-bcrp-dolares-a-soles-sbs-ocona-lbposting-noticia/",
+        "disposition": "no_relevant_support",
+        "reason": "24일 표시의 환전 방법/시세 설명과 23일 링크다. 환전 행동 조언은 리포트 업무 지침으로 옮기지 않으며 27일 원인도 아니다."
+      },
+      {
+        "currency": "PEN",
+        "sourceId": "pen-infobae",
+        "url": "https://www.infobae.com/peru/2026/10/26/precio-del-dolar-hoy-en-peru-cotizacion-de-apertura-del-26-de-octubre/",
+        "disposition": "insufficient_information",
+        "reason": "게시일26일과 본문27일·이전 마감·개장이 혼재한다. 인용된 어업/미국 PMI의 기간과 PEN 당일 연결도 확인되지 않아 배경으로 원인을 채우지 않는다."
+      }
+    ]
+  },
+  "commonFixes": [
+    "Verified saved-original date-only notes bind to the same local publication day without inventing time.",
+    "Bound insufficient/irrelevant judgments differ from missing reviews; chronology conflicts are held.",
+    "Explicit Bloomberg credits rechecked from the saved body without modifying old captures or permissions.",
+    "Shared-basis review material excludes article bodies, old scores and paid/publication authorization; no legacy price fallback."
+  ],
+  "generation": {
+    "reviewBriefsPrepared": 6,
+    "executableRequestsPrepared": 0,
+    "exactTrialBudgetUsd": null,
+    "blocker": "The shared-reference material is not yet compiled into the existing writer request and output/claim validation contract.",
+    "defaultProfileUnchanged": true,
+    "endpointPreflight": {
+      "model": "openai/gpt-6.1-sol",
+      "receipts": [
+        {
+          "name": "model",
+          "url": "https://openrouter.ai/api/v1/models/openai/gpt-6.1-sol/endpoints",
+          "checkedAt": "2026-10-29T02:40:47.042Z",
+          "authentication": "none",
+          "modelCall": false,
+          "httpStatus": 200,
+          "status": "received"
+        },
+        {
+          "name": "zdr",
+          "url": "https://openrouter.ai/api/v1/endpoints/zdr",
+          "checkedAt": "2026-10-29T02:40:47.131Z",
+          "authentication": "none",
+          "modelCall": false,
+          "httpStatus": 200,
+          "status": "received"
+        }
+      ],
+      "profiles": [
+        {
+          "selection": "sol",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure",
+          "advertisedStatus": -2,
+          "listedInZdr": true,
+          "pricePerMillion": {
+            "input": 2,
+            "output": 10,
+            "reasoning": 10
+          },
+          "supportedParameters": [
+            "reasoning",
+            "include_reasoning",
+            "max_completion_tokens",
+            "tools",
+            "tool_choice",
+            "verbosity",
+            "response_format",
+            "seed",
+            "structured_outputs",
+            "reasoning_effort"
+          ],
+          "policyMaximumInputTokens": 44000,
+          "policyMaximumOutputTokens": 8192,
+          "volumeCeilingReserveUsd": 0.19192,
+          "priceMeaning": "public_endpoint_quote_and_saved_policy_volume_cap_not_exact_trial_budget",
+          "exactTrialBudgetUsd": null,
+          "sharedBasisGenerationRequestCompiled": false,
+          "approved": false,
+          "automaticProfileChange": false
+        },
+        {
+          "selection": "sol-us",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "advertisedStatus": 0,
+          "listedInZdr": true,
+          "pricePerMillion": {
+            "input": 2.2,
+            "output": 11,
+            "reasoning": 11
+          },
+          "supportedParameters": [
+            "reasoning",
+            "include_reasoning",
+            "max_completion_tokens",
+            "tools",
+            "tool_choice",
+            "verbosity",
+            "response_format",
+            "seed",
+            "structured_outputs",
+            "reasoning_effort"
+          ],
+          "policyMaximumInputTokens": 44000,
+          "policyMaximumOutputTokens": 8192,
+          "volumeCeilingReserveUsd": 0.211112,
+          "priceMeaning": "public_endpoint_quote_and_saved_policy_volume_cap_not_exact_trial_budget",
+          "exactTrialBudgetUsd": null,
+          "sharedBasisGenerationRequestCompiled": false,
+          "approved": false,
+          "automaticProfileChange": false
+        }
+      ],
+      "modelCalls": 0,
+      "newPaidCostUsd": 0,
+      "credentialsRead": false,
+      "meaning": "read_only_public_metadata_not_endpoint_authorization_or_writer_eligibility"
+    }
+  },
+  "verification": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "unitTestFiles": 130,
+    "executedCases": 996,
+    "declaredTests": 821,
+    "parameterExpansions": 175,
+    "builds": [
+      "production",
+      "existing-app-local-report",
+      "standalone-local-report"
+    ],
+    "bundleBoundary": "pass",
+    "entryBytes": 615654,
+    "warning": "Existing entry chunk exceeds 500kB; unchanged.",
+    "preservation": {
+      "verifiedAt": "2026-10-29T02:49:47.537Z",
+      "protectedFiles": 363,
+      "changedProtectedFiles": [],
+      "buildArtifacts": 62,
+      "secretValuesCompared": 5,
+      "rawParagraphsCompared": 147,
+      "secretMatchFiles": [],
+      "rawParagraphMatchFiles": [],
+      "browserServingNotRetested": true,
+      "uiDatabaseUnchanged": true,
+      "modelCalls": 0,
+      "newPaidCostUsd": 0,
+      "limitations": "Exact hashes and selected strings only; no new browser, database permission, model quality or publication approval."
+    },
+    "newBrowserOrDatabaseTest": false,
+    "newAiQualitySample": false
+  },
+  "cost": {
+    "paidModelCalls": 0,
+    "newPaidCostUsd": 0,
+    "publicMetadataHttpReads": 2,
+    "newArticleNetworkReads": 0
+  },
+  "productionChanged": false,
+  "existingReportsChanged": false,
+  "existingReferencePricesChanged": false,
+  "nextFixedWork": "Compile the shared reference review material through the existing writer and validation contract, verify saved cases, then quote an exact paid trial separately."
+}

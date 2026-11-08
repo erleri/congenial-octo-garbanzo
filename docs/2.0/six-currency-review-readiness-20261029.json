@@ -1,0 +1,275 @@
+{
+  "version": "six-currency-review-readiness/1",
+  "checkedOnKst": "2026-10-29",
+  "scope": "local preparation only; no model, source API, production or publication change",
+  "cadence": {
+    "version": "publication-cadence/2",
+    "policyVersion": "six-currency-cadence/2",
+    "currencies": [
+      "BRL",
+      "MXN",
+      "COP",
+      "PEN",
+      "CLP",
+      "ARS"
+    ],
+    "thresholdPct": 2,
+    "periodic": "first Korean Monday at or after 14 days without qualifying publication",
+    "userDecision": "2026-10-29 continuation after proposal to confirm PEN/ARS at 2%",
+    "pricePolicyChanged": false,
+    "productionApplied": false,
+    "oldDecisionRecordsOverwritten": false
+  },
+  "originalReview": [
+    {
+      "currency": "BRL",
+      "selectedNewsSources": 3,
+      "exactCaptureBound": 3,
+      "sources": [
+        {
+          "evidenceId": "news-brl-brl-cnn-market-20261027",
+          "url": "https://www.cnnbrasil.com.br/economia/money/mercado/mercado-financeiro-ibovespa-dolar-27-outubro-2026/",
+          "status": "exact_saved_original_bound",
+          "sha256": "835aa18d38b96f8f758078107bcec1c00be3107527d2cf1a7d6430420815fdd1",
+          "collectedAt": "2026-10-28T06:22:30.043Z",
+          "adapter": "jsonld_article_body",
+          "bodyBlocks": 17,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T12:13:54.000Z",
+          "newOriginalPublication": "2026-10-27T12:13:54.000Z"
+        },
+        {
+          "evidenceId": "news-brl-brl-cnn-view-20261027",
+          "url": "https://www.cnnbrasil.com.br/economia/entenda-o-que-esperar-do-mercado-financeiro-apos-reeleicao-de-lula/",
+          "status": "exact_saved_original_bound",
+          "sha256": "5511437ab044ac644c2af4ac74690c0ebfda8455830e9b4088b03e843677abc9",
+          "collectedAt": "2026-10-28T06:22:30.107Z",
+          "adapter": "jsonld_article_body",
+          "bodyBlocks": 20,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T15:07:27.000Z",
+          "newOriginalPublication": "2026-10-27T15:07:27.000Z"
+        },
+        {
+          "evidenceId": "news-brl-ebc-retail-20261015",
+          "url": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-10/vendas-no-comercio-varejista-tem-variacao-de-01-em-agosto",
+          "status": "exact_saved_original_bound",
+          "sha256": "0b142b97c5c3e729ce9d630b245e0fe7f884a08d23df0a63dbf121cb74e07d82",
+          "collectedAt": "2026-10-28T12:57:11.694Z",
+          "adapter": "agencia-brasil-body/1",
+          "bodyBlocks": 6,
+          "publicationPrecision": "verified_capture_more_precise_old_date_preserved",
+          "archivedPublication": "2026-10-15",
+          "newOriginalPublication": "2026-10-15T16:09:00.000Z"
+        }
+      ],
+      "externalOriginalProcessing": "held_original_use_not_resolved",
+      "automaticEntailmentTestPerformed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "COP",
+      "selectedNewsSources": 2,
+      "exactCaptureBound": 2,
+      "sources": [
+        {
+          "evidenceId": "news-cop-larepublica-20261027",
+          "url": "https://www.larepublica.co/finanzas/precios-del-dolar-y-del-petroleo-hoy-27-de-octubre-de-2026-4511869",
+          "status": "exact_saved_original_bound",
+          "sha256": "f8b0872366860cb562d39138539181048961412c9bd2122b3a623fc4fd4306f9",
+          "collectedAt": "2026-10-28T15:12:34.740Z",
+          "adapter": "la-republica-body/1",
+          "bodyBlocks": 11,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T13:06:45.000Z",
+          "newOriginalPublication": "2026-10-27T13:06:45.000Z"
+        },
+        {
+          "evidenceId": "news-cop-valora-20261027",
+          "url": "https://www.valoraanalitik.com/dolar-colombia-reboto-este-martes-27/",
+          "status": "exact_saved_original_bound",
+          "sha256": "d4db5d302f1e291116e307a2ba45f1acfbe7cf59af5035dab0efe1ab43202699",
+          "collectedAt": "2026-10-28T15:48:31.211Z",
+          "adapter": "valora-free-publisher-body/2",
+          "bodyBlocks": 7,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T21:45:00.000Z",
+          "newOriginalPublication": "2026-10-27T21:45:00.000Z"
+        }
+      ],
+      "externalOriginalProcessing": "held_original_use_not_resolved",
+      "automaticEntailmentTestPerformed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "PEN",
+      "selectedNewsSources": 1,
+      "exactCaptureBound": 1,
+      "sources": [
+        {
+          "evidenceId": "news-pen-revistaeconomia-20261027",
+          "url": "https://www.revistaeconomia.com/sol-retrocede-025-frente-al-dolar-mientras-la-bolsa-de-lima-avanza-122/",
+          "status": "exact_saved_original_bound",
+          "sha256": "57149f552c64f84940f5a7d055dd756b7186cb072323983f669063e8ec6bd880",
+          "collectedAt": "2026-10-28T12:57:14.587Z",
+          "adapter": "expanded-free-publisher-body/1",
+          "bodyBlocks": 5,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T19:52:05.000Z",
+          "newOriginalPublication": "2026-10-27T19:52:05.000Z"
+        }
+      ],
+      "externalOriginalProcessing": "held_original_use_not_resolved",
+      "automaticEntailmentTestPerformed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "ARS",
+      "selectedNewsSources": 1,
+      "exactCaptureBound": 1,
+      "sources": [
+        {
+          "evidenceId": "news-ars-infobae-20261027",
+          "url": "https://www.infobae.com/economia/2026/10/27/el-dolar-bajo-y-corto-una-racha-de-siete-sesiones-consecutiva-de-avances/",
+          "status": "exact_saved_original_bound",
+          "sha256": "a6650a6cca256736fd33435879738237216fd59f0663f365a29aa216bf4f833b",
+          "collectedAt": "2026-10-28T15:12:33.753Z",
+          "adapter": "jsonld_article_body",
+          "bodyBlocks": 1,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T18:56:31.000Z",
+          "newOriginalPublication": "2026-10-27T18:56:31.000Z"
+        }
+      ],
+      "externalOriginalProcessing": "held_original_use_not_resolved",
+      "automaticEntailmentTestPerformed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "CLP",
+      "selectedNewsSources": 3,
+      "exactCaptureBound": 2,
+      "sources": [
+        {
+          "evidenceId": "news-clp-emol-close-20261027",
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215338/dolar-mercado-cambiario-local.html",
+          "status": "exact_saved_original_bound",
+          "sha256": "5fb9f92f5874be5d832b24139db595459f17e1b902eff767a528aa718c7fa5b8",
+          "collectedAt": "2026-10-28T05:33:27.152Z",
+          "adapter": "registered-clp-original/1",
+          "bodyBlocks": 7,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T16:57:44.000Z",
+          "newOriginalPublication": "2026-10-27T16:57:44.000Z"
+        },
+        {
+          "evidenceId": "news-clp-emol-am-20261027",
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215291/dolar-mercado-cambiario-local.html",
+          "status": "exact_saved_original_bound",
+          "sha256": "edd734b9c3a0b9335d9463d4e42b244dded8bcf60ca0adf0eca504c54bfedbc4",
+          "collectedAt": "2026-10-28T05:33:28.561Z",
+          "adapter": "registered-clp-original/1",
+          "bodyBlocks": 7,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T12:35:00.000Z",
+          "newOriginalPublication": "2026-10-27T12:35:00.000Z"
+        },
+        {
+          "evidenceId": "news-clp-df-close-20261027",
+          "url": "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-p5xh6",
+          "status": "extraction_failed",
+          "sha256": "7afa107f42f8203ef4908174095c579478198ddca32f0988233d074ebc1c4537",
+          "reason": "article_body_not_identified"
+        }
+      ],
+      "externalOriginalProcessing": "held_original_use_not_resolved",
+      "automaticEntailmentTestPerformed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "MXN",
+      "selectedNewsSources": 2,
+      "exactCaptureBound": 2,
+      "sources": [
+        {
+          "evidenceId": "news-mxn-mxn-economista-20261027",
+          "url": "https://www.eleconomista.com.mx/mercados/precio-dolar-hoy-27-octubre-2026-cuanto-cerro-20261027-840709.html",
+          "status": "exact_saved_original_bound",
+          "sha256": "1eeb1e04861190d8e79e248836fe89250ec5d358f7b016d72f3a9ea1459dc7e6",
+          "collectedAt": "2026-10-28T06:22:29.795Z",
+          "adapter": "jsonld_article_body",
+          "bodyBlocks": 1,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T15:20:23.000Z",
+          "newOriginalPublication": "2026-10-27T15:20:23.000Z"
+        },
+        {
+          "evidenceId": "news-mxn-monex-20261027",
+          "url": "https://www.eleconomista.com.mx/empresas/sismo-cambiario-peso-mexicano-roza-18-90-dolar-firma-peor-nivel-ano-20261027-840350.html",
+          "status": "exact_saved_original_bound",
+          "sha256": "e246e73fe8bae397fdfccddb0dc383c59743189b7db766ff41b71af626e87658",
+          "collectedAt": "2026-10-28T06:33:53.327Z",
+          "adapter": "jsonld_article_body",
+          "bodyBlocks": 1,
+          "publicationPrecision": "same",
+          "archivedPublication": "2026-10-27T17:18:53.000Z",
+          "newOriginalPublication": "2026-10-27T17:18:53.000Z"
+        }
+      ],
+      "externalOriginalProcessing": "held_original_use_not_resolved",
+      "automaticEntailmentTestPerformed": false,
+      "publicationApproved": false
+    }
+  ],
+  "totals": {
+    "selectedSources": 12,
+    "exactCaptureBound": 11,
+    "currentSourceModelCallsReady": 0,
+    "modelCalls": 0,
+    "newPaidCostUsd": 0
+  },
+  "boundaries": [
+    "Existing independent notes may have a scoped use judgment. It cannot authorize raw article processing.",
+    "No second card-only campaign is proposed as proof of original support; earlier card trials remain archived.",
+    "The DF capture exists but the identified public-body extractor fails; hidden articleFree content is not used as a fallback.",
+    "A date-only old Brazilian note and the same-day precise timestamp in its saved capture are retained separately; the old note is not rewritten.",
+    "No blanket denial or publisher AI licence is inferred from a pending use policy.",
+    "A previously eligible 2024 Radio Camara protocol sample is historical only; no new cost or current six-country coverage is claimed."
+  ],
+  "next": [
+    "Resolve scoped original processing separately from authored-note use, or validate an eligible local-only review method.",
+    "Fix or exclude the DF source through the common optional/required material selection rules; no whole-page or hidden-body fallback.",
+    "When an actual test is eligible, verify route/privacy/current price and request separate exact budget approval before calling.",
+    "Then evaluate new report quality, source display/approval/UI and pilot/release in the original sequence."
+  ],
+  "references": [
+    {
+      "url": "https://developers.openai.com/api/docs/guides/evaluation-best-practices",
+      "checkedOn": "2026-10-29",
+      "applied": "Task-specific evaluations and separate semantic judgments from deterministic checks; model scores alone do not authorize publication."
+    }
+  ],
+  "localArtifacts": {
+    "handoff": ".local-reports/private/six-currency-preparation-LmgDyo",
+    "originalPlans": ".local-reports/private/policy-review-trial-20261029/bound-originals-mSxnHs",
+    "cadence": ".local-reports/private/policy-review-trial-20261029/prepared-ImQSmy/summary.json",
+    "linkedManifest": ".local-reports/private/policy-review-trial-20261029/linked-g1cpHL/manifest.json"
+  },
+  "currentEndpointOrPriceReverified": false,
+  "productionChanged": false,
+  "verification": {
+    "protectedFiles": 178,
+    "changedProtectedFiles": 0,
+    "allSixSnapshotsUnchanged": true,
+    "testFiles": 128,
+    "executedCases": 975,
+    "typecheck": "pass",
+    "lint": "pass",
+    "threeBuilds": "pass",
+    "bundle": "pass",
+    "privateSettingMatches": 0,
+    "rawArticleBlockMatches": 0,
+    "existingEntryBytes": 615654,
+    "existing500kbWarning": true
+  }
+}

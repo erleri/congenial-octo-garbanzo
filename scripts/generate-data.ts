@@ -6,10 +6,12 @@ import {
 } from '../src/lib/api.ts'
 import { fetchRemoteExchangeData } from '../src/lib/merger.ts'
 import { FULL_DATASET_PATH, STATIC_FALLBACK_PATH, writeDatasetFiles } from './dataset-files.ts'
+import type { FxPriceSource } from '../src/types/exchangeRate'
 
 type RepoSupplementalCache = {
   fetchedAt: string
   rates: Record<string, Record<string, number>>
+  priceSources?: Record<string, FxPriceSource>
 }
 
 type RepoBackfillCache = {
@@ -48,13 +50,14 @@ async function main() {
   const supplementalRates = {
     ...(repoSupplementalCache?.rates ?? {}),
   }
+  const supplementalPriceSources={...repoSupplementalCache?.priceSources}
 
   const missingCurrencies = ALPHA_VANTAGE_HISTORY_CURRENCIES.filter(
     (currency) => !supplementalRates[currency],
   )
 
   for (const currency of missingCurrencies) {
-    const rates = await fetchAlphaVantageFXDaily(currency)
+    const rates = await fetchAlphaVantageFXDaily(currency,source=>{supplementalPriceSources[currency]=source})
     if (rates) {
       supplementalRates[currency] = rates
     }
@@ -62,6 +65,7 @@ async function main() {
 
   const dataset = await fetchRemoteExchangeData(new Date(), {
     supplementalHistoryByCurrency: supplementalRates,
+    supplementalPriceSources,
     manualBackfillByDate: repoBackfillCache?.ratesByDate,
   })
   const rawSheets = dataset.rawSheets ?? []
@@ -85,12 +89,12 @@ async function main() {
   )
   await writeFile(
     supplementalOutputPath,
-    `${JSON.stringify({ fetchedAt: new Date().toISOString(), rates: supplementalRates }, null, 2)}\n`,
+    `${JSON.stringify({ fetchedAt: new Date().toISOString(), rates: supplementalRates, priceSources:supplementalPriceSources }, null, 2)}\n`,
     'utf8',
   )
   await writeFile(
     supplementalCachePath,
-    `${JSON.stringify({ fetchedAt: new Date().toISOString(), rates: supplementalRates }, null, 2)}\n`,
+    `${JSON.stringify({ fetchedAt: new Date().toISOString(), rates: supplementalRates, priceSources:supplementalPriceSources }, null, 2)}\n`,
     'utf8',
   )
 

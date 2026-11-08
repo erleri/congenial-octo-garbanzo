@@ -11,14 +11,22 @@ node_modules
 dist
 dist-local
 dist-report
+dist-report-ui
+.local-reports/
 dist-ssr
 email-chart.png
 email-chart-meta.json
 email-market-context.json
 fx-report-run.json
 fx-report-published.json
+fx-report-model-evaluation/
 public/email-preview.html
+email-compose-context.json
+email-dataset-snapshot.json
+scripts/email/__pycache__/
 *.local
+dist-app-local/
+dist-ui2-preview/
 
 # Editor directories and files
 .vscode/*

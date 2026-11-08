@@ -28,9 +28,17 @@
    - `FX_REPORT_ENABLED=true`
    - `FX_REPORT_PUBLISH_MODE=review`
    - `FX_REPORT_AI_MODE=optional`
-   - `FX_REPORT_AI_MODEL=openrouter/free`
+   - `FX_REPORT_AI_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free`
 6. Run `Daily Dashboard Email` manually once. Confirm the legacy email still arrives, a private pending run appears in Supabase, and no private run file is uploaded as an Actions artifact.
 7. Sign in as an active admin, review the candidate, approve it, and confirm the public dashboard and `#report` show only sanitized content.
+
+## Model-quality checkpoint
+
+- Run the manual `Evaluate FX Report Models` workflow before enabling an AI model in the daily path. It has read-only repository permission and never persists, publishes, commits, or sends email.
+- Start with 10 recent observed BRL business dates. Review `blind-review.md` without opening `mapping.json`, then record the preferred candidate and only afterward reveal the model mapping.
+- Compare schema/validator pass rate, clarity, finance usefulness, restrained causal language, and latency. Ranking or benchmark position alone is not an acceptance criterion.
+- The historical harness intentionally omits historical news and business-plan reconstruction. It evaluates factual FX narrative quality, not the complete production report.
+- Keep `FX_REPORT_AI_MODE=optional`. If the selected free endpoint becomes unavailable or violates the ZDR/data-collection requirements, retain the deterministic report rather than routing to a paid or less private endpoint.
 
 ## Ten-trading-day pilot log
 

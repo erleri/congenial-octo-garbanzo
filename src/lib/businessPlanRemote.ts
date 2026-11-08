@@ -5,7 +5,7 @@ import type {
   CurrencyCode,
 } from '../types/exchangeRate'
 import { CURRENCIES } from '../types/exchangeRate'
-import { isSupabaseConfigured, supabase } from './supabaseClient'
+import { getAppClient, isAppClientConfigured, sendAdminLoginLink } from './appClient'
 
 interface BusinessPlanRateRow {
   period_month: string
@@ -73,26 +73,13 @@ export function isSchemaCompatibilityError(error: { code?: string; message?: str
 }
 
 export async function requestBusinessPlanLogin(email: string): Promise<void> {
-  if (!supabase) {
-    throw new Error('Supabase is not configured.')
-  }
-
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: window.location.origin,
-    },
-  })
-
-  if (error) {
-    throw error
-  }
+  const supabase = await getAppClient()
+  await sendAdminLoginLink(supabase, email, window.location.origin)
 }
 
 export async function signOutBusinessPlanUser(): Promise<void> {
-  if (!supabase) {
-    return
-  }
+  if (!canUseRemoteBusinessPlan()) return
+  const supabase = await getAppClient()
 
   const { error } = await supabase.auth.signOut()
   if (error) {
@@ -103,9 +90,7 @@ export async function signOutBusinessPlanUser(): Promise<void> {
 export async function loadBusinessPlanFromSupabase(
   periodMonth: string,
 ): Promise<RemoteBusinessPlanResult> {
-  if (!supabase) {
-    throw new Error('Supabase is not configured.')
-  }
+  const supabase = await getAppClient()
 
   const currentResult = await supabase
     .from('business_plan_current')
@@ -263,9 +248,7 @@ export async function loadBusinessPlanHistoryFromSupabase(
   before: string | null = null,
   limit = 20,
 ): Promise<BusinessPlanHistoryPage> {
-  if (!supabase) {
-    throw new Error('Supabase is not configured.')
-  }
+  const supabase = await getAppClient()
 
   const cursor = before ? JSON.parse(before) as { createdAt: string; changeGroup: string } : null
   const { data, error } = await supabase.rpc('get_business_plan_history', {
@@ -299,9 +282,8 @@ export function buildBusinessPlanHistoryPage(rows: BusinessPlanHistoryRow[], lim
 }
 
 export async function loadBusinessPlanAdminAccess(email: string | null): Promise<boolean> {
-  if (!supabase || !email) {
-    return false
-  }
+  if (!email || !canUseRemoteBusinessPlan()) return false
+  const supabase = await getAppClient()
 
   const { data, error } = await supabase
     .from('business_plan_admins')
@@ -322,9 +304,7 @@ export async function saveBusinessPlanToSupabase(
   plan: BusinessPlan,
   userEmail: string,
 ): Promise<RemoteBusinessPlanResult> {
-  if (!supabase) {
-    throw new Error('Supabase is not configured.')
-  }
+  const supabase = await getAppClient()
 
   const normalizedEmail = userEmail.toLowerCase()
   const changeSetId = globalThis.crypto.randomUUID()
@@ -354,5 +334,5 @@ export async function saveBusinessPlanToSupabase(
 }
 
 export function canUseRemoteBusinessPlan(): boolean {
-  return isSupabaseConfigured
+  return isAppClientConfigured()
 }

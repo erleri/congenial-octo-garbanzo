@@ -1,0 +1,42 @@
+{
+  "version": "publisher-input-revision-verification/1",
+  "date": "2026-10-27",
+  "correctedInput": ".local-reports/private/publisher-admission-nFVplW/review-input.json",
+  "correctedInputSha256": "35d5a79c5a46fd24d2a9c49f286db5d0adda1a094474ce060acd4ab930a8dd66",
+  "privateManifest": ".local-reports/private/publisher-input-revision-EeaY0j/verification.json",
+  "checks": {
+    "savedHtmlReextracted": true,
+    "compilerReplayIdentical": true,
+    "attributionPassageProjected": true,
+    "adjacentClaimsNotAdmitted": true,
+    "fiveClaimsPreserved": true,
+    "sourceDecisionsAndReuseUnchanged": true,
+    "publicationStillBlocked": true,
+    "protectedFilesUnchanged": true
+  },
+  "sourceRoutes": "docs/2.0/report-source-routes-20261027.json",
+  "sourceRouteCount": 5,
+  "sourceRoutesAreRuntimeConfig": false,
+  "unitTests": {
+    "files": 1,
+    "passed": 9,
+    "failed": 0,
+    "firstAttempt": "environment_temp_rename_EPERM_before_tests",
+    "secondAttempt": "passed_with_workspace_temp"
+  },
+  "testsOrRulesAdded": false,
+  "fullSuiteAndBuilds": "not_rerun_docs_and_private_input_only",
+  "webReads": "official_terms_and_data_pages_reviewed; no_new_local_raw_captures",
+  "credentialFilesRead": false,
+  "modelCalls": 0,
+  "newApiCostUsd": 0,
+  "manuscriptCreated": false,
+  "productionChanged": false,
+  "remaining": [
+    "source_use_basis_for_media",
+    "item_level_origin_and_timeliness_for_new_candidates",
+    "novelty_review",
+    "independent_content_review",
+    "runtime_connection_of_route_contract"
+  ]
+}

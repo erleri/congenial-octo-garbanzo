@@ -1,0 +1,105 @@
+{
+  "version": "data-boundary-implementation/1",
+  "date": "2026-10-29",
+  "status": "local_3A_3B_3C_verified_not_deployed",
+  "scope": {
+    "paidModelCalls": 0,
+    "productionChanged": false,
+    "rawDataDeleted": false,
+    "newActualReports": 0,
+    "existingManuscriptsPreserved": true
+  },
+  "completed": [
+    {
+      "stage": "3A",
+      "result": "새 수집·근거 검토·6통화 준비·집필 입력/결과·검토 사본·명시적 로컬 DB 가져오기에 판본/참조/완료 기록 연결. 중단/해시 변경 시 다음 단계 차단. 기존 파일 호환 유지"
+    },
+    {
+      "stage": "3B",
+      "result": "파일 공개 투영과 DB 공개 응답에 허용 필드 적용. 로컬 비교 전용 메타데이터 분리. 관리자 저장 미완료 승인 보류, 서버에서 원고/입력/검토 결과 해시 재검사"
+    },
+    {
+      "stage": "3C",
+      "result": "6통화 합성 DB 연결·역할·동시 승인·철회 검증, 실제 저장 입력6개 무호출 재생. 보존/경보 모의 판정과 공개 캐시 만료/철회 방어, 실제 앱 권한 해제·로그아웃 확인"
+    }
+  ],
+  "verification": {
+    "unitFiles": 133,
+    "unitCases": 1023,
+    "unitCasesNotQualitySamples": true,
+    "pgtapFiles": 5,
+    "pgtapAssertions": 74,
+    "localIntegrationChecks": 33,
+    "syntheticDbFixtures": 6,
+    "storedInputReplays": 6,
+    "requestHashesUnchanged": true,
+    "builds": [
+      "production",
+      "report",
+      "app-local"
+    ],
+    "entryBytes": 615654,
+    "existingChunkWarning": true,
+    "originalPrivateInputsChecked": 22,
+    "protectedInventory": 596,
+    "authorizedCodeChanges": [
+      "src/components/PublishedCurrencyReports.tsx",
+      "src/local-report/approval-readiness.test.ts",
+      "src/local-report/approval-readiness.ts",
+      "src/local-report/DbReview.tsx",
+      "src/local-report/provider.test.ts",
+      "src/local-report/provider.ts",
+      "src/types/currencyReport.ts",
+      "scripts/currency-report/country-news-pool-local.js",
+      "scripts/currency-report/original-news-pipeline-local.js",
+      "scripts/currency-report/research-materials-local.js",
+      "scripts/currency-report/run-event-trial.js",
+      "scripts/currency-report/selected-material-review-local.js",
+      "scripts/currency-report/selected-source-collection-local.js",
+      "scripts/currency-report/shared-writer-local.js",
+      "scripts/currency-report/six-currency-preparation-local.js",
+      "scripts/currency-report/storage.d.ts",
+      "scripts/currency-report/storage.js",
+      "scripts/currency-report/storage.test.ts",
+      "package.json"
+    ],
+    "unexpectedChanges": [],
+    "preservedDataAndManuscripts": 98,
+    "scannedBuildFiles": 56,
+    "secretPatternsChecked": 2,
+    "secretOrFixtureFindings": 0,
+    "browser": [
+      "로컬 대시보드와 관리 진입",
+      "미완료 저장 원고 승인 버튼 비활성",
+      "로그인 중 관리자 권한 해제 시 초안 숨김",
+      "시험 계정 권한 원상 복구",
+      "로그아웃 후 초안·비밀번호·사유 제거"
+    ],
+    "htmlReportValidation": "static structure/links only"
+  },
+  "localDatabase": {
+    "target": "latamfx-2x-isolated / 56321 / 56322",
+    "migrationFile": "20261029135456_currency_report_data_receipts.sql",
+    "method": "격리 DB에서 직접 SQL로 검증. 기존 migration 수정 없음. 운영 적용·이력 반영 없음",
+    "freshEmptyRebuild": "not_exercised_in_this_step"
+  },
+  "policy": {
+    "configuration": "src/lib/report-data-policy.js",
+    "mode": "dry_run",
+    "deletionEnabled": false,
+    "quotaEnforcementEnabled": false,
+    "localPublicCache": "마지막 성공 확인 후 최대24시간, 접속 중15분마다 상태 재조회. 알려진 철회 ID 재노출 차단. live-local 초안/비교 자료 캐시 금지",
+    "historicalUtilities": "업데이트한 공통 진입 경로에 적용. 과거 개별 실험 스크립트 전체를 운영 경로로 승격하지 않음"
+  },
+  "remaining": [
+    "월 한도·잔여량과 서비스 여유 실측",
+    "비공개 파일 저장소 선택·대규모 중복 복제 개선",
+    "보존 대상의 권리·전체 참조 확인과 삭제 없는 정리 예행연습",
+    "독립 백업·복원 검증·담당자 확정",
+    "새 migration 빈 DB 재구축 및 실제 운영 전환 검증",
+    "기존 생성기 단일 전환·수신자 경로·정기 실행 지연",
+    "실제 새 모델 품질 시험과 파일럿·UI2.0·운영 승인"
+  ],
+  "next": "4단계 Sol High — 실제 용량/전송과 raw-sheets 관리 의존을 확인하고 기존 동작을 보존하는 최적화. 운영 변경은 별도 승인",
+  "providerState": "재생한 저장 모델 카탈로그6건은 hold. 새 제공 경로·가격·처리 조건은 새 유료 시험 전에 다시 확인 필요"
+}

@@ -1,0 +1,143 @@
+{
+  "version": "operating-readiness/1",
+  "date": "2026-11-03",
+  "status": "local_predeployment_connection_verified",
+  "productionApplied": false,
+  "production": {
+    "repository": "erleri/congenial-octo-garbanzo",
+    "commit": "1d05b093c08894a55bfd3e9c78f6e3c85b63e532",
+    "supabaseProject": "amzvxggdomxerdffbfdt",
+    "appliedMigrations": 9,
+    "latestFxDate": "2026-11-02",
+    "currentPlanRows": 110,
+    "planHistoryRows": 176,
+    "legacyRuns": 51,
+    "legacyPublications": 0,
+    "newCurrencyTablesPresent": false,
+    "netlifySite": "latamforex",
+    "netlifyDeploy": "6ae829692b949c9b3f1fa761",
+    "deployMatchesMain": true,
+    "frontendUrlMatchesProject": true,
+    "frontendKeyType": "publishable",
+    "githubVariablesAndSecretsStatus": "unverified"
+  },
+  "localVerification": {
+    "migrations": {
+      "from": 9,
+      "to": 32,
+      "additional": 23,
+      "sqlFiles": 20,
+      "sqlAssertions": 347,
+      "syntheticLegacyRows": 7,
+      "applicationRowsPreserved": true,
+      "legacySecurity": {
+        "legacyTables": 9,
+        "legacyPolicies": 10,
+        "legacyFunctions": 8,
+        "legacySecurityUnchanged": true,
+        "authUsersAndSessionsUnchanged": true,
+        "newConfigureSecurityInvoker": true,
+        "productionWrites": 0,
+        "paidCalls": 0
+      },
+      "securityAdvisor": "no_issues"
+    },
+    "restart": {
+      "passed": true,
+      "synthetic": true,
+      "independentProcesses": 3,
+      "committedCheckpoints": true,
+      "frozenInputPreserved": true,
+      "unknownCostBlockedNewWork": true,
+      "duplicateJobs": 0,
+      "controlsDisabled": true,
+      "actualModelCalls": 0,
+      "paidUsd": 0,
+      "productionWrites": 0
+    },
+    "unitTests": {
+      "files": 179,
+      "declarations": 1098,
+      "cases": 1282,
+      "parameterExpansions": 184,
+      "duplicateNames": 0,
+      "identicalBodies": 0,
+      "tautologies": 0,
+      "limitation": "Exact metadata/source audit only; does not prove semantic uniqueness or real AI quality."
+    },
+    "sourceAssembly": {
+      "operatingMainPreservedFiles": [
+        "data/alpha-vantage-history.json",
+        "data/fx-full-history.json",
+        "public/data.json",
+        "src/generated/fxReportConfig.ts"
+      ],
+      "operatingFeatureFlag": true,
+      "oldLocalFeatureFlag": false,
+      "existingMailStepsUnchanged": 5,
+      "sourceManifestPrivate": true,
+      "releaseCommitCreated": false
+    },
+    "publicModelMetadata": {
+      "observedAt": "2026-11-03T02:06:41.613Z",
+      "publicMetadataOnly": true,
+      "modelCalls": 0,
+      "paidUsd": 0,
+      "rows": [
+        {
+          "profile": "sol",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure",
+          "present": true,
+          "healthy": true,
+          "zdr": true,
+          "withinPriceCeilings": true,
+          "structuredOutput": true
+        },
+        {
+          "profile": "sol-us",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "present": true,
+          "healthy": true,
+          "zdr": true,
+          "withinPriceCeilings": true,
+          "structuredOutput": true
+        }
+      ]
+    },
+    "operatingRunnerTest": "not_run",
+    "productionBackupRestoreTest": "not_run",
+    "newLinuxDependencyInstall": "not_run"
+  },
+  "completedChanges": [
+    "pending_work_blocks_policy_revision_replacement",
+    "first_configuration_and_nonempty_legacy_test_initialization",
+    "explicit_recurring_policy_draft_without_activation",
+    "fresh_local_upgrade_and_committed_restart_tools",
+    "operating_main_source_assembly_with_current_data_preservation"
+  ],
+  "remainingOperationalGates": [
+    "verify_actual_github_secret_variable_registration_without_echoing_values",
+    "confirm_recurring_monthly_budget_and_authorization",
+    "obtain_verify_current_production_backup_and_compare_revocations_withdrawals",
+    "approve_production_migrations_code_deploy_and_activation",
+    "verify_actual_runner_storage_recovery_and_minimum_authenticated_public_reads"
+  ],
+  "separateReleaseWork": [
+    "final_webapp_ui_review",
+    "email_2_0_scope_and_validation",
+    "overall_release_approval",
+    "postlaunch_10_business_day_observation"
+  ],
+  "boundaries": {
+    "paidCalls": 0,
+    "paidUsd": 0,
+    "productionDatabaseWrites": 0,
+    "remotePushes": 0,
+    "deployments": 0,
+    "environmentChanges": 0,
+    "actionsRuns": 0,
+    "mailSent": 0
+  }
+}

@@ -72,7 +72,7 @@ values (
 );
 
 set local role anon;
-select is((select count(*) from public.fx_reports), 1::bigint, 'anon can read published reports');
+select is((select count(*) from public.fx_reports where run_id='10000000-0000-0000-0000-000000000000'), 1::bigint, 'anon can read published reports');
 select ok(not has_table_privilege(current_user, 'public.fx_report_runs', 'SELECT'), 'anon cannot reach private runs');
 select ok(not has_function_privilege(current_user, 'public.review_fx_report(uuid,text,text)', 'EXECUTE'), 'anon cannot review reports');
 reset role;
@@ -87,12 +87,12 @@ select throws_ok(
 select ok(not has_function_privilege(current_user, 'public.publish_fx_report_system(uuid)', 'EXECUTE'), 'authenticated users cannot execute system publish');
 
 select set_config('request.jwt.claims', '{"sub":"20000000-0000-0000-0000-000000000002","email":"report-admin@example.test","role":"authenticated"}', true);
-select is((select count(*) from public.fx_report_runs), 2::bigint, 'active admin can read private runs');
+select is((select count(*) from public.fx_report_runs where id in ('10000000-0000-0000-0000-000000000000','10000000-0000-0000-0000-000000000001')), 2::bigint, 'active admin can read private runs');
 select lives_ok(
   $$select public.review_fx_report('10000000-0000-0000-0000-000000000001', 'approved', null)$$,
   'active admin can approve and publish'
 );
-select is((select count(*) from public.fx_report_reviews), 1::bigint, 'approval creates one append-only review');
+select is((select count(*) from public.fx_report_reviews where run_id='10000000-0000-0000-0000-000000000001'), 1::bigint, 'approval creates one append-only review');
 select is((select content ->> 'headline' from public.fx_reports where base_date = '2099-05-01'), 'test', 'approval publishes sanitized content');
 reset role;
 

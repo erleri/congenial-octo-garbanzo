@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import type { DatasetCoverage, ExchangeRateDataset } from '../src/types/exchangeRate'
+import {prunePriceProvenance} from '../src/lib/price-provenance'
 
 export const FULL_DATASET_PATH = resolve(process.cwd(), 'data', 'fx-full-history.json')
 export const STATIC_FALLBACK_PATH = resolve(process.cwd(), 'public', 'data.json')
@@ -64,6 +65,7 @@ export function buildDatasetFiles(dataset: ExchangeRateDataset): {
     ...datasetWithoutCoverage,
     dailyRates: fallbackDailyRates,
     coverage: coverageFor(dataset, fallbackDailyRates, dataVersion, true),
+    ...(dataset.priceProvenance?{priceProvenance:prunePriceProvenance(dataset.priceProvenance,fallbackDailyRates)}:{}),
   }
 
   return { fullDataset, staticFallback }

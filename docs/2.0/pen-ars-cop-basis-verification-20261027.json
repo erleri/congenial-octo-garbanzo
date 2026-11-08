@@ -1,0 +1,364 @@
+{
+  "version": "pen-ars-cop-basis-review/1",
+  "checkedOn": "2026-10-27",
+  "scope": "local_research_only",
+  "runtimeIntegrated": false,
+  "paidCalls": 0,
+  "newPaidCostUsd": 0,
+  "productionChanged": false,
+  "pen": {
+    "status": "sample_response_normalized_not_permanent_server_fix",
+    "series": "PD04646PD",
+    "priceKind": "13:30 closing ask",
+    "unit": "PEN per USD",
+    "requestLanguage": "esp",
+    "rootCause": "not_established_omitted_and_explicit_language_now_identical",
+    "lastValidDate": "2026-10-23",
+    "observedAt": null,
+    "declaredPriceClock": "13:30",
+    "declaredPriceTimeZone": null,
+    "rows": [
+      {
+        "date": "2026-10-19",
+        "bid": 3.436,
+        "ask": 3.437,
+        "status": "observed"
+      },
+      {
+        "date": "2026-10-20",
+        "bid": 3.425,
+        "ask": 3.427,
+        "status": "observed"
+      },
+      {
+        "date": "2026-10-21",
+        "bid": 3.434,
+        "ask": 3.435,
+        "status": "observed"
+      },
+      {
+        "date": "2026-10-22",
+        "bid": 3.443,
+        "ask": 3.445,
+        "status": "observed"
+      },
+      {
+        "date": "2026-10-23",
+        "bid": 3.447,
+        "ask": 3.449,
+        "status": "observed"
+      },
+      {
+        "date": "2026-10-26",
+        "bid": null,
+        "ask": null,
+        "status": "missing",
+        "sourceValue": "n.d."
+      }
+    ],
+    "crossFormatMatchedRows": 5,
+    "contentType": "text/html despite valid JSON",
+    "rules": [
+      "full response JSON parse required; do not strip server error suffix",
+      "n.d. stays missing; no zero or carry-forward",
+      "requested end date is not last valid observation date"
+    ],
+    "docsUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/api"
+  },
+  "ars": {
+    "status": "terms_verified_service_purpose_application_unresolved",
+    "apiCatalogUrl": "https://www.bcra.gob.ar/apis-banco-central/",
+    "legalUrl": "https://www.bcra.gob.ar/aviso-legal/",
+    "legalLastUpdated": "2025-12",
+    "catalogLegalLinkMatches": true,
+    "evidenceSections": [
+      "catalog: monetary v4 legal notice link",
+      "legal notice: scope section 1, reuse section 3, availability section 6"
+    ],
+    "sourceTermsSummary": "정보·교육·학술 목적의 출처·맥락 유지 재사용 허용. 상업·광고·캠페인 목적은 사전 허가 대상.",
+    "agentInterpretation": {
+      "localInformationalResearch": "within_current_research_scope",
+      "informationalPublication": "conditional_on_actual_service_purpose_and_attribution",
+      "commercialPublication": "prior_permission_required_by_notice",
+      "externalAi": "no_specific_AI_clause_found; neither_blanket_permission_nor_blanket_prohibition",
+      "bulkRedistribution": "not_approved_by_this_review"
+    },
+    "servicePurposeDecision": "not_made",
+    "permissionRequested": false,
+    "permissionGranted": false,
+    "alternatives": {
+      "status": "not_adopted",
+      "candidate": "Datos Argentina historic FX / retail / real-index datasets",
+      "reason": "current wholesale reference equivalence and date coverage not verified"
+    },
+    "automaticallyAdopted": false
+  },
+  "cop": {
+    "status": "validity_intervals_verified_trade_date_not_in_api",
+    "dataUrl": "https://www.datos.gov.co/resource/32sa-8pi3.json",
+    "metadataUrl": "https://www.datos.gov.co/api/views/32sa-8pi3.json",
+    "viewUrl": "https://www.datos.gov.co/api/views/mcec-87by.json",
+    "publisher": "Superintendencia Financiera de Colombia",
+    "license": "CC-BY-SA-4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "licensePresentation": "source, license, modification notices; derivative scope to implement",
+    "fields": [
+      "valor",
+      "unidad",
+      "vigenciadesde",
+      "vigenciahasta"
+    ],
+    "dateEncoding": "floating_calendar_date_not_UTC_observation",
+    "observedAt": null,
+    "tradeDateProvidedByApi": false,
+    "recentIntervalCount": 25,
+    "usHolidayIntervalCount": 4,
+    "examples": [
+      {
+        "validFrom": "2026-10-10",
+        "validThrough": "2026-10-13",
+        "ruleBasedTradeDateCandidate": "2026-10-09",
+        "basis": "agent_inference_from_circular_and_intervals_not_API_trade_date",
+        "calendarCoverage": "full_local_holiday_calendar_not_integrated",
+        "certifiedTradeDate": false
+      },
+      {
+        "validFrom": "2026-10-24",
+        "validThrough": "2026-10-26",
+        "ruleBasedTradeDateCandidate": "2026-10-23",
+        "basis": "agent_inference_from_circular_and_intervals_not_API_trade_date",
+        "calendarCoverage": "full_local_holiday_calendar_not_integrated",
+        "certifiedTradeDate": false
+      },
+      {
+        "validFrom": "2026-10-27",
+        "validThrough": "2026-10-27",
+        "ruleBasedTradeDateCandidate": "2026-10-26",
+        "basis": "agent_inference_from_circular_and_intervals_not_API_trade_date",
+        "calendarCoverage": "full_local_holiday_calendar_not_integrated",
+        "certifiedTradeDate": false
+      }
+    ],
+    "usHolidaySample": [
+      {
+        "validFrom": "2026-06-18",
+        "validThrough": "2026-06-18",
+        "value": 3439.91,
+        "tradeDate": null,
+        "tradeDateStatus": "not_provided_by_api",
+        "observedAt": null
+      },
+      {
+        "validFrom": "2026-06-19",
+        "validThrough": "2026-06-22",
+        "value": 3459.53,
+        "tradeDate": null,
+        "tradeDateStatus": "not_provided_by_api",
+        "observedAt": null
+      },
+      {
+        "validFrom": "2026-06-23",
+        "validThrough": "2026-06-23",
+        "value": 3406.14,
+        "tradeDate": null,
+        "tradeDateStatus": "not_provided_by_api",
+        "observedAt": null
+      },
+      {
+        "validFrom": "2026-06-24",
+        "validThrough": "2026-06-24",
+        "value": 3425.95,
+        "tradeDate": null,
+        "tradeDateStatus": "not_provided_by_api",
+        "observedAt": null
+      }
+    ],
+    "regulatoryPdf": "https://www.banrep.gov.co/sites/default/files/reglamentacion/archivos/bjd_94_2020.pdf",
+    "circularIssued": "2020-11-04",
+    "circularEffectiveFrom": "2021-02-01",
+    "relevantPages": [
+      "8-1",
+      "8-2"
+    ],
+    "regulatoryReview": "page 8-2 rendered and visually checked",
+    "conflictingExplanatoryPage": "https://www.banrep.gov.co/es/node/57129/printable/print",
+    "conflict": "2020 circular page 8-2 says following business day; 2021 explanatory text says previous. Saved interval data support circular; no generic weekday-minus-one implementation.",
+    "bankHolidaySource": "https://www.federalreserve.gov/aboutthefed/k8.htm",
+    "bankHolidayFinding": "2026-06-19 and 2026-10-12 listed; Federal Reserve Banks open on 2026-07-03 despite Board closure",
+    "rules": [
+      "keep official validity interval inclusive",
+      "repeated calendar date within one interval is not a new observation",
+      "do not infer UTC observation from floating date midnight",
+      "no forward-fill beyond certified validity",
+      "equal prices in different intervals do not imply one observation"
+    ],
+    "remaining": [
+      "complete local, US bank and CUD calendar integration",
+      "methodology change/exception coverage",
+      "API provides no certified trade date or quote timestamp"
+    ]
+  },
+  "verification": {
+    "mode": "saved_response_replay",
+    "networkCallsDuringReplay": 0,
+    "penCrossFormatCount": 5,
+    "copActualIntervals": 29,
+    "syntheticNegativeCases": [
+      {
+        "id": "server_error_suffix_not_trimmed",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "missing_not_zero",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "blank_not_zero",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "nonpositive_price",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "wrong_currency",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "duplicate_interval",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "reversed_validity",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      },
+      {
+        "id": "overlapping_intervals",
+        "kind": "synthetic_mutation",
+        "result": "rejected"
+      }
+    ],
+    "automaticQualityOrPublicationApproval": false
+  },
+  "captures": [
+    {
+      "name": "ars-api-catalog",
+      "url": "https://www.bcra.gob.ar/apis-banco-central/",
+      "collectedAt": "2026-10-27T12:15:16.260Z",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 77130,
+      "sha256": "5e9cf2f04f3044ee340d55da87535c92972418e99d2d0ba67cd44a8bf9a81a29",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/ars-api-catalog.body"
+    },
+    {
+      "name": "ars-legal",
+      "url": "https://www.bcra.gob.ar/aviso-legal/",
+      "collectedAt": "2026-10-27T12:15:18.372Z",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 73326,
+      "sha256": "f2d82d33eaddf52925a7024b99bf4286218a1e3848e01857bd69309917840809",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/ars-legal.body"
+    },
+    {
+      "name": "cop-base-meta",
+      "url": "https://www.datos.gov.co/api/views/32sa-8pi3.json",
+      "collectedAt": "2026-10-27T12:17:00.713Z",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 11654,
+      "sha256": "78ac4291bb51266dd8dbe49006656bb6fb1c71c861c76c05d62c213c65c22d2c",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/cop-base-meta.body"
+    },
+    {
+      "name": "cop-dataset-meta",
+      "url": "https://www.datos.gov.co/api/views/mcec-87by.json",
+      "collectedAt": "2026-10-27T12:15:51.842Z",
+      "status": 200,
+      "contentType": "application/json; charset=utf-8",
+      "bytes": 11159,
+      "sha256": "73cd6d50300ae243786904e8f21dfc3b317cf589f7cc3902618d7a8b75c56fd7",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/cop-dataset-meta.body"
+    },
+    {
+      "name": "cop-doam146-pdf",
+      "url": "https://www.banrep.gov.co/sites/default/files/reglamentacion/archivos/bjd_94_2020.pdf",
+      "collectedAt": "2026-10-27T12:17:25.253Z",
+      "status": 200,
+      "contentType": "application/pdf",
+      "bytes": 321956,
+      "sha256": "7083c24f3f3a46ea4f39216c8f58367903eb595c91c9fcd3158e9d98e99a78d2",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/cop-doam146-pdf.body"
+    },
+    {
+      "name": "cop-latest-25",
+      "url": "https://www.datos.gov.co/resource/32sa-8pi3.json?$limit=25&$order=vigenciadesde%20DESC",
+      "collectedAt": "2026-10-27T12:16:35.740Z",
+      "status": 200,
+      "contentType": "application/json;charset=utf-8",
+      "bytes": 3001,
+      "sha256": "32a8dc6db1a3ad4eff4970d5116fd04f337294725063c5f7ed3e2d167c0aeba5",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/cop-latest-25.body"
+    },
+    {
+      "name": "cop-us-holiday-june",
+      "url": "https://www.datos.gov.co/resource/32sa-8pi3.json?$where=vigenciadesde%20between%20%272026-06-18T00%3A00%3A00%27%20and%20%272026-06-24T23%3A59%3A59%27&$order=vigenciadesde&$limit=20",
+      "collectedAt": "2026-10-27T12:16:36.722Z",
+      "status": 200,
+      "contentType": "application/json;charset=utf-8",
+      "bytes": 481,
+      "sha256": "25aabd9f4c8eb55f7d0ced5b2d3f237cfe24670616d3f25a2b61206f307029c0",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/cop-us-holiday-june.body"
+    },
+    {
+      "name": "pen-bid-ask-weekend",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04645PD-PD04646PD/json/2026-10-19/2026-10-26/esp",
+      "collectedAt": "2026-10-27T12:14:25.176Z",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 545,
+      "sha256": "ed1856853b713df91c4bfad1d19c8719d2c93fb8db116e3f1611d6b4470c2bfd",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/pen-bid-ask-weekend.body"
+    },
+    {
+      "name": "pen-csv-esp",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04646PD/csv/2026-10-19/2026-10-23/esp",
+      "collectedAt": "2026-10-27T12:14:24.848Z",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 205,
+      "sha256": "368d1208614fb89d1b30258c43b5bdf87627c6a0062477831152da64aacff41a",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/pen-csv-esp.body"
+    },
+    {
+      "name": "pen-json-esp",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04646PD/json/2026-10-19/2026-10-23/esp",
+      "collectedAt": "2026-10-27T12:14:09.076Z",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 372,
+      "sha256": "5354b91659f4e21200b99133c6538fe5f03dc5082e8d2f8863d84872d779eda7",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/pen-json-esp.body"
+    },
+    {
+      "name": "pen-json-omitted",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04646PD/json/2026-10-19/2026-10-23",
+      "collectedAt": "2026-10-27T12:14:24.498Z",
+      "status": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "bytes": 372,
+      "sha256": "5354b91659f4e21200b99133c6538fe5f03dc5082e8d2f8863d84872d779eda7",
+      "rawFile": ".local-reports/private/pen-ars-cop-basis-20261027/pen-json-omitted.body"
+    }
+  ],
+  "rawRecordPolicy": "raw public files and offline scripts remain Git-ignored, not served to browser",
+  "note": "No manuscript or report approval created. Previous failed probe record remains in the source register."
+}

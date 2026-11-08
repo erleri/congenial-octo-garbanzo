@@ -1,0 +1,95 @@
+{
+  "version": "research-material-handoff-verification/1",
+  "date": "2026-10-27",
+  "result": ".local-reports/private/research-materials-9fzxaW/result.json",
+  "useReviews": ".local-reports/private/research-materials-review-BDKmSQ/source-use-reviews.json",
+  "privateVerification": ".local-reports/private/research-materials-review-BDKmSQ/verification.json",
+  "price": {
+    "inputDate": "2026-10-26",
+    "actualSessionDate": "2026-10-23",
+    "value": 990.35,
+    "unit": "CLP_per_USD",
+    "mode": "saved_snapshot_not_current_fetch"
+  },
+  "materialStatus": "incomplete",
+  "consumerPeriod": "2026-08",
+  "latestConsumerPeriodVerified": false,
+  "officialStatisticsForReview": 3,
+  "mediaInContentProjection": 0,
+  "questions": [
+    {
+      "id": "market",
+      "status": "material_review_required"
+    },
+    {
+      "id": "local",
+      "status": "material_review_required"
+    },
+    {
+      "id": "global",
+      "status": "material_review_required"
+    },
+    {
+      "id": "counter",
+      "status": "material_review_required"
+    },
+    {
+      "id": "consumer",
+      "status": "usable_for_content_review"
+    },
+    {
+      "id": "watch",
+      "status": "evidence_pending"
+    }
+  ],
+  "checks": {
+    "protectedFileHashesUnchanged": true,
+    "filesProtected": 20,
+    "oldReuseFlagsPreserved": true,
+    "projectionExcludesPrivateReviewData": true,
+    "sourceUseDoesNotApprovePublication": true,
+    "unitTests": {
+      "files": 88,
+      "declared": 509,
+      "executed": 613,
+      "parameterExpansions": 104
+    },
+    "exactDuplicateNames": 0,
+    "identicalTestBodies": 0,
+    "tautologicalAssertions": 0,
+    "newTests": 6,
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed",
+    "bundleSecretPatternScan": {
+      "files": 33,
+      "matches": 0
+    },
+    "warning": "existing 610348-byte entry exceeds 500KB; unchanged",
+    "pgTap": "not_rerun_no_database_change",
+    "visualQa": "not_rerun_no_ui_change"
+  },
+  "writingEligibility": {
+    "eligible": false,
+    "reasons": [
+      "independent_content_review_required",
+      "novelty_not_assessed",
+      "publication_not_approved"
+    ]
+  },
+  "contentQuality": "not_assessed",
+  "publicationApproved": false,
+  "networkCalls": 0,
+  "modelCalls": 0,
+  "newApiCostUsd": 0,
+  "credentialFilesRead": false,
+  "productionChanged": false,
+  "limitations": [
+    "Only saved CLP inputs exercised; BRL and MXN collection routes not verified.",
+    "Usage records are reviewer judgments, not legal guarantees or authenticated approvals.",
+    "Model input projection has not been sent to any model.",
+    "Latest-month selection, fresh collection handoff, novelty and independent content review remain."
+  ]
+}

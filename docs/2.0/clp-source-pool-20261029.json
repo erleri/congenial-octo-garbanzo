@@ -1,0 +1,239 @@
+{
+  "version": "country-news-pool-implementation/1",
+  "checkedOnKst": "2026-10-29",
+  "currency": "CLP",
+  "targetSessionDate": "2026-10-27",
+  "referenceDate": "2026-10-28",
+  "referenceSnapshotUnchanged": true,
+  "newReportGenerated": false,
+  "sourceSelection": "all_currently_enabled_country_news_routes",
+  "collectionMode": "actual_public_lookup_and_explicit_saved_capture_reuse",
+  "connectedSources": [
+    "Emol",
+    "BioBioChile"
+  ],
+  "connectedArticles": 3,
+  "connectedClaims": 7,
+  "newAuthoredNoteIds": [
+    "news-clp-biobio-20261027:n0",
+    "news-clp-biobio-20261027:n1"
+  ],
+  "addedNoteReview": {
+    "method": "current_Codex_agent_direct_original_read",
+    "independent": false,
+    "unattendedRuntimeReviewProven": false,
+    "permissionScope": "exact_minimal_authored_facts_and_attributed_ideas_only_not_article_text_licence",
+    "publicDisplay": "pending"
+  },
+  "attributions": [
+    {
+      "person": "Lucas Santillán",
+      "organization": "Capitaria",
+      "evidenceIds": [
+        "news-clp-emol-close-20261027",
+        "news-clp-biobio-20261027"
+      ]
+    },
+    {
+      "person": "Agustín Vargas",
+      "organization": "Capitaria",
+      "evidenceIds": [
+        "news-clp-emol-am-20261027"
+      ]
+    },
+    {
+      "person": "Juan Ortiz",
+      "organization": "XTB",
+      "evidenceIds": [
+        "news-clp-emol-close-20261027"
+      ]
+    }
+  ],
+  "sourceIndependence": "not_inferred_from_publisher_count_or_repeated_analysts",
+  "sourceStates": [
+    {
+      "sourceId": "clp-df",
+      "collectionState": "excluded_from_automatic_collection",
+      "publisherAttempts": [],
+      "acceptedEvidenceIds": [],
+      "articleStates": []
+    },
+    {
+      "sourceId": "clp-pulso",
+      "collectionState": "excluded_from_automatic_collection",
+      "publisherAttempts": [],
+      "acceptedEvidenceIds": [],
+      "articleStates": []
+    },
+    {
+      "sourceId": "clp-existing-four-outlets",
+      "collectionState": "collected_pending_review",
+      "publisherAttempts": [
+        {
+          "sourceId": "emol-economia",
+          "status": "collected_for_review",
+          "reason": null
+        },
+        {
+          "sourceId": "reporte-minero",
+          "status": "partial_collected_for_review",
+          "reason": "source_collection_incomplete"
+        }
+      ],
+      "acceptedEvidenceIds": [
+        "news-clp-emol-close-20261027",
+        "news-clp-emol-am-20261027"
+      ],
+      "articleStates": [
+        {
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215338/dolar-mercado-cambiario-local.html",
+          "status": "existing_notes_reused",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "bound_existing_notes_reused_not_new_original_semantic_review"
+        },
+        {
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215291/dolar-mercado-cambiario-local.html",
+          "status": "existing_notes_reused",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "bound_existing_notes_reused_not_new_original_semantic_review"
+        },
+        {
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215330/banco-central-consumo-inflacion-tasas.html",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        },
+        {
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215338/dolar-mercado-cambiario-local.html",
+          "status": "existing_notes_reused",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "bound_existing_notes_reused_not_new_original_semantic_review"
+        },
+        {
+          "url": "https://www.reporteminero.cl/noticia/noticias/2026/10/capstone-copper-invertira-3000-millones-chile-duplicar-cobre",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        },
+        {
+          "url": "https://www.emol.com/noticias/Economia/2026/10/27/1215291/dolar-mercado-cambiario-local.html",
+          "status": "existing_notes_reused",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "bound_existing_notes_reused_not_new_original_semantic_review"
+        },
+        {
+          "url": "https://www.reporteminero.cl/noticia/noticias/2026/10/cobre-657-centavos-londres-alza-inventarios-transicion-energetica",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        },
+        {
+          "url": "https://www.emol.com/noticias/Economia/2026/10/26/1215168/dolar-mercado-cambiario-local.html",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        }
+      ]
+    },
+    {
+      "sourceId": "clp-biobio",
+      "collectionState": "collected_pending_review",
+      "publisherAttempts": [],
+      "acceptedEvidenceIds": [
+        "news-clp-biobio-20261027"
+      ],
+      "articleStates": [
+        {
+          "url": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/27/dolar-cae-ante-fuerte-recuperacion-del-cobre-y-previo-al-anuncio-de-tasas-del-banco-central.shtml",
+          "status": "connected_for_content_review",
+          "reviewState": "review_judgment_recorded",
+          "reason": null
+        },
+        {
+          "url": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/28/reserva-federal-mantiene-los-tipos-se-abren-expectativas-de-posible-alza-y-dolar-sube-en-chile.shtml",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        },
+        {
+          "url": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/28/dolar-cae-de-los-980-tras-decision-de-tasas-del-banco-central-y-con-los-mercados-atentos-a-la-fed.shtml",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        },
+        {
+          "url": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/27/dolar-cae-ante-fuerte-recuperacion-del-cobre-y-previo-al-anuncio-de-tasas-del-banco-central.shtml",
+          "status": "existing_notes_reused",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "bound_existing_notes_reused_not_new_original_semantic_review"
+        },
+        {
+          "url": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/28/reserva-federal-mantiene-los-tipos-se-abren-expectativas-de-posible-alza-y-dolar-sube-en-chile.shtml",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        },
+        {
+          "url": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/28/dolar-cae-de-los-980-tras-decision-de-tasas-del-banco-central-y-con-los-mercados-atentos-a-la-fed.shtml",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        }
+      ]
+    },
+    {
+      "sourceId": "clp-cooperativa",
+      "collectionState": "no_candidates_in_listing",
+      "publisherAttempts": [],
+      "acceptedEvidenceIds": [],
+      "articleStates": [
+        {
+          "url": "https://www.cooperativa.cl/noticias/economia/divisas/dolar/dolar-volvio-a-rozar-los-mil-pesos-tras-la-reeleccion-de-lula-en-brasil/2026-10-26/141137.html",
+          "status": "pending_content_review",
+          "reviewState": "automatic_review_unavailable",
+          "reason": "no_bound_content_review_result"
+        }
+      ]
+    },
+    {
+      "sourceId": "clp-yahoo",
+      "collectionState": "excluded_from_automatic_collection",
+      "publisherAttempts": [],
+      "acceptedEvidenceIds": [],
+      "articleStates": []
+    }
+  ],
+  "materialStatus": "materials_prepared_for_content_review",
+  "contentReview": "pending_independent_shared_context_review",
+  "publicationApproved": false,
+  "remaining": [
+    "Unattended original-entailment review is not proven by saved or current-agent judgments.",
+    "Newly collected unreviewed, wrong-period, extraction-failed or use-pending articles cannot enter writer material.",
+    "New original/model tests require an eligible processing scope and separately approved budget.",
+    "Report writing, public approval, UI and production release remain separate."
+  ],
+  "protectedFilesUnchanged": 315,
+  "browserFilesScanned": 56,
+  "privateSecretMatches": 0,
+  "rawArticleMatches": 0,
+  "staticAndBuilds": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "tests": {
+      "files": 129,
+      "declared": 815,
+      "executedCases": 990,
+      "parameterExpansions": 175
+    },
+    "productionBuild": "pass",
+    "appReportBuild": "pass",
+    "reportBuild": "pass",
+    "bundleBoundary": "pass"
+  },
+  "existingWarning": "500kB_chunk_warning_entry_615654_bytes",
+  "publicRequestAttempts": 22,
+  "initialRestrictedTransportFailures": 4,
+  "paidModelCalls": 0,
+  "newPaidCostUsd": 0,
+  "productionChanged": false
+}

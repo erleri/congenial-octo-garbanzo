@@ -1,0 +1,40 @@
+{
+  "version": "material-processing/2",
+  "reviewedOn": "2026-11-01",
+  "decisionBasis": "project_operating_policy_not_publisher_licence",
+  "defaultArticleMode": "private_article_analysis",
+  "rawPublicDisplay": false,
+  "analysisContext": {
+    "mode": "complete_captured_body",
+    "truncation": "forbidden"
+  },
+  "requirements": [
+    "registered_public_acquisition_adapter_no_access_bypass",
+    "bound_original_and_complete_capture",
+    "explicit_restrictions_override_default",
+    "private_zdr_no_training_no_fallback",
+    "separate_extract_and_context_comparison",
+    "independent_facts_and_attributed_views_not_translation_or_article_substitute",
+    "source_credit_and_period_preserved",
+    "separate_report_content_review_and_admin_publication"
+  ],
+  "restrictions": [],
+  "revision": "20261101-use-scope-separated",
+  "sourceNotices": [
+    {
+      "id": "ebc-owned-and-partner-publication-scope",
+      "origin": "https://agenciabrasil.ebc.com.br",
+      "pathPrefix": "/",
+      "checkedOn": "2026-11-01",
+      "evidenceUrls": [
+        "https://acessoainformacao.ebc.com.br/perguntas-frequentes",
+        "https://www.ebc.com.br/sobre/sala-de-imprensa",
+        "https://www.ebc.com.br/termos-de-uso-e-condicoes-gerais-do-portal-da-ebc"
+      ],
+      "summary": "자체 제작 보도의 출처 표시를 전제로 한 이용 안내와 비상업 목적 안내가 있으며 상업적 복제는 별도 문의 대상이다. 국제 통신사 자료와 사진은 자체 제작물의 일반 재배포 범위에 자동 포함되지 않는다. 이를 비공개 AI 분석의 명시적 허가나 금지로 바꾸지 않는다.",
+      "aiPermission": "not_explicitly_addressed",
+      "grantsUse": false
+    }
+  ],
+  "binding": "ad3a1e5bb4a329d2295306be17c9d7fabfff9725a52c6c2b30eeba5df222194c"
+}

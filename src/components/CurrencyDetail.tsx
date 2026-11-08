@@ -45,8 +45,8 @@ const DETAIL_TOOLTIP_STYLE = {
   fontSize: '12px',
 } as const
 const DETAIL_LABEL_STYLE = {
-  fill: '#8a94a3',
-  fontSize: 10,
+  fill: '#526478',
+  fontSize: 12,
   fontWeight: 600,
 } as const
 

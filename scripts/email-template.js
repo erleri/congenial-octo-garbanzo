@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { renderEmailReportDigest } from './email-report-digest.js'
 
 export const MAJOR_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN']
 
@@ -552,12 +553,16 @@ export function composeEmailBody({
   businessPlan = null,
   chartSrc = 'cid:fx-chart-image',
   includePreviewChrome = false,
+  reportDigest = null,
+  digestPlaceholder = false,
 }) {
   const baseDate = dataset.baseDate
   const fetchedAt = dataset.fetchedAt ?? '-'
   const subject = `[LATAM FX] ${baseDate} Daily FX Brief`
   const currencyDetails = getCurrencyDetails(dataset, businessPlan)
   const hasChart = Boolean(chartSrc)
+  // Opt-in preview: the existing composer/sender never supplies this option.
+  const email2 = reportDigest !== null
   const chartSection = hasChart
     ? `<p style="margin:18px 0;"><img src="${chartSrc}" alt="LATAM FX 30-day chart" style="display:block;width:100%;max-width:${EMAIL_CONTENT_MAX_WIDTH}px;height:auto;border:1px solid #d9dee7;"></p>`
     : `<p style="margin:18px 0;padding:12px;border:1px solid #d9dee7;color:#667085;font-size:12px;background:#f8fafc;">Chart image is not available in this preview build.</p>`
@@ -579,18 +584,18 @@ export function composeEmailBody({
                 <h2 style="margin:0 0 8px;">LATAM FX Daily Brief</h2>
                 <p style="margin:0 0 14px;font-size:13px;color:#667085;">
                   Base date: ${baseDate}<br>
-                  Fetched at: ${fetchedAt}<br>
-                  Source: ExchangeRate API, Alpha Vantage, adjusted data
+                  ${email2 ? '' : `Fetched at: ${fetchedAt}<br>
+                  Source: ExchangeRate API, Alpha Vantage, adjusted data`}
                 </p>
                 ${renderCta('0 0 16px')}
-                ${renderFxReport(fxReport)}
-                ${renderMarketContext(marketContext)}
+                ${email2 ? digestPlaceholder ? '<!--LATAM_FX_APPROVED_REPORT_DIGEST-->' : renderEmailReportDigest(reportDigest) : renderFxReport(fxReport)}
+                ${email2 ? '' : renderMarketContext(marketContext)}
                 ${renderUsdKrwAnchor(getUsdKrwAnchor(dataset))}
                 ${renderTodayFocus(currencyDetails)}
                 ${renderKpiSummary(currencyDetails, baseDate)}
                 ${chartSection}
                 ${renderTagRuleFootnote()}
-                ${renderCta('16px 0')}
+                ${renderCta('16px 0')}${email2 ? `<p style="margin:18px 0 0;padding-top:12px;border-top:1px solid #e4e8ee;font-size:11px;line-height:1.6;color:#667085;">환율 기준일 ${escapeHtml(baseDate)} · 수집시각 ${escapeHtml(fetchedAt)}<br>Source: ExchangeRate API, Alpha Vantage, adjusted data<br>리포트의 기준일과 기사에서 다룬 거래일은 다를 수 있습니다. 각 리포트에서 확인할 수 있습니다.</p>` : ''}
               </td>
             </tr>
           </table>

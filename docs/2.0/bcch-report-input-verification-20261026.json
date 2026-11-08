@@ -1,0 +1,138 @@
+{
+  "version": "bcch-report-input-verification/1",
+  "date": "2026-10-26",
+  "scope": "Local official API adapter and session-aware question/search/original-review connection. No new AI report or operational source change.",
+  "status": {
+    "adapterAndDatePolicy": "implemented_and_offline_verified",
+    "realSavedApiReplay": "passed",
+    "newPublicNewsSearch": "transport_failed",
+    "originalMarketEvidence": "not_collected_in_this_run",
+    "writingEligibility": "hold",
+    "contentQuality": "not_assessed",
+    "publicationApproved": false
+  },
+  "implementation": {
+    "sourceModule": "scripts/currency-report/bcch-api.js",
+    "inputModule": "scripts/currency-report/bcch-report-input.js",
+    "command": "npm run report:price:api",
+    "modes": {
+      "plan": "Default; no credential read, request, model or file write.",
+      "replay": "Explicit private snapshot and reviewed methodology PDF; no credential read or network.",
+      "collect": "Explicit local token file, reviewed methodology PDF, dates and PowerShell path; at most one request, no retry or fallback. This mode was tested with synthetic transport, not called live again in this task."
+    },
+    "probeCompatibility": "Existing diagnostic CLI and exported parser names are preserved via the shared source module.",
+    "commonConnections": [
+      "prepareOfficialClpResearch retains existing numeric calculations and report packet shape",
+      "researchPlan includes versioned question time scopes and transaction-date query text",
+      "runResearch hands the same scopes to the existing public search collector",
+      "replayResearchCollection uses the same search scopes",
+      "inspectDossier checks same-day and earlier-context event dates against the relevant question anchor",
+      "collectOriginal reports article publication relation to the transaction day and aggregation cutoff"
+    ],
+    "failClosed": [
+      "Recompute saved session labels from effective dates; do not trust a saved localSessionDate",
+      "Unmapped latest observation blocks default preparation instead of selecting an older price",
+      "Explicit historical-session selection remains possible and retains its actual observedDate",
+      "Changed methodology, invalid snapshots and not-yet-available observations are rejected",
+      "Publication time is not event time; article timing never grants direct-cause approval",
+      "Public search transport failure is not recorded as absence of market news"
+    ]
+  },
+  "replay": {
+    "source": ".local-reports/private/bcch-api-probe-4BhpF1/result.json",
+    "sourceFileSha256": "f9bb97c2b587b6b43f719d8cf7a04037300d3f28e47c3928ad446b50998aa07d",
+    "output": ".local-reports/private/bcch-report-input-uYxzrx/research-input.json",
+    "command": "npm run report:price:api -- --mode replay --input .local-reports/private/bcch-api-probe-4BhpF1/result.json --methodology .local-reports/private/clp-official-price-20261017/bcch-methodology.pdf --as-of 2026-10-26T10:24:09.678Z",
+    "reportDate": "2026-10-26",
+    "capturedAt": "2026-10-26T10:24:09.678Z",
+    "effectiveDate": "2026-10-26",
+    "actualTransactionDate": "2026-10-23",
+    "price": 990.35,
+    "unit": "CLP per USD",
+    "priorTransactionDate": "2026-10-22",
+    "priorPrice": 986.58,
+    "intervalPct": 0.38212815990593585,
+    "verifiedSessionObservations": 15,
+    "excludedEffectiveDates": ["2026-10-01", "2026-10-13"],
+    "exclusionReason": "Previous banking day not established at capture boundary or blank weekday; no holiday inference.",
+    "exactObservedAt": null,
+    "exactPublishedAt": null,
+    "aggregationCutoffAt": "2026-10-23T19:00:00.000Z",
+    "networkRequests": 0,
+    "tokenRead": false
+  },
+  "timePolicy": {
+    "version": "research-time-scope/1",
+    "marketLocalGlobalCounter": {
+      "localStartDate": "2026-10-22",
+      "localEndDate": "2026-10-23",
+      "utcStart": "2026-10-22T03:00:00Z",
+      "utcEnd": "2026-10-24T02:59:59Z",
+      "role": "Market explanation candidates; original event, price basis and attribution review still required."
+    },
+    "consumer": {
+      "localStartDate": "2026-09-26",
+      "localEndDate": "2026-10-26",
+      "role": "Sales environment background; search publication window does not establish the statistic target period or a daily FX cause."
+    },
+    "watch": {
+      "localStartDate": "2026-10-23",
+      "localEndDate": "2026-10-26",
+      "role": "Subsequent context, including weekend news; cannot explain earlier price movements automatically."
+    },
+    "legacyPackets": "No official reportPriceBasis means previous report-date search policy remains available.",
+    "calendarMethod": "IANA America/Santiago DST conversion; no fixed UTC offset.",
+    "intradayLimit": "Search covers local calendar days, not exact historical publication availability. Aggregation cutoff is not a single quote time."
+  },
+  "realNewsProbe": {
+    "output": ".local-reports/private/bcch-session-news-6wKUic/result.json",
+    "source": "Existing GDELT public search adapter",
+    "maxQueries": 1,
+    "maxOriginals": 2,
+    "networkCalls": 1,
+    "searchStatus": "failed",
+    "reason": "transport_or_redirect_error",
+    "originalsCaptured": 0,
+    "retries": 0,
+    "limitation": "This is a local transport failure, not evidence that GDELT is generally unavailable or that no relevant articles exist. No alternate source was silently admitted."
+  },
+  "checks": {
+    "newSyntheticCases": 9,
+    "fullSuite": {"files": 85, "declaredTests": 488, "executedCases": 591, "parameterExpansions": 103, "status": "passed"},
+    "testInventory": "No exact duplicate names/bodies or detected tautologies. This does not prove semantic uniqueness or real AI quality.",
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed; production entry remains 610348 bytes; existing chunk-size warning remains",
+    "appSpecificBuild": "Not repeated; no app UI or app build configuration change in this task.",
+    "database": "Not touched or tested in this task.",
+    "secretScan": {
+      "scannedFiles": 331,
+      "scope": "public, production/report/app build outputs, report scripts, 2.0 docs and initial new private replay/search results",
+      "method": "Compare actual local token and URL-encoded form internally; print counts only",
+      "credentialMatches": 0,
+      "gitDiffContainsCredential": false
+    },
+    "operationalHashesUnchanged": {
+      "public/data.json": "c7d75391561af63d4fc67cf05cd991cf12c7acbb6d1175ab56b5dbcfa35c3f9e",
+      "data/fx-full-history.json": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f"
+    }
+  },
+  "costAndBoundaries": {
+    "newAuthenticatedApiRequests": 0,
+    "newPublicSearchRequests": 1,
+    "modelCalls": 0,
+    "newCostUsd": 0,
+    "existingManuscriptsAndCostRecords": "preserved; no editing or reapproval",
+    "productionDeploymentDbMailPush": "none"
+  },
+  "remaining": [
+    "Resolve public-news transport or explicitly use the registered publisher discovery path; verify original passages for the selected transaction days.",
+    "Review news event time, article publication/modification times and price basis separately; metadata and IDs alone do not prove causal support.",
+    "Methodology uses the previously reviewed PDF hash, not a newly verified current revision.",
+    "Short date range does not provide a full 3-month chart, prior-month comparison or 52-week history; missing metrics must not be fabricated.",
+    "Official API attribution and adaptation-responsibility metadata are prepared, but public UI attribution and full publication readiness remain separate work.",
+    "Local snapshots are not cryptographically signed historical archives."
+  ]
+}

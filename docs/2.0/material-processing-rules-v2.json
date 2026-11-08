@@ -1,0 +1,34 @@
+{
+  "version": "material-processing/2",
+  "reviewedOn": "2026-11-01",
+  "decisionBasis": "project_operating_policy_not_publisher_licence",
+  "defaultArticleMode": "private_article_analysis",
+  "rawPublicDisplay": false,
+  "analysisContext": {
+    "mode": "complete_captured_body",
+    "truncation": "forbidden"
+  },
+  "requirements": [
+    "registered_public_acquisition_adapter_no_access_bypass",
+    "bound_original_and_complete_capture",
+    "explicit_restrictions_override_default",
+    "private_zdr_no_training_no_fallback",
+    "separate_extract_and_context_comparison",
+    "independent_facts_and_attributed_views_not_translation_or_article_substitute",
+    "source_credit_and_period_preserved",
+    "separate_report_content_review_and_admin_publication"
+  ],
+  "restrictions": [
+    {
+      "id": "ebc-purpose-scope",
+      "origin": "https://agenciabrasil.ebc.com.br",
+      "pathPrefix": "/",
+      "target": "all_external_text",
+      "effect": "review",
+      "checkedOn": "2026-10-31",
+      "evidenceUrl": "https://www.ebc.com.br/termos-de-uso-e-condicoes-gerais-do-portal-da-ebc",
+      "reason": "EBC 포털의 개인·비상업 목적 조건과 Agencia Brasil 보도 이용 안내의 적용 범위가 미확정이므로 외부 본문 분석을 보류한다."
+    }
+  ],
+  "binding": "51ecbbc14f58ff73c85575a25adf8491d3346d4b1bdbe248d912a5616c39e074"
+}

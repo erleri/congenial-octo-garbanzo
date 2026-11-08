@@ -1,0 +1,741 @@
+{
+  "version": "six-currency-explanatory-source-plan/1",
+  "checkedOn": "2026-10-27",
+  "scope": "research_catalog_not_runtime_config",
+  "purpose": "기존 환율 API를 유지하고 환율 원인·영업 환경 설명에 필요한 뉴스·지표·일정 경로를 선택",
+  "currencies": [
+    "BRL",
+    "MXN",
+    "COP",
+    "PEN",
+    "CLP",
+    "ARS"
+  ],
+  "runtimeIntegrated": false,
+  "paidCalls": 0,
+  "productionChanged": false,
+  "baselineRegister": "docs/2.0/six-currency-source-register-20261027.json",
+  "priceVerification": "docs/2.0/pen-ars-cop-basis-verification-20261027.json",
+  "prices": {
+    "source": "existing_app_exchange_rate_sources",
+    "changeRequested": false,
+    "supplementalPriceChecks": "문장과 가격의 날짜·종류를 연결할 때만 사용. 새 공식 환율로 운영 교체하지 않음"
+  },
+  "questions": [
+    {
+      "id": "cause",
+      "text": "이번 환율 변화를 현지 시장 보도는 어떻게 설명하는가?",
+      "requiredFor": "currency_move",
+      "role": "dated_market_reporting"
+    },
+    {
+      "id": "policy",
+      "text": "정책 결정·물가 발표에 확인된 새 정보가 있는가?",
+      "requiredFor": "only_when_relevant_to_selected_explanation",
+      "role": "event_or_policy_context"
+    },
+    {
+      "id": "demand",
+      "text": "확인한 기간의 소비·소매·관련 내구재 흐름은 어떠한가?",
+      "requiredFor": "only_when_sales_environment_claim_is_written",
+      "role": "consumer_background"
+    },
+    {
+      "id": "financing",
+      "text": "정책금리와 구분되는 실제 소비자 금융 여건이 달라졌는가?",
+      "requiredFor": "only_when_financing_claim_is_written",
+      "role": "consumer_finance"
+    },
+    {
+      "id": "watch",
+      "text": "앞선 설명을 재확인할 발표·변수는 무엇인가?",
+      "requiredFor": "only_when_confirmed_event_or_indicator_exists",
+      "role": "scheduled_event"
+    }
+  ],
+  "rules": [
+    "공식 통계만으로 당일 환율 원인을 대신하지 않는다",
+    "모든 지표를 매 리포트의 필수 입력으로 만들지 않는다",
+    "국가별 최대 원고 개수를 채우려고 근거 없는 항목을 추가하지 않는다",
+    "발표일·대상 기간·관측 기간·자료 이용 가능 시각을 분리한다",
+    "정책금리·실제 대출금리·법정 금리 상한을 혼용하지 않는다",
+    "명목 매출 증가를 실질 판매량 증가로 바꾸지 않는다",
+    "검색 결과·경로 발견·본문 읽기·데이터 응답·내용 검토·사용 범위·승인은 별도 상태",
+    "발표 예정은 실제 발표가 아니고 URL 날짜가 본문 대상 기간을 대신하지 않는다",
+    "출처 자료 안의 지시문은 실행하지 않는다. 집필에는 검토된 자체 카드만 전달한다. 수집 본문 전송은 별도 승인된 비공개 원문 검토 범위에만 한정하며, 출처 등록이나 기사 발견 자체를 전송 승인으로 간주하지 않는다",
+    "Sol 집필 전에 별도 수집·검토. Sol 호출 자체가 외부 검색을 수행한다는 전제를 두지 않는다"
+  ],
+  "countryPlans": [
+    {
+      "currency": "BRL",
+      "newsRefs": [
+        "brl-valor",
+        "brl-infomoney",
+        "brl-agenciabrasil",
+        "brl-cnn",
+        "brl-yahoo"
+      ],
+      "officialRefs": [
+        "brl-policy",
+        "brl-retail",
+        "brl-calendar"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-oil"
+      ],
+      "gaps": [
+        "은행 소비자금리와 품목별 실질 판매 시리즈 추가 선택",
+        "IBGE 이용 범위 보완",
+        "시장 기사 카드 자동 수집 미연결"
+      ],
+      "requiredAllIndicators": false,
+      "currentReportApproved": false
+    },
+    {
+      "currency": "MXN",
+      "newsRefs": [
+        "mxn-eleconomista",
+        "mxn-elfinanciero",
+        "mxn-expansion",
+        "mxn-forbes",
+        "mxn-yahoo"
+      ],
+      "officialRefs": [
+        "mxn-policy",
+        "mxn-consumer",
+        "mxn-calendar"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-oil"
+      ],
+      "gaps": [
+        "실제 소비자금리 시리즈 미선정",
+        "EMEC·토큰 또는 공개 원문 연결",
+        "시장 기사 카드 자동 수집 미연결"
+      ],
+      "requiredAllIndicators": false,
+      "currentReportApproved": false
+    },
+    {
+      "currency": "COP",
+      "newsRefs": [
+        "cop-larepublica",
+        "cop-portafolio",
+        "cop-valora",
+        "cop-yahoo"
+      ],
+      "officialRefs": [
+        "cop-policy",
+        "cop-retail",
+        "cop-credit"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-oil"
+      ],
+      "gaps": [
+        "금리 데이터 최신성·집계 단위 확인",
+        "정책 발표·달력 반복 수집 미연결",
+        "질문 계획기 COP 미지원"
+      ],
+      "requiredAllIndicators": false,
+      "currentReportApproved": false
+    },
+    {
+      "currency": "PEN",
+      "newsRefs": [
+        "pen-revistaeconomia",
+        "pen-gestion",
+        "pen-rpp",
+        "pen-elcomercio",
+        "pen-andina",
+        "pen-infobae",
+        "pen-larepublica",
+        "pen-yahoo"
+      ],
+      "officialRefs": [
+        "pen-policy",
+        "pen-financing",
+        "pen-activity"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-copper"
+      ],
+      "gaps": [
+        "INEI 최신 소매·물가·임금과 일정·이용 범위",
+        "원인 설명이 있는 기사 표본 추가",
+        "질문 계획기 PEN 미지원"
+      ],
+      "requiredAllIndicators": false,
+      "currentReportApproved": false
+    },
+    {
+      "currency": "CLP",
+      "newsRefs": [
+        "clp-df",
+        "clp-pulso",
+        "clp-existing-four-outlets",
+        "clp-biobio",
+        "clp-cooperativa",
+        "clp-yahoo"
+      ],
+      "officialRefs": [
+        "clp-policy",
+        "clp-consumer",
+        "clp-pay"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-copper"
+      ],
+      "gaps": [
+        "실제 소비자 금융 지표 추가 선택",
+        "기존 기사·통계의 반복 수집·승인 연결"
+      ],
+      "requiredAllIndicators": false,
+      "currentReportApproved": false
+    },
+    {
+      "currency": "ARS",
+      "newsRefs": [
+        "ars-cronista",
+        "ars-ambito",
+        "ars-infobae",
+        "ars-iprofesional",
+        "ars-yahoo"
+      ],
+      "officialRefs": [
+        "ars-policy",
+        "ars-retail-appliances",
+        "ars-calendar"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields"
+      ],
+      "gaps": [
+        "가전·슈퍼마켓 최신 본문/표 수집",
+        "실제 소비자금리·임금 선택",
+        "BCRA 서비스 이용 목적 확인",
+        "질문 계획기 ARS 미지원"
+      ],
+      "requiredAllIndicators": false,
+      "currentReportApproved": false
+    }
+  ],
+  "sources": [
+    {
+      "id": "brl-policy",
+      "currency": "BRL",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/10?formato=json",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "policy_context",
+      "notes": "SGS 432는 정책금리 수준. 발표문·예상 차이·실제 환율 반응은 별도 확인",
+      "automaticInputApproved": false,
+      "existingCode": "scripts/currency-report/sources.js",
+      "baselineSourceId": "brl-bcb-policy"
+    },
+    {
+      "id": "brl-retail",
+      "currency": "BRL",
+      "url": "https://servicodados.ibge.gov.br/api/docs/agregados?versao=3",
+      "questionIds": [
+        "demand"
+      ],
+      "status": "existing_record_reused",
+      "role": "retail_volume",
+      "notes": "기존 표 8880·변수 11708. 실질·계절조정·국가 전체를 보존. 가전 하위 항목은 선택·검증 전 추정 금지",
+      "automaticInputApproved": false,
+      "baselineSourceId": "brl-ibge"
+    },
+    {
+      "id": "brl-calendar",
+      "currency": "BRL",
+      "url": "https://servicodados.ibge.gov.br/api/docs/calendario?versao=3",
+      "questionIds": [
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "calendar",
+      "notes": "제품·기간·페이지를 선별. 뉴스 API 최신 항목 하나를 경제 발표로 취급하지 않음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "brl-ibge"
+    },
+    {
+      "id": "mxn-policy",
+      "currency": "MXN",
+      "url": "https://www.banxico.org.mx/SieAPIRest/service/v1/",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "policy_context",
+      "notes": "SF61745·일정·발표 PDF 기존 검토. API 토큰 필요, 이번 인증 호출 없음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "mxn-banxico"
+    },
+    {
+      "id": "mxn-consumer",
+      "currency": "MXN",
+      "url": "https://www.inegi.org.mx/servicios/api_indicadores.html",
+      "questionIds": [
+        "demand",
+        "policy"
+      ],
+      "status": "existing_record_reused",
+      "role": "consumer_statistics",
+      "notes": "INPC·소매 지표. 새 EMEC 시리즈·자료 정의 선택 및 인증/공개 파일 확인 남음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "mxn-inegi"
+    },
+    {
+      "id": "mxn-calendar",
+      "currency": "MXN",
+      "url": "https://www.inegi.org.mx/contenidos/saladeprensa/doc/cal_2026.pdf",
+      "questionIds": [
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "calendar",
+      "notes": "발표일·대상 기간·시각 구분",
+      "automaticInputApproved": false,
+      "baselineSourceId": "mxn-inegi"
+    },
+    {
+      "id": "cop-retail",
+      "currency": "COP",
+      "url": "https://www.dane.gov.co/index.php/estadisticas-por-tema/comercio-interno/encuesta-mensual-de-comercio-emc",
+      "questionIds": [
+        "demand"
+      ],
+      "status": "existing_record_reused",
+      "role": "retail_statistics",
+      "notes": "실질 소매와 품목 범위. 10월 공개 자료의 대상 월을 10월 실적으로 바꾸지 않음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "cop-dane-emc"
+    },
+    {
+      "id": "cop-credit",
+      "currency": "COP",
+      "url": "https://www.superfinanciera.gov.co/publicaciones/60955/informes-y-cifrascifrasestablecimientos-de-creditoinformacion-periodicamensualtasa-de-interes-y-desembolsos-por-modalidad-de-credito-60955/",
+      "questionIds": [
+        "financing"
+      ],
+      "status": "official_page_and_metadata_read",
+      "role": "consumer_finance",
+      "notes": "SFC 링크의 w9zh-vetq 공식 데이터·CC BY-SA 4.0과 금리·실행액 필드 확인. 전체 기간 집계는 시간 초과. 범위를 줄인 2026-10-01~26 조회는 정상 JSON 빈 배열이므로 10월 자료 확보나 최신성 확인으로 세지 않음. 단위·가중 집계 미검증",
+      "automaticInputApproved": false,
+      "metadataUrl": "https://www.datos.gov.co/api/views/w9zh-vetq.json",
+      "dataUrl": "https://www.datos.gov.co/resource/w9zh-vetq.json",
+      "fields": [
+        "fecha_corte",
+        "tipo_de_cr_dito",
+        "producto_de_cr_dito",
+        "plazo_de_cr_dito",
+        "tasa_efectiva_promedio",
+        "montos_desembolsados",
+        "numero_de_creditos"
+      ],
+      "avoid": "개별 은행·상품 표본을 검증된 국가 평균이나 법정 금리 상한으로 표현하지 않음"
+    },
+    {
+      "id": "cop-policy",
+      "currency": "COP",
+      "url": "https://www.banrep.gov.co/",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "official_portal_route_only",
+      "role": "policy_context",
+      "notes": "기존 중앙은행 발표 시작점. 반복 발표 수집·일정 파서 미연결",
+      "automaticInputApproved": false
+    },
+    {
+      "id": "pen-policy",
+      "currency": "PEN",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/mensuales/tasas-de-interes",
+      "questionIds": [
+        "policy"
+      ],
+      "status": "official_catalog_read",
+      "role": "policy_context",
+      "notes": "PD04722MM 정책 기준금리 시리즈를 목록에서 확인. 월간 시리즈를 정책 발표시각·기자회견으로 대체하지 않음",
+      "automaticInputApproved": false
+    },
+    {
+      "id": "pen-financing",
+      "currency": "PEN",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/mensuales/tasas-de-interes",
+      "questionIds": [
+        "financing"
+      ],
+      "status": "valid_json_sample",
+      "role": "consumer_finance",
+      "notes": "은행권·현지통화·실효 연율·상품/만기 구분. BCRP 배포·SBS 원천. 6~9월 3개 시리즈 실제 응답 확인",
+      "automaticInputApproved": false,
+      "series": [
+        "PN07845NM",
+        "PN07846NM",
+        "PN07847NM"
+      ],
+      "seriesNames": [
+        "consumer_credit_card",
+        "consumer_loan_up_to_360_days",
+        "consumer_loan_over_360_days"
+      ],
+      "dataUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PN07845NM-PN07846NM-PN07847NM/json/2026-06/2026-09/esp",
+      "targetPeriod": "2026-06 through 2026-09",
+      "reportedUpdateDate": "2026-10-23",
+      "scope": "banking_companies_domestic_currency_effective_annual_rates",
+      "termsUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/condiciones-de-uso"
+    },
+    {
+      "id": "pen-activity",
+      "currency": "PEN",
+      "url": "https://www.inei.gob.pe/media/MenuRecursivo/boletines/boletin-produccion-nacional-set2026.pdf",
+      "questionIds": [
+        "demand"
+      ],
+      "status": "historical_pdf_body_read",
+      "role": "economic_activity_background",
+      "notes": "INEI의 9월호가 7월 생산·상업을 다룸. 홈페이지 실패와 PDF 접근을 구분. 현재 최신 통계로 승인하지 않음",
+      "automaticInputApproved": false,
+      "targetPeriod": "2026-07",
+      "issuePeriod": "2026-09",
+      "informationCutoff": "2026-09-14",
+      "reuseStatus": "INEI specific scope pending",
+      "next": "공식 최신 목록·보고서 발견과 소매/생산 정의·사용 조건"
+    },
+    {
+      "id": "clp-policy",
+      "currency": "CLP",
+      "url": "https://www.bcentral.cl/",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "policy_context",
+      "notes": "정책 발표·달력 기존 조사. BDE 통계 조건을 모든 성명 원문에 자동 확대하지 않음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "clp-bcch"
+    },
+    {
+      "id": "clp-consumer",
+      "currency": "CLP",
+      "url": "https://www.ine.gob.cl/estadisticas-por-tema/comercio-y-servicios/actividad-mensual-del-comercio",
+      "questionIds": [
+        "demand"
+      ],
+      "status": "existing_local_collector_reused",
+      "role": "retail_statistics",
+      "notes": "기존 INE 상업활동·품목 범위 카드·월간 수집 재사용. 회사별 셀아웃으로 확대하지 않음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "clp-ine",
+      "existingCode": "scripts/currency-report/chile-monthly-refresh-local.js"
+    },
+    {
+      "id": "clp-pay",
+      "currency": "CLP",
+      "url": "https://www.ine.gob.cl/estadisticas-por-tema/mercado-laboral/remuneraciones-y-costos-laborales",
+      "questionIds": [
+        "demand"
+      ],
+      "status": "existing_local_collector_reused",
+      "role": "real_pay",
+      "notes": "임금 구매력과 실질 소매를 동일 대상 기간·범위에서 비교하는 기존 경로",
+      "automaticInputApproved": false,
+      "baselineSourceId": "clp-ine"
+    },
+    {
+      "id": "ars-policy",
+      "currency": "ARS",
+      "url": "https://www.bcra.gob.ar/",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "policy_context",
+      "notes": "정책 안내와 통계 시작점. 실제 금리 변수를 선택하기 전 도매 환율 변수를 금리로 사용하지 않음",
+      "automaticInputApproved": false,
+      "baselineSourceId": "ars-bcra"
+    },
+    {
+      "id": "ars-retail-appliances",
+      "currency": "ARS",
+      "url": "https://www.indec.gob.ar/indec/web/Nivel3-Tema-3-1",
+      "questionIds": [
+        "demand"
+      ],
+      "status": "catalog_and_calendar_verified_body_collection_pending",
+      "role": "retail_and_appliance_survey",
+      "notes": "공식 가전·가정용품 판매 조사와 슈퍼마켓 통계 경로. 정적 읽기는 본문 미추출. 검색 요약 수치로 카드 승인하지 않음",
+      "automaticInputApproved": false,
+      "topics": [
+        "supermarket_real_sales",
+        "appliance_and_household_goods_sales"
+      ],
+      "frequency": {
+        "supermarkets": "monthly",
+        "appliances": "quarterly"
+      },
+      "termsUrl": "https://creativecommons.org/licenses/by-sa/4.0/deed.es",
+      "termsBasis": "INDEC official site footer links CC BY-SA 4.0 except specifically indicated content",
+      "latestReportBodyConfirmed": false
+    },
+    {
+      "id": "ars-calendar",
+      "currency": "ARS",
+      "url": "https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf",
+      "questionIds": [
+        "watch"
+      ],
+      "status": "calendar_pdf_read",
+      "role": "calendar",
+      "notes": "공식 PDF 2026-10-01 수정 표기. 11월 25일 예정 가전 조사 대상은 2026년 3분기. 발표 예정은 수치 확보가 아님",
+      "automaticInputApproved": false,
+      "calendarRevision": "2026-10-01",
+      "sampleScheduledDate": "2026-11-25",
+      "sampleTargetPeriod": "2026-Q3",
+      "sampleTopic": "appliance_and_household_goods_survey",
+      "actualReleaseVerified": false
+    },
+    {
+      "id": "common-us-policy",
+      "currency": "COMMON",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "us_policy",
+      "notes": "FOMC 일정·공식 성명·RSS 기존 조사 재사용",
+      "automaticInputApproved": false
+    },
+    {
+      "id": "common-us-prices",
+      "currency": "COMMON",
+      "url": "https://www.bls.gov/schedule/news_release/",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "status": "existing_record_reused",
+      "role": "us_releases",
+      "notes": "CPI·고용 발표와 대상 기간. 예상 컨센서스를 무료 공식 데이터가 제공한다고 가정하지 않음",
+      "automaticInputApproved": false
+    },
+    {
+      "id": "common-dollar",
+      "currency": "COMMON",
+      "url": "https://www.federalreserve.gov/releases/h10/summary/default.htm",
+      "questionIds": [
+        "cause"
+      ],
+      "status": "official_page_read",
+      "role": "market_context",
+      "notes": "광의 명목 달러지수는 DXY와 다름. 전주 일별 관측을 주간 발표하므로 당일 DXY·장중 원인에 대체하지 않음",
+      "automaticInputApproved": false,
+      "releasePage": "https://www.federalreserve.gov/releases/h10/",
+      "cadence": "weekly_release_of_previous_business_week_daily_observations",
+      "observations": "daily",
+      "releaseClock": "Monday 16:15 (source clock; holiday exception)",
+      "asOfRule": "지수 관측일과 실제 이용 가능 발표일 모두 기준일 이전 확인"
+    },
+    {
+      "id": "common-us-yields",
+      "currency": "COMMON",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2026&type=daily_treasury_yield_curve",
+      "questionIds": [
+        "cause"
+      ],
+      "status": "official_table_and_download_links_read",
+      "role": "market_context",
+      "notes": "미 국채 2·10년 par yield 후보. 장중 가격이 아니고 만기·단위·관측과 발표 순서를 구분",
+      "automaticInputApproved": false,
+      "downloadStatus": "CSV/XML links confirmed; download parser not connected",
+      "failedPriorUrl": "https://home.treasury.gov/resource-center-data-chart-center/interest-rates"
+    },
+    {
+      "id": "common-copper",
+      "currency": "COMMON",
+      "url": "https://www.cochilco.cl/web/",
+      "questionIds": [
+        "cause"
+      ],
+      "status": "weekly_report_body_read",
+      "role": "commodity_context",
+      "notes": "구리 공식 주간 해설 후보. 주간 요인을 개별 통화의 당일 원인으로 단정하지 않음. 가격 데이터 원천·사용 조건 추가 확인",
+      "automaticInputApproved": false,
+      "appliesWhenRelevant": [
+        "CLP",
+        "PEN"
+      ],
+      "sampleBodyPeriod": "2026-10-19 through 2026-10-23",
+      "sampleUrl": "https://www.cochilco.cl/web/informe-del-mercado-internacional-del-cobre-semana-del-01-al-05-de-junio-de-2026/",
+      "urlBodyDateMismatch": true,
+      "archiveUrl": "https://www.cochilco.cl/web/historico-precio-de-los-metales/",
+      "archiveCoverage": "page describes files through 2024; not current daily source",
+      "reuseStatus": "pending_source_specific_conditions"
+    },
+    {
+      "id": "common-oil",
+      "currency": "COMMON",
+      "url": "https://www.eia.gov/petroleum/prices/table.php?show_by=12_series&period=D&table_key=PET_PRI_SPT_S1_D",
+      "questionIds": [
+        "cause"
+      ],
+      "status": "data_table_not_extracted",
+      "role": "commodity_context",
+      "notes": "원유 공식 경로 후보. 현재 읽기에서는 Brent/WTI 표가 추출되지 않아 가격 확보 성공으로 기록하지 않음",
+      "automaticInputApproved": false,
+      "appliesWhenRelevant": [
+        "COP",
+        "MXN",
+        "BRL"
+      ],
+      "reuseStatus": "EIA government products reuse with attribution/date; third-party items excepted",
+      "termsUrl": "https://www.eia.gov/about/copyrights_reuse.php"
+    }
+  ],
+  "probeRecords": [
+    {
+      "id": "pen-consumer-rates",
+      "status": "valid_json_sample",
+      "currencies": [
+        "PEN"
+      ],
+      "series": [
+        "PN07845NM",
+        "PN07846NM",
+        "PN07847NM"
+      ],
+      "periods": 4,
+      "cells": 12,
+      "targetPeriodFrom": "2026-06",
+      "targetPeriodThrough": "2026-09",
+      "rawFile": ".local-reports/private/explanatory-sources-20261027/pen-consumer-rates.body",
+      "sha256": "05da25da655c498a095828eee69f814647ae82c7aa61f3656d51f03d1d8ea8d4",
+      "contentReviewedForNewReport": false
+    },
+    {
+      "id": "cop-consumer-rates-meta",
+      "status": "metadata_valid_json",
+      "currency": "COP",
+      "official": true,
+      "license": "CC-BY-SA-4.0",
+      "latestDataPeriod": null,
+      "rawFile": ".local-reports/private/explanatory-sources-20261027/cop-consumer-rates-meta.body",
+      "sha256": "7efe93f65614987a3f116b6dc1f6a8ea0ac92039141132a54ad2fc954e09302d",
+      "contentReviewedForNewReport": false
+    },
+    {
+      "id": "cop-credit-coverage",
+      "status": "timeout_45s",
+      "currency": "COP",
+      "httpStatus": null,
+      "rawFile": null,
+      "latestDataPeriod": null,
+      "reason": "min/max/count query timed out before response; no automatic retry; not a current-data success"
+    },
+    {
+      "id": "cop-credit-october-sample",
+      "status": "valid_json_empty_result",
+      "currency": "COP",
+      "requestedPeriod": "2026-10-01 through 2026-10-26",
+      "rows": 0,
+      "latestDataPeriod": null,
+      "rawFile": ".local-reports/private/explanatory-sources-20261027/cop-credit-october-sample.body",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "reason": "Selected window returned no rows; not a current-data success or proof of global unavailability",
+      "contentReviewedForNewReport": false
+    }
+  ],
+  "codeCoverage": {
+    "questionPlanner": {
+      "path": "scripts/currency-report/research-needs.js",
+      "supportedCurrencies": [
+        "BRL",
+        "CLP",
+        "MXN",
+        "COP",
+        "PEN",
+        "ARS"
+      ]
+    },
+    "localPublisherDiscovery": {
+      "path": "scripts/currency-report/local-source-discovery.js",
+      "supportedCurrencies": [
+        "CLP"
+      ]
+    },
+    "genericOfficialCollector": {
+      "path": "scripts/currency-report/sources.js",
+      "supportedCurrencies": [
+        "BRL",
+        "MXN"
+      ]
+    },
+    "chileSpecificCollection": {
+      "path": "scripts/currency-report/research-collection.js",
+      "profiles": [
+        "clp-retail",
+        "clp-consumption"
+      ]
+    },
+    "sixCurrencyImplementationComplete": false,
+    "selectedMaterialCollector": {
+      "path": "scripts/currency-report/selected-source-collection.js",
+      "mode": "explicit_local_saved_or_public_get",
+      "reviewPath": "scripts/currency-report/selected-material-review.js",
+      "allSourcesConnected": false,
+      "writerOrProductionIntegration": false
+    },
+    "sourceSelector": {
+      "path": "scripts/currency-report/research-source-selection.js",
+      "supportedCurrencies": [
+        "BRL",
+        "CLP",
+        "MXN",
+        "COP",
+        "PEN",
+        "ARS"
+      ],
+      "mode": "offline_opt_in_source_selection",
+      "collectionAdaptersComplete": false
+    }
+  },
+  "nextImplementation": "기존 질문·수집·자료 상태 계약을 재사용하되 국가별 출처 설정을 연결하고 COP/PEN/ARS는 지원 검증 후 통과시킨다. 이번 등록부로 기존 실행기를 우회하지 않는다.",
+  "newsRoutingRevision": "2026-10-28-automatic-only",
+  "newsRoutingBoundary": "자동 수집 가능한 기존 연결만 실행 대상으로 선택한다. 미연결·조건 미해결 출처는 제외 사유만 보존하며 수동 확인 작업을 만들지 않는다. 수집 성공은 이용 범위·근거·집필·게시 승인이 아니다.",
+  "localRoutingIntegrated": true,
+  "productionIntegrated": false
+}

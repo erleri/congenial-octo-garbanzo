@@ -1,0 +1,94 @@
+{
+  "version": "bcch-api-token-verification/1",
+  "reviewDateSeoul": "2026-10-26",
+  "status": "authenticated_local_query_verified",
+  "source": {
+    "provider": "Banco Central de Chile",
+    "seriesId": "F073.TCO.PRE.Z.D",
+    "documentation": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/documentacion.html",
+    "accessInstructions": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/acceso_api.html",
+    "firstDate": "2026-10-01",
+    "lastDate": "2026-10-26",
+    "capturedAtUtc": "2026-10-26T10:24:09.678Z"
+  },
+  "actualResult": {
+    "authentication": "accepted",
+    "seriesIdentity": "verified",
+    "positiveObservations": 17,
+    "missingObservations": 9,
+    "latest": {
+      "effectiveDate": "2026-10-26",
+      "localTransactionDate": "2026-10-23",
+      "value": 990.35,
+      "unit": "CLP per 1 USD",
+      "priceKind": "official_transaction_weighted_average",
+      "aggregationEndUtc": "2026-10-23T19:00:00Z",
+      "scheduledWebAvailabilityUtc": "2026-10-23T20:30:00Z",
+      "observedAt": null,
+      "actualPublishedAt": null
+    },
+    "dateInterpretation": "26일 적용 고시값과 23일 실제 거래를 분리한다. 주말을 건너뛴 이전 영업일 연결이며 26일 시장 움직임의 관측값으로 쓰지 않는다.",
+    "priorOfficialHtmlComparison": [
+      {"effectiveDate": "2026-10-15", "value": 987.03, "previouslyCheckedValueMatches": true},
+      {"effectiveDate": "2026-10-16", "value": 984.09, "previouslyCheckedValueMatches": true}
+    ],
+    "unverifiedSessionMapping": ["2026-10-01", "2026-10-13"],
+    "mappingLimit": "조회 시작 전일과 빈 평일의 달력은 확정하지 않는다. 10월 1일의 이전 거래일에는 9월 자료가 필요하며, 13일의 연결에는 휴일 확인이 필요하다.",
+    "responseSha256": "e4265a8d722bdb6fe3e2b0f7a8743a0ba57eef01076cf433c213088cda9f7206"
+  },
+  "localTools": {
+    "probe": "scripts/currency-report/bcch-api-probe-local.js",
+    "transport": "scripts/currency-report/read-bcch-api.ps1",
+    "configuration": ".env.bcch.local",
+    "defaultMode": "plan_only_no_token_read_no_network",
+    "liveMode": "--live --first YYYY-MM-DD --last YYYY-MM-DD --powershell ABSOLUTE_PWSH_EXE",
+    "requestLimit": 1,
+    "automaticRetries": 0,
+    "transportNote": "기존 Node TLS 문제를 고려한 명시적 Windows 호환 경로. IWR 용량 제한은 다운로드 후 검사이며 토큰은 stdin으로만 전달한다.",
+    "privateResult": ".local-reports/private/bcch-api-probe-4BhpF1/result.json",
+    "rawResponseStored": false,
+    "projection": "상태·시리즈 ID·날짜·양수 값·ND 누락만 검사해 저장한다. 서버 오류 본문·설명·credential-bearing 요청 URL은 저장하거나 출력하지 않는다."
+  },
+  "secretChecks": {
+    "tokenDisplayed": false,
+    "tokenInProcessArguments": false,
+    "tokenInBrowserOrAiRequest": false,
+    "tokenFileIgnoredAndUntracked": true,
+    "probeResultIgnored": true,
+    "publicAndBuildFilesScanned": 68,
+    "publicAndBuildTokenFound": false,
+    "gitDiffTokenFound": false,
+    "requestAndResultTokenFound": false,
+    "scope": "설정된 토큰과 URL 인코딩 문자열이 public·dist·dist-app-local·dist-report-ui·요청/결과 기록 및 현재 Git diff에 있는지 로컬에서 검사했다. 결과만 출력했다.",
+    "remainingSecurityWork": "운영 연결은 미구현이다. 공식 REST는 토큰을 URL query에 넣으므로 향후 운영 HTTP 클라이언트·프록시·에러 추적의 URL 마스킹도 확인해야 한다."
+  },
+  "reportInputReplay": {
+    "file": ".local-reports/private/bcch-api-probe-4BhpF1/research-input-replay.json",
+    "existingAssembler": "prepareOfficialClpResearch",
+    "status": "passed",
+    "reportDate": "2026-10-26",
+    "actualLocalTransactionDate": "2026-10-23",
+    "spotValue": 990.35,
+    "additionalRequests": 0,
+    "publicationApproved": false,
+    "limit": "기존 산정 기준 검토를 재사용한 로컬 입력 변환만 확인했다. 새 원고·기사 검색·실행 승인·운영 데이터는 생성하거나 변경하지 않았다.",
+    "nextTimeWindowCheck": "다음 기사 탐색에서는 리포트 날짜 26일뿐 아니라 환율의 대상 거래일 23일을 명시해야 한다. 기존 기본 검색 기간을 그대로 사용하지 않는다."
+  },
+  "verification": {
+    "focusedTests": {"files": 2, "casesPassed": 14},
+    "newUnitCases": 5,
+    "fullSuite": {"files": 84, "declarations": 479, "executedCases": 582, "parameterExpansions": 103, "passed": true},
+    "typecheck": "passed",
+    "newTestLint": "passed",
+    "builds": "not_rerun_local_diagnostic_only_no_ui_or_build_config_change",
+    "networkRequests": 1,
+    "retries": 0,
+    "modelCalls": 0,
+    "newApiCostUsd": 0,
+    "operationalDataHashesUnchanged": {
+      "public/data.json": "c7d75391561af63d4fc67cf05cd991cf12c7acbb6d1175ab56b5dbcfa35c3f9e",
+      "data/fx-full-history.json": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f"
+    },
+    "unchanged": ["기존 원고·비용·승인 기록", "운영 설정·DB·메일·정기 작업", "공개 플래그", "원격 push·배포"]
+  }
+}

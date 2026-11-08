@@ -1714,3 +1714,42 @@ main {
     display: block;
   }
 }
+.app-shell .kpi-report-link { border-top: 1px solid #dce3df; margin-top: 10px; padding-top: 10px; display: block; text-decoration: none; color: #126453; }
+.app-shell .kpi-report-link strong { font-size: 12px; }
+.app-shell .kpi-report-link small { display: block; font-size: 10px; color: #526567; margin-top: 3px; }
+
+/* UI2.0 navigation only. Dashboard metrics and chart grids retain their styles. */
+.top-header { grid-template-columns: minmax(190px, auto) minmax(280px, 1fr); gap: 10px 20px; }
+.top-header .screen-nav { justify-content: flex-end; }
+.top-header .tab, .top-header .header-refresh-button, .top-header .admin-entry { white-space: nowrap; flex-shrink: 0; }
+.top-header .header-actions { grid-column: 1 / -1; min-width: 0; }
+.top-header .status-group { flex: 1; flex-wrap: wrap; min-width: 0; gap: 4px 12px; }
+.top-header .title-primary, .top-header .title-secondary { white-space: nowrap; }
+.kpi-navigation { margin-top: 10px; }
+.kpi-trend-link { display: inline-block; font-size: 12px; color: #344054; text-decoration: none; }
+.kpi-trend-link:hover, .kpi-report-link:hover { text-decoration: underline; }
+.app-shell .kpi-navigation .kpi-report-link { margin-top: 7px; padding-top: 7px; }
+.report-fresh-badge { display: inline-block; vertical-align: middle; margin: 0 0 0 6px; padding: 2px 5px; border-radius: 4px; background: #e9f4ee; color: #155d3e; font-size: 11px; font-weight: 650; white-space: nowrap; }
+.report-fresh-badge.correction { background: #fff1da; color: #7c4d0d; }
+.trends-workspace { min-width: 0; }
+.trends-controls, .trends-workspace > .panel { margin-bottom: 12px; }
+.trend-view-switch, .admin-section-nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.admin-section-nav { margin: 16px 0; }
+.trend-view-switch button[aria-pressed="true"], .admin-section-nav button[aria-pressed="true"], .admin-entry.selected { background: var(--accent-soft); border-color: #8b98a8; color: var(--text-main); }
+.trend-related-report { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 16px; border: 1px solid var(--border-soft); background: var(--surface); border-radius: var(--radius-md); }
+.trend-related-report > span, .trend-related-report > small { font-size: 12px; color: var(--text-muted); }
+.app-shell .trend-related-report .kpi-report-link { margin: 0; padding: 0; border: 0; }
+.inline-link { border: 0; padding: 0; background: transparent; color: var(--blue); text-decoration: underline; font: inherit; }
+.trends-controls .global-filters { margin-top: 12px; }
+@media (max-width: 760px) {
+  .top-header { grid-template-columns: 1fr; }
+  .top-header .screen-nav { justify-content: flex-start; gap: 8px; }
+  .top-header .screen-nav .tab { font-size: 12px; padding-right: 9px; padding-left: 9px; }
+  .top-header .header-actions { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .top-header .status-group { flex-basis: 100%; white-space: normal; font-size: 11px; }
+  .top-header .header-refresh-button, .top-header .admin-entry { width: auto; }
+  .trend-view-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+  .trend-view-switch button { padding: 7px 5px; font-size: 12px; }
+  .admin-section-nav .quiet-button { width: auto; }
+  .trend-related-report { align-items: flex-start; flex-direction: column; gap: 7px; }
+}

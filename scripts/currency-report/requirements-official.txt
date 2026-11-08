@@ -1,0 +1,2 @@
+# Matches the locally verified extractor. No OCR, browser or model dependency.
+pypdf==6.10.0

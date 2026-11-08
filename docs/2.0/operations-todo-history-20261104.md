@@ -1,0 +1,82 @@
+# Operations TODO
+
+This checklist tracks the remaining production setup for LATAM FX 1.x operations and the 2.0 report pilot.
+
+## Verified on 2026-09-12
+
+- GitHub `main` is deployed on Netlify at commit `3266256` (migration-version alignment on top of the report foundation).
+- Production site responds at `https://latamforex.netlify.app/`.
+- Production reports `baseDate = 2026-09-11` from the Supabase operational data source.
+- The existing dashboard loaded all five 1.x screens with no browser console errors after PR 13 deployment.
+- Production Supabase contains the report storage and append-only review migrations; anon, authenticated non-admin, active admin, revoked admin with the same JWT, and service role passed rollback-only role smoke tests.
+- Report tables are empty at this checkpoint. No real OpenRouter request has been made because `OPENROUTER_API_KEY` is not yet configured.
+
+## Local Verification Notes
+
+- Use `npm.cmd run dev:local` from a normal local CMD/PowerShell window when the Codex shell cannot keep the Vite server alive.
+- Use `npm.cmd run build:local` followed by `npm.cmd run preview:local` when checking static preview behavior.
+- Keep the dashboard header lightweight: show only factual context such as base date and active averaging period.
+
+## Supabase Business Plan Rates
+
+- [x] Run `supabase/migrations/20260504120000_business_plan_rates.sql` in the Supabase SQL Editor.
+- [x] Confirm production has active editor entries in `public.business_plan_admins` without recording addresses in the repository.
+- [x] Apply `20260911135121_close_business_plan_history_access.sql`. Anonymous users read only `business_plan_current`, never `business_plan_rates`.
+- [x] Confirm in the isolated DB that only active `business_plan_admins` can read history or insert business plan rates; repeat against the production Data API immediately after approval and application.
+
+## Environment Variables
+
+- [x] Add `VITE_SUPABASE_URL` to Netlify.
+- [x] Add `VITE_SUPABASE_ANON_KEY` to Netlify.
+- [x] Confirm the browser app never receives `service_role`, `secret key`, or `sb_secret_...` values.
+
+## Auth Redirect URLs
+
+- [ ] Add `https://latamforex.netlify.app` to Supabase Auth redirect URLs.
+- [ ] Add `http://127.0.0.1:4173` to Supabase Auth redirect URLs for local verification.
+- [ ] Add `http://localhost:4173` if local testing uses `localhost` instead of `127.0.0.1`.
+
+## Production Verification
+
+- [x] Open the production site and confirm the plan panel loads the Supabase operational current values.
+- [x] Verify a signed-out user sees the operational values as read-only, with disabled inputs/save and no admin history.
+- [ ] Request a login link from the plan modal and confirm the redirect returns to the app.
+- [ ] Sign in with an admin email and confirm the save button becomes enabled.
+- [ ] Save a small test change and confirm the success message says Supabase re-read verification succeeded.
+- [ ] Confirm `마지막 저장`, `저장 주체`, and `마지막 검증` update after saving.
+- [ ] Reopen the production site in a fresh browser session and confirm the saved values are still loaded from Supabase.
+
+## Failure Checks
+
+- [ ] Temporarily test without Supabase env vars in a local build and confirm the panel shows `설정 필요` or `로컬 임시값`.
+- [ ] Confirm remote load failure does not present cached values as operational values.
+- [ ] Confirm insert success plus re-read failure shows a warning, not a success message.
+
+## Daily No-Cost Improvement Checks
+
+- [ ] Confirm the dashboard header stays factual and shows only the base date and active averaging period.
+- [ ] Confirm the generated email still uses the latest no-cost market context and chart notes after the next scheduled GitHub Actions run.
+
+## LATAM FX 2.0 Report Pilot
+
+- [x] Apply `20260912021010_fx_report_storage.sql` and `20260912021458_lock_fx_report_reviews_append_only.sql` to production.
+- [x] Verify report storage with rollback-only tests for anon, non-admin, active admin, revoked admin, and service role.
+- [ ] Add `OPENROUTER_API_KEY` as a GitHub Actions secret only.
+- [ ] Set the four `FX_REPORT_*` repository variables to the review-mode defaults documented in `docs/2x-rollout.md`.
+- [ ] Run the daily workflow manually and confirm the existing 1.x email still arrives.
+- [ ] Confirm an active admin can approve or reject a draft and a non-admin cannot read draft data.
+- [ ] Record ten consecutive trading-day outcomes without confidential data.
+- [ ] Request separate approval before changing publication mode to `automatic`.
+# Supabase 환율 데이터 병행 이전
+
+- [x] 운영 코드 기준 태그 `pre-supabase-fx-migration` 생성
+- [x] `codex/supabase-fx-migration` 브랜치 생성
+- [x] 환율 일별·월별·상태 테이블과 읽기 전용 RLS 추가
+- [x] JSON/Supabase/자동 폴백 데이터 저장소 구현
+- [x] 통화·연도 단위 IndexedDB 캐시와 인접 연도 사전 로딩 구현
+- [ ] GitHub Secrets에 `SUPABASE_SERVICE_ROLE_KEY` 등록
+- [ ] GitHub Actions의 `Supabase Initial Load`에서 확인 문구 `LOAD_SUPABASE` 입력 후 실행
+- [ ] `Supabase Verify Data`로 전체 행 수와 표본 일치 확인
+- [ ] Netlify에 `VITE_FX_DATA_SOURCE=auto` 명시
+- [ ] 프리뷰 배포에서 신규 24개월 조회 1초 이내 확인
+- [ ] 안정화 후 JSON 자동 커밋 중단 여부 결정

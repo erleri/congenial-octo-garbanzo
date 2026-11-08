@@ -1,0 +1,107 @@
+{
+  "date": "2026-11-03",
+  "scope": "local-approved-report-email-integration",
+  "status": "local_complete",
+  "actualApprovedReports": 6,
+  "mockDatabaseFlows": 16,
+  "sqlAssertions": 21,
+  "settingsCombinations": 12,
+  "smtpProtocolFixtures": 5,
+  "regressionTests": 1292,
+  "regressionFailures": 0,
+  "regressionFiles": 180,
+  "actualLocalApi": true,
+  "existingPublicTablesPreserved": 15,
+  "anonymousAccessDenied": true,
+  "typeCheck": "passed",
+  "lint": "passed",
+  "builds": [
+    "production",
+    "report",
+    "app"
+  ],
+  "bundleBoundary": "passed",
+  "securityAdvisor": "no_warn_or_error",
+  "secretBoundary": "passed",
+  "actualEmailsSent": 0,
+  "modelCalls": 0,
+  "productionChanges": 0,
+  "next": "one_self_addressed_real_email_test_after_explicit_send_scope",
+  "remaining": [
+    "real_smtp_delivery_and_inbox_rendering",
+    "iphone_and_pc_report_link_verification",
+    "production_migration_settings_and_activation",
+    "post_delivery_bounce_ingestion_not_implemented",
+    "capacity_and_retention_operations_for_new_private_mail_tables"
+  ],
+  "files": [
+    {
+      "file": "scripts/email/delivery-core.js",
+      "sha256": "92b3cd685dc35f1ac04c8fe1f29d50cc5b891f585e6b6aeebe71c08df2c73382"
+    },
+    {
+      "file": "scripts/email/delivery-store.js",
+      "sha256": "e3200578ff52b39f0dec4256c2324907fc2161a47106d218da36d5ebed4061b1"
+    },
+    {
+      "file": "scripts/email/delivery-worker.js",
+      "sha256": "400b4fda6078733ff5e3382250a14361578eb89db047b4cdc9c30301c03b8421"
+    },
+    {
+      "file": "scripts/email/delivery.test.ts",
+      "sha256": "d2b6191eae6538319145d0dff31ec054b908312ac2bf37b7b21cbdb30acfbb55"
+    },
+    {
+      "file": "scripts/email/frozen-dataset.js",
+      "sha256": "ea400936c2e686492eb2b6960ca1fbb11b4f8516fc13a59f56b6b98c841c835d"
+    },
+    {
+      "file": "scripts/email/smtp-transport.js",
+      "sha256": "7daf2f4aba00f6b4ba362cb93834abca36431c58a43d94d6b7a41c25c4a2d0bd"
+    },
+    {
+      "file": "scripts/email/smtp_transport.py",
+      "sha256": "41a1fcc7818e647c3c830f6909c6e1eb7da06d9571609b3193fef55580dc7b00"
+    },
+    {
+      "file": "scripts/email/test_smtp_transport.py",
+      "sha256": "ade68d77607d3f6da3172f671cfd1532e32265944601a311e2e21443c22c5c1e"
+    },
+    {
+      "file": "scripts/email/verify-delivery-local.mjs",
+      "sha256": "ea6351ea336a5724d4581b888d01b95a508433db5f576abf3e0db70bb708ae9e"
+    },
+    {
+      "file": "scripts/email/verify-wiring-local.mjs",
+      "sha256": "de2c1a9fadedeab6420dc2b4498d9b24880f2c9f3af4ff6a6a3d20c4d743c857"
+    },
+    {
+      "file": "scripts/compose-email.js",
+      "sha256": "78ea817a36e048acdf61a89ea64a314801187cea35d62043431f685efe404a22"
+    },
+    {
+      "file": "scripts/create-email-chart.js",
+      "sha256": "4f0721ca5b6659a5e54567e245f110466fd080417a50ac17a827910f4719d454"
+    },
+    {
+      "file": "scripts/send-dashboard-email.mjs",
+      "sha256": "d5d4c26ca6ba1a6cfc63d13a53bb029fd3c9371346a6c4e8eef9e1a593ca0add"
+    },
+    {
+      "file": ".github/workflows/generate-data.yml",
+      "sha256": "2382207c47a916ae42be48b5c2a5efaef95358bd08cca4d3dccd8c7593870dc3"
+    },
+    {
+      "file": "supabase/migrations/20261103112417_dashboard_email_delivery.sql",
+      "sha256": "4ba0297bfe621010f546d93c059c1a263614f3bc477f9b40c83ae881e6b2ac6b"
+    },
+    {
+      "file": "supabase/tests/dashboard_email_delivery.sql",
+      "sha256": "6c8b921b1b6ca126aef2eefd452faaeadb31ca7011f2a5bac96992c0df5866ad"
+    },
+    {
+      "file": "docs/2.0/email-integration-20261103.md",
+      "sha256": "af9ef6eaf03d4056713e89892b0b667136c59f3901a22988ea3bf82ee65ad924"
+    }
+  ]
+}

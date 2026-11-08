@@ -1,0 +1,72 @@
+{
+  "version": "chile-monthly-refresh-verification/1",
+  "date": "2026-10-16",
+  "scope": "등록된 칠레 INE 공식 목록의 최신 파일 재수집, 이전 저장본과 버전·텍스트 비교, 실제 추출과 실패 처리 확인",
+  "liveResult": {
+    "captureDirectory": ".local-reports/private/official-statistics/cl-kRXLfW",
+    "baseline": ".local-reports/private/official-statistics/cl-ucFtrr/manifest.json",
+    "requestsInSuccessfulCollection": 4,
+    "requestCountScope": "성공 수집의 목록 2회·PDF 2회. 앞선 실패 시도와 연결 진단·웹 확인 요청은 이 숫자에 포함하지 않는다.",
+    "latestListedPeriod": {"cl-retail":"2026-08","cl-pay":"2026-08"},
+    "latestMeaning": "등록된 목록 링크에서 확인한 최신 월. 9월 자료의 미발표나 다른 경로의 자료 부재를 확정하지 않는다.",
+    "documents": [
+      {"sourceId":"cl-retail","bytes":1774562,"sha256":"418834a7b14953f7022d42a4bc4b83b2bfe89041234c546a19c8a9cbe8419c6c","version":"unchanged_bytes","text":"same_extracted_text","pages":4},
+      {"sourceId":"cl-pay","bytes":1454490,"sha256":"8d4612a04f34808874c32cb82fde368ed6d43ca7b0268585b680612944caf794","version":"unchanged_bytes","text":"same_extracted_text","pages":7}
+    ],
+    "extractor": "pypdf/6.10.0",
+    "baselineManifestUnchanged": true,
+    "newOriginalHashesVerifiedAfterSaving": true,
+    "publicationApproved": false,
+    "evidenceReady": false,
+    "writingEligibility": "not_assessed",
+    "finding": "이번 재수집에서 신규 월이나 수정 내용은 발견되지 않았다. 기존 원문·원고는 그대로 유지한다."
+  },
+  "connection": {
+    "nodeFetch": "기본 sandbox에서는 ENOTFOUND, 확대된 공개 읽기에서는 ECONNRESET 발생. 실패는 .local-reports/private/official-statistics/cl-bKWb62/manifest.json에 보존.",
+    "successfulTransport": "명시적인 Windows Invoke-WebRequest 호환 경로",
+    "automaticFallback": false,
+    "restrictions": "등록된 INE 목록·PDF 주소만 허용. 최대 6회, 요청별 15초, 자동 리디렉션·인증정보 없음.",
+    "sizeCheck": "Windows 호환 경로는 응답을 메모리에 받은 뒤 2MB를 검사한다. Node 기본 경로의 스트리밍 상한과 동일하지 않다. 운영 표준 수집 경로로 자동 연결하지 않았다.",
+    "browserResearch": "웹 도구로 공식 목록의 8월 링크와 원문 접근을 확인했다. 로컬 수집 성공의 대체 기록으로 사용하지 않았다."
+  },
+  "revisionAndFailureChecks": {
+    "actualPublisherRevisionFound": false,
+    "localFaultInjection": ".local-reports/private/monthly-extraction-probe-xkrHJI/result.json",
+    "binaryOnlyChange": "실제 새 원본의 별도 시험 사본에 주석 바이트를 추가. 변경된 파일로 판정하되 같은 추출 텍스트로 구분했다. 기관이 발표한 수정본으로 세지 않는다.",
+    "actualParserFailure": "PDF 시작·끝 표시는 있지만 내부 구조가 손상된 합성 파일을 실제 pypdf로 실행. extraction_failed / extractor_or_schema_failure로 반환했다.",
+    "unitFailures": ["빈 추출 텍스트", "추출기 시간 초과", "원본 바이트 불일치", "추출기 버전 차이", "목록 후보 없음", "현재 원문 수집 실패"],
+    "priorReviewInheritance": "동일 파일이라도 새 수집 시각·본문 바인딩에 과거 의미 검토를 자동 승계하지 않는다.",
+    "originalPreserved": true
+  },
+  "implementation": {
+    "latestDiscovery": "chile-monthly-originals.js에 명시한 기준일 이전 최근 12개월의 등록 목록 링크 선택 추가. 기존 월 지정 수집은 유지.",
+    "refresh": "chile-monthly-refresh-local.js가 새 폴더에 원본·추출·비교 결과를 보존. 각 문서의 추출 실패를 개별 상태로 남김.",
+    "command": "npm.cmd run report:official:refresh -- --live --as-of YYYY-MM-DD --baseline <private manifest.json> --python <python.exe> [--powershell <pwsh.exe>]",
+    "default": "--live가 없으면 계획만 표시하며 통신·파일 쓰기 없음.",
+    "stageBoundary": "새 오프라인 재현 명령과 구분한 명시적 공식 자료 수집 명령. 질문 판정·의미 검토·집필·게시 상태를 변경하지 않음."
+  },
+  "verification": {
+    "newContractTests": 7,
+    "fullRegression": {"files":81,"declaredTests":457,"executedCases":560,"parameterExpansions":103,"passed":true},
+    "exactTestAudit": {"duplicateNames":0,"identicalBodies":0,"tautologies":0,"semanticUniquenessGuaranteed":false},
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuildAndBundleBoundary": "passed; existing 610348-byte entry warning remains",
+    "reportBuild": "passed",
+    "appReportBuild": "passed; existing large-chunk warning remains",
+    "scriptSyntax": "Node scripts and PowerShell parsing passed",
+    "visualPdfCheck": "소매 2쪽·보수 1쪽과 6쪽을 새 원본에서 PNG로 렌더하고 표·주석 가독성을 확인. Poppler의 한글 경로 일부 문자표 경고는 있었으나 세 PNG는 생성·확인했다.",
+    "notRun": ["clean install", "DB pgTAP", "새 AI 내용 평가", "운영 배포"]
+  },
+  "remaining": [
+    "수집·추출 결과를 질문별 근거 검토 입력에 자동 연결",
+    "새 월·개정본의 지표 정의와 수치·조건의 의미 검토",
+    "운영 실행 환경에서 기본 Node 연결 또는 스트리밍 제한을 갖춘 수집 경로 검증"
+  ],
+  "modelCalls":0,
+  "newApiCostUsd":0,
+  "existingManuscriptsChanged":false,
+  "productionChanged":false,
+  "dbChanged":false,
+  "remotePush":false
+}

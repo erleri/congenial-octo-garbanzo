@@ -1,0 +1,1237 @@
+{
+  "version": "six-currency-source-research/1",
+  "checkedOn": "2026-10-27",
+  "scope": "local_research_only",
+  "runtimeIntegrated": false,
+  "paidCalls": 0,
+  "newPaidCostUsd": 0,
+  "productionChanged": false,
+  "purpose": "6개 통화의 기존 준비 상태와 무료 탐색 경로. 운영 허용 목록이나 새 기사 카드 승인 파일이 아님.",
+  "currencies": [
+    {
+      "code": "BRL",
+      "cadence": "accepted_2pct_plus_periodic_review",
+      "basis": "PTAX candidate, not spot close",
+      "existing": "BCB/IBGE partial collectors, source reviews and writer comparisons",
+      "next": "PTAX response and license implementation; article cards"
+    },
+    {
+      "code": "MXN",
+      "cadence": "accepted_2pct_plus_periodic_review",
+      "basis": "FIX SF43718 candidate",
+      "existing": "Banxico/INEGI documents and token-dependent source entries",
+      "next": "authenticated or public-file verification; FIX/spot distinction"
+    },
+    {
+      "code": "COP",
+      "cadence": "accepted_2pct_plus_periodic_review",
+      "basis": "SFC-certified TRM candidate",
+      "existing": "offline cadence replay, not full collector",
+      "next": "TRM validity/transaction dates, reuse and collector"
+    },
+    {
+      "code": "PEN",
+      "cadence": "2pct_not_yet_approved",
+      "basis": "BCRP PD04646PD 13:30 closing ask candidate",
+      "existing": "operating app FX history, not a verified report-specific collector",
+      "next": "invalid response investigation, metadata, consumer sources and cadence replay"
+    },
+    {
+      "code": "CLP",
+      "cadence": "accepted_2pct_plus_periodic_review",
+      "basis": "BCCh F073.TCO.PRE.Z.D existing reviewed local route",
+      "existing": "BCCh/INE adapters, news cards, local drafts and periodic trials",
+      "next": "reusable scheduling and service integration"
+    },
+    {
+      "code": "ARS",
+      "cadence": "2pct_not_yet_approved",
+      "basis": "BCRA monetary v4 variable 5 wholesale reference candidate",
+      "existing": "operating app ARS history",
+      "next": "methodology transition, service-use scope and cadence replay"
+    }
+  ],
+  "verificationLegend": {
+    "body_read": "이번 공개 읽기에서 본문 확인. 정확성·재사용·운영 승인과 별개",
+    "existing_record": "기존 로컬 기록 재사용. 이번에 재접속·인증 검증하지 않음",
+    "listing_only": "기사 목록 또는 경로만 확인",
+    "inaccessible": "이번 환경에서 원문 확보 실패. 전세계 접근 불가나 영구 금지를 뜻하지 않음"
+  },
+  "officialRoutes": [
+    {
+      "id": "brl-bcb-ptax",
+      "currency": "BRL",
+      "url": "https://dadosabertos.bcb.gov.br/en/dataset/dolar-americano-usd-todos-os-boletins-diarios",
+      "status": "body_read",
+      "dataRoute": "https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/documentacao",
+      "access": "공식 목록에 OData·JSON·Swagger 경로. 이번 PTAX 값 호출 없음",
+      "basis": "2011-07-01 이후 네 일중 조회의 산술평균. PTAX fechamento를 현물 시장 종가로 바꾸지 않음",
+      "reuse": "이 데이터셋에 ODbL 명시. 출처·파생 데이터베이스 배포 등 조건 적용 검토 필요",
+      "externalModelUse": "통계 수치·메타데이터 후보. 이번 전송 없음",
+      "next": "실제 시리즈 응답·타임존·휴일·수정 및 ODbL 적용 범위"
+    },
+    {
+      "id": "brl-bcb-policy",
+      "currency": "BRL",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/10?formato=json",
+      "status": "existing_record",
+      "access": "기존 무인증 JSON 확인, 이번 재호출 없음",
+      "role": "정책금리 배경, 발표 원문·시각 별도",
+      "reuse": "PTAX 라이선스를 SGS에 자동 적용하지 않음",
+      "localCode": "scripts/currency-report/sources.js"
+    },
+    {
+      "id": "brl-ibge",
+      "currency": "BRL",
+      "url": "https://servicodados.ibge.gov.br/api/docs",
+      "status": "existing_record",
+      "routes": [
+        "https://servicodados.ibge.gov.br/api/docs/calendario?versao=3",
+        "https://servicodados.ibge.gov.br/api/docs/noticias?versao=3",
+        "https://servicodados.ibge.gov.br/api/docs/agregados?versao=3"
+      ],
+      "access": "기존 공개 API·PDF 기록. 이번 라이선스 원문 403",
+      "role": "소매 판매량·물가·발표 일정. 변수·계절조정·대상 기간 유지",
+      "reuse": "검색의 라이선스 설명만으로 새 이용 승인하지 않음",
+      "next": "선택한 자료의 이용 조건 원문과 발표 연결",
+      "termsUrl": "https://agenciadenoticias.ibge.gov.br/agencia-sala-de-imprensa/2080-agencia-de-noticias/an-artigos-diversos/9277-licenca.html"
+    },
+    {
+      "id": "mxn-banxico",
+      "currency": "MXN",
+      "url": "https://www.banxico.org.mx/SieAPIRest/service/v1/",
+      "status": "existing_record",
+      "access": "SIE 토큰 필요, 인증 호출 없음",
+      "series": [
+        "SF43718 FIX",
+        "SF61745 policy"
+      ],
+      "reuse": "기존 검토상 출처·Banco de México URL 표시 조건. 새 인증 호출·계약 없음",
+      "next": "FIX 조사일·적용일·시각 및 실제 응답",
+      "termsUrl": "https://www.banxico.org.mx/footer-es/salvedad-politicas-uso-banco-.html"
+    },
+    {
+      "id": "mxn-inegi",
+      "currency": "MXN",
+      "url": "https://www.inegi.org.mx/servicios/api_indicadores.html",
+      "status": "existing_record",
+      "calendar": "https://www.inegi.org.mx/contenidos/saladeprensa/doc/cal_2026.pdf",
+      "access": "지표 API 토큰·시리즈 선택 필요. 공개 원문·달력 기록 재사용",
+      "role": "INPC·소매, 업데이트 시각과 지표 대상 월 구분",
+      "reuse": "기존 자유이용 조건 검토. 출처·제품·가능한 갱신일 및 가공 표시 유지",
+      "next": "EMEC 시리즈·정의와 인증/공개 파일 경로",
+      "termsUrl": "https://www.inegi.org.mx/inegi/terminos.html"
+    },
+    {
+      "id": "cop-sfc-trm",
+      "currency": "COP",
+      "url": "https://www.superfinanciera.gov.co/publicaciones/10115773/market-representative-exchange-rate-trm/",
+      "status": "body_read",
+      "access": "공식 정의 본문 확인, 값 API 호출 없음",
+      "basis": "SFC 계산·인증. 적격 동일일 결제 현물 거래의 거래액 가중평균",
+      "historyRoute": "https://www.banrep.gov.co/es/como-consultar-datos-historicos-tasa-representativa-mercado-trm-nuevo-portal-estadisticas",
+      "role": "공식 가격 후보. 기사 종가와 별개",
+      "reuse": "특정 다운로드/API 재사용 조건 미완료",
+      "next": "적용 구간·기초 거래일·휴일·공개 파일·사용 조건",
+      "followUp": {
+        "review": "pen-ars-cop-basis-review-20261027",
+        "status": "official_validity_intervals_verified",
+        "sourceDataset": "32sa-8pi3",
+        "license": "CC-BY-SA-4.0",
+        "tradeDateInApi": false,
+        "actualIntervalsChecked": 29,
+        "productionAdapterConnected": false
+      }
+    },
+    {
+      "id": "cop-dane-emc",
+      "currency": "COP",
+      "url": "https://www.dane.gov.co/index.php/estadisticas-por-tema/comercio-interno/encuesta-mensual-de-comercio-emc",
+      "status": "body_read",
+      "access": "통계 페이지와 bulletin/XLS 경로 확인. 파일 추출·자동 수집 미시험",
+      "publicationOrUpdateDate": "2026-10-16",
+      "targetPeriod": "2026-08",
+      "role": "실질 소매 판매 등 소비 환경. 회사 실적이나 당일 FX 원인으로 확장하지 않음",
+      "reuse": "확인한 일반 조건에 출처 표시한 사용·변형·분석 허용. Geoportal 전용 라이선스와 구분",
+      "next": "항목·기준년·수정본·발표 일정 확인",
+      "termsUrl": "https://www.dane.gov.co/index.php/terminos-y-condiciones"
+    },
+    {
+      "id": "pen-bcrp-fx",
+      "currency": "PEN",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/diarias/tipo-de-cambio",
+      "status": "body_read",
+      "series": [
+        "PD04646PD closing ask 13:30",
+        "PD04645PD closing bid 13:30",
+        "PD04637PD interbank buy",
+        "PD04638PD interbank sell",
+        "PD04639PD SBS buy",
+        "PD04640PD SBS sell"
+      ],
+      "access": "무료 공개 시리즈 목록. 실제 API 표본은 형식 실패",
+      "apiDocs": "https://estadisticas.bcrp.gob.pe/estadisticas/series/documentos/bcrpdataapi.pdf",
+      "apiDocsStatus": "timeout",
+      "calendar": "https://www.bcrp.gob.pe/docs/Estadisticas/Calendario-Estadisticas.pdf",
+      "calendarStatus": "내용 확인 불가, 일정 채택 안 함",
+      "reuse": "출처 표시 재현 허용. 외부 원천 통계 별도 표시",
+      "next": "정상 형식 응답·시각 정의·원천·휴일·수정",
+      "termsUrl": "https://estadisticas.bcrp.gob.pe/estadisticas/series/ayuda/condiciones-de-uso",
+      "followUp": {
+        "review": "pen-ars-cop-basis-review-20261027",
+        "status": "sample_json_normal_now_root_cause_unknown",
+        "normalObservations": 5,
+        "missingDate": "2026-10-26",
+        "lastValidDate": "2026-10-23",
+        "productionAdapterConnected": false
+      }
+    },
+    {
+      "id": "pen-inei",
+      "currency": "PEN",
+      "url": "https://www.gob.pe/institucion/inei/colecciones/7445-informes-tecnicos",
+      "status": "inaccessible",
+      "otherRoutes": [
+        "https://www.inei.gob.pe/",
+        "https://www.gob.pe/inei"
+      ],
+      "access": "목록 검색 후 직접 열기 HTTP 418; INEI 홈페이지 시간 초과",
+      "role": "공식 물가·상업·소득 보고서 후보, 개별 원문 미확보",
+      "reuse": "미확인",
+      "next": "공식 공개 PDF·일정·자료 이용 조건. 접근 차단 우회 안 함"
+    },
+    {
+      "id": "clp-bcch",
+      "currency": "CLP",
+      "url": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/ayuda_soporte.html",
+      "status": "existing_record",
+      "series": [
+        "F073.TCO.PRE.Z.D"
+      ],
+      "access": "기존 로컬 인증·가격 기준 검증 재사용, 이번 키 읽기·호출 없음",
+      "localCode": "scripts/currency-report/bcch-report-input-local.js",
+      "basis": "관측/거래/적용일과 가중평균 구분, 종가 대체 안 함",
+      "reuse": "기존 BDE 통계 출처·가공 책임 조건 유지",
+      "termsUrl": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/terminos_condiciones.html"
+    },
+    {
+      "id": "clp-ine",
+      "currency": "CLP",
+      "url": "https://www.ine.gob.cl/estadisticas-por-tema/comercio-y-servicios/actividad-mensual-del-comercio",
+      "status": "existing_record",
+      "localCode": "scripts/currency-report/chile-monthly-refresh-local.js",
+      "access": "기존 로컬 원문·월간 수집 재사용",
+      "role": "물가·보수·소비 배경, 대상 월과 공개일 구분",
+      "reuse": "기존 CC BY-SA 4.0 검토 유지; 공개 표시·파생물 적용 범위 별도",
+      "termsUrl": "https://www.ine.gob.cl/terminos-de-uso-y-licencia-de-datos-abiertos"
+    },
+    {
+      "id": "ars-bcra",
+      "currency": "ARS",
+      "url": "https://www.bcra.gob.ar/apis-banco-central/",
+      "status": "body_read",
+      "dataRoute": "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias?idVariable=5",
+      "methodRoute": "https://api.bcra.gob.ar/estadisticas/v4.0/metodologia/5",
+      "docs": "https://www.bcra.gob.ar/archivos/Catalogo/Content/files/pdf/principales-variables-v4.pdf",
+      "access": "무인증 공개 GET 정상 JSON. 역사 범위·장기 안정성 미시험",
+      "basis": "변수 5 도매 기준환율 ARS/USD, 일별",
+      "methodology": "https://www.bcra.gob.ar/Pdfs/comytexord/A8359.pdf",
+      "methodologyEffectiveFrom": "2026-01-02",
+      "reuse": "정보·교육·학술 목적은 출처·맥락 조건. 상업·광고 목적 사전 허가. API 별도 조건·LATAM FX 적용 범위 추가 확인",
+      "next": "서비스 사용 목적 범위와 역사 산식·유효일 검증. MEP/CCL/blue/은행 소매 대체 금지",
+      "termsUrl": "https://www.bcra.gob.ar/aviso-legal/",
+      "followUp": {
+        "review": "pen-ars-cop-basis-review-20261027",
+        "status": "terms_link_confirmed_service_purpose_application_unresolved",
+        "informationalReuse": "attribution_and_context_conditions",
+        "commercialUse": "prior_permission_clause",
+        "permissionRequested": false
+      }
+    },
+    {
+      "id": "ars-indec",
+      "currency": "ARS",
+      "url": "https://api.indec.gob.ar/ayuda/faq",
+      "status": "body_read",
+      "access": "무료 계정·토큰 API 안내 확인. 토큰 12개월, 이번 계정 발급·인증 호출 없음",
+      "role": "공식 소비·물가 시리즈 선택 필요",
+      "reuse": "집계 정보와 출처·제품 표시. 통계비밀 개인자료 제외",
+      "next": "실제 시리즈·달력·공개 PDF 대안·수정 이력",
+      "termsUrl": "https://api.indec.gob.ar/ayuda/terminos"
+    }
+  ],
+  "newsRoutes": [
+    {
+      "id": "brl-infomoney",
+      "currency": "BRL",
+      "listingUrl": "https://www.infomoney.com.br/mercados/",
+      "sampleUrl": "https://www.infomoney.com.br/mercados/dolar-apos-bater-os-r-540-com-reeleicao-de-lula-ate-onde-pode-ir/",
+      "sampleDate": "2026-10-27",
+      "verification": "body_read",
+      "usefulScope": "시장·정책 해석 후보. 전문가 귀속과 Estadão Conteúdo 출처 유지, 목표환율 제외",
+      "termsUrl": null,
+      "termsObservation": "이번 콘텐츠 재사용 허가 미확인. 개인정보 정책을 라이선스로 사용하지 않음",
+      "next": "해당 사실·견해 카드 사용 범위 확인",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "infomoney.com.br"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "brl-agenciabrasil",
+      "currency": "BRL",
+      "listingUrl": "https://agenciabrasil.ebc.com.br/economia",
+      "sampleUrl": "https://agenciabrasil.ebc.com.br/economia/noticia/2026-10/dolar-sobe-821-e-bolsa-cai-1388-apos-reeleicao-de-lula",
+      "sampleDate": "2026-10-26",
+      "verification": "body_read",
+      "usefulScope": "19:07 Brasília 발행 표본. 당일 시장 설명 후보; Reuters 정보·사진 별도 권리",
+      "termsUrl": "https://www.ebc.com.br/termos-de-uso-e-condicoes-gerais-do-portal-da-ebc",
+      "termsObservation": "출처 표시 재현 허용과 개인·비상업 이용 조항 함께 있음. 제3자 권리는 별도",
+      "next": "서비스 목적·제3자 부분·RSS 실제 응답 범위",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "agenciabrasil.ebc.com.br"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "mxn-eleconomista",
+      "currency": "MXN",
+      "listingUrl": "https://www.eleconomista.com.mx/seccion/mercados",
+      "sampleUrl": "https://www.eleconomista.com.mx/mercados/precio-dolar-hoy-23-octubre-2026-cuanto-cotiza-20261023-840175.html",
+      "sampleDate": "2026-10-23",
+      "verification": "body_read",
+      "usefulScope": "09:20 발행·10:35 갱신 표시, 시간대 미확인. 현물·DXY·전문가 해석 후보. 8월 IGAE를 10월 실적으로 표시하지 않음",
+      "termsUrl": "https://www.eleconomista.com.mx/terminos-servicio.html",
+      "termsObservation": "구독 구매 조건을 콘텐츠 재사용 허가로 사용할 수 없음",
+      "next": "기사 카드 범위·사용 조건",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "eleconomista.com.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano",
+          "Mexican peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "mxn-expansion",
+      "currency": "MXN",
+      "listingUrl": "https://expansion.mx/mercados",
+      "sampleUrl": null,
+      "sampleDate": null,
+      "verification": "listing_only",
+      "usefulScope": "대체 무료 기사 탐색 경로, 개별 본문 채택 없음",
+      "termsUrl": null,
+      "termsObservation": "미확인",
+      "next": "해당 날짜 원인 기사 본문·조건 확인",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "expansion.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano",
+          "Mexican peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "cop-larepublica",
+      "currency": "COP",
+      "listingUrl": "https://www.larepublica.co/finanzas",
+      "sampleUrl": "https://www.larepublica.co/finanzas/precios-del-dolar-y-el-petroleo-hoy-26-de-octubre-de-2026-4511039",
+      "sampleDate": "2026-10-26",
+      "verification": "body_read",
+      "usefulScope": "종가와 같은 날 TRM 비교. 전일 종가 수익률과 다름. 글로벌 견해를 COP 직접 원인으로 확대하지 않음",
+      "termsUrl": "https://www.larepublica.co/aviso-legal/",
+      "termsObservation": "본문 복제·번역·전송·저장 제한과 개인 비상업 범위 안내",
+      "next": "자체 사실·귀속 견해 카드 범위 검토. 본문 전체 전송 경로로 채택하지 않음",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "larepublica.co"
+        ],
+        "terms": [
+          "dólar peso colombiano",
+          "Colombian peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "cop-portafolio",
+      "currency": "COP",
+      "listingUrl": "https://www.portafolio.co/economia/finanzas",
+      "sampleUrl": null,
+      "sampleDate": null,
+      "verification": "listing_only",
+      "usefulScope": "목록 검색 결과 캐시가 약 7개월 전. 최신 정상 수집으로 취급하지 않음",
+      "termsUrl": null,
+      "termsObservation": "미확인",
+      "next": "최신 원인 기사 접근·조건",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "portafolio.co"
+        ],
+        "terms": [
+          "dólar peso colombiano",
+          "Colombian peso"
+        ],
+        "reason": "기존 본문 추출 또는 접근 조건이 해결되지 않았다. 공개 본문과 이용 범위를  자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "pen-revistaeconomia",
+      "currency": "PEN",
+      "listingUrl": "https://www.revistaeconomia.com/mercado/",
+      "sampleUrl": "https://www.revistaeconomia.com/sol-retrocede-025-frente-al-dolar-mientras-la-bolsa-de-lima-avanza-122/",
+      "sampleDate": "2026-10-27",
+      "verification": "saved_body_and_robots_reviewed_20261029",
+      "usefulScope": "실명 분석가의 당일 솔 약세 해석. 시가 대비 종가와 전일 대비 구분. 독립 작성 최소 카드만 별도 용도 판단",
+      "termsUrl": "https://www.revistaeconomia.com/avisos-legales/",
+      "termsObservation": "권리 유보 고지 확인. robots는 해당 경로를 제한하지 않지만 재사용 허가가 아니다. 원문 모델 전송과 자체 카드 용도를 구분",
+      "next": "자동 발견/본문 추출 1건 성공. 같은 Codex의 저장 판단 재생을 공통 배치에 연결했으나 실제 무인 내용 검토·새 원고 품질·공개 표시는 별도 미완료",
+      "modelInputState": "scoped_notes_separate_review_original_not_allowed",
+      "publicationState": "pending",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.revistaeconomia.com"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "sol dólar"
+        ],
+        "reason": "공개 robots와 고유 기사 본문 경계를 확인한 로컬 연결. 요지의 사실·귀속·시점·용도 검토는 기존 공통 경로를 사용한다."
+      },
+      "automatedDiscovery": {
+        "checkedOnKst": "2026-10-29",
+        "status": "rss_sitemap_body_confirmed_for_one_case",
+        "rssUrl": "https://www.revistaeconomia.com/feed/",
+        "sitemapUrl": "https://www.revistaeconomia.com/sitemap_index.xml",
+        "oneChildSitemapLimit": true,
+        "httpRequests": 6,
+        "articleOriginals": 1,
+        "uniqueBodyBlocks": 5,
+        "unattemptedCandidates": 2,
+        "completeCoverageVerified": false,
+        "publicationState": "pending",
+        "rawModelTransmissionAllowed": false
+      }
+    },
+    {
+      "id": "pen-gestion",
+      "currency": "PEN",
+      "listingUrl": "https://gestion.pe/noticias/tipo-de-cambio/",
+      "sampleUrl": "https://gestion.pe/economia/mercados/tipo-de-cambio-dolar-hoy-en-peru-cuanto-esta-el-precio-del-dolar-este-viernes-18-de-septiembre-dolares-a-soles-compra-y-venta-bcrp-noticia/",
+      "sampleDate": "2026-09-18",
+      "verification": "body_read",
+      "usefulScope": "14H07 표시. 가격·미국 정책 배경 후보. 한 기사 안의 BCRP·은행·평행시장 가격 구분",
+      "termsUrl": "https://gestion.pe/terminos-y-condiciones/",
+      "termsObservation": "기사 하단 무단 복제 제한과 링크 공유 안내. 무료 열람을 재현 허가로 확대하지 않음",
+      "next": "역사 표본과 현재 입력 구분, 사실·견해 카드 범위",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "gestion.pe"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "Peruvian sol"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "pen-rpp",
+      "currency": "PEN",
+      "listingUrl": "https://rpp.pe/economia",
+      "sampleUrl": "https://rpp.pe/economia/economia/precio-del-dolar-peru-y-tipo-de-cambio-hoy-26-de-octubre-del-2026-noticia-1714485",
+      "sampleDate": "2026-10-26",
+      "verification": "body_read",
+      "usefulScope": "15:05 갱신 표시. 가격 안내와 일반 영향 설명만으로 환율 원인을 뒷받침하지 못함",
+      "termsUrl": null,
+      "termsObservation": "이번 이용 조건 미확인",
+      "next": "별도의 시장 원인 기사 조사, 소비 영향 단정 제외",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "rpp.pe"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "Peruvian sol"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "ars-infobae",
+      "currency": "ARS",
+      "listingUrl": "https://www.infobae.com/economia/",
+      "sampleUrl": "https://www.infobae.com/economia/2026/10/26/dolar-riesgo-pais-y-acciones-uno-por-uno-cuales-fueron-los-efectos-del-ballotage-de-brasil-en-el-mercado-financiero-argentino/",
+      "sampleDate": "2026-10-26",
+      "verification": "body_read",
+      "usefulScope": "도매·은행 소매·MEP·CCL·blue 및 전문가 설명 후보. BCRA 가중평균과 기사 도매 종가 별개",
+      "termsUrl": "https://www.infobae.com/terminos-y-condiciones/",
+      "termsObservation": "접근 자체는 라이선스 부여가 아니며 무단 복제·재사용·배포 등에 제한. 짧은 사실 카드의 범위를 별도 판단",
+      "next": "날짜·가격 기준·귀속과 사용 범위 검토",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "infobae.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "ars-cronista",
+      "currency": "ARS",
+      "listingUrl": "https://www.cronista.com/finanzas-mercados/",
+      "sampleUrl": "https://www.cronista.com/finanzas-mercados/dolar-hoy-y-dolar-blue-hoy-cual-es-la-cotizacion-del-lunes-26-de-octubre-minuto-a-minuto/",
+      "sampleDate": "2026-10-26",
+      "verification": "paywall",
+      "usefulScope": "표본 본문 미확보. 검색 제목으로 원인 카드 만들지 않음",
+      "termsUrl": "https://www.cronista.com/institucional/terminos-y-condiciones/",
+      "termsObservation": "콘텐츠 복제·배포 제한. 구독 우회 없음",
+      "next": "무료 본문이 실제 공개된 다른 표본 또는 Infobae 등 대체 경로",
+      "modelInputState": "new_cards_not_approved_or_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "cronista.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "기존 본문 추출 또는 접근 조건이 해결되지 않았다. 공개 본문과 이용 범위를  자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "clp-existing-four-outlets",
+      "currency": "CLP",
+      "verification": "existing_record",
+      "outlets": [
+        "DF",
+        "Pulso",
+        "Emol",
+        "Yahoo"
+      ],
+      "localEvidence": "docs/2.0/clp-news-notes-20260910.json",
+      "localRouteReview": "docs/2.0/report-source-routes-20261027.json",
+      "usefulScope": "기존 9월 10일 사실·견해 카드와 후행/다른 날짜 제외 기록 재사용. Yahoo의 출처 확인된 게시 부분 검토 허용",
+      "modelInputState": "preserve_existing_case_specific_decisions",
+      "publicationState": "not_newly_approved",
+      "next": "새 날짜에는 가격 기준·본문 제공 범위·원 발행처·중복·사용 범위 재확인",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "emol.com",
+          "reporteminero.cl"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "기존 저장 네 매체 기록은 보존한다. 실행 수집 범위는 기존 Emol/Reporte Minero 수집기이며 DF/Pulso/Yahoo를 자동 수집하지 않는다."
+      }
+    },
+    {
+      "id": "brl-valor",
+      "currency": "BRL",
+      "listingUrl": "https://valor.globo.com/",
+      "verification": "discovery_route_reviewed_body_not_collected",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "valor.globo.com"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "경제 일간지. 자동 접근 차단과 본문 공개 범위를  구독벽이나 robots 차단은 우회하지 않는다. 자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "mxn-elfinanciero",
+      "currency": "MXN",
+      "listingUrl": "https://www.elfinanciero.com.mx/mercados/",
+      "verification": "local_http_sample_checked_20261028",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.elfinanciero.com.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      },
+      "publisher": "El Financiero",
+      "sampleUrl": "https://www.elfinanciero.com.mx/economia/2026/10/20/pesadilla-para-el-tipo-de-cambio-al-cierre-de-2026-en-cuanto-cerrara-el-peso-frente-al-dolar/",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": null,
+      "termsObservation": "정확한 기사 활용 조건은 미확정. 개인정보 문서·금융 플랫폼 약관을 기사 라이선스로 사용하지 않는다.",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license"
+    },
+    {
+      "id": "ars-ambito",
+      "currency": "ARS",
+      "listingUrl": "https://www.ambito.com/",
+      "verification": "discovery_route_reviewed_body_not_collected",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "ambito.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "금융 전문 매체. 아르헨티나 도매·소매·MEP·CCL·blue를 구분해 공개 본문을 확인한다. 전용 자동 수집은 미연결이다. 자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "clp-df",
+      "currency": "CLP",
+      "listingUrl": "https://www.df.cl/",
+      "verification": "discovery_route_reviewed_body_not_collected",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "df.cl"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "경제 전문지. 공개된 기사만 확인하며 제목·검색 요약·구독 안내를 원문 근거로 승인하지 않는다. 자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "clp-pulso",
+      "currency": "CLP",
+      "listingUrl": "https://www.latercera.com/",
+      "verification": "discovery_route_reviewed_body_not_collected",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "latercera.com"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "La Tercera의 Pulso 경제 보도를 검색한다. 기존 목록 오류로  자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "brl-yahoo",
+      "currency": "BRL",
+      "listingUrl": "https://finance.yahoo.com/",
+      "verification": "search_found_direct_reads_rate_limited",
+      "termsUrl": "https://legal.yahoo.com/us/es/yahoo/terms/otos/index.html",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "mxn-yahoo",
+      "currency": "MXN",
+      "listingUrl": "https://finance.yahoo.com/",
+      "verification": "search_found_direct_reads_rate_limited",
+      "termsUrl": "https://legal.yahoo.com/us/es/yahoo/terms/otos/index.html",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar peso mexicano",
+          "Mexican peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "cop-yahoo",
+      "currency": "COP",
+      "listingUrl": "https://finance.yahoo.com/",
+      "verification": "search_found_direct_reads_rate_limited",
+      "termsUrl": "https://legal.yahoo.com/us/es/yahoo/terms/otos/index.html",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar peso colombiano",
+          "Colombian peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "pen-yahoo",
+      "currency": "PEN",
+      "listingUrl": "https://finance.yahoo.com/",
+      "verification": "search_found_direct_reads_rate_limited",
+      "termsUrl": "https://legal.yahoo.com/us/es/yahoo/terms/otos/index.html",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "Peruvian sol"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "clp-yahoo",
+      "currency": "CLP",
+      "listingUrl": "https://finance.yahoo.com/",
+      "verification": "search_found_direct_reads_rate_limited",
+      "termsUrl": "https://legal.yahoo.com/us/es/yahoo/terms/otos/index.html",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "ars-yahoo",
+      "currency": "ARS",
+      "listingUrl": "https://finance.yahoo.com/",
+      "verification": "search_found_direct_reads_rate_limited",
+      "termsUrl": "https://legal.yahoo.com/us/es/yahoo/terms/otos/index.html",
+      "reviewRecord": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+      "modelInputState": "not_approved_or_sent",
+      "publicationState": "not_approved",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "brl-cnn",
+      "currency": "BRL",
+      "publisher": "CNN Brasil Money",
+      "listingUrl": "https://www.cnnbrasil.com.br/economia/money/mercado/",
+      "sampleUrl": "https://www.cnnbrasil.com.br/economia/money/mercado/para-onde-vai-o-dolar-eleicao-e-fed-colocam-cambio-no-centro-das-atencoes/",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://conteudos.cnnbrasil.com.br/termos-de-uso-da-cnn-brasil/",
+      "termsObservation": "권리 유보·복제 제한을 확인했다. 무료 열람을 외부 AI 전송·공개 재사용 허가로 간주하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.cnnbrasil.com.br"
+        ],
+        "terms": [
+          "dólar real brasileiro"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "mxn-forbes",
+      "currency": "MXN",
+      "publisher": "Forbes México",
+      "listingUrl": "https://forbes.com.mx/mercados/",
+      "sampleUrl": "https://forbes.com.mx/peso-retrocede-tras-debiles-datos-de-empleo-privado-en-eu/",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://forbes.com.mx/terminos-y-condiciones/",
+      "termsObservation": "권리 유보·복제 제한을 확인했다. 무료 열람을 외부 AI 전송·공개 재사용 허가로 간주하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "forbes.com.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "cop-valora",
+      "currency": "COP",
+      "publisher": "Valora Analitik",
+      "listingUrl": "https://www.valoraanalitik.com/",
+      "sampleUrl": "https://www.valoraanalitik.com/dolar-en-colombia-llegaria-a-4-000-a-finales-de-2026-proyecciones-se-mueven-entre-el-alivio-de-la-apreciacion-y-la-sombra-fiscal/",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": null,
+      "termsObservation": "정확한 기사 활용 조건은 미확정. 개인정보 문서·금융 플랫폼 약관을 기사 라이선스로 사용하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.valoraanalitik.com"
+        ],
+        "terms": [
+          "dólar peso colombiano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      },
+      "automatedDiscovery": {
+        "checkedOnKst": "2026-10-29",
+        "status": "one_hop_related_article_confirmed_for_one_case",
+        "targetDay": "2026-10-27",
+        "httpRequests": 4,
+        "articleOriginals": 2,
+        "wrongDayOriginalKept": true,
+        "relatedArticleUrl": "https://www.valoraanalitik.com/dolar-colombia-reboto-este-martes-27/",
+        "samePublisherOnly": true,
+        "completeCoverageVerified": false,
+        "publicationState": "pending",
+        "rawModelTransmissionAllowed": false
+      }
+    },
+    {
+      "id": "clp-biobio",
+      "currency": "CLP",
+      "publisher": "BioBioChile",
+      "listingUrl": "https://www.biobiochile.cl/lista/categorias/economia",
+      "sampleUrl": "https://www.biobiochile.cl/noticias/economia/actualidad-economica/2026/10/27/dolar-cae-ante-fuerte-recuperacion-del-cobre-y-previo-al-anuncio-de-tasas-del-banco-central.shtml",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": null,
+      "termsObservation": "정확한 기사 활용 조건은 미확정. 개인정보 문서·금융 플랫폼 약관을 기사 라이선스로 사용하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.biobiochile.cl"
+        ],
+        "terms": [
+          "dólar peso chileno"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "clp-cooperativa",
+      "currency": "CLP",
+      "publisher": "Cooperativa",
+      "listingUrl": "https://www.cooperativa.cl/noticias/site/tax/port/all/cooperativataxport_6___1.html",
+      "sampleUrl": "https://www.cooperativa.cl/noticias/economia/divisas/dolar/dolar-volvio-a-rozar-los-mil-pesos-tras-la-reeleccion-de-lula-en-brasil/2026-10-26/141137.html",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": null,
+      "termsObservation": "정확한 기사 활용 조건은 미확정. 개인정보 문서·금융 플랫폼 약관을 기사 라이선스로 사용하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.cooperativa.cl"
+        ],
+        "terms": [
+          "dólar peso chileno"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "ars-iprofesional",
+      "currency": "ARS",
+      "publisher": "iProfesional",
+      "listingUrl": "https://www.iprofesional.com/finanzas",
+      "sampleUrl": "https://www.iprofesional.com/finanzas/465528-bcra-compro-mayor-cantidad-de-dolares-del-mes-pero-cayeron-las-reservas",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://www.iprofesional.com/secciones/terminos-y-condiciones-de-uso.html",
+      "termsObservation": "권리 유보·복제 제한을 확인했다. 무료 열람을 외부 AI 전송·공개 재사용 허가로 간주하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.iprofesional.com"
+        ],
+        "terms": [
+          "dólar mayorista"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      },
+      "termsRetrievalState": "stored_response_reviewed_not_a_repeat_crawl_target"
+    },
+    {
+      "id": "pen-elcomercio",
+      "currency": "PEN",
+      "publisher": "El Comercio Perú",
+      "listingUrl": "https://elcomercio.pe/economia/mercados/",
+      "sampleUrl": "https://elcomercio.pe/economia/peru/tipo-de-cambio-dolar-cotiza-en-s339-tras-publicacion-de-datos-de-inflacion-de-lima-metropolitana-l-ultimas-noticia/",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://elcomercio.pe/terminos-y-condiciones/",
+      "termsObservation": "권리 유보·복제 제한을 확인했다. 무료 열람을 외부 AI 전송·공개 재사용 허가로 간주하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "elcomercio.pe"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-andina",
+      "currency": "PEN",
+      "publisher": "Agencia Andina",
+      "listingUrl": "https://andina.pe/agencia/seccion-economia-2.aspx",
+      "sampleUrl": "https://andina.pe/agencia/noticia-dolar-sube-frente-al-sol-tensiones-geopoliticas-y-mayor-demanda-divisas-1065662.aspx",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://andina.pe/agencia/legal/andinatyc.html",
+      "termsObservation": "권리 유보·복제 제한을 확인했다. 무료 열람을 외부 AI 전송·공개 재사용 허가로 간주하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "andina.pe"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-infobae",
+      "currency": "PEN",
+      "publisher": "Infobae Perú",
+      "listingUrl": "https://www.infobae.com/peru/",
+      "sampleUrl": "https://www.infobae.com/peru/2026/10/09/por-que-subio-el-dolar-el-analisis-del-bcrp-sobre-el-tipo-de-cambio-en-peru/",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://www.infobae.com/terminos-y-condiciones/",
+      "termsObservation": "권리 유보·복제 제한을 확인했다. 무료 열람을 외부 AI 전송·공개 재사용 허가로 간주하지 않는다.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.infobae.com"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-larepublica",
+      "currency": "PEN",
+      "publisher": "La República Perú",
+      "listingUrl": "https://larepublica.pe/economia",
+      "sampleUrl": "https://larepublica.pe/economia/2026/09/20/superavit-comercial-de-peru-llega-a-us45759-millones-por-que-la-bonanza-externa-no-se-siente-en-los-hogares-hnews-573059",
+      "verification": "local_http_sample_checked_20261028",
+      "usefulScope": "시장 사실·전문가 귀속 해석 후보. 기간·가격·원문 지지와 전재 중복 검토를 거친 카드만 집필에 사용한다.",
+      "termsUrl": "https://larepublica.pe/terminos-de-uso",
+      "termsObservation": "개인·비공개 사용과 저장/전송 제한 조항. 반복 서비스 수집 용도 판단 미확정으로 자동 경로 제외.",
+      "modelInputState": "pending_separate_fact_card_use_review",
+      "publicationState": "not_approved",
+      "localCollectionScope": "bounded_local_research_only_not_a_reuse_license",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "excluded",
+        "domains": [
+          "larepublica.pe"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "반복 수집의 저장·전송 이용 범위가 미확정이다. 사용자 수동 작업을 생성하지 않고 자동 수집에서 제외한다."
+      }
+    },
+    {
+      "id": "brl-camara-radio",
+      "currency": "BRL",
+      "publisher": "Rádio Câmara / Economia Direta",
+      "listingUrl": "https://www.camara.leg.br/radio/742791-economia-direta",
+      "sampleUrl": "https://www.camara.leg.br/radio/programas/1081042-alta-do-dolar-afeta-economia-como-um-todo-e-consumidor-deve-estar-alerta/",
+      "sampleDate": "2024-07-08",
+      "verification": "body_read_current_page_not_archived",
+      "usefulScope": "과거 시장·영업 환경의 귀속 해설. 이번 연결 표본은 2024년 상반기 설명이며 2026년 당일 원인으로 사용할 수 없다.",
+      "termsUrl": "https://www.camara.leg.br/radio/termos-de-uso",
+      "termsObservation": "자체 제작물 Creative Commons BY, 부분 사용 시 Rádio Câmara 표시. 제3자 제작물·음원·사진은 이번 범위에서 제외.",
+      "next": "이 표본의 추출·대조 시험 및 별도 최신 목록·제3자 제작 여부 확인",
+      "modelInputState": "original_plan_only_not_sent",
+      "publicationState": "not_approved_by_this_research",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.camara.leg.br"
+        ],
+        "terms": [
+          "dólar",
+          "câmbio",
+          "Economia Direta"
+        ],
+        "reason": "확인한 과거 프로그램 URL의 직접 수집 시험용 보조 경로. 자동 최신 목록은 아직 검증하지 않았고 최신 시장 보도를 대체하지 않는다."
+      }
+    }
+  ],
+  "publicApiProbes": [
+    {
+      "id": "pen-fx-format-probe",
+      "date": "2026-10-27",
+      "method": "GET",
+      "authenticationUsed": false,
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/api/PD04646PD/json/2026-10-19/2026-10-23",
+      "httpStatus": 200,
+      "contentType": "text/html; charset=UTF-8",
+      "dataStatus": "invalid_json_response",
+      "observation": "JSON 형태 자료 뒤에 Notice/HTML 서버 오류가 붙음. 일부 값 절단·정상자료 채택 없음",
+      "inputApproved": false,
+      "evidenceRecord": "라이브 도구 응답에서 조사 결과를 옮긴 기록. 원문 응답 파일·해시 보존을 주장하지 않음",
+      "next": "공식 문서/다른 형식/재조회로 전체 응답 검증"
+    },
+    {
+      "id": "ars-fx-metadata-probe",
+      "date": "2026-10-27",
+      "method": "GET",
+      "authenticationUsed": false,
+      "url": "https://api.bcra.gob.ar/estadisticas/v4.0/monetarias?idVariable=5",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "dataStatus": "valid_json",
+      "metadata": {
+        "variable": 5,
+        "label": "Tipo de cambio mayorista de referencia",
+        "periodicity": "D",
+        "unit": "Pesos argentinos por dólar estadounidense",
+        "latestDate": "2026-10-26"
+      },
+      "inputApproved": false,
+      "evidenceRecord": "라이브 도구 응답 요지. 새 보고서 가격 입력이나 역사 전수 검증이 아님"
+    },
+    {
+      "id": "ars-fx-method-probe",
+      "date": "2026-10-27",
+      "method": "GET",
+      "authenticationUsed": false,
+      "url": "https://api.bcra.gob.ar/estadisticas/v4.0/metodologia/5",
+      "httpStatus": 200,
+      "contentType": "application/json",
+      "dataStatus": "valid_json",
+      "observation": "A3500·A8359 및 Comunicación C 연결. 실제 발표 시각을 추정하지 않음",
+      "inputApproved": false,
+      "evidenceRecord": "라이브 도구 응답 요지, 원문 응답 해시 없음"
+    }
+  ],
+  "commonReuse": [
+    "docs/2.0/source-feasibility.md",
+    "docs/2.0/source-applicability-review-20261011.md",
+    "docs/2.0/report-source-routes-20261027.json",
+    "docs/2.0/clp-news-notes-20260910.json",
+    "docs/2.0/publication-cadence-four-currencies-2pct-20261027.md"
+  ],
+  "proposedCardFields": [
+    "currency",
+    "sourceId",
+    "url",
+    "originalPublisher",
+    "publishedAt",
+    "updatedAt",
+    "eventDate",
+    "targetPeriod",
+    "collectedAt",
+    "accessStatus",
+    "priceBasis",
+    "methodologyVersion",
+    "factSummary",
+    "attributedOpinion",
+    "supportedScope",
+    "excludedScope",
+    "sourceUseReview",
+    "manualOrAutomatic"
+  ],
+  "retention": "새 기사 본문·번역·이미지는 저장하지 않음. URL과 짧은 자체 조사 요지만 저장.",
+  "integrationBoundary": "이 등록부의 candidate 상태를 기존 source-use 승인으로 변환하지 않음. 기존 개별 카드의 허용 범위도 덮어쓰지 않음.",
+  "followUpReviews": [
+    {
+      "id": "pen-ars-cop-basis-review-20261027",
+      "path": "docs/2.0/pen-ars-cop-basis-verification-20261027.json",
+      "originalProbeRecordsPreserved": true
+    }
+  ],
+  "newsRoutingRevision": "2026-10-28-automatic-only",
+  "newsRoutingBoundary": "자동 수집 가능한 기존 연결만 실행 대상으로 선택한다. 미연결·조건 미해결 출처는 제외 사유만 보존하며 수동 확인 작업을 만들지 않는다. 수집 성공은 이용 범위·근거·집필·게시 승인이 아니다.",
+  "localRoutingIntegrated": true,
+  "productionIntegrated": false,
+  "lastLocalExpansion": "2026-10-29",
+  "lastLocalContinuation": {
+    "checkedOnKst": "2026-10-29",
+    "scope": "bounded_discovery_and_saved_common_review_only",
+    "modelCalls": 0,
+    "productionChanged": false,
+    "sourceRightsUpgraded": false
+  }
+}

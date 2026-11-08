@@ -1,0 +1,310 @@
+{
+  "version": "original-scope-and-df-decision/1",
+  "checkedOnKst": "2026-10-29",
+  "reviewOrigin": "current_codex_source_review_no_separate_paid_or_independent_model_call",
+  "purpose": "판단·설계 및 저장 자료 검증. 실행 정책/원고/운영 변경 없음.",
+  "notLegalClearance": true,
+  "general": {
+    "principle": "원문/번역/기사 구성의 복제·외부 전송과 독립 작성한 최소 사실·귀속 견해 카드를 같은 허용 값으로 처리하지 않는다.",
+    "copyrightReference": "https://www.wipo.int/edocs/mdocs/diplconf/en/crnr_dc/crnr_dc_94.html",
+    "copyrightReferenceSection": "Articles 2 and 5",
+    "limits": "표현과 아이디어/데이터의 구분은 개별 국가법·계약·데이터베이스·접근 조건의 모든 문제를 자동 해결하지 않는다. 출처 표시도 모든 복제/전송 허가를 대체하지 않는다.",
+    "zdrIsNotContentPermission": true,
+    "localModelIsNotCopyrightExemption": true,
+    "mainRecommendation": "이미 승인된 최소 카드 집필 경로는 유지한다. 모든 기사 원문을 외부 AI로 전송해야만 리포트를 만들 수 있다는 추가 전제는 기본 경로로 두지 않는다.",
+    "qualityBoundary": "원문 미전송은 자동 카드의 정확성을 보증하지 않는다. 새 카드의 원문 지지·귀속·기간 정확성은 허용된 처리 방식에서 검증해야 하며, 검증되지 않은 새 근거는 보류한다.",
+    "notApplied": true
+  },
+  "sources": [
+    {
+      "id": "cnn-brasil",
+      "currency": "BRL",
+      "articles": 2,
+      "notice": "https://conteudos.cnnbrasil.com.br/termos-de-uso-da-cnn-brasil/",
+      "section": "Direitos autorais e de propriedade intelectual",
+      "finding": "허가 없는 전체·부분 복제, 공개, 배포를 제한하는 게시자 고지를 직접 재확인했다.",
+      "rawDecision": "do_not_dispatch_under_current_scope",
+      "basis": "explicit_reproduction_and_distribution_restriction_no_separate_authorization_recorded",
+      "notesDecision": "기존 독립 사실·귀속 견해 카드의 제한된 판단은 보존. 원문·번역·기사 구성의 전송 허가로 승격하지 않음.",
+      "alternative": "허용된 직접 원출처에서 확인 가능한 사실은 별도 재검토한 카드로 구성. 같은 날짜의 대체 기사/발언을 확보하지 못하면 해당 설명 보류."
+    },
+    {
+      "id": "agencia-brasil",
+      "currency": "BRL",
+      "articles": 1,
+      "notice": "https://agenciabrasil.ebc.com.br/sobre",
+      "section": "Política de reprodução",
+      "finding": "출처를 명시한 언론매체의 저널리즘 목적 재현을 안내하며 상업적 재현과 제휴·제3자 자료는 별도로 다룬다. 현재 소매 본문은 Agência Brasil 명의이고 본문 내 국제통신사 전재 표시는 없었다. 옆 기사 사진의 Reuters 표시는 본문 판정에 섞지 않았다.",
+      "rawDecision": "conditional_candidate_not_automatically_applied",
+      "basis": "journalistic_purpose_and_text_ownership_scope_need_binding_not_generic_free_or_ccby",
+      "notesDecision": "현재 독립 통계 요지의 범위를 유지. 출처 표기만으로 모든 목적의 원문 처리가 허용됐다고 하지 않음.",
+      "alternative": "이미 확보한 IBGE 원자료와 단위·기간을 비교해 소비 배경을 구성. 환율 당일 원인의 대체물로 사용하지 않음."
+    },
+    {
+      "id": "el-economista",
+      "currency": "MXN",
+      "articles": 2,
+      "notice": "https://www.eleconomista.com.mx/terminos-servicio.html",
+      "section": "Términos del servicio",
+      "finding": "열람한 안내는 주로 디지털 구독의 판매·결제 조건이다. 기사 원문의 자동 분석/외부 전송을 허용한다는 근거는 확인하지 못했다.",
+      "rawDecision": "hold_scope_unresolved",
+      "basis": "subscription_terms_do_not_establish_content_processing_permission",
+      "notesDecision": "기존 짧은 사실·견해 카드의 판단과 원문 이용 판단을 구분. AI라는 단어가 없다는 이유만으로 사용 금지로 단정하지 않음.",
+      "alternative": "허용 범위가 명시된 요약 API를 보조 탐색에 검토하되, 동일 거래일의 MXN 원인을 실제 지지하는지 따로 확인."
+    },
+    {
+      "id": "la-republica-co",
+      "currency": "COP",
+      "articles": 1,
+      "notice": "https://www.larepublica.co/aviso-legal",
+      "section": "Términos y condiciones / Conducta",
+      "finding": "복제·번역·전송·저장에 사전 서면 허가를 요구하며 개인 비상업적 다운로드와 기업/집단적 이용을 구분한다. 국가가 다른 동명 매체의 약관을 적용하지 않았다.",
+      "rawDecision": "do_not_dispatch_under_current_scope",
+      "basis": "explicit_restriction_personal_download_exception_not_a_business_service_grant",
+      "notesDecision": "기존 최소 사실·귀속 카드 자체의 법적 사용 여부까지 일괄 금지한 결론은 아님.",
+      "alternative": "선택한 Valora의 별도 귀속 설명을 독립적으로 검토. TRM 비교 사실을 환율 원인으로 바꾸지 않음."
+    },
+    {
+      "id": "valora-analitik",
+      "currency": "COP",
+      "articles": 1,
+      "notice": "https://www.valoraanalitik.com/",
+      "section": "공개 홈페이지·기존 출처 등록",
+      "finding": "기사 처리 범위를 정하는 충분한 콘텐츠 약관을 확인하지 못했다. robots·개인정보·다른 금융 플랫폼의 약관을 기사 라이선스로 사용하지 않았다.",
+      "rawDecision": "hold_scope_unresolved",
+      "basis": "missing_applicable_content_notice_not_a_prohibition_or_permission",
+      "notesDecision": "확보한 분석팀/필자 견해의 최소 카드 판단은 유지하며 전체 원문 권리와 분리.",
+      "alternative": "해당 출처가 없으면 남는 COP 자료가 원인 설명의 최소 기준을 만족하는지 검사. 가격 나열만 남으면 원인 리포트 보류."
+    },
+    {
+      "id": "revista-economia",
+      "currency": "PEN",
+      "articles": 1,
+      "notice": "https://www.revistaeconomia.com/avisos-legales/",
+      "section": "4. Propiedad industrial e intelectual",
+      "finding": "원문의 복제·전송·정보검색 시스템 기록 등에 사전 서면 허가를 요구하는 고지를 재확인했다.",
+      "rawDecision": "do_not_dispatch_under_current_scope",
+      "basis": "explicit_transmission_and_storage_restriction_no_separate_authorization_recorded",
+      "notesDecision": "기존 사실·Felipe Mendoza 귀속 견해의 독립 작성 카드와 원문·번역 전송을 혼동하지 않음.",
+      "alternative": "직접 원출처의 허용된 사실/발언 또는 다른 검토된 기사 필요. 단독 원인 근거가 빠지면 발행하지 않고 기존 보고서 날짜 유지."
+    },
+    {
+      "id": "infobae",
+      "currency": "ARS",
+      "articles": 1,
+      "notice": "https://www.infobae.com/terminos-y-condiciones/",
+      "section": "3.2–3.5, 4.5",
+      "finding": "접근이 라이선스 부여를 의미하지 않으며 복제·전송·처리 등에 명시적 서면 허가를 요구하는 고지가 있다.",
+      "rawDecision": "do_not_dispatch_under_current_scope",
+      "basis": "explicit_treatment_and_transmission_restriction_no_separate_authorization_recorded",
+      "notesDecision": "현재 필자의 해석을 해당 매체·필자에 귀속한 최소 카드로 유지. 단순 사실과 보호되는 표현/기사 구성을 구분.",
+      "alternative": "원문 처리나 상업 이용 범위를 확인한 다른 출처를 검토. 도매·소매·blue를 혼합하거나 전일 견해를 당일로 전용하지 않음."
+    },
+    {
+      "id": "emol",
+      "currency": "CLP",
+      "articles": 2,
+      "notice": "https://digital.elmercurio.com/assets/docs/TERMINOS%20Y%20CONDICIONES%20GENERALES%20DE%20USO%20v2023.pdf",
+      "section": "저장 PDF 1–2쪽",
+      "finding": "일반 약관의 적용 대상에 emol.com이 포함됨을 확인했다. 개인·비상업적 이용과 사전 서면 허가 없는 복제·전송 등의 제한을 대조했다. 이번 온라인 PDF 재조회는 실패해 저장 원본을 사용했다.",
+      "rawDecision": "do_not_dispatch_under_current_scope",
+      "basis": "saved_publisher_terms_read_not_current_live_pdf_reverified",
+      "notesDecision": "현재 두 기사에 대한 개별 사실·귀속 카드의 기존 범위를 보존. 둘은 한 매체이며 Capitaria 두 분석가를 독립 매체 둘로 세지 않음.",
+      "alternative": "DF 없이도 관측 사실·귀속 설명·반대 조건을 남길 수 있으나 DF 고유의 외국인 자금 유입 설명은 제거해야 함."
+    },
+    {
+      "id": "diario-financiero",
+      "currency": "CLP",
+      "articles": 1,
+      "notice": "https://www.df.cl/terminos-y-condiciones",
+      "section": "Derechos/Obligaciones del usuario",
+      "finding": "콘텐츠 권리 유보와 상업적 이용 관련 제한을 확인했다. 현재 일반 웹 열람에서는 해당 기사 본문·Concha 발언이 읽혔다. 추출 실패나 초기 숨김 DOM만으로 유료벽/기사 부재라고 판정하지 않는다.",
+      "rawDecision": "hold_original_processing_scope_and_adapter",
+      "basis": "ordinary_public_read_does_not_grant_external_raw_processing",
+      "notesDecision": "기존 짧은 Bci/Concha 귀속 카드의 범위는 유지. 새 자동 입력의 필수 출처로 만들지 않음.",
+      "alternative": "공개 본문 경계를 정상적으로 식별할 수 있으면 검토 경로를 보강. 실패 시 DF 전용 주장/인용/출처 연결을 모두 제외하고 남은 최소 근거를 재검사."
+    }
+  ],
+  "dfDecision": {
+    "version": "df-scope-decision/1",
+    "checkedOnKst": "2026-10-29",
+    "purpose": "judgment_only_not_a_generated_or_approved_report",
+    "source": ".local-reports/private/six-currency-preparation-LmgDyo/CLP-handoff.json",
+    "referenceSnapshotId": "dc23824af86c836847ccbb7878733bc00e841e5fef471cbe9e154c2832e7884f",
+    "ordinaryPublicRead": {
+      "performed": true,
+      "sourceUrl": "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-p5xh6",
+      "observedAt": "2026-10-28T22:02:41.510Z",
+      "claimChecked": "Existing Jorge Concha/Bci foreign-dollar-sales and possible Brazil position-unwind interpretation.",
+      "wholeVersionEqualityProven": false,
+      "availabilityAtOriginalPublicationProven": false,
+      "paywallClassification": "not_proven_by_hidden_DOM_or_parser_failure"
+    },
+    "decisions": {
+      "storedReviewedNotes": "retain_existing_scoped_attribution_no_manuscript_change",
+      "externalFullArticle": "hold_no_processing_permission_established",
+      "automaticDiscovery": "optional_not_mandatory",
+      "futureExtractionFailure": "omit_DF_dependent_claim_with_complete_dependency_checks_not_manual_user_review"
+    },
+    "exclusionFeasibility": {
+      "analysisOnly": true,
+      "omittedClaimIds": [
+        "news-clp-df-close-20261027-n0"
+      ],
+      "remainingClaims": 5,
+      "marketObservations": 1,
+      "attributedExplanations": 2,
+      "countercontextClaims": 2,
+      "remainingSources": 2,
+      "remainingPublishers": 1,
+      "sourceIndependenceClaimed": false,
+      "remainingTopics": [
+        "source-attributed profit taking",
+        "copper/oil support in the morning report",
+        "DXY, geopolitical and Treasury-yield counterconditions"
+      ],
+      "lostTopic": "foreign-dollar sales and possible return of capital from Brazil; not supported by remaining Emol sources",
+      "crossSourceDependencyHolds": [],
+      "minimumRoleCountsSufficient": true,
+      "contentQualityEvaluated": false
+    },
+    "currentSelector": {
+      "supportsCauseSourceRemoval": false,
+      "observedError": "required_material_cannot_be_excluded",
+      "codeNotChanged": true,
+      "reason": "The existing selector forbids removing market-role material even if other qualified evidence remains."
+    },
+    "proposedCommonRule": {
+      "applied": false,
+      "countryException": false,
+      "requiredChecks": [
+        "explicit reason and exact source binding",
+        "remove every dependent claim, citation and metadata reference",
+        "preserve dashboard reference snapshot",
+        "keep at least one selected-day market observation and supported attributed explanation",
+        "validate all retained dependency links, scope, source uses and periods",
+        "rebuild the current writer projection; do not cut an archived rich writer packet",
+        "do not inherit old review, score or approval; block if a sole essential source is lost"
+      ]
+    },
+    "manuscriptEdited": false,
+    "policyChanged": false,
+    "modelCalls": 0,
+    "newPaidCostUsd": 0,
+    "networkCalls": 0,
+    "productionChanged": false,
+    "publicationApproved": false
+  },
+  "alternatives": [
+    {
+      "id": "columna-digital",
+      "type": "conditional_free_discovery_and_owned_content_candidate",
+      "publisher": "Columna Digital",
+      "notice": "https://columnadigital.com/terminos-y-condiciones/",
+      "reuseGuide": "https://columnadigital.com/republicar/",
+      "apiDocs": "https://columnadigital.com/api/",
+      "rssDocs": "https://columnadigital.com/servicio-rss/",
+      "noticeVerification": {
+        "directTwoPageReceipt": ".local-reports/private/original-scope-decision-20261029/notice-check-zqBkHF/result.json",
+        "clauses": [
+          "8.2 attribution/author/adaptation/no endorsement/corrections",
+          "8.3 third-party/agency/press-release exclusions",
+          "8.5 text/data analysis and AI explicitly covered"
+        ],
+        "staleSearchCacheNotUsedToRejectCurrentTerms": true
+      },
+      "freeApiProbe": {
+        "receipt": ".local-reports/private/original-scope-decision-20261029/alternative-bb6xdH/receipt.json",
+        "authenticated": false,
+        "results": 2,
+        "body": false,
+        "summaries": true,
+        "newsDates": [
+          "2026-10-26"
+        ],
+        "sourceAttributions": [
+          "Infobae",
+          "La Vanguardia"
+        ],
+        "sameDayMxnOrClpCauseEvidenceFound": false
+      },
+      "decision": "기술 경로·현재 조건은 확인. 자체 콘텐츠 소유/전재 구분·시점·설명 지지를 확인할 때만 개별 채택. 이번 두 결과는 10/27 칠레 원인이나 기존 원출처의 원문 권한을 대체하지 않음.",
+      "productionIntegrated": false,
+      "coverageForAllSixVerified": false
+    },
+    {
+      "id": "direct-official-data",
+      "type": "facts_and_background_only",
+      "decision": "기존 통계/API 원자료로 확인되는 숫자·기간은 해당 용도에서 사용. 현지 시장 수급이나 전문가 해석의 빈자리를 공식 통계로 채우지 않음."
+    },
+    {
+      "id": "local-only-model",
+      "type": "future_option_not_installed_or_verified",
+      "decision": "외부 전송을 줄일 수 있으나 복제/자동 수집 조건은 남고 설치·하드웨어·한국어/귀속 정확성 시험이 추가됨. 당장 기존 검토를 대신한 것으로 표시하지 않음."
+    }
+  ],
+  "implementationDecisions": {
+    "productCodeChanged": false,
+    "sourceUseRegistryChanged": false,
+    "sourcePermissionGranted": false,
+    "dfDroppedFromExistingPacket": false,
+    "sharedSelectorGap": "현재 선택기는 시장 역할 출처의 제거를 일괄 금지한다. 다른 충분한 근거가 남아도 DF 제외가 거부됨을 저장 재생에서 확인.",
+    "nextWorkModelRecommendation": {
+      "judgment": "Astra High",
+      "implementation": "Sol High"
+    },
+    "proposedNext": "Sol High에서 국가 예외 없이 근거 의존성과 최소 원인/관측 기준을 재검사하는 선택 규칙 및 원문/카드 경로 분리를 구현. 실제 원문/모델 품질 시험은 전송 범위·가격·예산을 따로 확인."
+  },
+  "preservation": {
+    "beforeFile": ".local-reports/private/original-scope-decision-20261029/before.json",
+    "codeBaseline": ".local-reports/private/original-scope-decision-20261029/code-baseline.json"
+  },
+  "paidCalls": 0,
+  "newPaidCostUsd": 0,
+  "productionChanged": false,
+  "newReportGenerated": false,
+  "verification": {
+    "version": "scope-decision-verification/1",
+    "checkedAt": "2026-10-28T22:07:38.532Z",
+    "protectedPriorFiles": 270,
+    "changedPriorFiles": [],
+    "protectedCodeAndDataFiles": 426,
+    "changedCodeAndDataFiles": [],
+    "checkedPublishers": 9,
+    "articleCases": 12,
+    "dfStoredExtractionStillFails": true,
+    "ordinaryPublicReadAndClaimSupportRecorded": true,
+    "oldDfCardNotEdited": true,
+    "dfRemovalNotImplemented": true,
+    "dfSelectorBlockReproduced": true,
+    "remainingEmolClaims": 5,
+    "remainingPublishers": 1,
+    "localReadAttempts": 5,
+    "localSuccessfulReads": 3,
+    "freeAlternativeApiCalls": 1,
+    "alternativeArticles": 2,
+    "alternativeArticlesUsedAsCauseEvidence": 0,
+    "paidModelCalls": 0,
+    "newPaidCostUsd": 0,
+    "credentialsRead": false,
+    "sourceUsePolicyChanged": false,
+    "publicationApproved": false,
+    "productionChanged": false,
+    "appTestsAndBuilds": "not_rerun_judgment_only_code_and_data_unchanged",
+    "checks": [
+      "prior records and source code/data unchanged",
+      "DF old extractor failure classified separately from ordinary public access",
+      "common selector still rejects market-source removal; no bypass applied",
+      "retained roles/dependencies/date and unique-DF claim separation",
+      "direct current licence receipts and API bytes match saved hashes",
+      "no alternative article relabelled as selected-day CLP/MXN cause"
+    ],
+    "limitations": [
+      "publisher processing judgment is not jurisdiction-specific legal clearance",
+      "Valora and El Economista raw permission unresolved",
+      "Emol online PDF refresh failed; saved original checked instead",
+      "single free alternative query does not establish six-country coverage",
+      "no newly generated report, automated semantic quality trial or independent model review"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+begin;
+set local search_path=public,extensions,pg_catalog;
+select plan(13);
+insert into public.business_plan_admins(email,active) values('ledger-reviewer@example.test',true);
+insert into public.currency_report_runs(id,currency,base_date,attempt,rule_version,event_binding,storage_required,packet,candidate,validation)
+values('41000000-0000-0000-0000-000000000001','PEN','2096-01-01',1,'ledger-test/1','fixture',true,'{"private":"original"}',
+'{"id":"PEN-2096-01-01-1","schemaVersion":"currency-report/1","currency":"PEN","baseDate":"2096-01-01","observedDate":"2096-01-01","generationMode":"ai_enhanced","futurePrivate":"PRIVATE_NEW","content":{"title":"합성 저장 시험","summary":"실제 분석이 아닌 권한 시험","change":{"title":"관측","text":"합성 값","kind":"fact","factIds":["spot"],"evidenceIds":[]},"drivers":[],"implications":[],"watch":[],"limitations":[]},"facts":[{"id":"spot","value":100,"label":"합성 환율"}],"series":[{"date":"2096-01-01","value":100}],"evidence":[],"limitations":[]}',
+'{"structureValid":true,"contentReview":"passed","criticalErrors":0,"qualityAverage":4,"evidenceScore":4,"synthetic":true}');
+select ok(not has_table_privilege('anon','public.currency_report_storage_receipts','SELECT'),'anon has no receipt access');
+select ok(not has_function_privilege('authenticated','public.seal_currency_report_storage(uuid,text,text)','EXECUTE'),'admin cannot forge file seal');
+select ok(not has_table_privilege('service_role','public.currency_report_storage_receipts','UPDATE'),'server cannot overwrite seal');
+set local role authenticated;
+select set_config('request.jwt.claims','{"sub":"41000000-0000-0000-0000-000000000010","email":"ledger-reviewer@example.test","role":"authenticated"}',true);
+select throws_ok($$select public.review_currency_report('41000000-0000-0000-0000-000000000001','approved',null)$$,'55000','storage incomplete or approval input changed','incomplete storage blocks publication');
+reset role;
+select is((select count(*) from public.currency_report_reviews where run_id='41000000-0000-0000-0000-000000000001'),0::bigint,'blocked approval leaves no audit side effects');
+set local role service_role;
+select lives_ok($$select public.seal_currency_report_storage('41000000-0000-0000-0000-000000000001','synthetic-bundle',repeat('a',64))$$,'trusted server seals exact stored inputs');
+reset role;
+update public.currency_report_runs set candidate=jsonb_set(candidate,'{content,title}','"변경된 합성 제목"') where id='41000000-0000-0000-0000-000000000001';
+set local role authenticated;
+select throws_ok($$select public.review_currency_report('41000000-0000-0000-0000-000000000001','approved',null)$$,'55000','storage incomplete or approval input changed','changed manuscript cannot reuse old seal');
+reset role;
+update public.currency_report_runs set candidate=jsonb_set(candidate,'{content,title}','"합성 저장 시험"') where id='41000000-0000-0000-0000-000000000001';
+set local role authenticated;
+select lives_ok($$select public.review_currency_report('41000000-0000-0000-0000-000000000001','approved',null)$$,'exact sealed and reviewed manuscript can publish');
+set local role anon;
+select ok((select not(report ? 'futurePrivate') from public.currency_reports where run_id='41000000-0000-0000-0000-000000000001'),'future private field never public');
+reset role;
+update public.currency_report_runs set packet='{"private":"changed after publication"}' where id='41000000-0000-0000-0000-000000000001';
+set local role authenticated;
+select lives_ok($$select public.review_currency_report('41000000-0000-0000-0000-000000000001','withdrawn','correction')$$,'withdrawal remains possible when original binding breaks');
+set local role anon;
+select is((select count(*) from public.currency_reports where run_id='41000000-0000-0000-0000-000000000001'),0::bigint,'withdrawn manuscript not visible');
+reset role;
+update public.business_plan_admins set active=false where email='ledger-reviewer@example.test';
+set local role authenticated;
+select is((select count(*) from public.currency_report_storage_receipts),0::bigint,'revoked admin with same token sees no private receipts');
+reset role;
+select is((select count(*) from public.currency_report_storage_receipts where run_id='41000000-0000-0000-0000-000000000001'),1::bigint,'withdrawal retains immutable receipt');
+select * from finish();
+rollback;

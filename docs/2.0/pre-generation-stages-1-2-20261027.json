@@ -1,0 +1,111 @@
+{
+  "version": "pre-generation-stages-1-2-verification/1",
+  "date": "2026-10-27",
+  "codeScope": {
+    "inputOrchestration": "implemented",
+    "writerAndReviewerRoleContracts": "defined_using_existing_contracts",
+    "generationOrModelReview": "not_run"
+  },
+  "finalReplay": ".local-reports/private/report-preparation-gmKzwJ/result.json",
+  "liveRuns": [
+    "report-preparation-rFCrBD",
+    "report-preparation-UCItSQ",
+    "report-preparation-M7qTqF"
+  ],
+  "reportDate": "2026-10-27",
+  "actualPriceSession": "2026-10-26",
+  "spot": 994.29,
+  "unit": "CLP_per_USD",
+  "monthly": {
+    "alignment": "same_latest_index_period",
+    "comparisonPeriod": "2026-08",
+    "sources": [
+      {
+        "sourceId": "cl-retail",
+        "latestPeriod": "2026-08",
+        "latestBasis": "registered_index_links_only",
+        "status": "source_unavailable",
+        "reason": "timeout",
+        "absenceProven": false
+      },
+      {
+        "sourceId": "cl-pay",
+        "latestPeriod": "2026-08",
+        "latestBasis": "registered_index_links_only",
+        "status": "reviewed_original_unchanged",
+        "reason": "fresh_bytes_and_extraction_match_reviewed_original",
+        "absenceProven": false,
+        "sha256": "8d4612a04f34808874c32cb82fde368ed6d43ca7b0268585b680612944caf794",
+        "capturedAt": "2026-10-26T23:39:22.940Z",
+        "originalReviewPreserved": true
+      }
+    ]
+  },
+  "localHistory": {
+    "records": 32,
+    "scope": "local_files_only",
+    "productionHistoryVerified": false
+  },
+  "network": {
+    "preparationRuns": {
+      "bcchRequests": 3,
+      "ineRequests": 8
+    },
+    "publicTransportDiagnostics": 4,
+    "officialWebReading": "separate; not counted as local capture success",
+    "automaticRetries": 0
+  },
+  "unresolved": [
+    "question:market",
+    "question:local",
+    "question:global",
+    "question:counter",
+    "source:cl-retail:timeout",
+    "semantic_input_review_not_completed",
+    "new_information_value_not_reviewed",
+    "paid_generation_not_authorized"
+  ],
+  "priceAssessment": {
+    "sourceCapture": "validated_projected_snapshot",
+    "rollingWindows": "partial",
+    "interpretation": "historical_window_coverage_incomplete_not_a_source_download_failure"
+  },
+  "checks": {
+    "protectedPriorInputsAndOperationalDataUnchanged": true,
+    "protectedOldFiles": 20,
+    "unitTests": {
+      "files": 89,
+      "declared": 516,
+      "executed": 623,
+      "parameterExpansions": 107
+    },
+    "newDeclaredTests": 7,
+    "newExecutedCases": 10,
+    "exactDuplicateNames": 0,
+    "identicalTestBodies": 0,
+    "tautologicalAssertions": 0,
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed",
+    "existingWarning": "610348-byte entry exceeds 500KB",
+    "credentialScan": {
+      "files": 56,
+      "matches": 0
+    },
+    "pgTap": "not_rerun_no_db_change",
+    "visualQa": "not_rerun_no_ui_change"
+  },
+  "modelCalls": 0,
+  "newApiCostUsd": 0,
+  "manuscriptCreated": false,
+  "publicationApproved": false,
+  "productionChanged": false,
+  "limitations": [
+    "Live INE collection is intermittent; retail original freshness is not verified.",
+    "Matched PDF and extraction preserve an old source judgment; they do not establish new interpretation.",
+    "No actual writer or reviewer model run, no new report-quality score.",
+    "BRL/MXN source adapters are not verified by this CLP run."
+  ]
+}

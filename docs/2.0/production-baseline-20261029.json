@@ -1,0 +1,522 @@
+{
+  "version": "production-baseline/1",
+  "checkedAt": "2026-10-29T12:32:02.691Z",
+  "status": "baseline_recorded_with_explicit_gaps",
+  "productionCommit": "828f68c9d8bf4d952a6a3d650fbc4c84a1fc0da5",
+  "scope": {
+    "productionWrites": 0,
+    "paidModelCalls": 0,
+    "newPaidModelCostUsd": 0,
+    "mailSent": 0,
+    "deployments": 0,
+    "readRequestsMayConsumeExistingPlatformAllowance": true
+  },
+  "platform": {
+    "github": {
+      "fullName": "erleri/congenial-octo-garbanzo",
+      "sizeKiB": 78472,
+      "defaultBranch": "main",
+      "private": false,
+      "pushedAt": "2026-10-29T05:51:43Z"
+    },
+    "netlify": {
+      "teamPlan": "Personal",
+      "publishedDeploy": "6ae2def1ab747a18f67b906f",
+      "monthlyCredits": "unverified",
+      "traffic": {
+        "window": {
+          "from_ts": 1793193637000,
+          "to_ts": 1793276437000
+        },
+        "bytes": 2167689,
+        "scope": "site all deploy hosts; observability sample not monthly invoice"
+      }
+    },
+    "supabase": {
+      "plan": "Free",
+      "databaseBytes": 31935635,
+      "storage": {
+        "buckets": 0,
+        "objects": 0
+      },
+      "monthlyEgress": "unverified",
+      "backupAvailability": "not_verified",
+      "restore": "not_exercised"
+    }
+  },
+  "consistency": {
+    "baseDate": true,
+    "fetchedAt": true,
+    "dataVersion": true,
+    "dailySamples": 14,
+    "dailyMatches": 14,
+    "monthlySamples": 14,
+    "monthlyMatches": 14,
+    "exactDailyCount": 128130,
+    "exactMonthlyCount": 4488,
+    "planCurrentRows": 110,
+    "planUnchanged": true,
+    "versionUnchanged": true
+  },
+  "productionDataset": {
+    "baseDate": "2026-10-29",
+    "fetchedAt": "2026-10-29T05:51:22.862Z",
+    "coverage": {
+      "dailyFrom": "2025-09-25",
+      "dailyTo": "2026-10-29",
+      "monthlyFrom": "2010-01-01",
+      "monthlyTo": "2026-12-01",
+      "limitedDailyHistory": true,
+      "dataVersion": "575c0ed4ea63afbf00543632854f66b03cd4d59d5be81333793eff295569ad5c"
+    },
+    "dailyRows": 8800,
+    "monthlyRows": 4488,
+    "hash": "6d8a68f98a76df9e51b2480b8bd5237911e4f12b7a9214da6c4f222ee75843cb",
+    "wireBodyBytes": 139148,
+    "uncompressedBytes": 3279962
+  },
+  "localFull": {
+    "baseDate": "2026-09-12",
+    "fetchedAt": "2026-09-12T04:38:23.518Z",
+    "hash": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f",
+    "dailyRows": 127096,
+    "monthlyRows": 4488
+  },
+  "migrations": {
+    "productionFiles": 9,
+    "applied": 9,
+    "appliedNotDeployed": [],
+    "deployedNotApplied": [],
+    "localOnly": [
+      "20261011023007_currency_report_review_storage.sql",
+      "20261011065342_currency_report_public_metadata.sql",
+      "20261011070501_currency_report_metadata_guard.sql",
+      "20261013121729_currency_report_editorial_provenance.sql",
+      "20261016101307_currency_report_presentation_version.sql",
+      "20261028005722_expand_currency_report_six_currencies.sql"
+    ]
+  },
+  "codeComparisons": [
+    {
+      "file": "netlify.toml",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "src/generated/fxReportConfig.ts",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": false
+    },
+    {
+      "file": "src/lib/exchangeRateRepository.ts",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "src/App.tsx",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": false
+    },
+    {
+      "file": "src/components/Admin.tsx",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "scripts/generate-data.ts",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": false
+    },
+    {
+      "file": "scripts/load-fx-dataset.js",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "scripts/create-fx-report.js",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "scripts/persist-fx-report.js",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "src/lib/businessPlanRemote.ts",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": "src/components/Dashboard.tsx",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": false
+    },
+    {
+      "file": "src/hooks/useExchangeData.ts",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    },
+    {
+      "file": ".github/workflows/generate-data.yml",
+      "sameTextIgnoringLineEndingsAndFinalBlankLines": true
+    }
+  ],
+  "historicalTreeComparison": {
+    "olderCommit": "4f685e38b6e0307323bf579b7ebbaae09242319e",
+    "olderDate": "2026-10-19",
+    "currentDate": "2026-10-29",
+    "files": [
+      {
+        "file": "data/fx-full-history.json",
+        "olderBytes": 34035654,
+        "currentBytes": 34093822,
+        "sizeDelta": 58168,
+        "contentChanged": true
+      },
+      {
+        "file": "public/data.json",
+        "olderBytes": 3278762,
+        "currentBytes": 3279962,
+        "sizeDelta": 1200,
+        "contentChanged": true
+      },
+      {
+        "file": "public/raw-sheets.json",
+        "olderBytes": 35404818,
+        "currentBytes": 35404818,
+        "sizeDelta": 0,
+        "contentChanged": false
+      },
+      {
+        "file": "data/mailing_list.json",
+        "olderBytes": 38,
+        "currentBytes": 38,
+        "sizeDelta": 0,
+        "contentChanged": false
+      },
+      {
+        "file": "src/generated/fxReportConfig.ts",
+        "olderBytes": 139,
+        "currentBytes": 139,
+        "sizeDelta": 0,
+        "contentChanged": false
+      }
+    ],
+    "limitation": "file-size change is not cumulative Git storage growth"
+  },
+  "scheduledRuns": {
+    "count": 10,
+    "allSuccess": true,
+    "scheduledKst": "09:15",
+    "starts": [
+      {
+        "id": 40825714897,
+        "name": "Daily Dashboard Email",
+        "sha": "991936e25d3604455c47690eb774dd80048f2693",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-29T05:50:42Z",
+        "updatedAt": "2026-10-29T05:51:54Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/40825714897",
+        "kst": "2026-10-29T14:50:42.000+09:00",
+        "minutesAfterSchedule": 335.7
+      },
+      {
+        "id": 40639773151,
+        "name": "Daily Dashboard Email",
+        "sha": "c7fdd4ab7ed2186d1313a7a2740b1c06ba43b674",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-28T05:44:53Z",
+        "updatedAt": "2026-10-28T05:46:03Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/40639773151",
+        "kst": "2026-10-28T14:44:53.000+09:00",
+        "minutesAfterSchedule": 329.8833333333333
+      },
+      {
+        "id": 40453614630,
+        "name": "Daily Dashboard Email",
+        "sha": "8f9cca63672e6b5628fa1c85831e3cb700eb8d56",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-27T05:08:32Z",
+        "updatedAt": "2026-10-27T05:09:46Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/40453614630",
+        "kst": "2026-10-27T14:08:32.000+09:00",
+        "minutesAfterSchedule": 293.53333333333336
+      },
+      {
+        "id": 40271086130,
+        "name": "Daily Dashboard Email",
+        "sha": "a28a082816c71ee3c3f93afaaa2dc18f7b36c31f",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-26T04:50:09Z",
+        "updatedAt": "2026-10-26T04:51:31Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/40271086130",
+        "kst": "2026-10-26T13:50:09.000+09:00",
+        "minutesAfterSchedule": 275.15
+      },
+      {
+        "id": 40162970547,
+        "name": "Daily Dashboard Email",
+        "sha": "80f51dedccdeea66a71a8212ded5b10d88f87a53",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-25T04:44:15Z",
+        "updatedAt": "2026-10-25T04:45:37Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/40162970547",
+        "kst": "2026-10-25T13:44:15.000+09:00",
+        "minutesAfterSchedule": 269.25
+      },
+      {
+        "id": 40063199479,
+        "name": "Daily Dashboard Email",
+        "sha": "86098956aff6b166ef950e19bd548172f822524d",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-24T04:39:24Z",
+        "updatedAt": "2026-10-24T04:40:32Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/40063199479",
+        "kst": "2026-10-24T13:39:24.000+09:00",
+        "minutesAfterSchedule": 264.4
+      },
+      {
+        "id": 39902726953,
+        "name": "Daily Dashboard Email",
+        "sha": "30bfb55d225d2c528175d6efcdf3fda4873b9de3",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-23T04:53:21Z",
+        "updatedAt": "2026-10-23T04:54:40Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/39902726953",
+        "kst": "2026-10-23T13:53:21.000+09:00",
+        "minutesAfterSchedule": 278.35
+      },
+      {
+        "id": 39724659548,
+        "name": "Daily Dashboard Email",
+        "sha": "c69e49d1147ac640623f3fb9967e6bb1cbbe8646",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-22T04:50:59Z",
+        "updatedAt": "2026-10-22T04:52:29Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/39724659548",
+        "kst": "2026-10-22T13:50:59.000+09:00",
+        "minutesAfterSchedule": 275.98333333333335
+      },
+      {
+        "id": 39546344022,
+        "name": "Daily Dashboard Email",
+        "sha": "08e65ca9a7c8e9596750a51b0c04270395c6122b",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-21T04:51:46Z",
+        "updatedAt": "2026-10-21T04:53:08Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/39546344022",
+        "kst": "2026-10-21T13:51:46.000+09:00",
+        "minutesAfterSchedule": 276.76666666666665
+      },
+      {
+        "id": 39371968695,
+        "name": "Daily Dashboard Email",
+        "sha": "4f685e38b6e0307323bf579b7ebbaae09242319e",
+        "event": "schedule",
+        "status": "completed",
+        "conclusion": "success",
+        "createdAt": "2026-10-20T04:53:36Z",
+        "updatedAt": "2026-10-20T04:54:45Z",
+        "url": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/39371968695",
+        "kst": "2026-10-20T13:53:36.000+09:00",
+        "minutesAfterSchedule": 278.6
+      }
+    ],
+    "minDelayMinutes": 264.4,
+    "maxDelayMinutes": 335.7,
+    "latestRun": 40825714897,
+    "mailStepSuccess": true,
+    "inboxReceipt": "not_verified",
+    "latestArtifacts": [
+      {
+        "bytes": 162789,
+        "createdAt": "2026-10-29T05:51:50Z",
+        "expiresAt": "2027-01-27T05:50:42Z"
+      }
+    ]
+  },
+  "reportState": {
+    "compiledFeatureFlag": true,
+    "legacyWorkflowActive": true,
+    "runsToday": [
+      {
+        "status": "pending_review",
+        "attempt": 1,
+        "ai_model": null,
+        "base_date": "2026-10-29",
+        "created_at": "2026-10-29T05:51:39.32972+00:00",
+        "generation_mode": "deterministic"
+      }
+    ],
+    "publishedCount": 0,
+    "aiResult": "ZDR endpoint unavailable; deterministic pending review; no new call triggered by baseline audit"
+  },
+  "uiObservations": [
+    {
+      "screen": "dashboard",
+      "result": "latest Supabase data and build visible",
+      "baseDate": "2026-10-29",
+      "initialCache": "2026-09-11 appeared in first observation then refreshed automatically; duration not measured"
+    },
+    {
+      "screen": "monthly",
+      "result": "2025-2026 tables and monthly values visible"
+    },
+    {
+      "screen": "daily",
+      "result": "BRL chart and table visible; retained period 2026-08 through 2026-09"
+    },
+    {
+      "screen": "plan",
+      "result": "2026-10 remote plan confirmed, read-only, last saved 2026-10-11T23:43:13.548395Z; no save attempted"
+    },
+    {
+      "screen": "admin",
+      "result": "raw sheet selector/preview visible; report review locked while unauthenticated; no Excel or email-list action attempted"
+    },
+    {
+      "screen": "reports",
+      "result": "no published report; administrator review waiting message"
+    }
+  ],
+  "kpiVisualReference": {
+    "currencyOrder": [
+      "BRL",
+      "MXN",
+      "CLP",
+      "COP",
+      "ARS",
+      "PEN"
+    ],
+    "usdKrw": 1336,
+    "usdMonthAverage": 1338,
+    "spot": [
+      5.3468,
+      18.6534,
+      987.6,
+      3167.6,
+      1541.64,
+      3.4492
+    ],
+    "monthAverage": [
+      5.106,
+      18.4076,
+      981.2,
+      3208.7,
+      1522.34,
+      3.4433
+    ],
+    "momPercent": [
+      -0.7,
+      6.86,
+      3.48,
+      0.61,
+      0.6,
+      2.12
+    ],
+    "low52": [
+      4.9019,
+      16.898,
+      852.6,
+      3048.2,
+      1354.78,
+      3.3373
+    ],
+    "high52": [
+      5.5884,
+      18.7823,
+      995.5,
+      3874.5,
+      1541.64,
+      3.5241
+    ],
+    "limitation": "Displayed values transcribed from read-only browser observation; not a full recomputation or a trading-price certification"
+  },
+  "protectedFiles": {
+    "count": 596,
+    "changed": []
+  },
+  "gaps": [
+    {
+      "id": "B01",
+      "item": "Netlify remaining credits / monthly usage",
+      "reason": "connector exposes traffic sample, not billing balance; in-app session is logged out",
+      "gate": "cost headroom before release"
+    },
+    {
+      "id": "B02",
+      "item": "Supabase monthly egress, billable usage, tested backup",
+      "reason": "metadata/SQL measures physical size only; no backup/restore performed",
+      "gate": "before storage/schema rollout"
+    },
+    {
+      "id": "B03",
+      "item": "GitHub account Actions storage / complete artifact sum",
+      "reason": "repository size and latest-run artifact available; account billing unavailable",
+      "gate": "before fixing retention quotas"
+    },
+    {
+      "id": "B04",
+      "item": "daily operational growth",
+      "reason": "one DB measurement; historical blob sizes are available, not daily DB/backed-up storage trend",
+      "gate": "before long-term capacity claim"
+    },
+    {
+      "id": "B05",
+      "item": "authenticated write and mailbox delivery",
+      "reason": "baseline deliberately read-only; successful SMTP job does not confirm inbox receipt",
+      "gate": "test environment and approved later smoke test"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F01",
+      "priority": "release",
+      "item": "scheduled job delay",
+      "detail": "Latest 10 starts 4h24m to 5h36m after declared 09:15 KST; all succeed. Cause not established."
+    },
+    {
+      "id": "F02",
+      "priority": "release",
+      "item": "legacy report pipeline already enabled",
+      "detail": "New shared Sol writer must not run alongside legacy generator for same publication purpose."
+    },
+    {
+      "id": "F03",
+      "priority": "before optimization",
+      "item": "raw sheet has active admin-view dependency",
+      "detail": "Public source blob 35,404,818 bytes. Replace required read path before removal; HEAD did not measure body transfer."
+    },
+    {
+      "id": "F04",
+      "priority": "before release",
+      "item": "recovery and quota evidence incomplete",
+      "detail": "Do not promise uninterrupted operation or capacity from current DB size alone."
+    },
+    {
+      "id": "F05",
+      "priority": "privacy review",
+      "item": "mailing-list path tracked in public repository",
+      "detail": "Tree includes data/mailing_list.json (38 bytes). Contents were not opened/copied; move operational recipient management outside public Git after scope review."
+    },
+    {
+      "id": "F06",
+      "priority": "informational",
+      "item": "Supabase advisors",
+      "detail": "All 9 public tables have RLS. Password-leak protection WARN and unused report index INFO; assess actual password auth/usage before changing. RLS presence is not role-policy verification."
+    }
+  ],
+  "verificationLimitations": [
+    "Migration names/versions match; not a complete schema drift verification.",
+    "No production save, user login, mail dispatch, model call, cache outage injection or restore executed.",
+    "Traffic 2,167,689 bytes refers to preceding 23h across this site including deploy host traffic; not monthly bill or organic-only traffic.",
+    "Protected-file hashes do not prove external state untouched; read-only operations and DB before/after fingerprints are recorded."
+  ]
+}
