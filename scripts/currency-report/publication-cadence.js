@@ -49,7 +49,7 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
  candidates.sort((a,b)=>Date.parse(b.publishedAt)-Date.parse(a.publishedAt)||a.id.localeCompare(b.id))
  const anchor=candidates[0]??null
  const due=anchor&&threshold!==null?periodicDueDate(anchor.publishedAt):null
- const dataHolds=[],comparisonHolds=[]
+ const dataHolds=[],comparisonHolds=[],comparisonDetails=[]
  const expected=calendar?.status==='confirmed'?calendar.expectedReferenceDate:null
  if(!cleanPoint(snapshot,expected)||snapshot.current.date>date)dataHolds.push('current_reference_invalid_or_imputed')
  if(!calendar||calendar.status!=='confirmed'||!validDate(calendar.expectedReferenceDate)||calendar.expectedReferenceDate>date)
@@ -65,7 +65,12 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
   const points=snapshot.series?.filter(r=>r.date===old.current.date&&r.currency===currency&&r.rateType==='LOCAL_PER_USD')??[]
   if(points.length!==1||!referenceRowOrigin(snapshot.series??[],points[0]))
    comparisonHolds.push('anchor_revision_check_unavailable')
-  else if(points[0].value!==old.current.value)comparisonHolds.push('anchor_value_revised')
+  else if(points[0].value!==old.current.value){
+   comparisonHolds.push('anchor_value_revised')
+   comparisonDetails.push({reason:'anchor_value_revised',date:old.current.date,publishedValue:old.current.value,
+    currentHistoryValue:points[0].value,publishedProvider:oldProvider??null,currentProvider:currentProvider??null,
+    resolution:'compare_original_source_records_no_automatic_rebase'})
+  }
   if(!comparisonHolds.length)cumulativePct=(snapshot.current.value/old.current.value-1)*100
  }
  const correctionIds=correctionReportIds.filter(key=>publications.some(r=>r.id===key&&r.currency===currency
@@ -86,7 +91,7 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
  const result={version:PUBLICATION_CADENCE_VERSION,policyVersion:REPORT_CADENCE_POLICY_VERSION,currency,checkedOnKst:date,policyStatus,thresholdPct:threshold,
   anchorId:anchor?.id??null,anchorObservedDate:anchor?.snapshot.current.date??null,periodicDueDate:due,cumulativePct,
   direction:cumulativePct===null?'unverified':cumulativePct>0?'local_currency_weaker':cumulativePct<0?'local_currency_stronger':'unchanged',
-  status,triggers,caseId,checkId,duplicateCheck,dataHolds,comparisonHolds,correctionReportIds:correctionIds,
+  status,triggers,caseId,checkId,duplicateCheck,dataHolds,comparisonHolds,comparisonDetails,correctionReportIds:correctionIds,
   researchAllowed:!duplicateCheck&&(correctionIds.length>0||eventCandidateIds.length>0||!hasPriceHold&&policyStatus!=='decision_pending'&&triggers.length>0),
   triggerIsEvidence:false,paidCallAuthorized:false,publicationApproved:false,resetPublicationAnchor:false,
   calendarMeaning:'expected_stored_reference_date_not_certified_local_close',

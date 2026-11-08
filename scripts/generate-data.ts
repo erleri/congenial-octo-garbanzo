@@ -6,7 +6,9 @@ import {
 } from '../src/lib/api.ts'
 import { fetchRemoteExchangeData } from '../src/lib/merger.ts'
 import { FULL_DATASET_PATH, STATIC_FALLBACK_PATH, writeDatasetFiles } from './dataset-files.ts'
-import type { FxPriceSource } from '../src/types/exchangeRate'
+import type { FxPriceSource, DashboardReferenceRecovery } from '../src/types/exchangeRate'
+import {retainDashboardReferences} from './dashboard-reference-archive'
+import {verifyReferenceRecovery} from './dashboard-reference-recovery'
 
 type RepoSupplementalCache = {
   fetchedAt: string
@@ -40,6 +42,15 @@ async function loadRepoBackfillCache(cachePath: string): Promise<RepoBackfillCac
 }
 
 async function main() {
+  // A missing/corrupt prior full dataset must not silently reset adopted values.
+  const previousDataset=JSON.parse(await readFile(FULL_DATASET_PATH,'utf8'))
+  let recoveries:DashboardReferenceRecovery[]=[]
+  try{
+    const saved=JSON.parse(await readFile(resolve(process.cwd(),'data','reference-recoveries.json'),'utf8'))
+    if(saved.version!=='dashboard-reference-recovery-set/1'||!Array.isArray(saved.recoveries))throw Error('invalid_reference_recovery_set')
+    recoveries=saved.recoveries
+    for(const receipt of recoveries)verifyReferenceRecovery(receipt)
+  }catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error}
   const rawSheetsOutputPath = resolve(process.cwd(), 'public', 'raw-sheets.json')
   const supplementalOutputPath = resolve(process.cwd(), 'public', 'alpha-vantage-history.json')
   const supplementalCachePath = resolve(process.cwd(), 'data', 'alpha-vantage-history.json')
@@ -63,11 +74,13 @@ async function main() {
     }
   }
 
-  const dataset = await fetchRemoteExchangeData(new Date(), {
+  const incoming = await fetchRemoteExchangeData(new Date(), {
     supplementalHistoryByCurrency: supplementalRates,
     supplementalPriceSources,
     manualBackfillByDate: repoBackfillCache?.ratesByDate,
   })
+  const {dataset,review}=retainDashboardReferences(incoming,previousDataset,new Date().toISOString(),recoveries)
+  console.log(`Dashboard reference archive: ${JSON.stringify(review)}`)
   const rawSheets = dataset.rawSheets ?? []
   const coreDataset = { ...dataset }
   delete coreDataset.rawSheets

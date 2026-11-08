@@ -151,6 +151,69 @@ export interface ExchangeRateDataset {
   rawSheets?: RawSheet[]
   coverage?: DatasetCoverage
   priceProvenance?: FxPriceProvenance
+  referenceArchive?: DashboardReferenceArchive
+}
+
+// First adopted daily selections. Dataset dates are not certified trading days.
+export interface DashboardReferenceArchive {
+  version: 'dashboard-reference-archive/1'
+  scope: 'full' | 'window'
+  entries: Array<{
+    id: string
+    date: string
+    selectedForDate: string
+    selectedAt: string
+    recordedAt: string
+    basis: 'legacy_dataset_bootstrap' | 'generated_dashboard_selection' | 'verified_stored_selection'
+    recoveryId?: string
+    rows: Array<[CurrencyCode, DailyRate['rateType'], number]>
+    sourceIds: Partial<Record<CurrencyCode, string | null>>
+  }>
+  sources: Record<string, FxPriceSource>
+  recoveries?: Record<string, DashboardReferenceRecovery>
+  revisionOffers: Array<{
+    id: string
+    date: string
+    currency: CurrencyCode
+    rateType: DailyRate['rateType']
+    selectedValue: number
+    offeredValue: number | null
+    offeredIdentity: string | null
+    offeredSourceId: string | null
+    firstSeenAt: string
+  }>
+  digest: string
+}
+
+// A compact recovery receipt compiled from an unchanged historical Git artifact
+// and a read-only copy of public reports. It is not a provider certification.
+export interface DashboardReferenceRecovery {
+  version: 'dashboard-reference-recovery/1'
+  id: string
+  preparedAt: string
+  artifact: {
+    commit: string
+    productionCommit: string
+    path: 'data/fx-full-history.json'
+    blob: string
+    sha256: string
+    dataVersion: string
+    baseDate: string
+    fetchedAt: string
+  }
+  selections: Array<{
+    currency: CurrencyCode
+    unit: string
+    reportId: string
+    reportSha256: string
+    publishedAt: string
+    matchedChartPoints: number
+    selected: DailyRate
+    origin: DailyRate
+    conversion: DailyRate | null
+    conversionBasis: DailyRate | null
+    provider: FxPriceSource | null
+  }>
 }
 
 // Optional for backward compatibility. Dataset dates are not local sessions.

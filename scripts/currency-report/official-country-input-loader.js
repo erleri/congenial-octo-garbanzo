@@ -23,8 +23,15 @@ export async function collectOfficialCountryInputs({currency,asOf,fetchImpl=fetc
   if(!pdf&&officialAccessBarrier(raw.toString('utf8')))throw Error('official_access_barrier_not_statistic')
   if(pdf&&!raw.subarray(0,5).equals(Buffer.from('%PDF-')))throw Error('official_pdf_content_mismatch')
   const proof={id,url,httpStatus:response.status,collectedAt:now(),sha256:digest(raw),rawBase64:raw.toString('base64')}
-  if(pdf){if(typeof extractPdf!=='function')throw Error('official_pdf_extractor_not_configured');proof.extraction=await extractPdf(raw,'statistical-bulletin')}
-  proofs.push(proof);return raw.toString('utf8')
+  // Capture before extraction, so a parser failure does not discard a valid
+  // original or force another download just to diagnose/replay it.
+  proofs.push(proof)
+  if(pdf){
+   if(typeof extractPdf!=='function')throw Error('official_pdf_extractor_not_configured')
+   try{proof.extraction=await extractPdf(raw,'statistical-bulletin')}
+   catch{proof.extractionFailure='official_pdf_extraction_failed';throw Error('official_pdf_extraction_failed')}
+  }
+  return raw.toString('utf8')
  }
  try{
   if(currency==='BRL')await read('brl-pmc',IBGE_RETAIL_SIDRA_URL)

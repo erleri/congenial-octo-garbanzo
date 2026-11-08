@@ -1,6 +1,6 @@
 import {expect,it,vi} from 'vitest'
 import {createHash} from 'node:crypto'
-import {officialCacheRecord,assertOfficialCacheRecord,withOfficialInputCache} from './official-input-cache.js'
+import {officialCacheRecord,assertOfficialCacheRecord,withOfficialInputCache,OFFICIAL_CACHE_DEFINITIONS,officialCacheDefinitions} from './official-input-cache.js'
 import {OFFICIAL_COUNTRY_VERSION} from './official-country-statistics.js'
 import {officialBackgroundCoverage} from './official-background-coverage.js'
 
@@ -14,6 +14,14 @@ function memory(){const records=new Map();return {records,saveOfficialInput:vi.f
 const failure=()=>({inputState:'official_inputs_partial',inputIssues:['official_access_barrier_not_statistic'],inputNetworkCalls:1})
 const review=async({inputs,asOf:clock})=>({currency:'BRL',admitted:inputs.countryOfficialInputs&&clock.startsWith('2026-11')?[{scope:{metric:'retail'},seriesId:'synthetic'}]:[],
  rows:[{reason:inputs.countryOfficialInputs?'official_background_outside_collection_window':'official_profile_capture_missing'}]})
+
+it('invalidates only the affected provider envelope while retaining existing unrelated country cache definitions',()=>{
+ for(const currency of ['BRL','MXN','CLP','COP','ARS'])expect(officialCacheDefinitions(currency)).toBe(OFFICIAL_CACHE_DEFINITIONS)
+ expect(officialCacheDefinitions('PEN')).toBe(OFFICIAL_CACHE_DEFINITIONS+'|official-json-envelope/1')
+ const existing=officialCacheRecord({currency:'BRL',inputs:input(),asOf})
+ expect(existing.definitions).toBe(OFFICIAL_CACHE_DEFINITIONS)
+ expect(assertOfficialCacheRecord(existing,'BRL',asOf)).toEqual(existing)
+})
 
 it('preserves original receipts across recaptures with the same body, while retaining actual changed editions',()=>{
  const first=input(),second=input();second.countryOfficialInputs.proofs[0].collectedAt='2026-11-01T12:00:00Z'

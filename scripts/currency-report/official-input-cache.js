@@ -6,9 +6,13 @@ import {OFFICIAL_COUNTRY_VERSION} from './official-country-statistics.js'
 import {INEGI_DEFINITION_VERSION,verifyInegiReportSeries} from './inegi-report-indicators.js'
 import {INEGI_NUMERIC_USE} from './official-statistic-admission.js'
 import {REPORT_CURRENCIES} from './shared-price-contract.js'
+import {OFFICIAL_JSON_ENVELOPE_VERSION} from './official-json-envelope.js'
 
 export const OFFICIAL_CACHE_VERSION='official-input-cache/1'
 export const OFFICIAL_CACHE_DEFINITIONS=`${OFFICIAL_COUNTRY_VERSION}|${INEGI_DEFINITION_VERSION}`
+// A provider-envelope change must not invalidate unrelated country caches.
+export const officialCacheDefinitions=currency=>currency==='PEN'
+ ?`${OFFICIAL_CACHE_DEFINITIONS}|${OFFICIAL_JSON_ENVELOPE_VERSION}`:OFFICIAL_CACHE_DEFINITIONS
 const currencies=REPORT_CURRENCIES
 const seal=value=>({...value,binding:fingerprint(value)})
 function frozenInputs(currency,input){
@@ -23,13 +27,13 @@ function frozenInputs(currency,input){
   officialTerms:structuredClone(input.officialTerms??null)}
 }
 function identity(currency,input){
- if(currency!=='MXN')return fingerprint({currency,definitions:OFFICIAL_CACHE_DEFINITIONS,proofs:input.countryOfficialInputs.proofs.map(p=>({id:p.id,
+ if(currency!=='MXN')return fingerprint({currency,definitions:officialCacheDefinitions(currency),proofs:input.countryOfficialInputs.proofs.map(p=>({id:p.id,
   // The ARS API date window is a query, not a different source. Exact URL and
   // receipts remain in the record; identical raw bytes do not grow the cache
   // merely because today's end_date changed. Other URL semantics are retained.
   url:p.id==='ars-definition'?`${new URL(p.url).origin}${new URL(p.url).pathname}?ids=${new URL(p.url).searchParams.get('ids')}`:p.url,sha256:p.sha256,
   extraction:p.extraction?fingerprint(p.extraction):null})).sort((a,b)=>a.id.localeCompare(b.id)||a.url.localeCompare(b.url))})
- return fingerprint({currency,definitions:OFFICIAL_CACHE_DEFINITIONS,series:input.inegiCaptures.map(({checkedAt,networkCalls,...c})=>{void checkedAt;void networkCalls;return c}),
+ return fingerprint({currency,definitions:officialCacheDefinitions(currency),series:input.inegiCaptures.map(({checkedAt,networkCalls,...c})=>{void checkedAt;void networkCalls;return c}),
   documents:input.officialDocuments.map(d=>({url:d.url,sha256:d.sha256,extraction:fingerprint(d.extraction)})).sort((a,b)=>a.url.localeCompare(b.url)),
   terms:input.officialTerms?.sha256??null})
 }
@@ -39,14 +43,14 @@ export function officialCacheRecord({currency,inputs,asOf}){
  const times=currency==='MXN'?[...frozen.inegiCaptures.map(c=>c.checkedAt),...frozen.officialDocuments.map(d=>d.collectedAt),frozen.officialTerms?.collectedAt]
   :frozen.countryOfficialInputs.proofs.map(p=>p.collectedAt)
  if(!times.length||times.some(t=>!Number.isFinite(Date.parse(t))||Date.parse(t)>Date.parse(asOf)))throw Error('official_cache_capture_time_invalid')
- const record=seal({version:OFFICIAL_CACHE_VERSION,definitions:OFFICIAL_CACHE_DEFINITIONS,currency,key:identity(currency,frozen),
+ const record=seal({version:OFFICIAL_CACHE_VERSION,definitions:officialCacheDefinitions(currency),currency,key:identity(currency,frozen),
   observedAt:[...times].sort((a,b)=>Date.parse(b)-Date.parse(a))[0],inputs:frozen})
  if(Buffer.byteLength(JSON.stringify(record))>16_000_000||/sk-or-|bearer\s+\S+|-----BEGIN .*PRIVATE KEY|[?&](?:token|api_?key)=/i.test(JSON.stringify(record)))throw Error('official_cache_unsafe_or_oversized')
  return record
 }
 export function assertOfficialCacheRecord(record,currency,asOf){
  const {binding,...body}=record??{}
- if(record?.version!==OFFICIAL_CACHE_VERSION||record.definitions!==OFFICIAL_CACHE_DEFINITIONS||record.currency!==currency
+ if(record?.version!==OFFICIAL_CACHE_VERSION||record.definitions!==officialCacheDefinitions(currency)||record.currency!==currency
   ||binding!==fingerprint(body)||identity(currency,record.inputs)!==record.key||Date.parse(record.observedAt)>Date.parse(asOf))throw Error('official_cache_binding_or_version_invalid')
  const checked=officialCacheRecord({currency,inputs:record.inputs,asOf})
  if(checked.binding!==record.binding)throw Error('official_cache_binding_or_version_invalid')
@@ -80,7 +84,7 @@ export function withOfficialInputCache({loader,store,review,now=()=>new Date().t
   }
   if(fresh.inputState==='official_inputs_collected')return {...fresh,officialCache:{status:'fresh_statistic_held_no_cache_substitution'}}
   try{
-   const stored=await store.officialInput(args.currency,OFFICIAL_CACHE_DEFINITIONS,asOf)
+   const stored=await store.officialInput(args.currency,officialCacheDefinitions(args.currency),asOf)
    if(!stored)return {...fresh,officialCache:{status:'not_found'}}
    const cached=assertOfficialCacheRecord(stored,args.currency,asOf),check=await assess(cached.inputs)
    if(!check.admitted.length)return {...fresh,inputIssues:[...issues,'official_cached_input_no_longer_eligible'],officialCache:{status:'expired_or_held',

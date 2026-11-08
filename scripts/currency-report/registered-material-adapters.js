@@ -8,6 +8,7 @@ import {decodeEntities} from './local-source-discovery.js'
 import {CHILE_MONTHLY_SOURCES} from './chile-monthly-originals.js'
 import {newsPublisherProfile} from './news-publisher-access.js'
 import {nonEconomicSection} from './news-preselection.js'
+import {readOfficialJson} from './official-json-envelope.js'
 
 export const IBGE_RETAIL_SIDRA_URL='https://apisidra.ibge.gov.br/values/t/8880/n1/all/v/11708/p/last%203/c11046/56734?formato=json'
 
@@ -73,7 +74,7 @@ const decimal=value=>typeof value==='number'&&Number.isFinite(value)?value:
 const PEN_LABELS=['Tarjeta de Crédito','Hasta 360 días','Más 360 días']
 const ES_MONTHS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic']
 export function parseRegisteredStatistic(recipe,text,asOf) {
-  const body=JSON.parse(text)
+  const decoded=readOfficialJson(text,recipe.kind==='bcrp_credit_json'?'bcrp':null),body=decoded.body
   if(recipe.kind==='ibge_sidra_json') {
     if(!validDate(asOf)||!Array.isArray(body)||body.length<2||body.length>121||body[0]?.V!=='Valor')throw new Error('sidra_schema_changed')
     const seen=new Set(),observations=[]
@@ -108,7 +109,7 @@ export function parseRegisteredStatistic(recipe,text,asOf) {
       if(period>asOf.slice(0,7))return []
       return p.values.map((value,i)=>({period,seriesId:['PN07845NM','PN07846NM','PN07847NM'][i],label:body.config.series[i].name,value:decimal(value)}))
     })
-    return {kind:'statistic',observations,unit:'percent_effective_annual',publishedAt:null,
+    return {kind:'statistic',observations,unit:'percent_effective_annual',publishedAt:null,transportWarnings:decoded.warnings,
       limitation:'은행권 현지통화 상품·만기별 금리. 정책금리·국가 소비자 평균·당일 환율 원인이 아님.'}
   }
   if(recipe.kind==='sfc_credit_json') {

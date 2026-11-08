@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   fetchManualBackfillDataset,
-  fetchRemoteExchangeData,
   fetchRemoteExchangeDataWithExcel,
   fetchSupplementalHistoryDataset,
   loadDailyYears,
@@ -85,6 +84,7 @@ function mergeDailyRows(
 export function useExchangeData() {
   const [dataset, setDataset] = useState<ExchangeRateDataset | null>(null)
   const datasetRef = useRef<ExchangeRateDataset | null>(null)
+  const datasetLoadEpoch = useRef(0)
   useEffect(() => { datasetRef.current = dataset }, [dataset])
   const [datasetSource, setDatasetSource] = useState<DatasetSource>('none')
   const [loading, setLoading] = useState(false)
@@ -179,6 +179,7 @@ export function useExchangeData() {
     periodTo: string,
   ) => {
     const activeDataset = datasetRef.current
+    const epoch = datasetLoadEpoch.current
     if (currency === 'ALL' || !periodFrom || !periodTo || !activeDataset) {
       return
     }
@@ -200,6 +201,7 @@ export function useExchangeData() {
     try {
       setDailyRangeLoading(true)
       const rows = await loadDailyYears(fxMetadata, currency, years)
+      if (epoch !== datasetLoadEpoch.current) return
       setDailyRangeNotice(dailyCoverageNotice(mergeDailyRows(activeDataset, rows), currency, periodFrom, periodTo))
       setDataset((current) => current ? mergeDailyRows(current, rows) : current)
 
@@ -207,9 +209,11 @@ export function useExchangeData() {
         (year) => year >= 2009 && year <= new Date().getFullYear(),
       )
       void loadDailyYears(fxMetadata, currency, adjacentYears).then((prefetched) => {
+        if (epoch !== datasetLoadEpoch.current) return
         setDataset((current) => current ? mergeDailyRows(current, prefetched) : current)
       }).catch(() => { /* Optional prefetch failure must not interrupt the selected range. */ })
     } catch (rangeError) {
+      if (epoch !== datasetLoadEpoch.current) return
       setDailyRangeNotice(dailyCoverageNotice(activeDataset, currency, periodFrom, periodTo))
       setError(
         rangeError instanceof Error
@@ -217,14 +221,24 @@ export function useExchangeData() {
           : '선택 기간 데이터를 불러오지 못했습니다.',
       )
     } finally {
-      setDailyRangeLoading(false)
+      if (epoch === datasetLoadEpoch.current) setDailyRangeLoading(false)
     }
   }, [fxMetadata])
 
   const refreshData = async () => {
+    const epoch=++datasetLoadEpoch.current
+    setDailyRangeLoading(false)
     try {
       setLoading(true)
       setError(null)
+      if(!excelFile){
+        const current=await loadInitialExchangeDataset({refresh:true})
+        if(epoch!==datasetLoadEpoch.current)return
+        setFxMetadata(current.metadata)
+        await applyDataset(current.dataset,current.source)
+        if(current.stale)setError('운영 데이터 연결이 원활하지 않아 마지막 저장 데이터를 표시합니다.')
+        return
+      }
       const [manualBackfill, supplementalHistory] = await Promise.all([
         fetchManualBackfillDataset(),
         fetchSupplementalHistoryDataset(),
@@ -234,8 +248,7 @@ export function useExchangeData() {
         void saveAVSupplementalCache(supplementalHistory)
       }
 
-      const fetched = excelFile
-        ? await fetchRemoteExchangeDataWithExcel(
+      const fetched = await fetchRemoteExchangeDataWithExcel(
             excelFile,
             { excelPriority, fillMissing },
             new Date(),
@@ -244,20 +257,19 @@ export function useExchangeData() {
               manualBackfillByDate: manualBackfill?.ratesByDate,
             },
           )
-        : await fetchRemoteExchangeData(new Date(), {
-            supplementalHistoryByCurrency: supplementalHistory?.rates,
-            manualBackfillByDate: manualBackfill?.ratesByDate,
-          })
 
-      await applyDataset(fetched, excelFile ? 'excel' : 'remote')
+      if(epoch!==datasetLoadEpoch.current)return
+      setFxMetadata(null)
+      await applyDataset(fetched, 'excel')
     } catch (refreshError) {
+      if(epoch!==datasetLoadEpoch.current)return
       setError(
         refreshError instanceof Error
           ? refreshError.message
           : 'An error occurred while refreshing the exchange data.',
       )
     } finally {
-      setLoading(false)
+      if(epoch===datasetLoadEpoch.current)setLoading(false)
     }
   }
 
@@ -265,6 +277,8 @@ export function useExchangeData() {
     file: File,
     options: { excelPriority: boolean; fillMissing: boolean },
   ) => {
+    const epoch=++datasetLoadEpoch.current
+    setDailyRangeLoading(false)
     try {
       validateExcelUpload(file)
       setLoading(true)
@@ -284,6 +298,8 @@ export function useExchangeData() {
         manualBackfillByDate: manualBackfill?.ratesByDate,
       })
 
+      if(epoch!==datasetLoadEpoch.current)return {type:'error' as const,text:'더 최근 데이터 요청으로 대체되었습니다.'}
+      setFxMetadata(null)
       await applyDataset(merged, 'excel')
       setExcelFile(file)
       setExcelPriority(options.excelPriority)
@@ -296,14 +312,14 @@ export function useExchangeData() {
     } catch (mergeError) {
       const message =
         mergeError instanceof Error ? mergeError.message : 'An error occurred while merging Excel data.'
-      setError(message)
+      if (epoch === datasetLoadEpoch.current) setError(message)
 
       return {
         type: 'error' as const,
         text: `Excel upload failed: ${message}`,
       }
     } finally {
-      setLoading(false)
+      if (epoch === datasetLoadEpoch.current) setLoading(false)
     }
   }
 
@@ -474,6 +490,7 @@ export function useExchangeData() {
     let isMounted = true
 
     const init = async () => {
+      const epoch=++datasetLoadEpoch.current
       const cachedPlanPromise = loadBusinessPlanFromCache()
       const cachedPromise = loadDatasetFromCache()
 
@@ -483,7 +500,7 @@ export function useExchangeData() {
       }
 
       const cached = await cachedPromise
-      if (!isMounted) {
+      if (!isMounted||epoch!==datasetLoadEpoch.current) {
         return
       }
 
@@ -495,7 +512,7 @@ export function useExchangeData() {
 
       try {
         const initial = await loadInitialExchangeDataset()
-        if (!isMounted) {
+        if (!isMounted||epoch!==datasetLoadEpoch.current) {
           return
         }
         setFxMetadata(initial.metadata)
@@ -504,6 +521,7 @@ export function useExchangeData() {
           setError('Supabase 연결이 원활하지 않아 마지막 캐시 또는 JSON 데이터를 표시합니다.')
         }
       } catch (initialError) {
+        if(!isMounted||epoch!==datasetLoadEpoch.current)return
         if (cached) {
           setError('최신 데이터를 불러오지 못해 마지막 로컬 캐시를 표시합니다.')
           return

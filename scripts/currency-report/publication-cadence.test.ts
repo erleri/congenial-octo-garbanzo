@@ -71,7 +71,9 @@ it('requires the expected reference date explicitly instead of guessing holidays
 
 it('holds revised or incompatible anchors while preserving a pending periodic check',()=>{
  const revised=snapshot(103);revised.series[0].value=99
- expect(inspect(revised)).toMatchObject({status:'data_wait',cumulativePct:null,comparisonHolds:['anchor_value_revised']})
+ expect(inspect(revised)).toMatchObject({status:'data_wait',cumulativePct:null,comparisonHolds:['anchor_value_revised'],
+  comparisonDetails:[{date:'2026-10-02',publishedValue:100,currentHistoryValue:99,publishedProvider:null,currentProvider:null,
+   resolution:'compare_original_source_records_no_automatic_rebase'}]})
  const other=snapshot(103);other.lineage.current.provider='new-provider'
  const old=publication();old.snapshot.lineage.current.provider='old-provider'
  expect(inspect(other,{publications:[old]}).comparisonHolds).toContain('reference_provider_changed')

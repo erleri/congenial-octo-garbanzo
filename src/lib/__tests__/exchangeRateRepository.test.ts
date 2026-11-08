@@ -1,8 +1,25 @@
 import { describe, expect, it, vi } from 'vitest'
-import { selectInitialExchangeDataset } from '../exchangeRateRepository'
+import { selectInitialExchangeDataset,refreshableDatasetLoader } from '../exchangeRateRepository'
 import { dataset } from './fixtures'
 
 describe('initial exchange-rate data source selection', () => {
+  it('reloads the operating store explicitly while ordinary reads share the current request',async()=>{
+    const source=vi.fn().mockResolvedValueOnce({version:1}).mockResolvedValueOnce({version:2})
+    const load=refreshableDatasetLoader(source)
+    const first=load();expect(load()).toBe(first)
+    expect(await first).toEqual({version:1})
+    expect(await load(true)).toEqual({version:2})
+    expect(await load()).toEqual({version:2})
+    expect(source).toHaveBeenCalledTimes(2)
+  })
+  it('does not let an older failed read discard a successful refresh',async()=>{
+    let rejectOld:(e:Error)=>void=()=>{}
+    const source=vi.fn().mockImplementationOnce(()=>new Promise((_resolve,reject)=>{rejectOld=reject})).mockResolvedValueOnce({version:2})
+    const load=refreshableDatasetLoader(source),old=load();await Promise.resolve()
+    const current=load(true);expect(await current).toEqual({version:2})
+    rejectOld(new Error('old request failed'));await expect(old).rejects.toThrow('old request failed')
+    expect(load()).toBe(current)
+  })
   it('labels the cached outage recovery as static and stale', async () => {
     const result = await selectInitialExchangeDataset({
       mode: 'auto', supabaseConfigured: true,

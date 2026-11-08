@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import type { DatasetCoverage, ExchangeRateDataset } from '../src/types/exchangeRate'
 import {prunePriceProvenance} from '../src/lib/price-provenance'
+import {validateReferenceArchive} from './dashboard-reference-archive'
 
 export const FULL_DATASET_PATH = resolve(process.cwd(), 'data', 'fx-full-history.json')
 export const STATIC_FALLBACK_PATH = resolve(process.cwd(), 'public', 'data.json')
@@ -50,6 +51,7 @@ export function buildDatasetFiles(dataset: ExchangeRateDataset): {
   fullDataset: ExchangeRateDataset
   staticFallback: ExchangeRateDataset
 } {
+  validateReferenceArchive(dataset,true)
   const datasetWithoutCoverage = { ...dataset }
   delete datasetWithoutCoverage.coverage
   const canonicalJson = JSON.stringify(datasetWithoutCoverage)
@@ -61,8 +63,13 @@ export function buildDatasetFiles(dataset: ExchangeRateDataset): {
     ...datasetWithoutCoverage,
     coverage: coverageFor(dataset, dataset.dailyRates, dataVersion, false),
   }
+  // The append-only selection journal belongs to the generator's full dataset.
+  // Browser readers already receive the retained prices and their provenance;
+  // duplicating the journal/source dictionary here grows the 400-day payload.
+  const {referenceArchive,...browserDataset}=datasetWithoutCoverage
+  void referenceArchive
   const staticFallback: ExchangeRateDataset = {
-    ...datasetWithoutCoverage,
+    ...browserDataset,
     dailyRates: fallbackDailyRates,
     coverage: coverageFor(dataset, fallbackDailyRates, dataVersion, true),
     ...(dataset.priceProvenance?{priceProvenance:prunePriceProvenance(dataset.priceProvenance,fallbackDailyRates)}:{}),

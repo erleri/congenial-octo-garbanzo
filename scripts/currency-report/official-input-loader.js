@@ -44,7 +44,7 @@ export function createOfficialInputLoader({workspace,env=process.env,savedByCurr
    calls+=result.networkCalls??0;inegiCaptures.push(result)
    if(result.status!=='ok')issues.push(`official_inegi_${d.id.replaceAll('-','_')}_${result.status}`)
   }
-  const read=async(url,maxBytes)=>{
+  const read=async(url,maxBytes,expectedPdf=false)=>{
    calls++
    const r=await fetchImpl(url,{redirect:'error',signal:AbortSignal.timeout(20000)})
    if(r.status===404)throw Error('official_document_not_found')
@@ -52,7 +52,16 @@ export function createOfficialInputLoader({workspace,env=process.env,savedByCurr
    if(Number(r.headers.get('content-length'))>maxBytes)throw Error('official_document_too_large')
    const chunks=[];let size=0
    for await(const chunk of r.body){size+=chunk.length;if(size>maxBytes)throw Error('official_document_too_large');chunks.push(Buffer.from(chunk))}
-   return Buffer.concat(chunks)
+   const raw=Buffer.concat(chunks)
+   if(expectedPdf&&!raw.subarray(0,5).equals(Buffer.from('%PDF-'))){
+    const text=raw.toString('utf8')
+    if(officialAccessBarrier(text))throw Error('official_document_access_barrier')
+    // INEGI serves its missing-file page with HTTP 200. A registered URL is
+    // not a PDF merely because its name ends in .pdf; no numeric parser runs.
+    if(/<title>\s*P[aá]gina no encontrada\s*<\/title>/i.test(text))throw Error('official_document_not_found')
+    throw Error('official_document_not_pdf')
+   }
+   return raw
   }
   let officialTerms
   try{
@@ -67,7 +76,7 @@ export function createOfficialInputLoader({workspace,env=process.env,savedByCurr
    const file=`${product}${product==='inpc'?'_2q':''}${month.replace('-','_')}.pdf`
    const url=`https://www.inegi.org.mx/contenidos/saladeprensa/boletines/${month.slice(0,4)}/${product}/${file}`
    try{
-    const raw=await read(url,2000000),extraction=await extract(raw)
+    const raw=await read(url,2000000,true),extraction=await extract(raw)
     officialDocuments.push({url,rawBase64:raw.toString('base64'),sha256:hash(raw),collectedAt:now(),extraction})
     releaseLookups.push({product,publicationMonth:month,status:'captured'})
    }catch(error){

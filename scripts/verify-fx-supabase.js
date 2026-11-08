@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createClient } from '@supabase/supabase-js'
+import {recoverySyncRows,dailySyncKey} from './fx-recovery-sync.js'
 
 const dataset = JSON.parse(fs.readFileSync(path.resolve('data/fx-full-history.json'), 'utf8'))
 
@@ -65,6 +66,8 @@ async function main() {
   }
 
   const failures = []
+  if(state.load_status!=='ready')failures.push(`dataset status ${state.load_status} !== ready`)
+  if(dataset.coverage?.dataVersion&&state.data_version!==dataset.coverage.dataVersion)failures.push('dataset version mismatch')
   if (state.base_date !== dataset.baseDate) {
     failures.push(`baseDate ${state.base_date} !== ${dataset.baseDate}`)
   }
@@ -93,11 +96,13 @@ async function main() {
     failures.push(`stored monthly rows ${monthlyCount} !== ${dataset.monthlyRates.length}`)
   }
 
-  const samples = dataset.dailyRates.filter((_, index) =>
+  const recovered=recoverySyncRows(dataset)
+  const representative = dataset.dailyRates.filter((_, index) =>
     index === 0 ||
     index === dataset.dailyRates.length - 1 ||
     index % Math.max(1, Math.floor(dataset.dailyRates.length / 20)) === 0
   )
+  const samples=[...new Map([...representative,...recovered.daily].map(r=>[dailySyncKey(r),r])).values()]
 
   for (const sample of samples) {
     const { data, error } = await supabase
@@ -128,11 +133,19 @@ async function main() {
     }
   }
 
+  for(const sample of recovered.monthly){
+    const period=`${sample.year}-${String(sample.month).padStart(2,'0')}-01`
+    const {data,error}=await supabase.from('fx_monthly_rates').select('rate_value,status,source,imputation_method')
+      .eq('currency',sample.currency).eq('rate_type',sample.rateType).eq('period_month',period).single()
+    if(error)failures.push(`${sample.currency}/${sample.rateType}/${period}: ${error.message}`)
+    else if(!numericValuesMatch(sample.value,data.rate_value)||data.status!==sample.status||data.source!==sample.source||data.imputation_method!==sample.imputationMethod)
+      failures.push(`${sample.currency}/${sample.rateType}/${period}: recovered monthly value/status/source mismatch`)
+  }
   if (failures.length) {
     throw new Error(`Supabase verification failed:\n${failures.join('\n')}`)
   }
 
-  console.log(`Verified state and ${samples.length} representative daily rows.`)
+  console.log(`Verified state, ${samples.length} daily rows and ${recovered.monthly.length} recovery-dependent monthly rows.`)
 }
 
 const isDirectRun =
