@@ -14,6 +14,7 @@ import {inspectRobots,publisherAccessBarrier} from './news-publisher-access.js'
 import {validDate} from './core.js'
 import {LOCAL_SOURCE_REGISTRY} from './local-source-discovery.js'
 import {MAX_RESEARCH_PERIODS_PER_QUESTION} from './research-limits.js'
+import {MAX_SOURCE_NETWORK_REQUESTS,sourceAttemptMinimum,allocateSourceRequests} from './source-request-budget.js'
 
 export const SELECTED_COLLECTION_VERSION='selected-source-collection/1'
 const MAX_SELECTED_LOGICAL_REQUESTS=30*MAX_RESEARCH_PERIODS_PER_QUESTION*4 // routes × periods × core questions; not HTTP allowance
@@ -70,7 +71,7 @@ export function bindSelectedOriginalReview({request,record,adapter,requestIds,ta
 
 export async function collectSelectedResearch({input,sourcePlan,sourceRegister,requestIds,articleUrls=[],captures=[],pdfCaptures=[],inegiCaptures=[],mode='saved',fetchImpl,
   maxNetworkRequests=8,fairSourceBudgets=false,timeoutMs=15000,now=()=>new Date().toISOString(),checkpoint=async()=>{},discoveryFeedback}) {
-  if(!['saved','live'].includes(mode)||mode==='live'&&typeof fetchImpl!=='function'||!bounded(maxNetworkRequests,1,16)
+  if(!['saved','live'].includes(mode)||mode==='live'&&typeof fetchImpl!=='function'||!bounded(maxNetworkRequests,1,MAX_SOURCE_NETWORK_REQUESTS)
     ||typeof fairSourceBudgets!=='boolean'||!bounded(timeoutMs,1,20000)||!Array.isArray(captures)||captures.length>32||!Array.isArray(pdfCaptures)||pdfCaptures.length>8)throw new Error('invalid_selected_collection_options')
   captures.forEach(validateCapture)
   if(!Array.isArray(inegiCaptures)||inegiCaptures.length>3||new Set(inegiCaptures.map(c=>c.seriesId)).size!==inegiCaptures.length)
@@ -98,8 +99,8 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
   const sourceIds=[...new Set(chosen.map(r=>r.sourceId))]
   const weights=sourceIds.map(sourceId=>materialRecipe(chosen.find(r=>r.sourceId===sourceId),catalog,sourceRegister).kind==='existing_chile_publisher'
     ?Math.max(1,(LOCAL_SOURCE_REGISTRY[selection.currency]??[]).length):1)
-  const totalWeight=weights.reduce((sum,n)=>sum+n,0),limits=weights.map(n=>Math.floor(maxNetworkRequests*n/totalWeight))
-  for(let n=maxNetworkRequests-limits.reduce((sum,n)=>sum+n,0),i=0;n>0;n--,i++)limits[i%limits.length]++
+  const minimums=sourceIds.map((id,i)=>sourceAttemptMinimum(materialRecipe(chosen.find(r=>r.sourceId===id),catalog,sourceRegister),weights[i]))
+  const budget=allocateSourceRequests({minimums,weights,maxNetworkRequests}),limits=budget.limits
   const sourceLimits=new Map(sourceIds.map((id,index)=>[id,fairSourceBudgets?limits[index]:maxNetworkRequests]))
   let activeSource=null
   const sourceSpent=id=>network.filter(r=>r.sourceId===id).length
@@ -118,14 +119,23 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
     if(mode!=='live')throw new Error('saved_mode_network_forbidden')
     const key=safeUrl(String(url)),prior=transportCache.get(key)
     if(prior?.error)throw prior.error
-    if(prior?.response)return prior.response.clone()
+    if(prior?.response)return new Response(prior.response.body,prior.response.init)
     if(network.length>=maxNetworkRequests)throw new Error('local_request_limit')
     if(fairSourceBudgets&&sourceSpent(activeSource)>=sourceLimits.get(activeSource))throw new Error('local_source_request_limit')
     const row={url:safeUrl(String(url)),status:'started',...(fairSourceBudgets?{sourceId:activeSource}:{})};network.push(row)
     try {
       const response=await fetchImpl(url,options)
       if(response.redirected||response.url&&response.url!==String(url))throw new Error('redirect_not_allowed')
-      row.status=`http_${response.status}`;transportCache.set(key,{response:response.clone()});return response
+      // Store bounded, fully consumed bytes rather than a live Response clone.
+      // The first request's abort timer must not poison reuse for later dates.
+      const chunks=[];let bytes=0
+      if(response.body)for await(const chunk of response.body){
+        bytes+=chunk.length;if(bytes>4_000_000)throw Error('selected_response_too_large')
+        chunks.push(Buffer.from(chunk))
+      }
+      const cached={body:[204,205,304].includes(response.status)?null:Buffer.concat(chunks),
+        init:{status:response.status,headers:Object.fromEntries(response.headers)}}
+      row.status=`http_${response.status}`;transportCache.set(key,{response:cached});return new Response(cached.body,cached.init)
     }catch{row.status='transport_failed';const error=new Error('selected_transport_failed');transportCache.set(key,{error});throw error}
   }
   async function read(sourceId,url,recipe,period) {
@@ -236,7 +246,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
       }
       const {captured,result}=publisherCache.get(key)
       row.publisherAttempts=result.discovery.sourceResults.map(s=>({sourceId:s.source,
-        status:s.status,reason:s.reason??null}))
+        status:s.status,reason:s.reason??null,issues:s.issues??[]}))
       for(const record of result.originals.filter(o=>o.status==='collected_pending_review')) {
         const raw=captured.find(c=>c.url===record.url)
         if(!raw)continue
@@ -248,8 +258,11 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
         }
         row.originalIds.push(addOriginal(request,{...record,kind:'article',sha256:receipt.sha256,collectedAt:receipt.collectedAt},'reviewed_news_notes'))
       }
-      row.status=row.originalIds.length?'collected_pending_review':result.status==='collection_failed'?'access_failed':'discovery_incomplete'
-      row.reason=result.status;continue
+      const issues=row.publisherAttempts.flatMap(s=>s.issues)
+      const budgetOnly=issues.length>0&&issues.every(i=>['request_budget','source_request_budget'].includes(i.reason))
+      row.status=row.originalIds.length?'collected_pending_review':budgetOnly?'not_attempted'
+        :result.status==='collection_failed'?'access_failed':result.status==='no_candidates_in_attempt'?'no_candidates_in_listing':'discovery_incomplete'
+      row.reason=budgetOnly?issues[0].reason:result.status;continue
     }
     const explicitArticle=articleUrls.find(a=>a.sourceId===request.sourceId)
     let readResult=explicitArticle?{status:'ok',explicitArticle:true}:await read(request.sourceId,recipe.url,recipe,request.period)
@@ -356,9 +369,13 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
       }
       row.status=row.originalIds.length?row.issues.length?'partial_pending_review':'collected_pending_review'
         :row.issues.length?row.issues[0].status:'no_candidates_in_listing'
-      row.reason=!found.candidates.length?'listing_did_not_identify_matching_article':null
+      row.reason=!found.candidates.length?'listing_did_not_identify_matching_article':!row.originalIds.length?row.issues[0]?.reason??null:null
       if(!found.candidates.length&&row.discoveryAttempts?.some(a=>a.status!=='ok'&&a.status!=='no_matching_candidate')){
         row.status='discovery_incomplete';row.reason='alternative_index_unavailable'
+        const failed=row.discoveryAttempts.filter(a=>!['ok','no_matching_candidate','no_target_day_discovery_hint','review_feedback_alternative_lookup'].includes(a.status))
+        if(failed.length&&failed.every(a=>a.status==='not_attempted'&&['request_budget','source_request_budget'].includes(a.reason))){
+          row.status='not_attempted';row.reason=failed[0].reason
+        }
       }else if(!found.candidates.length&&row.feedCoverage&&validDate(request.period)
         &&marketCalendarDate(row.feedCoverage.latestItemPublishedAt,selection.currency)<request.period){
         row.status='discovery_incomplete';row.reason='available_feed_older_than_requested_period'
@@ -396,7 +413,8 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
   if(fingerprint({input,sourcePlan,sourceRegister,captures,pdfCaptures,articleUrls})!==before)throw new Error('collection_input_mutated')
   const result={version:SELECTED_COLLECTION_VERSION,mode,currency:selection.currency,baseDate:selection.baseDate,asOf:selection.asOf,
     startedAt,selectionId:selection.selectionId,catalogId:catalog.catalogId,outcomes,originals,reviewQueue,receipts,network,
-    ...(fairSourceBudgets?{sourceRequestBudgets:sourceIds.map(sourceId=>({sourceId,limit:sourceLimits.get(sourceId),spent:sourceSpent(sourceId)}))}:{}),
+    ...(fairSourceBudgets?{sourceRequestBudgets:sourceIds.map(sourceId=>({sourceId,limit:sourceLimits.get(sourceId),spent:sourceSpent(sourceId)})),
+      sourceBudgetCoverage:{minimumCoverage:budget.minimumCoverage,minimumRequired:budget.minimumRequired,maxNetworkRequests}}:{}),
     networkCalls:network.length,modelCalls:0,newPaidCostUsd:0,retries:0,writingEligibility:'not_assessed',publicationApproved:false}
   await checkpoint('result',result);return result
 }

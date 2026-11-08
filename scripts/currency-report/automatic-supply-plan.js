@@ -8,6 +8,7 @@ import {acquireRuntimeResearch,previousWeekdayTarget,emptySupplyCache,latestColl
 import {operatingMaterialHash,newMaterialCandidates,newOfficialMaterialCandidates} from './operating-source-cache.js'
 import {prepareOperatingBatch} from './operating-batch-plan.js'
 import {recordPublishedCorrections} from './published-corrections.js'
+import {collectionDiagnostics} from './collection-diagnostics.js'
 
 export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store,policy,sourcePlan,sourceRegister,registry,processingRules,
  cachedByCurrency={},mode='saved',capturesByCurrency={},acquire=acquireRuntimeResearch,checkpoint=async()=>{}}) {
@@ -59,10 +60,10 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
   const row={currency,status,acquisitionError,correctionCheck,candidates:collection.reviewQueue.length,cadenceStatus:cadence?.status??'history_unavailable',publicationDecision,researchWindow,researchFeedback,
    referenceStatus:calendar.reason??calendar.referenceState?.status??calendar.status,
    sourceStates:(collection.outcomes??[]).map(o=>({sourceId:o.sourceId,status:o.status})),
-   lookupFailures:(collection.outcomes??[]).filter(o=>['access_failed','extraction_failed','discovery_incomplete'].includes(o.status))
-    .map(o=>({sourceId:o.sourceId,status:o.status,reason:o.reason??null})),
+   ...collectionDiagnostics(collection),
    officialBackground:officialBackground?{status:officialBackground.status,states:officialBackground.states,admissionStatus:officialBackground.admissionStatus,
     inputState:officialBackground.inputState??null,inputIssues:officialBackground.inputIssues??[],
+    releaseLookups:officialBackground.releaseLookups??[],
     cache:officialBackground.cache??null,coverage:officialBackground.coverage??null,
     admittedStatistics:officialBackground.admission?.admitted.length??0,
     admissionReasons:[...new Set((officialBackground.admission?.rows??[]).map(r=>r.reason).filter(Boolean))]}:null,

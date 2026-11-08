@@ -18,6 +18,9 @@ import {attachOfficialBackground,reviewOfficialStatistics} from './official-stat
 import {fitsCommentary,validMarketPeriod} from './news-period.js'
 import {sourceContinuation} from './research-continuation.js'
 import {MAX_RESEARCH_PERIODS_PER_QUESTION} from './research-limits.js'
+import {materialRecipe} from './registered-material-adapters.js'
+import {LOCAL_SOURCE_REGISTRY} from './local-source-discovery.js'
+import {sourceAttemptMinimum,automaticSourceRequestLimit} from './source-request-budget.js'
 
 export const RUNTIME_SUPPLY_VERSION='currency-runtime-supply/1'
 const marketRoles=['market_observation','attributed_fx_explanation','global_context','countercontext']
@@ -151,7 +154,7 @@ export function recontextualizeSupplyCache({handoff,snapshot,commentaryTarget,as
 }
 
 export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sourcePlan,sourceRegister,
- mode='saved',captures=[],fetchImpl=fetch,checkpoint=async()=>{},now=()=>new Date().toISOString(),maxNetworkRequests=16,
+ mode='saved',captures=[],fetchImpl=fetch,checkpoint=async()=>{},now=()=>new Date().toISOString(),maxNetworkRequests,
  inegiCaptures=[],pdfCaptures=[],officialDocuments=[],officialTerms,officialInputLoader,researchNeeds}) {
  const input=runtimeResearchInput({snapshot,asOf,commentaryTarget})
  const window=runtimeResearchDates(snapshot,asOf)
@@ -162,6 +165,9 @@ export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sou
  const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister)
  const selection=planResearchSourceSelection({input,sourcePlan,sourceRegister})
  const sources=countryNewsCollectionSources(selection,catalog)
+ if(maxNetworkRequests===undefined&&sources.length)maxNetworkRequests=automaticSourceRequestLimit(sources.map(sourceId=>
+  sourceAttemptMinimum(materialRecipe(selection.sourceRequests.find(r=>r.sourceId===sourceId),catalog,sourceRegister),
+   (LOCAL_SOURCE_REGISTRY[snapshot.currency]??[]).length)))
  let officialInputs={inegiCaptures,officialDocuments,officialTerms},officialInputState=null
  if(officialInputLoader)try{
   const loaded=await officialInputLoader({currency:snapshot.currency,asOf,mode,fetchImpl,now})
