@@ -1,0 +1,80 @@
+/* App admin screens use the shared app tokens, independently of report-page styles. */
+.app-shell .db-review { padding:24px; color:var(--text-main); font-size:14px; line-height:1.65; }
+.db-review :where(h2,h3,h4,p) { margin:0; }
+.db-review h2 { font-size:19px; line-height:1.4; }
+.db-review h3 { font-size:18px; line-height:1.5; }
+.db-review h4 { font-size:14px; }
+.review-page-heading,.review-section-heading,.review-card-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.review-page-heading { margin-bottom:20px; }
+.review-page-heading a { text-decoration:none; font-size:12px; }
+.review-section-heading { margin:28px 0 12px; }
+.db-review :where(button,select,input:not([type=checkbox]),textarea) { font:inherit; font-size:13px; min-height:38px; border:1px solid var(--border); border-radius:6px; padding:8px 12px; color:var(--text-main); background:var(--surface); max-width:100%; }
+.db-review button { font-weight:650; margin:3px 6px 3px 0; }
+.db-review button:hover:not(:disabled) { background:var(--surface-strong); border-color:#9cafc1; }
+.db-review button:disabled { cursor:not-allowed; opacity:.48; }
+.db-review .review-primary { background:var(--accent); border-color:var(--accent); color:white; }
+.db-review .review-primary:hover:not(:disabled) { background:#244d6a; color:white; }
+.db-review .review-danger { color:var(--danger); }
+.db-review textarea { width:100%; min-height:84px; resize:vertical; }
+.db-review input[type=checkbox] { accent-color:var(--accent); }
+.db-review label { font-size:13px; color:var(--text-muted); }
+.db-review fieldset { border:1px solid var(--border-soft); border-radius:8px; padding:12px; margin:12px 0; }
+.db-review p { margin:10px 0; }
+.db-review .table-help,.db-review small { font-size:12px; color:var(--text-muted); }
+.db-review a,.db-review li,.db-review p { overflow-wrap:anywhere; }
+.db-review .admin-ops-grid { margin:0 0 20px; }
+.db-review .admin-ops-grid strong { font-size:clamp(18px,2vw,24px); font-variant-numeric:tabular-nums; }
+.db-review .admin-ops-grid span { display:block; margin-top:5px; }
+.db-review .admin-review-inbox { background:var(--surface-muted); padding:16px; }
+.db-review .admin-review-inbox h2 { font-size:15px; }
+.db-review .admin-review-inbox ul:empty { display:none; }
+.db-review .admin-data-details { border:1px solid var(--border-soft); border-radius:8px; margin:10px 0; padding:0 16px; }
+.db-review summary { cursor:pointer; font-weight:650; font-size:13px; padding:10px 0; color:var(--text-main); }
+.db-review details[open]>summary { margin-bottom:10px; border-bottom:1px solid var(--border-soft); }
+.db-review .admin-data-details[open] { padding-bottom:16px; }
+.review-toolbar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; padding:14px 16px; margin-bottom:16px; background:var(--surface-muted); border:1px solid var(--border-soft); border-radius:8px; }
+.review-toolbar>label { display:flex; align-items:center; flex-wrap:wrap; gap:10px; }
+.review-toolbar>label:last-child { flex:1; }
+.review-toolbar input:not([type=checkbox]) { flex:1; min-width:160px; }
+.db-review-run { padding:20px; margin:14px 0; border:1px solid var(--border-soft); border-radius:10px; background:var(--surface); scroll-margin-top:20px; }
+.db-review-run:focus { outline:2px solid var(--ui2-focus); outline-offset:3px; }
+.review-card-heading { margin-bottom:12px; }
+.review-card-meta { display:flex; align-items:center; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--text-muted); }
+.review-card-meta strong { font-size:13px; color:var(--text-main); background:var(--surface-strong); padding:3px 8px; border-radius:4px; }
+.review-state { font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+.review-state.published { background:#edf6f2; color:#23654e; }
+.review-state.pending { background:#fff4df; color:#805611; }
+.db-review .review-card-summary { margin:12px 0; line-height:1.8; }
+.db-review .review-storage-note { font-size:12px; color:var(--text-muted); margin:8px 0; }
+.review-body { margin-top:14px; border-top:1px solid var(--border-soft); }
+.review-claim { margin:16px 0; }
+.review-claim p { margin-top:6px; }
+.review-body dl { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.review-body dl>div { background:var(--surface-muted); padding:10px; border-radius:6px; }
+.review-body dt { font-size:12px; color:var(--text-muted); }
+.review-body dd { margin:2px 0 0; font-weight:650; }
+.review-body li { margin:10px 0; }
+.review-validation,.review-notice { background:var(--surface-muted); border-radius:6px; padding:10px 12px; }
+.review-hold { background:#fff5e6; color:#805611; padding:12px; border-radius:6px; }
+.review-replacement { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:14px 0; }
+.review-replacement small { flex-basis:100%; }
+.review-card-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:14px; padding-top:12px; border-top:1px solid var(--border-soft); }
+.db-review .review-card-actions button { margin:0; min-width:72px; }
+.review-corrections { margin-top:28px; padding-top:24px; border-top:1px solid var(--border-soft); }
+.review-corrections label { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:12px 0; }
+.review-corrections input { flex:1; min-width:150px; }
+.db-review blockquote { margin:12px 0; padding:10px 16px; border-left:3px solid #91a8bb; background:var(--surface-muted); }
+.db-review .source-management-row { margin:12px 0; padding:16px; border:1px solid var(--border-soft); border-radius:8px; }
+.db-review .source-management-row label :where(input:not([type=checkbox]),textarea) { display:block; width:100%; margin:6px 0 12px; }
+@media(max-width:760px) {
+ .app-shell .db-review { padding:16px; }
+ .db-review-run { padding:15px; }
+ .db-review h2 { font-size:18px; }
+ .db-review h3 { font-size:16px; }
+ .db-review :where(button,input:not([type=checkbox]),select) { min-height:44px; }
+ .review-toolbar { padding:12px; }
+ .review-toolbar>label { width:100%; }
+ .review-toolbar input:not([type=checkbox]) { width:100%; flex-basis:100%; min-width:0; }
+ .db-review .admin-data-details { padding-left:12px; padding-right:12px; }
+ .review-page-heading { align-items:flex-start; }
+}

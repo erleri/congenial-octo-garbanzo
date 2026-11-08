@@ -640,10 +640,7 @@ function Dashboard({ data, businessPlan, renderReportLink }: DashboardProps) {
   return (
     <div className="dashboard-container">
       <h1 className="sr-only">대시보드</h1>
-      <div className="dashboard-meta">
-        <span className="base-date-chip">기준일 {baseDateText}</span>
-        <span className="data-pill">당월 누적 평균</span>
-      </div>
+      <p className="dashboard-print-date">기준일 {baseDateText} · 당월 누적 평균</p>
       <nav className="currency-shortcuts" aria-label="통화 바로가기">{KPI_CURRENCIES.map(c=><a key={c} href={`#currency-${c}`} onClick={event=>{event.preventDefault();const card=document.getElementById(`currency-${c}`);card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true})}}>{c}</a>)}</nav>
 
       <div className="usd-krw-anchor">
