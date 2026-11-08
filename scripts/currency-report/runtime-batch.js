@@ -3,7 +3,7 @@
 // prompt editing, original replacement, retries, fallback or publication here.
 import {REPORT_CURRENCIES} from './shared-price-contract.js'
 import {runtimeMode} from './runtime.js'
-import {runtimePublications} from './runtime-store.js'
+import {runtimePublications,isFatalRuntimeStoreError,isTemporaryRuntimeStoreError} from './runtime-store.js'
 import {runtimeSourceTransport} from './runtime-source-transport.js'
 import {reviewRuntimeSources} from './runtime-source-review.js'
 import {supplyRuntimeInput} from './runtime-supply.js'
@@ -39,12 +39,18 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
  if(runtimeMode(env)!=='currency')return {status:'runtime_disabled',modelCalls:0,publicationApproved:false}
  const control=await store.control()
  if(!['sol','sol-us'].includes(writer)||!control.enabled||!control.review_enabled||control.writer!==writer)return {status:'runtime_disabled',modelCalls:0,publicationApproved:false}
+ const writerCalls=approval?.writerCallAllowance??12,writerUsd=approval?.writerReserveUsd??3,
+  sourceCalls=approval?.sourceMaxCalls??(approval?.maxCalls??0)-12
+ const eligibleCountries=countries.filter(c=>!c.preparation||c.preparation.status==='planned').length
+ if(!Number.isInteger(writerCalls)||writerCalls<2*eligibleCountries||writerCalls>12
+  ||!Number.isFinite(writerUsd)||writerUsd<eligibleCountries*.5||writerUsd>3
+  ||!Number.isInteger(sourceCalls)||sourceCalls<0||sourceCalls+writerCalls>approval?.maxCalls)throw Error('bound_writer_source_allowances_required')
  if(approval?.version!=='operational-report-batch-approval/1'||approval.authorized!==true||approval.maxReports!==6
   ||!Number.isFinite(approval.budgetUsd)||approval.budgetUsd<=0||!Number.isInteger(approval.maxCalls)||approval.maxCalls<12
   ||approval.datasetBinding!==fingerprint(dataset)||approval.rulesBinding!==fingerprint(processingRules)
   ||approval.countriesBinding!==fingerprint(countries)||approval.asOf!==asOf
   ||!Array.isArray(approval.sourcePlanBindings)||!Number.isFinite(approval.sourceBudgetUsd)
-  ||approval.sourceBudgetUsd+6*.5>approval.budgetUsd)throw Error('bound_operational_batch_budget_required')
+  ||approval.sourceBudgetUsd+writerUsd>approval.budgetUsd)throw Error('bound_operational_batch_budget_required')
  let calls=0,confirmedUsd=0,unknownCost=false
  const guardedSend=async args=>{
   if(unknownCost||calls>=approval.maxCalls)throw Error('batch_stopped_before_dispatch')
@@ -66,7 +72,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
   }}
  const sourceTransport=runtimeSourceTransport({store:accountingStore,env,
   approval:{version:'runtime-source-approval/1',planBindings:approval.sourcePlanBindings,
-   budgetUsd:approval.sourceBudgetUsd,maxCalls:approval.maxCalls-12},preflight:preflightSource,send:guardedSend,reconcile})
+   budgetUsd:approval.sourceBudgetUsd,maxCalls:sourceCalls},preflight:preflightSource,send:guardedSend,reconcile})
  const rows=[]
  for(const {currency} of countryWorkOrder(REPORT_CURRENCIES.map(c=>countries.find(r=>r.currency===c)))){
   if(unknownCost){rows.push({currency,status:'batch_cost_unresolved_no_call',modelCalls:0});continue}
@@ -80,7 +86,11 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
    continue
   }
   if(beforeCountry){
-   const eligibility=await beforeCountry(country)
+   let eligibility
+   try{eligibility=await beforeCountry(country)}catch(error){
+    if(!isTemporaryRuntimeStoreError(error))throw error
+    eligibility={claimed:false,reason:'country_runtime_read_wait'}
+   }
    if(!eligibility.claimed){rows.push({currency,status:eligibility.reason??'existing_case_update',
     ...(eligibility.holds?.length?{holds:eligibility.holds}:{}),runId:null,modelCalls:0,publicationApproved:false});continue}
   }
@@ -92,6 +102,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
     acquire:async()=>({collection:country.collection,officialBackground:country.officialBackground,sources:[...new Set(country.collection.reviewQueue.map(c=>c.sourceId))],networkCalls:0}),
     review:async args=>{
      const reviewed=await reviewRuntimeSources({...args,registry,processingRules,saved:country.savedSourceReviews??[],onlySaved,
+      dispatchCardBindings:country.preparation?.dispatchCardBindings,
       extract:sourceTransport.extract,compare:sourceTransport.compare})
      await checkpoint(currency,'source-review',reviewed)
      return reviewed
@@ -105,6 +116,9 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
    let generated={status:supply.status,modelCalls:0,publicationApproved:false}
    if(supply.staged&&!unknownCost)generated=await runRuntimeWorker({env,currency,asOf,store:accountingStore,
     loadDataset:async()=>dataset,preflight:preflightWriter,send:guardedSend,reconcile,testOnly})
+   if(!supply.staged&&!unknownCost&&(supply.sourceReviewIssues?.some(i=>i.status==='source_budget_deferred')
+    ||country.collection.retainedResearch?.omitted?.length))
+    generated={...generated,status:'source_dispatch_deferred'}
    await checkpoint(currency,'generation',generated)
    rows.push({currency,status:generated.status,sourceStatus:supply.status,purpose:supply.task?.purpose??null,
     runId:generated.runId??null,modelCalls:calls-beforeCalls,confirmedUsd:confirmedUsd-beforeCost,
@@ -114,8 +128,9 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
     pendingOriginalReviews:(supply.sourceReviewIssues??[]).filter(i=>i.status==='pending_original_review_not_admitted').length,
     ...(testOnly?{testOnly:true}:{}),publicationApproved:false})
   }catch(error){
+   if(isFatalRuntimeStoreError(error))throw error
    const reason=/^[a-z0-9_]+$/.test(error.message??'')?error.message:'runtime_batch_country_failed'
-   const row={currency,status:'country_execution_hold',reason,runId:null,modelCalls:calls-beforeCalls,confirmedUsd:confirmedUsd-beforeCost,publicationApproved:false}
+   const row={currency,status:isTemporaryRuntimeStoreError(error)?'country_store_wait':'country_execution_hold',reason,runId:null,modelCalls:calls-beforeCalls,confirmedUsd:confirmedUsd-beforeCost,publicationApproved:false}
    rows.push(row);await checkpoint(currency,'failure',row)
   }
   rows.at(-1).continuation=countryContinuation(rows.at(-1))

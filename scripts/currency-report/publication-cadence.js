@@ -4,7 +4,7 @@ import {fingerprint} from './research-harness.js'
 import {COUNTRY_REPORT_PROFILES,REPORT_REFERENCE_POLICY,SHARED_REPORT_RULE_VERSION,REPORT_CADENCE_POLICY_VERSION} from './shared-price-contract.js'
 import {referenceRowOrigin} from './dashboard-reference-state.js'
 
-export const PUBLICATION_CADENCE_VERSION='publication-cadence/2'
+export const PUBLICATION_CADENCE_VERSION='publication-cadence/3'
 const stamp=s=>typeof s==='string'&&validDate(s.slice(0,10))&&/T.*(?:Z|[+-]\d{2}:\d{2})$/.test(s)&&Number.isFinite(Date.parse(s))
 const id=s=>typeof s==='string'&&/^[a-zA-Z0-9:_-]{1,120}$/.test(s)
 const add=(s,n)=>new Date(Date.parse(s+'T00:00:00Z')+n*86400000).toISOString().slice(0,10)
@@ -13,10 +13,14 @@ export function koreaDate(instant){
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(instant)).map(p=>[p.type,p.value]))
  return `${p.year}-${p.month}-${p.day}`
 }
-export function periodicDueDate(publishedAt){
- const eligible=add(koreaDate(publishedAt),14),weekday=new Date(eligible+'T00:00:00Z').getUTCDay()
+export function periodicDueDate(baseDate){
+ if(!validDate(baseDate))throw Error('explicit_report_base_date_required')
+ const eligible=add(baseDate,14),weekday=new Date(eligible+'T00:00:00Z').getUTCDay()
  return add(eligible,(1-weekday+7)%7)
 }
+// Published reports carry their report date; older stored inputs carry the
+// snapshot date. Neither approval time nor the latest observation resets it.
+const reportBaseDate=r=>r.report?.baseDate??r.baseDate??r.snapshot?.baseDate??r.snapshot?.current?.date
 const calendarFreshness=(s,expected)=>validDate(expected)&&s?.current?.date===expected&&s.numericStatus==='hold'
  &&Array.isArray(s.numericHolds)&&s.numericHolds.length===1&&s.numericHolds[0]==='older_saved_dataset_not_current_market'
 const cleanPoint=(s,expected=null)=>s?.current&&validDate(s.current.date)&&Number.isFinite(s.current.value)&&s.current.value>0
@@ -45,10 +49,10 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
  const candidates=publications.filter(r=>r.currency===currency&&r.state==='published'&&r.approved&&r.stored&&r.priceReviewed
   &&!r.historical&&!r.editorialOnly&&!r.withdrawn&&['market','periodic'].includes(r.kind)
   &&Date.parse(r.publishedAt)<=Date.parse(asOf)&&cleanPoint(r.snapshot)&&r.snapshot.currency===currency
-  &&r.snapshot.current.date<=koreaDate(r.publishedAt))
- candidates.sort((a,b)=>Date.parse(b.publishedAt)-Date.parse(a.publishedAt)||a.id.localeCompare(b.id))
+  &&validDate(reportBaseDate(r))&&r.snapshot.current.date<=reportBaseDate(r)&&reportBaseDate(r)<=koreaDate(r.publishedAt))
+ candidates.sort((a,b)=>reportBaseDate(b).localeCompare(reportBaseDate(a))||Date.parse(b.publishedAt)-Date.parse(a.publishedAt)||a.id.localeCompare(b.id))
  const anchor=candidates[0]??null
- const due=anchor&&threshold!==null?periodicDueDate(anchor.publishedAt):null
+ const due=anchor&&threshold!==null?periodicDueDate(reportBaseDate(anchor)):null
  const dataHolds=[],comparisonHolds=[],comparisonDetails=[]
  const expected=calendar?.status==='confirmed'?calendar.expectedReferenceDate:null
  if(!cleanPoint(snapshot,expected)||snapshot.current.date>date)dataHolds.push('current_reference_invalid_or_imputed')
@@ -63,13 +67,12 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
   const oldProvider=old.lineage?.current?.provider,currentProvider=snapshot.lineage?.current?.provider
   if(oldProvider&&currentProvider&&oldProvider!==currentProvider)comparisonHolds.push('reference_provider_changed')
   const points=snapshot.series?.filter(r=>r.date===old.current.date&&r.currency===currency&&r.rateType==='LOCAL_PER_USD')??[]
-  if(points.length!==1||!referenceRowOrigin(snapshot.series??[],points[0]))
-   comparisonHolds.push('anchor_revision_check_unavailable')
-  else if(points[0].value!==old.current.value){
-   comparisonHolds.push('anchor_value_revised')
-   comparisonDetails.push({reason:'anchor_value_revised',date:old.current.date,publishedValue:old.current.value,
+  // Current history can be revised or rolled out of the retained window.
+  // The approved publication's immutable snapshot remains the denominator.
+  if(points.length===1&&referenceRowOrigin(snapshot.series??[],points[0])&&points[0].value!==old.current.value){
+   comparisonDetails.push({reason:'history_value_changed_since_publication',date:old.current.date,publishedValue:old.current.value,
     currentHistoryValue:points[0].value,publishedProvider:oldProvider??null,currentProvider:currentProvider??null,
-    resolution:'compare_original_source_records_no_automatic_rebase'})
+    resolution:'use_frozen_publication_value'})
   }
   if(!comparisonHolds.length)cumulativePct=(snapshot.current.value/old.current.value-1)*100
  }
@@ -89,7 +92,7 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
  const status=duplicateCheck?'duplicate_check':correctionIds.length?'correction_required':policyStatus==='decision_pending'?'policy_pending'
   :hasPriceHold?'data_wait':!triggers.length?'no_active_trigger':openCase?'existing_case_update':'research_candidate'
  const result={version:PUBLICATION_CADENCE_VERSION,policyVersion:REPORT_CADENCE_POLICY_VERSION,currency,checkedOnKst:date,policyStatus,thresholdPct:threshold,
-  anchorId:anchor?.id??null,anchorObservedDate:anchor?.snapshot.current.date??null,periodicDueDate:due,cumulativePct,
+  anchorId:anchor?.id??null,anchorBaseDate:anchor?reportBaseDate(anchor):null,anchorObservedDate:anchor?.snapshot.current.date??null,periodicDueDate:due,cumulativePct,
   direction:cumulativePct===null?'unverified':cumulativePct>0?'local_currency_weaker':cumulativePct<0?'local_currency_stronger':'unchanged',
   status,triggers,caseId,checkId,duplicateCheck,dataHolds,comparisonHolds,comparisonDetails,correctionReportIds:correctionIds,
   researchAllowed:!duplicateCheck&&(correctionIds.length>0||eventCandidateIds.length>0||!hasPriceHold&&policyStatus!=='decision_pending'&&triggers.length>0),

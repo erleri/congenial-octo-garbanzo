@@ -35,10 +35,11 @@ it('merges cumulative, due and event reasons into one anchor case and blocks the
   openCase:{id:'research-one',caseId:first.caseId,state:'research'}}).triggers).toEqual([])
 })
 
-it('uses Korean publication dates and keeps an overdue Monday check pending into Tuesday',()=>{
+it('uses report base dates and keeps an overdue Monday check pending into Tuesday',()=>{
  expect(koreaDate('2026-10-04T16:00:00Z')).toBe('2026-10-05')
- expect(periodicDueDate('2026-10-04T16:00:00Z')).toBe('2026-10-19')
- expect(periodicDueDate('2026-10-09T00:00:00Z')).toBe('2026-10-26')
+ expect(periodicDueDate('2026-10-05')).toBe('2026-10-19')
+ expect(periodicDueDate('2026-10-09')).toBe('2026-10-26')
+ expect(()=>periodicDueDate('2026-10-09T00:00:00Z')).toThrow('explicit_report_base_date_required')
  const tuesday=inspect(snapshot(100,'2026-10-19'),{asOf:'2026-10-20T00:00:00Z'})
  expect(tuesday).toMatchObject({periodicDueDate:'2026-10-19',resetPublicationAnchor:false})
  expect(tuesday.triggers).toContain('periodic')
@@ -69,17 +70,18 @@ it('requires the expected reference date explicitly instead of guessing holidays
  expect(inspect({...saved,numericHolds:[...saved.numericHolds,'dataset_collection_time_unverified']}).status).toBe('data_wait')
 })
 
-it('holds revised or incompatible anchors while preserving a pending periodic check',()=>{
+it('keeps the published denominator through history updates while holding incompatible price definitions',()=>{
  const revised=snapshot(103);revised.series[0].value=99
- expect(inspect(revised)).toMatchObject({status:'data_wait',cumulativePct:null,comparisonHolds:['anchor_value_revised'],
+ expect(inspect(revised)).toMatchObject({status:'research_candidate',cumulativePct:expect.closeTo(3),comparisonHolds:[],
   comparisonDetails:[{date:'2026-10-02',publishedValue:100,currentHistoryValue:99,publishedProvider:null,currentProvider:null,
-   resolution:'compare_original_source_records_no_automatic_rebase'}]})
+   resolution:'use_frozen_publication_value'}]})
  const other=snapshot(103);other.lineage.current.provider='new-provider'
  const old=publication();old.snapshot.lineage.current.provider='old-provider'
  expect(inspect(other,{publications:[old]}).comparisonHolds).toContain('reference_provider_changed')
- expect(inspect({...snapshot(),series:[]}).comparisonHolds).toContain('anchor_revision_check_unavailable')
+ expect(inspect({...snapshot(),series:[]}).comparisonHolds).toEqual([])
  const imputedAnchor=snapshot(103);imputedAnchor.series[0].source='IMPUTED'
- expect(inspect(imputedAnchor).comparisonHolds).toContain('anchor_revision_check_unavailable')
+ expect(inspect(imputedAnchor).comparisonHolds).toEqual([])
+ expect(inspect({...snapshot(),unit:'USD_per_CLP'}).comparisonHolds).toContain('reference_definition_changed')
 })
 
 it('prioritizes correction even during a price outage and keeps event investigation separate from price readiness',()=>{
@@ -95,7 +97,7 @@ it('uses the confirmed six-country policy, rejects per-run overrides and leaves 
  for(const currency of ['BRL','MXN','COP','PEN','CLP','ARS']){
   const s=snapshot(103,'2026-10-19',currency),p=publication({currency,snapshot:snapshot(100,'2026-10-02',currency)})
   const old=structuredClone(p)
-  expect(inspect(s,{publications:[p]})).toMatchObject({version:'publication-cadence/2',policyVersion:'six-currency-cadence/2',
+  expect(inspect(s,{publications:[p]})).toMatchObject({version:'publication-cadence/3',policyVersion:'six-currency-cadence/3',
    policyStatus:'confirmed',thresholdPct:2,periodicDueDate:'2026-10-19',triggers:['cumulative','periodic'],
    paidCallAuthorized:false,publicationApproved:false})
   expect(p).toEqual(old)
@@ -103,4 +105,21 @@ it('uses the confirmed six-country policy, rejects per-run overrides and leaves 
   expect(()=>inspect(s,{publications:[p],proposalThresholdPct:2})).toThrow('proposal_replay_only')
  }
  expect(()=>inspect(snapshot(),{proposalThresholdPct:3,mode:'saved_replay'})).toThrow('proposal_replay_only')
+})
+
+it('starts the fortnight on the report date, not delayed approval or a holiday observation, without reverting to older reports',()=>{
+ for(const currency of ['BRL','MXN','COP','PEN','CLP','ARS']){
+  const p=publication({currency,report:{baseDate:'2026-11-02'},publishedAt:'2026-11-08T02:13:00Z',snapshot:snapshot(100,'2026-10-30',currency)})
+  const before=structuredClone(p)
+  const run=(day:string,publications=[p])=>inspect(snapshot(100,day,currency),{asOf:`${day}T03:00:00Z`,publications})
+  expect(run('2026-11-08')).toMatchObject({anchorBaseDate:'2026-11-02',anchorObservedDate:'2026-10-30',periodicDueDate:'2026-11-16',triggers:[],status:'no_active_trigger'})
+  expect(run('2026-11-15').triggers).not.toContain('periodic')
+  expect(run('2026-11-16').triggers).toContain('periodic')
+  expect(run('2026-11-17').triggers).toContain('periodic')
+  const older=publication({...p,id:'delayed-older',report:{baseDate:'2026-10-29'},snapshot:snapshot(99,'2026-10-28',currency),publishedAt:'2026-11-09T00:00:00Z'})
+  expect(run('2026-11-16',[p,older]).anchorId).toBe(p.id)
+  const next=publication({...p,id:'next',report:{baseDate:'2026-11-16'},snapshot:snapshot(100,'2026-11-16',currency),publishedAt:'2026-11-17T00:00:00Z'})
+  expect(run('2026-11-17',[p,next])).toMatchObject({anchorId:'next',periodicDueDate:'2026-11-30',triggers:[]})
+  expect(p).toEqual(before)
+ }
 })

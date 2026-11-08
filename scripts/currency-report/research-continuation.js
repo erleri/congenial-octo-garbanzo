@@ -11,7 +11,11 @@ export function sourceContinuation(item) {
   category='superseded';action='prepare_current_input';resumeWhen='next_cycle_with_current_input_and_original_budget_gates'
  }else if(match(reasons,/cost_unresolved|cost_reconciliation|existing_source_call_not_reusable|unresolved_or_inflight/)){
   category='accounting';action='stop_paid_work';resumeWhen='confirmed_accounting_recovery'
- }else if(match(reasons,/frozen_(?:source|reference)_refresh_wait|execution_time_budget_wait|source_endpoint_preflight_hold|runtime_endpoint_preflight_wait|runtime_finalization_wait|runtime_store_.*_failed|runtime_stopped_before_call|runtime_disabled|source_runtime_stopped_before_post/)){
+ }else if(match(reasons,/published_history_unavailable|correction_storage_failed|correction_history_unavailable|supply_status_storage_failed/)){
+  category='temporary';action='wait_for_country_storage';resumeWhen='next_cycle_rechecks_country_history_and_storage'
+ }else if(match(reasons,/source_budget_deferred|source_dispatch_deferred/)){
+  category='budget';action='continue_next_budgeted_cycle';resumeWhen='next_cycle_reuses_reviews_and_allocates_remaining_sources'
+ }else if(match(reasons,/country_runtime_read_wait|country_store_wait|frozen_(?:source|reference)_refresh_wait|execution_time_budget_wait|source_endpoint_preflight_hold|runtime_endpoint_preflight_wait|runtime_finalization_wait|runtime_store_.*_failed|runtime_stopped_before_call|runtime_disabled|source_runtime_stopped_before_post/)){
   category='temporary';action='resume_saved_stages';resumeWhen='endpoint_control_or_execution_window_recovered';resumeExact=true
  }else if(match(reasons,/source_budget_not_approved|source_review_budget_required|source_review_wait|batch_budget_hold|monthly_budget|budget_exhausted|batch_stopped_before_dispatch|operating_batch_budget_hold/)){
   category='budget';action='wait_for_budget';resumeWhen='authorized_budget_available';resumeExact=true
@@ -37,7 +41,7 @@ export function sourceContinuation(item) {
 // Existing immutable review records are the feedback store. A URL is only
 // deprioritized, never banned: the publisher may have corrected the same page.
 export function researchFeedback(records=[]) {
- const effective=effectiveSourceGroups(records),current=effective.flatMap(g=>g.state==='usable'?[g.record]:g.records)
+ const effective=effectiveSourceGroups(records).filter(g=>g.state!=='unreviewed'),current=effective.flatMap(g=>g.state==='usable'?[g.record]:g.records)
  const editionTime=r=>Date.parse(r.original?.metadata?.modifiedAt??r.original?.collectedAt??'')||0
  const latest=new Map()
  for(const record of current)latest.set(record.original?.url,Math.max(latest.get(record.original?.url)??0,editionTime(record)))
@@ -61,6 +65,9 @@ export function countryContinuation(row) {
  const sourceIssues=(row.sourceIssues??[]).filter(i=>!['reviewed_note_ready_for_material_validation',
   'exact_saved_review_reused_not_new_verification','duplicate_original'].includes(i.status))
  const diagnostics=sourceIssues.map(issue=>({status:issue.status,reason:issue.reason??null,holds:issue.holds??[],...sourceContinuation(issue)}))
+ if(row.status==='source_dispatch_deferred')return {version:RESEARCH_CONTINUATION_VERSION,category:'budget',
+  action:'continue_next_budgeted_cycle',resumeExact:false,resumeWhen:'next_cycle_reuses_reviews_and_allocates_remaining_sources',
+  paidCallAuthorized:false,automaticRetry:false,issues:diagnostics}
  if(row.status==='country_owned_by_prior_batch')return {version:RESEARCH_CONTINUATION_VERSION,category:'ownership',
   action:'resume_original_batch',resumeExact:false,resumeWhen:'original_country_work_recovered',
   paidCallAuthorized:false,automaticRetry:false,issues:diagnostics}

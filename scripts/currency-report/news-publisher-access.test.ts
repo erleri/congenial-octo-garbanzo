@@ -78,8 +78,12 @@ it('uses a bounded RSS then sitemap fallback and leaves missing alternative inde
  const limited=await collectSelectedResearch({input,sourcePlan,sourceRegister,requestIds:ids,mode:'live',maxNetworkRequests:3,
   fetchImpl:async url=>new Response(pages[String(url)]??'')})
  expect(limited.networkCalls).toBe(3)
- expect(limited.outcomes.every(r=>r.status==='discovery_incomplete'&&r.reason==='alternative_index_unavailable')).toBe(true)
+ expect(limited.outcomes.every(r=>r.status==='not_attempted'&&r.reason==='request_budget')).toBe(true)
  expect(limited.originals).toEqual([])
+ const unavailable=await collectSelectedResearch({input,sourcePlan,sourceRegister,requestIds:ids,mode:'live',maxNetworkRequests:6,
+  fetchImpl:async url=>String(url)===host+'/sitemap_index.xml'?new Response('unavailable',{status:503}):new Response(pages[String(url)]??'')})
+ expect(unavailable.outcomes.every(r=>r.status==='discovery_incomplete'&&r.reason==='alternative_index_unavailable')).toBe(true)
+ expect(unavailable.originals).toEqual([])
 })
 
 it('keeps the Peru market source within its host, article path and unique visible body',()=>{

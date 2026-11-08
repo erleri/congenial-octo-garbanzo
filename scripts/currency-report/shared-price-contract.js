@@ -34,7 +34,7 @@ export const SHARED_REFERENCE_WRITING_GUIDE=Object.freeze([
 export const REPORT_CURRENCIES=Object.freeze(['BRL','MXN','COP','PEN','CLP','ARS'])
 // Publication policy has its own version: changing cadence must not rewrite a
 // frozen price snapshot or imply that archived reports used the new policy.
-export const REPORT_CADENCE_POLICY_VERSION='six-currency-cadence/2'
+export const REPORT_CADENCE_POLICY_VERSION='six-currency-cadence/3'
 export const COUNTRY_REPORT_PROFILES=Object.freeze(Object.fromEntries(REPORT_CURRENCIES.map(currency=>[currency,Object.freeze({
  currency,marketTimeZone:MARKET_ZONES[currency],unit:`${currency}_per_USD`,
  // Calendar identity does not imply that its holidays or a close have been verified.
@@ -44,7 +44,7 @@ export const COUNTRY_REPORT_PROFILES=Object.freeze(Object.fromEntries(REPORT_CUR
  priceAuthority:'dashboard_dataset',articlePriceRole:'context_only',referencePolicyVersion:REPORT_REFERENCE_POLICY.version,
  cadencePolicyVersion:REPORT_CADENCE_POLICY_VERSION,
  cumulativeThresholdPct:2,
- periodicPolicy:'first_monday_after_14_days_without_publication',
+ periodicPolicy:'first_monday_on_or_after_report_base_date_plus_14_days',
 })])))
 export const COMMON_REPORT_REQUIREMENTS=Object.freeze([
  'shared_price_snapshot','price_quality','reference_rate_basis','evidence_period_and_scope',

@@ -189,7 +189,9 @@ export function parseArticleMetadata(html, source, expectedUrl, baseDate, startD
 
 async function boundedText(url, maxBytes, fetchImpl) {
   let response
-  try { response = await fetchImpl(url, { redirect: 'error', signal: AbortSignal.timeout(25_000), headers: { Accept: 'text/html,application/xml;q=0.9,*/*;q=0.1', 'User-Agent': USER_AGENT } }) } catch { return { status: 'failed', reason: 'network_or_timeout' } }
+  try { response = await fetchImpl(url, { redirect: 'error', signal: AbortSignal.timeout(25_000), headers: { Accept: 'text/html,application/xml;q=0.9,*/*;q=0.1', 'User-Agent': USER_AGENT } }) }
+  catch(error) { return { status: 'failed', reason: error?.message==='local_request_limit'?'request_budget'
+    :error?.message==='local_source_request_limit'?'source_request_budget':'network_or_timeout' } }
   if (!response.ok) return { status: 'failed', reason: `http_${response.status}` }
   const length = Number(response.headers.get('content-length'))
   if (Number.isFinite(length) && length > maxBytes) return { status: 'failed', reason: 'oversize' }

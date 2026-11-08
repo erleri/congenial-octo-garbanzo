@@ -26,6 +26,28 @@ const penBody=JSON.stringify({config:{series:['Tarjeta de Crédito','Hasta 360 d
   periods:[{name:'Ago.2026',values:['63.2','65.1','17.5']},{name:'Sep.2026',values:['64.1','66.2','18.6']}]})
 
 describe('Selected public sources -> private pending card review',()=>{
+  it('reuses fully read bounded response bytes across research dates without retaining a live transport clone',async()=>{
+    const args=fixture('CLP','market_quote','2026-10-27','fx_explanation','clp-existing-four-outlets')
+    const calls:string[]=[],reads:string[]=[]
+    const fetchImpl=async(raw:unknown)=>{
+      const url=String(raw);calls.push(url)
+      const body=Buffer.from('<urlset></urlset>')
+      return {status:200,url,redirected:false,headers:new Headers({'content-type':'application/xml'}),
+        body:{async *[Symbol.asyncIterator](){reads.push(url);yield body}},
+        clone(){throw Error('live_transport_clone_unavailable')}}
+    }
+    const result=await collectSelectedResearch({...args,mode:'live',fetchImpl,maxNetworkRequests:4,fairSourceBudgets:true})
+    expect(calls).toHaveLength(2);expect(reads).toEqual(calls)
+    expect(result.outcomes.every(o=>o.status==='no_candidates_in_listing')).toBe(true)
+    expect(result.outcomes.every(o=>o.absenceVerified===false)).toBe(true)
+    expect(result.modelCalls).toBe(0)
+    const capped=await collectSelectedResearch({...args,mode:'live',fetchImpl:async(raw:unknown)=>{
+      const r=await fetchImpl(raw)
+      return {...r,body:{async *[Symbol.asyncIterator](){yield Buffer.alloc(4_000_001)}}}
+    }})
+    expect(capped.originals).toEqual([])
+    expect(capped.outcomes.every(o=>o.status==='access_failed')).toBe(true)
+  })
   it.each([
     ['COP','cop-larepublica','https://www.larepublica.co/finanzas/'],
     ['ARS','ars-infobae','https://www.infobae.com/economia/2026/10/27/'],
