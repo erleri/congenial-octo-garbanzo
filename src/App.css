@@ -1764,3 +1764,10 @@ main {
   .admin-section-nav .quiet-button { width: auto; }
   .trend-related-report { align-items: flex-start; flex-direction: column; gap: 7px; }
 }
+.admin-review-inbox { margin-bottom: 20px; padding: 18px; border: 1px solid #dce4ec; border-radius: 12px; background: #fff; }
+.admin-review-inbox ul { padding-left: 20px; }
+.admin-review-inbox li { margin: 10px 0; overflow-wrap: anywhere; }
+.review-request-notice { padding: 16px; margin-bottom: 14px; border-left: 3px solid #385b7c; border-radius: 6px; background: #f2f6fa; }
+.review-request-notice p { margin: 8px 0; }
+[id^="review-target-"] { scroll-margin-top: 24px; }
+[id^="review-target-"]:focus { outline: 2px solid #385b7c; outline-offset: 4px; }

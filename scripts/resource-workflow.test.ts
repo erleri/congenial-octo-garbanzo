@@ -12,6 +12,19 @@ const context=(scope='daily',mode='plan')=>({
  steps:{run_scope:{outputs:{scope}},mailing:{outputs:{emails:'synthetic@example.invalid'}},email:{outputs:{delivery_mode:'legacy',report_mode:'legacy',mail_hold:'false'}}},always:()=>true,cancelled:()=>false})
 const evaluate=(expression:string|boolean|number|undefined,ctx:ReturnType<typeof context>)=>typeof expression==='string'
  ?runInNewContext(expression.trim().replace(/^\$\{\{\s*|\s*\}\}$/g,'').replaceAll('needs.generate-data-and-send-email',"needs['generate-data-and-send-email']"),ctx):expression
+it('keeps administrator notices opt-in and after drafting, without email in data-check mode',()=>{
+ const job=workflow.jobs['admin-review-notices']
+ expect(job.needs).toEqual(['generate-data-and-send-email','currency-review-report'])
+ expect(job.permissions).toEqual({contents:'read'});expect(job['timeout-minutes']).toBe(5)
+ const run=(scope:string,enabled='true',approved='true',ref='refs/heads/main')=>{
+  const ctx={...context(scope),github:{ref}};Object.assign(ctx.vars,{FX_ADMIN_REVIEW_EMAIL_ENABLED:enabled,FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED:approved})
+  return evaluate(job.if,ctx)
+ }
+ expect(run('daily')).toBe(true);expect(run('data-check')).toBe(false);expect(run('daily','false')).toBe(false);expect(run('daily','true','false')).toBe(false);expect(run('daily','true','true','refs/heads/topic')).toBe(false)
+ const send=job.steps.find(s=>s.run?.includes('send-admin-review-email'))!
+ expect(send.env?.FX_ADMIN_REVIEW_EMAIL_TO).toBe('${{ secrets.FX_ADMIN_REVIEW_EMAIL_TO }}')
+ expect(job.steps.some(s=>s.env?.OPENROUTER_API_KEY||s.run?.includes('mailing_list')||s.run?.includes('git push'))).toBe(false)
+})
 it('isolates review generation on a bounded read-only runner without putting it upstream of FX or email',()=>{
  const main=workflow.jobs['generate-data-and-send-email'],review=workflow.jobs['optional-review-report']
  expect(main.needs).toBeUndefined()

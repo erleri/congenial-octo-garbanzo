@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getReportClient, localReportMode } from '../lib/reports/client'
 import type { CurrencyReport } from '../types/currencyReport'
 import { approvalBlockers, type ReviewValidation } from '../lib/reports/approval-readiness'
@@ -6,6 +6,9 @@ import { withConnectionDeadline } from '../lib/reports/connection-deadline'
 import AdminOverview from './AdminOverview'
 import type { AdminAccess } from '../hooks/useAdminAccess'
 import type { DatasetSource, ExchangeRateDataset } from '../types/exchangeRate'
+import AdminReviewInbox from './AdminReviewInbox'
+import type {InboxItem} from './AdminReviewInbox'
+import {parseReviewRequest} from '../lib/review-request.js'
 
 interface Run { id: string; status: string; candidate: CurrencyReport; validation: ReviewValidation; attempt: number; created_at:string; cost?:{costUsd?:number|null}; storage_required?:boolean; storageComplete?:boolean; expectedPublicId?:string|null }
 interface Correction {key:string;revision:number;createdAt:string;status:string;lastReview?:{reason:string;decision:string;createdAt:string}|null;record:{currency:string;reportId:string;baseDate:string;claimId:string;quote:string;kind:string;reason:string;sourceUrl:string;before:{value?:number;period?:string};after:{value?:number;period?:string};testOnly:boolean}}
@@ -21,10 +24,12 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
   const [revisions,setRevisions]=useState<Record<string,string>>({})
   const [corrections,setCorrections]=useState<Corrections|null>(null),[correctionReasons,setCorrectionReasons]=useState<Record<string,string>>({})
   const [correctionPages,setCorrectionPages]=useState<{at:string;key:string}[]>([])
+  const target=useMemo(()=>parseReviewRequest(window.location.search),[])
+  const [targetState,setTargetState]=useState('checking'),[targetItem,setTargetItem]=useState<InboxItem|null>(null)
   const epoch = useRef(0)
   const attended = useRef(true)
   const invalidate = useCallback(() => { epoch.current++ }, [])
-  const reset = useCallback(() => { invalidate(); setRuns([]);setPendingTotal(0); setAdmin(false); setReason('');setRevisions({});setCorrections(null);setCorrectionReasons({}) }, [invalidate])
+  const reset = useCallback(() => { invalidate(); setRuns([]);setPendingTotal(0); setAdmin(false); setReason('');setRevisions({});setCorrections(null);setCorrectionReasons({});setTargetItem(null);setTargetState('checking') }, [invalidate])
   const load = useCallback(async () => {
     if(!attended.current || !canManage)return
     const version = ++epoch.current
@@ -46,7 +51,11 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
           countQuery.abortSignal(signal),
         ])
         for(const result of [pending,recent,total])if(result.error)throw result.error
-        const rows=[...(pending.data??[]),...(recent.data??[])] as Run[],managed=rows.filter(r=>r.storage_required)
+        const selected=target?await client.rpc('currency_report_review_target',{p_kind:target.kind,p_id:target.id,p_version:target.version}).abortSignal(signal):null
+        const targetData=selected&&!selected.error?selected.data as {state:string;item?:InboxItem;run?:Run;correction?:Correction}:null
+        const rows=[...(pending.data??[]),...(recent.data??[])] as Run[]
+        if(targetData?.state==='current'&&targetData.run&&!rows.some(r=>r.id===targetData.run?.id))rows.unshift(targetData.run)
+        const managed=rows.filter(r=>r.storage_required)
         const receipts=managed.length?await client.from('currency_report_storage_receipts').select('run_id').in('run_id',managed.map(r=>r.id)).abortSignal(signal):{data:[],error:null}
         if(receipts.error)throw receipts.error
         const complete=new Set((receipts.data??[]).map(r=>r.run_id))
@@ -60,14 +69,16 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
         const correctionResult=await client.rpc('currency_report_corrections',{p_include_test:includeTest,p_before:cursor?.at??null,p_before_key:cursor?.key??null}).abortSignal(signal)
         // Missing migration is shown explicitly; never hide existing draft review.
         const correctionData=correctionResult.error?null:correctionResult.data as Corrections|null
-        return { signedIn: true, admin: true,corrections:correctionData?.items&&Array.isArray(correctionData.checks)?correctionData:null,pending:total.count??0, runs:rows.map((r,i)=>({...r,expectedPublicId:expected[i],storageComplete:complete.has(r.id),validation:{...r.validation,storageRequired:r.storage_required,storageComplete:complete.has(r.id)}})) }
-      }, 1500)
+        if(targetData?.state==='current'&&targetData.correction&&correctionData&&!correctionData.items.some(c=>c.key===targetData.correction?.key))correctionData.items.unshift(targetData.correction)
+        return { signedIn: true, admin: true,targetData,corrections:correctionData?.items&&Array.isArray(correctionData.checks)?correctionData:null,pending:total.count??0, runs:rows.map((r,i)=>({...r,expectedPublicId:expected[i],storageComplete:complete.has(r.id),validation:{...r.validation,storageRequired:r.storage_required,storageComplete:complete.has(r.id)}})) }
+      }, 5000)
       if (epoch.current !== version) return
       setAdmin(snapshot.admin);setPendingTotal(snapshot.pending);setCorrections('corrections' in snapshot?snapshot.corrections??null:null); setRuns(previous=>snapshot.runs.map(r=>{const old=previous.find(p=>p.id===r.id);return {...r,expectedPublicId:old?old.expectedPublicId:r.expectedPublicId}}))
+      setTargetState('targetData' in snapshot?snapshot.targetData?.state??'unavailable':'unavailable');setTargetItem('targetData' in snapshot?snapshot.targetData?.item??null:null)
       setNotice(previous=>previous==='연결 실패. 이전 초안은 숨겼습니다.'?'':previous)
       if(!snapshot.admin){setReason('');void recheck()}
-    } catch { if (epoch.current === version) { setAdmin(false); setRuns([]);setCorrections(null);setCorrectionReasons({}); setNotice('연결 실패. 이전 초안은 숨겼습니다.') } }
-  }, [includeTest,canManage,recheck,correctionPages])
+    } catch { if (epoch.current === version) { setAdmin(false); setRuns([]);setCorrections(null);setCorrectionReasons({});setTargetState('unavailable');setTargetItem(null); setNotice('연결 실패. 이전 초안은 숨겼습니다.') } }
+  }, [includeTest,canManage,recheck,correctionPages,target])
   useEffect(() => {
     let active = true
     queueMicrotask(()=>{if(active)void load()})
@@ -85,7 +96,9 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
     const version=epoch.current
     try {
       const run=runs.find(r=>r.id===runId)
-      const client = await getReportClient(), result = await client.rpc('review_currency_report_version',{p_run_id:runId,p_decision:decision,p_reason:reason.trim() || null,p_expected_public_id:run?.expectedPublicId??null,p_revision_kind:revisions[runId]||null,
+      const client = await getReportClient()
+      const requested=target?.kind==='report'&&target.id===runId
+      const result = await client.rpc(requested?'review_currency_report_request':'review_currency_report_version',{p_run_id:runId,...(requested?{p_version:target.version}:{}),p_decision:decision,p_reason:reason.trim() || null,p_expected_public_id:run?.expectedPublicId??null,p_revision_kind:revisions[runId]||null,
         p_report_kind:run?.candidate.purpose==='periodic_check'?'periodic':run?.candidate.purpose==='fx_explanation'?'movement':undefined})
       if(epoch.current!==version||!attended.current)return
       if (result.error) {
@@ -115,20 +128,25 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
   return <section className="generation-status db-review" aria-label="관리자 리포트 검토">
     <h2>데이터·리포트 관리</h2>{localReportMode()&&<p className="local-notice">격리된 로컬 DB · 운영 반영 없음</p>}
     <p role="status">{notice}</p>
-    {access.canManage && admin ? <><AdminOverview runs={runs} pendingTotal={pendingTotal} dataset={dataset} datasetSource={datasetSource}/><h2>리포트 검토</h2><button disabled={busy} onClick={()=>void load()}>상태 다시 읽기</button>{localReportMode()&&<label><input type="checkbox" checked={includeTest} onChange={event=>{reset();setIncludeTest(event.target.checked)}}/>합성 연결 시험 포함</label>}{pendingTotal>20&&<p>검토 대기 {pendingTotal}건 중 최근 20건을 표시합니다.</p>}<label>반려·철회 사유 <input maxLength={500} value={reason} onChange={e=>setReason(e.target.value)}/></label>
-      {runs.filter(r=>['pending_review','published'].includes(r.status)).map(run=><article key={run.id} className="db-review-run"><h2>{run.candidate.content.title}</h2>
+    {access.canManage && admin ? <><AdminReviewInbox target={target} state={targetState} item={targetItem}/><AdminOverview focus={targetState==='current'?targetItem:null} runs={runs} pendingTotal={pendingTotal} dataset={dataset} datasetSource={datasetSource}/><h2>리포트 검토</h2><button disabled={busy} onClick={()=>void load()}>상태 다시 읽기</button>{localReportMode()&&<label><input type="checkbox" checked={includeTest} onChange={event=>{reset();setIncludeTest(event.target.checked)}}/>합성 연결 시험 포함</label>}{pendingTotal>20&&<p>검토 대기 {pendingTotal}건 중 최근 20건과 메일에서 요청한 대상을 표시합니다.</p>}<label>반려·철회 사유 <input maxLength={500} value={reason} onChange={e=>setReason(e.target.value)}/></label>
+      {runs.filter(r=>['pending_review','published'].includes(r.status)).map(run=><article key={run.id} id={`review-target-${run.id}`} tabIndex={-1} className="db-review-run"><h2>{run.candidate.content.title}</h2>
         <p>{run.candidate.currency} · {run.candidate.baseDate} · 시도 {run.attempt} · {run.status==='published' ? '승인' : '검토 대기'}</p>
         {run.storage_required ? <p>{run.storageComplete ? '자료 저장 완료 기록 있음 · 승인 시 일치 여부 재확인' : '자료 저장 확인 필요 — 승인 보류'}</p> : <p>기존 저장 방식의 보존 원고</p>}
         {run.candidate.testOnly ? <p>합성 연결 시험 · AI 미사용</p> : null}<p>{run.candidate.content.summary}</p>
-        <details><summary>본문·검증 결과</summary>{run.candidate.content.drivers.map(claim=><p key={claim.title}><strong>{claim.title}</strong><br/>{claim.text}</p>)}<p>구조 검사 {run.validation.structureValid ? '통과' : '미통과'} · 내용 검토 {run.validation.contentReview ?? '미검증'}</p></details>
+        <details open={target?.kind==='report'&&target.id===run.id||undefined}><summary>본문·근거·검증 결과</summary>
+          <p className="table-help">환율 관측일 {run.candidate.observedDate}{run.candidate.observationAt?` · 관측시각 ${run.candidate.observationAt}`:''}</p>
+          {[run.candidate.content.change,...run.candidate.content.drivers,...run.candidate.content.implications,...run.candidate.content.watch].filter(Boolean).map((claim,i)=><p key={i}><strong>{claim.title}</strong><br/>{claim.text}</p>)}
+          <details><summary>사용한 수치와 출처</summary><dl>{run.candidate.facts.map(f=><div key={f.id}><dt>{f.label}</dt><dd>{String(f.value)}</dd></div>)}</dl><ul>{run.candidate.evidence.map(e=><li key={e.id}>{e.url.startsWith('https://')?<a href={e.url} target="_blank" rel="noreferrer">{e.publisher} · {e.title}</a>:e.title}<small> · 대상 기간 {e.period} · 발표 {e.publishedAt}</small></li>)}</ul></details>
+          <p>구조 검사 {run.validation.structureValid ? '통과' : '미통과'} · 내용 검토 {run.validation.contentReview ?? '미검증'}</p>
+        </details>
         {run.status==='pending_review' && approvalBlockers(run.validation).length > 0 ? <p>승인 보류: {approvalBlockers(run.validation).join(' · ')}</p> : null}
         {run.status==='pending_review'&&run.expectedPublicId?<label>현재 공개 ID {run.expectedPublicId} · 교체 유형 <select aria-label="공개본 교체 유형" value={revisions[run.id]??''} onChange={e=>setRevisions(old=>({...old,[run.id]:e.target.value}))}><option value="">유형 선택</option><option value="correction">사실·출처 정정</option><option value="editorial">문체·표현 편집</option><option value="replacement">동일 날짜 리포트 교체</option></select></label>:null}
-        {run.status==='published' ? <button disabled={busy || !reason.trim()} onClick={()=>void review(run.id,'withdrawn')}>철회</button> : <><button disabled={busy || approvalBlockers(run.validation).length > 0 || !!run.expectedPublicId&&!revisions[run.id]} onClick={()=>void review(run.id,'approved')}>승인</button><button disabled={busy} onClick={()=>void review(run.id,'rejected')}>반려</button></>}
+        {run.status==='published' ? <button disabled={busy || !reason.trim()} onClick={()=>void review(run.id,'withdrawn')}>철회</button> : <><button disabled={busy || target?.kind==='report'&&target.id===run.id&&targetState!=='current' || approvalBlockers(run.validation).length > 0 || !!run.expectedPublicId&&!revisions[run.id]} onClick={()=>void review(run.id,'approved')}>승인</button><button disabled={busy||target?.kind==='report'&&target.id===run.id&&targetState!=='current'} onClick={()=>void review(run.id,'rejected')}>반려</button></>}
       </article>)}{!runs.length ? <p>검토 대기 원고가 없습니다.</p> : null}
       <section aria-label="공개 리포트 정정 후보"><h2>공개 리포트 재검토</h2>
         <p className="table-help">수정값·인용 출처의 변경 신호입니다. 과거 원고의 오류 확정이나 자동 정정이 아닙니다.</p>
         {corrections?<><p>미확인 후보 {corrections.pending}건</p>
-          {corrections.items.slice(0,30).map(item=><article className="db-review-run" key={item.key}>
+          {corrections.items.slice(0,30).map(item=><article className="db-review-run" key={item.key} id={`review-target-${item.key}`} tabIndex={-1}>
             <p><strong>{item.record.currency} · {item.record.baseDate}</strong> · {({pending_review:'검토 대기',acknowledged:'확인·후속 검토',dismissed:'정정 불필요 판단',stale_target:'대상 공개본 교체·철회됨'} as Record<string,string>)[item.status]??'상태 확인 필요'}{item.record.testOnly?' · 합성 시험':''}</p>
             <blockquote>{item.record.quote}</blockquote><p>{item.record.reason}</p>
             {item.lastReview&&<p>최근 판단 사유: {item.lastReview.reason}</p>}

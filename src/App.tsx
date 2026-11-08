@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
 import DataStatus from './components/DataStatus'
 import AdminAccessPanel from './components/AdminAccessPanel'
+import {parseReviewRequest} from './lib/review-request.js'
 import { fxReportConfig } from './generated/fxReportConfig'
 import { REPORT_CURRENCIES, approvedHistory, reportLink } from './lib/currencyReportAccess'
 import type { ReportCurrency } from './types/currencyReport'
@@ -32,7 +33,7 @@ const REPORT_FEATURE_ENABLED = fxReportConfig.enabled
 const HAS_REPORTS = LOCAL_CURRENCY_REPORTS || REPORT_FEATURE_ENABLED
 
 function App() {
-  const [navigation,setNavigation]=useState(()=>parseFxNavigation(window.location.hash))
+  const [navigation,setNavigation]=useState(()=>parseFxNavigation(parseReviewRequest(window.location.search)?'#admin':window.location.hash))
   const [locationHash,setLocationHash]=useState(window.location.hash)
   const [selectionNotice,setSelectionNotice]=useState('')
   const reports=useDashboardReports(HAS_REPORTS,navigation.screen)
@@ -55,6 +56,7 @@ function App() {
     const url=new URL(window.location.href)
     url.hash=hash
     if(next.screen!=='reports')url.searchParams.delete('run')
+    if(next.screen!=='admin'){url.searchParams.delete('review');url.searchParams.delete('reviewVersion')}
     const entry=null
     if(url.href!==window.location.href)window.history[replace?'replaceState':'pushState'](entry,'',url)
     else if(replace)window.history.replaceState(entry,'',url)

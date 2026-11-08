@@ -5,8 +5,15 @@ export function assertEmailSendEnvironment(env) {
   if(env.GITHUB_ACTIONS!=='true'||env.GITHUB_REPOSITORY!=='erleri/congenial-octo-garbanzo'
     ||env.FX_EMAIL_REPORT_MODE!=='approved'||env.FX_EMAIL_SEND_APPROVED!=='true'||env.FX_EMAIL_HOLD==='true') throw Error('explicit_workflow_email_send_required')
 }
-export function createSmtpEmailTransport({env=process.env,python='python'}={}) {
-  assertEmailSendEnvironment(env)
+export function assertAdminReviewSendEnvironment(env) {
+  if(env.GITHUB_ACTIONS!=='true'||env.GITHUB_REPOSITORY!=='erleri/congenial-octo-garbanzo'
+    ||env.GITHUB_REF!=='refs/heads/main'||env.FX_ADMIN_REVIEW_EMAIL_ENABLED!=='true'
+    ||env.FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED!=='true')throw Error('explicit_admin_review_send_required')
+}
+export function createSmtpEmailTransport({env=process.env,python='python',channel='dashboard'}={}) {
+  if(channel==='admin-review')assertAdminReviewSendEnvironment(env)
+  else if(channel==='dashboard')assertEmailSendEnvironment(env)
+  else throw Error('unknown_email_channel')
   if(!env.SMTP_USERNAME?.trim()||!env.SMTP_PASSWORD?.trim()) throw Error('smtp_configuration_missing')
   return request=>new Promise(resolve=>{
     const child=spawn(python,[fileURLToPath(new URL('./smtp_transport.py',import.meta.url))],{

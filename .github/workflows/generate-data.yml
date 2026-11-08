@@ -398,3 +398,40 @@ jobs:
         run: npm run report:operate -- --action execute
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+
+  # Separate administrator notices. Does not share the reader mailing list,
+  # publish reports, call models, or delay the existing FX/reader-email job.
+  admin-review-notices:
+    needs: [generate-data-and-send-email, currency-review-report]
+    if: >-
+      ${{ always() && !cancelled() && github.ref == 'refs/heads/main'
+          && needs.generate-data-and-send-email.outputs.run_scope == 'daily'
+          && vars.FX_ADMIN_REVIEW_EMAIL_ENABLED == 'true'
+          && vars.FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.generate-data-and-send-email.outputs.dataset_ref || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Send deduplicated administrator review digest
+        run: node scripts/send-admin-review-email.mjs --send
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FX_ADMIN_REVIEW_EMAIL_TO: ${{ secrets.FX_ADMIN_REVIEW_EMAIL_TO }}
+          FX_ADMIN_REVIEW_EMAIL_ENABLED: ${{ vars.FX_ADMIN_REVIEW_EMAIL_ENABLED }}
+          FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED: ${{ vars.FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}

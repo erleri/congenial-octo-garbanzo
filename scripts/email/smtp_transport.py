@@ -28,9 +28,11 @@ def send_email(request, *, smtp_factory=smtplib.SMTP_SSL, credentials=None):
             raise ValueError("message_identity_invalid")
         if not isinstance(payload["subject"], str) or re.search(r"[\r\n]", payload["subject"]):
             raise ValueError("subject_invalid")
-        chart = base64.b64decode(request["chartBase64"], validate=True)
-        if not chart.startswith(b"\x89PNG\r\n\x1a\n") or len(chart) > 2_000_000:
-            raise ValueError("chart_invalid")
+        chart = None
+        if payload.get("version") != "admin-review-email/1":
+            chart = base64.b64decode(request["chartBase64"], validate=True)
+            if not chart.startswith(b"\x89PNG\r\n\x1a\n") or len(chart) > 2_000_000:
+                raise ValueError("chart_invalid")
         message = EmailMessage()
         message["Subject"] = payload["subject"]
         message["From"] = f"LATAM FX Admin <{username}>"
@@ -38,8 +40,9 @@ def send_email(request, *, smtp_factory=smtplib.SMTP_SSL, credentials=None):
         message["Message-ID"] = message_id
         message.set_content(payload["text"])
         message.add_alternative(payload["html"], subtype="html")
-        message.get_payload()[1].add_related(chart, maintype="image", subtype="png",
-                                            cid="<fx-chart-image>", filename="email-chart.png")
+        if chart is not None:
+            message.get_payload()[1].add_related(chart, maintype="image", subtype="png",
+                                                cid="<fx-chart-image>", filename="email-chart.png")
         smtp = smtp_factory("smtp.gmail.com", 465, timeout=30, context=ssl.create_default_context())
         smtp.login(username, password)
         phase = "dispatch"
