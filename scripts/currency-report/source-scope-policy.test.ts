@@ -1,7 +1,8 @@
-import {it,expect} from 'vitest'
+import {it,expect,vi} from 'vitest'
 import {createHash} from 'node:crypto'
 import {inspectSourceAdmission,resolveSourceAdmission} from './source-admission.js'
 import {sourceTermsContent,refreshSourceTerms} from './source-scope-policy.js'
+import {sourceRefreshBudget} from './source-refresh-budget.js'
 
 const asOf='2026-11-08T04:00:00Z',host='economics.example.org',termsUrl=`https://${host}/terms/`
 const scopes={discover:true,collect:true,analyze:true,publishNotes:true}
@@ -63,12 +64,50 @@ it('limits repeated checks and isolates transport or persistence failures to the
  let calls=0
  const state={proofs:[],decisions:[],policies:Array.from({length:9},(_,i)=>({...policy,id:`scope-${i}`,pathPrefix:`/section-${i}/`})),terms:[]}
  const result=await refreshSourceTerms({state,store:{saveSourceTerms:async()=>true},asOf,mode:'live',read:async()=>{calls++;throw Error('timeout')}})
- expect(calls).toBe(8);expect(result.results).toHaveLength(8)
+ expect(calls).toBe(1);expect(result.results).toHaveLength(8)
  await refreshSourceTerms({state:result.state,store:{saveSourceTerms:async()=>true},asOf,mode:'live',read:async()=>{calls++;throw Error('timeout')}})
- expect(calls).toBe(9) // The remaining scope, not a retry of the first eight.
+ expect(calls).toBe(2) // The remaining scope, not a retry of the first eight; one shared failed robots lookup per execution.
  const failed=await refreshSourceTerms({state:{...state,policies:[policy]},store:{saveSourceTerms:async()=>{throw Error('db unavailable')}},asOf,mode:'live',
   read:async url=>({status:200,text:url.endsWith('robots.txt')?'User-agent: *\nAllow: /':'Verified terms with enough detail for a content fingerprint. '.repeat(4)})})
  expect(failed.state.terms[0].status).toBe('unavailable')
+})
+
+it.each(['read','save'])('returns at the whole refresh deadline during a stalled %s, deferring unchecked scopes without granting permission',async stage=>{
+ vi.useFakeTimers({toFake:['setTimeout','clearTimeout','performance']})
+ try{
+  const calls:string[]=[],signals:AbortSignal[]=[],save=vi.fn(async(_check,{signal})=>{
+   signals.push(signal);if(stage==='save')return new Promise<boolean>(()=>{});return true
+  })
+  const state={proofs:[],decisions:[],policies:['BRL','MXN','COP','PEN','CLP','ARS'].flatMap(currency=>Array.from({length:8},(_,i)=>
+   ({...policy,currency,id:`${currency}-${i}`,termsUrl:`https://${host}/terms-${i}/`}))),terms:[]}
+  const before=JSON.stringify(state)
+  const pending=refreshSourceTerms({state,store:{saveSourceTerms:save},asOf,mode:'live',budget:sourceRefreshBudget({maxDurationMs:50}),
+   read:async(url,{signal})=>{
+    calls.push(url);signals.push(signal)
+    if(stage==='read')return new Promise(()=>{})
+    return {status:200,text:url.endsWith('robots.txt')?'User-agent: *\nAllow: /':'Synthetic allowed processing terms with detailed attribution conditions. '.repeat(4)}
+   }})
+  await vi.advanceTimersByTimeAsync(50)
+  const result=await pending
+  expect(calls).toHaveLength(stage==='read'?1:2)
+  expect(save).toHaveBeenCalledTimes(stage==='save'?1:0)
+  expect(signals.at(-1)?.aborted).toBe(true)
+  expect(result.results).toHaveLength(48)
+  expect(result.results.every(r=>r.status==='deferred'&&r.reason==='source_refresh_time_budget')).toBe(true)
+  expect(result.state.terms).toEqual([]);expect(JSON.stringify(state)).toBe(before)
+  expect(resolve(proof(),result.state.policies,result.state.terms).state).toBe('hold')
+ }finally{vi.useRealTimers()}
+})
+
+it('fetches one shared terms URL once while storing distinct checks for each reviewed country scope',async()=>{
+ const read=vi.fn(async url=>({status:200,text:url.endsWith('robots.txt')?'User-agent: *\nAllow: /':
+  'Synthetic publisher terms covering its own public articles and independent attributed analysis. '.repeat(3)})),save=vi.fn(async()=>true)
+ const state={policies:[{...policy,id:'scope-brl',currency:'BRL'},{...policy,id:'scope-pen'}],terms:[]}
+ const result=await refreshSourceTerms({state,store:{saveSourceTerms:save},asOf,mode:'live',read})
+ expect(read.mock.calls.map(([url])=>url)).toEqual([`https://${host}/robots.txt`,termsUrl])
+ expect(save).toHaveBeenCalledTimes(2)
+ expect(result.state.terms.map(t=>t.policyId).sort()).toEqual(['scope-brl','scope-pen'])
+ expect(result.results.reduce((n,r)=>n+r.networkCalls,0)).toBe(2)
 })
 
 it('rejects forged saved terms and same-time competing revisions before reusable admission',async()=>{

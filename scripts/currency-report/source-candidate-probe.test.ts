@@ -5,6 +5,14 @@ import {updateSourceMonitor} from './source-candidates.js'
 import {probeSourceCandidates,publicCandidateAddress,readCandidatePage} from './source-candidate-probe.js'
 import {EventEmitter} from 'node:events'
 
+it('aborts a pending DNS lookup at the optional deadline without starting a later HTTP request',async()=>{
+ const controller=new AbortController(),request=vi.fn(),resolve=vi.fn(()=>new Promise(()=>{}))
+ const pending=readCandidatePage('https://newspaper.example.org/economia/dolar',{signal:controller.signal,resolve,request})
+ controller.abort()
+ await expect(pending).rejects.toThrow('candidate_aborted')
+ expect(request).not.toHaveBeenCalled()
+})
+
 async function fixture(){
  const f=await originalPipelineFixture(),catalog=compileResearchSourceCatalog(f.sourcePlan,f.sourceRegister)
  return updateSourceMonitor({currency:'COP',catalog,asOf:'2026-11-01T04:00:00Z',collection:{...f.collection,originals:[],reviewQueue:[],

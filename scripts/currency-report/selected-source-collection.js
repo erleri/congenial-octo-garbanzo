@@ -73,7 +73,8 @@ export function bindSelectedOriginalReview({request,record,adapter,requestIds,ta
 }
 
 export async function collectSelectedResearch({input,sourcePlan,sourceRegister,requestIds,articleUrls=[],captures=[],pdfCaptures=[],inegiCaptures=[],mode='saved',fetchImpl,
-  maxNetworkRequests=8,fairSourceBudgets=false,timeoutMs=15000,now=()=>new Date().toISOString(),checkpoint=async()=>{},discoveryFeedback}) {
+  maxNetworkRequests=8,fairSourceBudgets=false,timeoutMs=15000,now=()=>new Date().toISOString(),checkpoint=async()=>{},discoveryFeedback,signal}) {
+  signal?.throwIfAborted()
   if(!['saved','live'].includes(mode)||mode==='live'&&typeof fetchImpl!=='function'||!bounded(maxNetworkRequests,1,MAX_SOURCE_NETWORK_REQUESTS)
     ||typeof fairSourceBudgets!=='boolean'||!bounded(timeoutMs,1,20000)||!Array.isArray(captures)||captures.length>32||!Array.isArray(pdfCaptures)||pdfCaptures.length>8)throw new Error('invalid_selected_collection_options')
   captures.forEach(validateCapture)
@@ -181,6 +182,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
     reviewQueue.push(review);return id
   }
   for(const request of chosen) {
+    signal?.throwIfAborted()
     activeSource=request.sourceId
     let recipe=materialRecipe(request,catalog,sourceRegister)
     const row={requestId:request.requestId,sourceId:request.sourceId,
@@ -193,7 +195,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
         source:recipe.source,mode,captures,asOf:selection.asOf,now,read:async(url,options)=>{
           if(network.length>=maxNetworkRequests||sourceSpent(activeSource)>=sourceLimits.get(activeSource))throw Error('local_source_request_limit')
           const attempt={url,sourceId:activeSource,status:'started'};network.push(attempt)
-          try{const result=await readCandidatePage(url,options);attempt.status=`http_${result.status}`;return result}
+          try{signal?.throwIfAborted();const result=await readCandidatePage(url,{...options,signal});attempt.status=`http_${result.status}`;return result}
           catch(error){attempt.status='transport_failed';throw error}
         }}))
       const result=admittedCache.get(request.sourceId)

@@ -4,6 +4,7 @@ import {candidateUrl} from './source-candidates.js'
 import {sourceStateBinding} from './source-state-binding.js'
 import {readCandidatePage} from './source-candidate-probe.js'
 import {inspectRobots,publisherAccessBarrier} from './news-publisher-access.js'
+import {sourceRefreshBudget} from './source-refresh-budget.js'
 
 export const SOURCE_TERMS_MAX_AGE_MS=86400000
 export const SOURCE_POLICY_MAX_AGE_MS=90*86400000
@@ -50,19 +51,34 @@ export function sourceTermsContent(text) {
 
 // At most eight due scopes per country, two bounded free requests per scope. Failed
 // refresh is stored as a failure, never mistaken for unchanged conditions.
-export async function refreshSourceTerms({state,store,asOf,mode='saved',capturesByCurrency={},read=readCandidatePage}) {
- const next=structuredClone(state),terms=[...(state.terms??[])],results=[],used=new Map()
- const policies=[...(state.policies??[])].sort((a,b)=>{
+export async function refreshSourceTerms({state,store,asOf,mode='saved',capturesByCurrency={},read=readCandidatePage,budget=sourceRefreshBudget()}) {
+ const next=structuredClone(state),terms=[...(state.terms??[])],results=[],used=new Map(),pages=new Map()
+ const sorted=[...(state.policies??[])].sort((a,b)=>{
   const at=terms.find(t=>t.policyId===a.id)?.checkedAt??'',bt=terms.find(t=>t.policyId===b.id)?.checkedAt??''
   return at.localeCompare(bt)||String(a.id).localeCompare(String(b.id))
  })
+ // Interleave countries, rotating equal-age work each day so one slow host
+ // cannot always monopolize the first optional check.
+ const day=Math.floor(Date.parse(asOf)/86400000),currencies=['BRL','MXN','COP','PEN','CLP','ARS']
+ const order=[...currencies.slice(day%6),...currencies.slice(0,day%6)]
+ const queues=order.map(currency=>{
+  const rows=sorted.filter(p=>p.currency===currency),ages=new Map()
+  for(const p of rows){const age=terms.find(t=>t.policyId===p.id)?.checkedAt??'';if(!ages.has(age))ages.set(age,[]);ages.get(age).push(p)}
+  return [...ages.values()].flatMap(group=>{const offset=day%group.length;return [...group.slice(offset),...group.slice(0,offset)]})
+ })
+ const policies=[]
+ while(queues.some(q=>q.length))for(const queue of queues)if(queue.length)policies.push(queue.shift())
  for(const p of policies){
   const prev=terms.find(t=>t.policyId===p.id)
   if(!validSourceScope(p)||!['prepare','apply'].includes(p.action)||(used.get(p.currency)??0)>=8
    ||prev&&time(prev.checkedAt)&&Date.parse(asOf)-Date.parse(prev.checkedAt)<SOURCE_TERMS_MAX_AGE_MS)continue
+  if(budget.remaining()<=0){results.push({policyId:p.id,currency:p.currency,status:'deferred',reason:'source_refresh_time_budget',networkCalls:0});continue}
   used.set(p.currency,(used.get(p.currency)??0)+1);let calls=0,result={policyId:p.id,url:p.termsUrl,checkedAt:asOf,status:'unavailable',hash:null,excerpt:null}
   const get=async(url,maxBytes)=>{
-   if(mode==='live'){calls++;return read(url,{maxBytes})}
+   const key=`${mode==='saved'?p.currency:''}:${url}`
+   if(pages.has(key))return pages.get(key)
+   const pending=budget.run(async(signal,remaining)=>{
+   if(mode==='live'){calls++;return read(url,{maxBytes,timeoutMs:Math.min(6000,remaining()),signal})}
    if(mode!=='saved')throw Error('source_terms_mode_invalid')
    const rows=(capturesByCurrency[p.currency]??[]).filter(c=>c.url===url&&c.httpStatus===200&&typeof c.text==='string'
     &&time(c.collectedAt)&&Date.parse(c.collectedAt)<=Date.parse(asOf)&&Date.parse(asOf)-Date.parse(c.collectedAt)<SOURCE_TERMS_MAX_AGE_MS)
@@ -73,6 +89,8 @@ export async function refreshSourceTerms({state,store,asOf,mode='saved',captures
    if(createHash('sha256').update(c.text).digest('hex')!==c.sha256
     ||rows.some(r=>r.collectedAt===c.collectedAt&&r.sha256!==c.sha256))throw Error('source_terms_capture_conflict')
    return {status:200,text:c.text}
+   })
+   pages.set(key,pending);return pending
   }
   try {
    const robots=await get(new URL('/robots.txt',p.termsUrl).href,200000)
@@ -82,9 +100,11 @@ export async function refreshSourceTerms({state,store,asOf,mode='saved',captures
    if(page.status!==200)throw Error('source_terms_access_failed')
    result={...result,...sourceTermsContent(page.text),status:'available'}
   }catch{/* A failed check holds this scope, not registered country sources. */}
+  if(budget.remaining()<=0){results.push({policyId:p.id,currency:p.currency,status:'deferred',reason:'source_refresh_time_budget',networkCalls:calls});continue}
   if(!store.saveSourceTerms)result={...result,status:'unavailable',hash:null,excerpt:null}
-  else try{if(await store.saveSourceTerms(result)===false)throw Error('source_terms_stale')}
+  else try{if(await budget.run(signal=>store.saveSourceTerms(result,{signal}))===false)throw Error('source_terms_stale')}
    catch{result={...result,status:'unavailable',hash:null,excerpt:null}}
+  if(budget.remaining()<=0){results.push({policyId:p.id,currency:p.currency,status:'deferred',reason:'source_refresh_time_budget',networkCalls:calls});continue}
   const index=terms.findIndex(t=>t.policyId===p.id);if(index<0)terms.push(result);else terms[index]=result
   results.push({policyId:p.id,currency:p.currency,status:result.status,networkCalls:calls})
  }

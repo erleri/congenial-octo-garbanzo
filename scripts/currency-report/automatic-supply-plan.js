@@ -18,27 +18,89 @@ import {admittedSourceCatalog} from './source-admission-catalog.js'
 import {inspectSourceAdmission,sourceAdmissionHash} from './source-admission.js'
 import {matchingProcessingRestrictions} from './material-processing.js'
 import {refreshSourceTerms} from './source-scope-policy.js'
+import {sourceRefreshBudget} from './source-refresh-budget.js'
+import {MAX_SOURCE_NETWORK_REQUESTS} from './source-request-budget.js'
+
+function mergeResearch(base,extra){
+ if(!extra.collection)return base
+ const a=base.collection,b=extra.collection
+ const unique=(rows,key)=>[...new Map(rows.map(r=>[key(r),r])).values()]
+ const collection={...a,catalogId:b.catalogId,
+  originals:unique([...a.originals,...b.originals],r=>r.id),reviewQueue:unique([...a.reviewQueue,...b.reviewQueue],r=>r.binding),
+  outcomes:[...(a.outcomes??[]),...(b.outcomes??[])],receipts:[...(a.receipts??[]),...(b.receipts??[])],network:[...(a.network??[]),...(b.network??[])],
+  sourceCandidates:unique([...(a.sourceCandidates??[]),...(b.sourceCandidates??[])],r=>r.domain??r.sampleUrl),
+  reviewRevalidations:unique([...(a.reviewRevalidations??[]),...(b.reviewRevalidations??[])],r=>r.cardBinding),
+  sourceRequestBudgets:[...(a.sourceRequestBudgets??[]),...(b.sourceRequestBudgets??[])],networkCalls:(a.networkCalls??0)+(b.networkCalls??0)}
+ if(a.sourceBudgetCoverage&&b.sourceBudgetCoverage)collection.sourceBudgetCoverage={
+  minimumCoverage:a.sourceBudgetCoverage.minimumCoverage&&b.sourceBudgetCoverage.minimumCoverage,
+  minimumRequired:a.sourceBudgetCoverage.minimumRequired+b.sourceBudgetCoverage.minimumRequired,maxNetworkRequests:MAX_SOURCE_NETWORK_REQUESTS}
+ const completedAt=Date.parse(extra.completedAt)>Date.parse(base.completedAt)?extra.completedAt:base.completedAt
+ return {...base,collection,completedAt,networkCalls:(base.networkCalls??0)+(extra.networkCalls??0),
+  savedSourceReviews:unique([...(base.savedSourceReviews??[]),...(extra.savedSourceReviews??[])],r=>r.cardBinding),
+  commentaryTarget:latestCollectedCommentaryTarget(collection,base.commentaryTarget??extra.commentaryTarget,completedAt)}
+}
 
 export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store,policy,sourcePlan,sourceRegister,registry,processingRules,
- cachedByCurrency={},mode='saved',capturesByCurrency={},acquire=acquireRuntimeResearch,checkpoint=async()=>{},probeCandidates=probeSourceCandidates}) {
+ cachedByCurrency={},mode='saved',capturesByCurrency={},acquire=acquireRuntimeResearch,checkpoint=async()=>{},probeCandidates=probeSourceCandidates,
+ createSourceBudget=sourceRefreshBudget,refreshTerms=refreshSourceTerms}) {
  if(!['saved','live'].includes(mode)||!store?.history||!calendarByCurrency)throw Error('automatic_supply_configuration_required')
  const countries=[],publicationsByCurrency={},collectionResults=[]
+ // Finish all registered-country acquisition before any optional source load,
+ // terms refresh or supplemental article can consume the job's elapsed time.
+ const acquiredByCurrency=new Map();let cutoff=asOf
+ for(const currency of REPORT_CURRENCIES){
+  try{
+   const acquired=await acquire({snapshot:buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calendar:calendarByCurrency[currency]??{status:'unverified'}}),
+    asOf,commentaryTarget:previousWeekdayTarget(dataset.baseDate),sourcePlan,sourceRegister,mode,captures:capturesByCurrency[currency]??[],
+    checkpoint:(stage,value)=>checkpoint(currency,stage,value)})
+   if(acquired.completedAt){
+    if(!Number.isFinite(Date.parse(acquired.completedAt))||Date.parse(acquired.completedAt)<Date.parse(asOf))throw Error('acquisition_completion_time_invalid')
+    if(Date.parse(acquired.completedAt)>Date.parse(cutoff))cutoff=acquired.completedAt
+   }
+   acquiredByCurrency.set(currency,{acquired})
+  }catch(error){acquiredByCurrency.set(currency,{error})}
+ }
+ const sourceBudget=createSourceBudget(),sourceSupplementResults=[]
  let sourceAdmissionState=null,sourceAdmissionLoadFailed=false
- if(store.sourceAdmissions)try{sourceAdmissionState=await store.sourceAdmissions()}catch{sourceAdmissionLoadFailed=true}
+ if(store.sourceAdmissions)try{sourceAdmissionState=await sourceBudget.run(signal=>store.sourceAdmissions({signal}))}catch{sourceAdmissionLoadFailed=true}
  let sourceTermsResults=[]
  let expanded=null
  if(sourceAdmissionState)try{
   // Validate bounds before free checks. A broken optional configuration must
   // neither expand network work nor block the registered country pipeline.
-  admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf})
-  const refreshed=await refreshSourceTerms({state:sourceAdmissionState,store,asOf,mode,capturesByCurrency})
-  sourceAdmissionState=refreshed.state;sourceTermsResults=refreshed.results
-  expanded=admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf})
+  admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf:cutoff})
+  if(sourceBudget.remaining()>0){
+   // Reserve part of the optional phase for articles whose checks succeeded.
+   const refreshed=await refreshTerms({state:sourceAdmissionState,store,asOf:cutoff,mode,capturesByCurrency,budget:sourceBudget.child(10000)})
+   sourceAdmissionState=refreshed.state;sourceTermsResults=refreshed.results
+  }
+  expanded=admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf:cutoff})
  }
  catch{sourceAdmissionState=null;sourceAdmissionLoadFailed=true}
  const effectivePlan=expanded?.sourcePlan??sourcePlan,effectiveRegister=expanded?.sourceRegister??sourceRegister
  const catalog=compileResearchSourceCatalog(effectivePlan,effectiveRegister)
- let cutoff=asOf
+ // Daily rotation avoids always spending the remaining optional time on the
+ // same country. It changes collection order, never eligibility or approval.
+ const offset=Math.floor(Date.parse(asOf)/86400000)%REPORT_CURRENCIES.length
+ const supplementalOrder=[...REPORT_CURRENCIES.slice(offset),...REPORT_CURRENCIES.slice(0,offset)]
+ for(const currency of supplementalOrder){
+  if(!catalog.sources.some(s=>s.currency===currency&&s.admission))continue
+  const entry=acquiredByCurrency.get(currency),base=entry?.acquired
+  const remainingRequests=MAX_SOURCE_NETWORK_REQUESTS-(base?.collection?.networkCalls??0)
+  if(!base?.collection||remainingRequests<1||sourceBudget.remaining()<=0){
+   sourceSupplementResults.push({currency,status:'deferred',reason:!base?.collection?'registered_collection_unavailable':remainingRequests<1?'source_request_budget':'source_refresh_time_budget'});continue
+  }
+  try{
+   const extra=await sourceBudget.run(signal=>acquire({snapshot:buildSharedDashboardPriceSnapshot({dataset,currency,asOf:cutoff,calendar:calendarByCurrency[currency]??{status:'unverified'}}),
+    asOf:cutoff,commentaryTarget:base.commentaryTarget??previousWeekdayTarget(dataset.baseDate),sourcePlan:effectivePlan,sourceRegister:effectiveRegister,
+    mode,captures:capturesByCurrency[currency]??[],supplementalOnly:true,maxNetworkRequests:remainingRequests,signal,
+    checkpoint:(stage,value)=>checkpoint(currency,stage,value)}))
+   entry.acquired=mergeResearch(base,extra)
+   if(Date.parse(entry.acquired.completedAt)>Date.parse(cutoff))cutoff=entry.acquired.completedAt
+   sourceSupplementResults.push({currency,status:extra.collection?'collected_pending_review':'not_collected'})
+  }catch(error){sourceSupplementResults.push({currency,status:'deferred',reason:sourceBudget.remaining()<=0?'source_refresh_time_budget':
+   /^[a-z_]{1,100}$/.test(error?.message??'')?error.message:'source_supplement_failed'})}
+ }
  for(const currency of REPORT_CURRENCIES){
   const calendar=calendarByCurrency[currency]??{status:'unverified'}
   let target=previousWeekdayTarget(dataset.baseDate)
@@ -58,8 +120,9 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
    // Free discovery is independent of price/cadence eligibility. Failed or old
    // reference data still blocks paid writing, not collection of new evidence.
    {
-    const acquired=await acquire({snapshot,asOf,commentaryTarget:target,sourcePlan:effectivePlan,sourceRegister:effectiveRegister,mode,
-     captures:capturesByCurrency[currency]??[],checkpoint:(stage,value)=>checkpoint(currency,stage,value)})
+    const entry=acquiredByCurrency.get(currency)
+    if(entry.error)throw entry.error
+    const acquired=entry.acquired
     if(acquired.collection){monitorCollection=acquired.collection;collection=isolateUnregisteredArticles(acquired.collection,catalog).collection}
     officialBackground=acquired.officialBackground??null;researchWindow=acquired.researchWindow??null;researchFeedback=acquired.researchFeedback??null
     target=acquired.commentaryTarget??latestCollectedCommentaryTarget(collection,target,acquired.completedAt??asOf)
@@ -125,7 +188,9 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
   const row={currency,status,acquisitionError,correctionCheck,candidates:collection.reviewQueue.length,cadenceStatus:cadence?.status??'history_unavailable',publicationDecision,researchWindow,researchFeedback,sourceMonitor,sourceMonitorStatus,
    referenceStatus:calendar.reason??calendar.referenceState?.status??calendar.status,
    sourceStates:[...(collection.outcomes??[]).map(o=>({sourceId:o.sourceId,status:o.status})),
-    ...(sourceAdmissionLoadFailed?[{sourceId:'source-admission',status:'source_admission_settings_unavailable'}]:[])],
+    ...(sourceAdmissionLoadFailed?[{sourceId:'source-admission',status:'source_admission_settings_unavailable'}]:[]),
+    ...sourceTermsResults.filter(r=>r.currency===currency&&r.status!=='available').map(r=>({sourceId:'source-terms',status:r.reason??'source_terms_check_pending'})),
+    ...sourceSupplementResults.filter(r=>r.currency===currency&&r.status==='deferred').map(r=>({sourceId:'source-supplement',status:r.reason}))],
    ...collectionDiagnostics(collection),
    sourceMonitorNetworkCalls:sourceMonitor?.networkCalls??0,
    officialBackground:officialBackground?{status:officialBackground.status,states:officialBackground.states,admissionStatus:officialBackground.admissionStatus,
@@ -160,6 +225,6 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
  }
  const prepared=prepareOperatingBatch({policy,dataset,countries,asOf:cutoff,publicationsByCurrency,sourcePlan,sourceRegister,registry,processingRules,
   control:await store.control(),...(sourceAdmissionState?{sourceAdmissionState}:{})})
- return {...prepared,collectionResults,sourceTermsResults,asOf:cutoff,acquisitionMode:mode,
+ return {...prepared,collectionResults,sourceTermsResults,sourceSupplementResults,asOf:cutoff,acquisitionMode:mode,
   modelCalls:0,publicationApproved:false,standingPolicyActivated:false}
 }

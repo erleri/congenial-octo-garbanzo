@@ -15,19 +15,24 @@ export function publicCandidateAddress(address) {
   ||a===192&&(b===168||b===0||b===2)||a===100&&b>=64&&b<=127||a===198&&(b===18||b===19||b===51&&c===100)
   ||a===203&&b===0&&c===113)
 }
-export async function readCandidatePage(url,{maxBytes=2_000_000,timeoutMs=6000,resolve=lookup,request=https.get}={}) {
+export async function readCandidatePage(url,{maxBytes=2_000_000,timeoutMs=6000,resolve=lookup,request=https.get,signal}={}) {
  if(!candidateUrl(url))throw Error('unsafe_candidate_url')
+ signal?.throwIfAborted()
  const target=new URL(url),deadline=Date.now()+timeoutMs
- let timer
+ let timer,abortListener
  try{
-  const addresses=await Promise.race([resolve(target.hostname,{family:4,all:true}),new Promise((_,reject)=>{
+  const cancelled=signal?new Promise((_,reject)=>{
+   abortListener=()=>reject(Error('candidate_aborted'));signal.addEventListener('abort',abortListener,{once:true})
+  }):new Promise(()=>{})
+  const addresses=await Promise.race([resolve(target.hostname,{family:4,all:true}),cancelled,new Promise((_,reject)=>{
    timer=setTimeout(()=>reject(Error('candidate_dns_timeout')),timeoutMs)
   })])
   clearTimeout(timer)
   if(!addresses.length||addresses.some(r=>!publicCandidateAddress(r.address)))throw Error('candidate_private_address')
   return await new Promise((resolveResult,reject)=>{
    const remaining=deadline-Date.now();if(remaining<=0){reject(Error('candidate_timeout'));return}
-   const req=request(target,{agent:false,headers:{'User-Agent':'LATAM-FX-source-check/1','Accept':'text/html,text/plain'},
+   signal?.throwIfAborted()
+   const req=request(target,{agent:false,signal,headers:{'User-Agent':'LATAM-FX-source-check/1','Accept':'text/html,text/plain'},
     lookup:(_host,options,callback)=>options.all?callback(null,[{address:addresses[0].address,family:4}]):callback(null,addresses[0].address,4)},response=>{
      if(response.statusCode<200||response.statusCode>=300){response.destroy();resolveResult({status:response.statusCode,text:''});return}
      let bytes=0;const chunks=[]
@@ -38,7 +43,7 @@ export async function readCandidatePage(url,{maxBytes=2_000_000,timeoutMs=6000,r
    const timeout=setTimeout(()=>req.destroy(Error('candidate_timeout')),remaining)
    req.on('error',reject);req.on('close',()=>clearTimeout(timeout))
   })
- }finally{clearTimeout(timer)}
+ }finally{clearTimeout(timer);if(abortListener)signal.removeEventListener('abort',abortListener)}
 }
 
 export async function probeSourceCandidates(state,{mode='saved',read=readCandidatePage,observe=async()=>{}}={}) {

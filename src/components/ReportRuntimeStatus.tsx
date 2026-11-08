@@ -12,6 +12,8 @@ const statusLabels:Record<string,string>={runtime_disabled:'생성 중지',revie
 Object.assign(statusLabels,{input_staged:'집필 입력 준비 완료',source_use_wait:'자료 사용 범위 확인 대기',writing_input_hold:'설명 근거 준비 대기',cadence_hold:'발행 조건 대기',collection_or_review_hold:'자료 수집·검토 확인 필요',source_cost_unresolved:'자료 검토 비용 확인 대기',material_connection_hold:'근거 연결 확인 필요',writer_preparation_hold:'집필 입력 확인 필요',cache_validation_hold:'저장 자료 확인 필요'})
 Object.assign(statusLabels,{source_review_wait:'자동 자료 검토 대기',analysis_context_wait:'문맥·출처 확인 대기',source_request_budget_wait:'자료 분석 예산 확인 대기'})
 Object.assign(statusLabels,{source_monitor_storage_failed:'출처 후보 기록 확인 실패 · 기존 자료 처리 계속',source_monitor_update_deferred:'출처 후보 동시 갱신 · 다음 조회에서 확인'})
+Object.assign(statusLabels,{source_refresh_time_budget:'새 출처 점검 시간 한도 · 다음 점검 대기',source_terms_check_pending:'새 출처 이용 조건 재확인 대기',
+ source_admission_settings_unavailable:'새 출처 설정 확인 실패 · 기존 자료 처리 계속',source_supplement_failed:'새 출처 보조 수집 확인 필요'})
 Object.assign(statusLabels,{running:'처리 중',paused:'중단 위치 보존',held:'보류',finished:'처리 완료',unchanged_case_already_processed:'같은 자료 처리 기록 유지',operating_batch_busy:'기존 실행 진행 중',existing_source_call_not_reusable:'기존 기사 검토 기록 확인 필요',existing_runtime_call_hold:'기존 집필 기록 확인 필요',execution_time_budget_wait:'실행시간 부족 · 다음 처리 대기'})
 Object.assign(statusLabels,{access_failed:'조회 실패',extraction_failed:'본문 추출 실패',discovery_incomplete:'기사 탐색 미완료',period_mismatch:'대상 기간 불일치',source_review_hold:'내용 검토 보류',processing_restricted:'처리 범위 제한',source_metadata_hold:'발표 정보 확인 필요',original_pipeline_failed:'원문 검토 중단'})
 Object.assign(statusLabels,{collection_returned_not_approved:'자료 수집 완료 · 내용 검토 전',official_inputs_collected:'공식 자료 새 조회 완료',
