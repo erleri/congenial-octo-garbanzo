@@ -11,7 +11,7 @@ import {NEWS_EVENT_DATE_VERSION} from './news-event-date.js'
 import {bindSelectedOriginalReview} from './selected-source-collection.js'
 import {buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
 
-it('surfaces a changed published reference in both free results and admin supply status without rebasing or spending',async()=>{
+it('uses the frozen published reference after a history update without blocking supply, rebasing or spending',async()=>{
  const f=await operatingFixture(),currency='BRL',calendar=f.calendarByCurrency[currency]
  const old=buildSharedDashboardPriceSnapshot({dataset:f.dataset,currency,asOf:f.asOf,calendar})
  const actual=old.current.value;old.current.value=actual-1
@@ -22,9 +22,9 @@ it('surfaces a changed published reference in both free results and admin supply
  f.store.supplyCheck=vi.fn(async()=>{})
  const result=await runOperatingCycle({...f,execute:false})
  expect(result.modelCalls).toBe(0)
- expect(result.collectionResults.find(r=>r.currency===currency).publicationDecision).toMatchObject({status:'data_wait',cumulativePct:null,
-  comparisonHolds:['anchor_value_revised'],comparisonDetails:[{publishedValue:actual-1,currentHistoryValue:actual}]})
- expect(f.store.supplyCheck.mock.calls.find(([r])=>r.currency===currency)[0].result.dataStatus).toBe('published_reference_conflict')
+ expect(result.collectionResults.find(r=>r.currency===currency).publicationDecision).toMatchObject({status:'no_active_trigger',cumulativePct:expect.closeTo((actual/(actual-1)-1)*100),
+  comparisonHolds:[],comparisonDetails:[{publishedValue:actual-1,currentHistoryValue:actual,resolution:'use_frozen_publication_value'}]})
+ expect(f.store.supplyCheck.mock.calls.find(([r])=>r.currency===currency)[0].result.dataStatus).toBe(result.collectionResults.find(r=>r.currency===currency).referenceStatus)
  expect(old).toEqual(saved)
 })
 

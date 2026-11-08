@@ -64,7 +64,7 @@ describe('Shared dashboard/report price contract',()=>{
     referenceBasis:{status:'pass',companyRateEquivalence:'assumed_pending_user_confirmation',companyRateVerified:false}})
    expect(COUNTRY_REPORT_PROFILES[currency].priceAuthority).toBe('dashboard_dataset')
    expect(COUNTRY_REPORT_PROFILES[currency]).toMatchObject({cumulativeThresholdPct:2,
-    periodicPolicy:'first_monday_after_14_days_without_publication',cadencePolicyVersion:'six-currency-cadence/2'})
+    periodicPolicy:'first_monday_on_or_after_report_base_date_plus_14_days',cadencePolicyVersion:'six-currency-cadence/3'})
   }
  })
  it('reads bound provider metadata without promoting an API update timestamp to the observation or local session',()=>{
