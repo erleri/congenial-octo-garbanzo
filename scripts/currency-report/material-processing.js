@@ -89,6 +89,11 @@ export function applyMaterialProcessing({collection,legacyRegistry,rules,evaluat
   // into the common validator would otherwise make one bad outlet stop all
   // other candidates, even though no text from that outlet may be transmitted.
   if(unsafe(JSON.stringify(original))){policyDecisions.push({originalId:original.id,...fail('unsafe_original_material')});continue}
+  if(original.sourceAdmission&&(!original.sourceAdmission.scopes?.analyze||!original.sourceAdmission.scopes?.publishNotes
+   ||original.sourceAdmission.url!==original.url||(original.sourceAdmission.actualCaptureHash??original.sourceAdmission.captureHash)!==original.sha256
+   ||original.sourceAdmission.expiresAt.slice(0,10)<evaluatedOn)){
+   policyDecisions.push({originalId:original.id,...fail('source_admission_scope_hold')});continue
+  }
   if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||u.search||original.url.length>480){policyDecisions.push({originalId:original.id,...fail('unsafe_or_unsupported_material_locator')});continue}
   const restrictions=matchingProcessingRestrictions({rules,url:original.url,target:'all_external_text',evaluatedOn})
   // Retain explicit pre-existing denials. A legacy 'pending full text' record is

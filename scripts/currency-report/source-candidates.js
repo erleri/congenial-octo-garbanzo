@@ -1,6 +1,6 @@
 // Discovery metadata only. Neither a link nor a successful technical check
 // registers a publisher, grants reuse rights, or supplies writer evidence.
-import {fingerprint} from './research-harness.js'
+import {sourceStateBinding} from './source-state-binding.js'
 import {registeredNewsSourceForUrl} from './research-source-selection.js'
 import {publisherAccessBarrier} from './news-publisher-access.js'
 import {publicationMetadata} from './public-research-adapter.js'
@@ -53,7 +53,7 @@ export function updateSourceMonitor({currency,collection,catalog,previous=null,a
   ||previous&&(previous.version!==SOURCE_MONITOR_VERSION||previous.currency!==currency||!Number.isFinite(Date.parse(previous.checkedAt))||Date.parse(previous.checkedAt)>Date.parse(asOf)))
   throw Error('source_monitor_state_invalid')
  asOf=new Date(asOf).toISOString()
- if(previous){const {binding,...body}=previous;if(binding!==fingerprint(body)||previous.candidates.length>32||previous.sources.length>32)throw Error('source_monitor_state_invalid')}
+ if(previous){const {binding,...body}=previous;if(binding!==sourceStateBinding(body)||previous.candidates.length>32||previous.sources.length>32)throw Error('source_monitor_state_invalid')}
  const before=previous??{candidates:[],sources:[]},candidates=new Map(),sources=new Map(),seen=new Map()
  for(const c of before.candidates??[])if(candidateUrl(c.sampleUrl)&&candidateUrl(c.discoveredFrom)
   &&!registeredNewsSourceForUrl({catalog,currency,url:c.sampleUrl}))candidates.set(c.domain,structuredClone(c))
@@ -74,7 +74,15 @@ export function updateSourceMonitor({currency,collection,catalog,previous=null,a
     firstSeenAt:asOf,lastSeenAt:asOf,status:'candidate_only',access:'not_checked',extraction:'not_checked',
     useScope:'unconfirmed',lastCheckedAt:null,nextCheckAt:null,checkHash:null,attempts:0})
   }
-  candidates.get(domain).lastSeenAt=asOf
+  const current=candidates.get(domain)
+  if(current.sampleUrl!==url){
+   // One publisher can produce a new article after the first candidate. Do not
+   // keep probing the first URL forever or transfer its check to another body.
+   Object.assign(current,{sampleUrl:url,discoveredFrom:from,discoveredSourceId:raw.discoveredSourceId,
+    status:'candidate_only',access:'not_checked',extraction:'not_checked',useScope:'unconfirmed',
+    lastCheckedAt:null,nextCheckAt:null,checkHash:null,attempts:0})
+  }
+  current.lastSeenAt=asOf
  }
  for(const s of before.sources??[])if(safeId(s.sourceId)&&catalog.sources.some(r=>r.id===s.sourceId&&r.currency===currency))sources.set(s.sourceId,structuredClone(s))
  for(const o of collection.outcomes??[]){
@@ -116,5 +124,5 @@ export function updateSourceMonitor({currency,collection,catalog,previous=null,a
   gaps,omittedCandidates:omitted,technicalChecks:checked,networkCalls:0,modelCalls:0,
   attentionRequired:gaps.length>0&&(candidates.size>0||[...sources.values()].some(s=>s.repeatedFailure)),
   writingEligible:false,publicationApproved:false}
- return {...body,binding:fingerprint(body)}
+ return {...body,binding:sourceStateBinding(body)}
 }

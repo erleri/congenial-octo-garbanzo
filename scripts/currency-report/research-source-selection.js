@@ -14,7 +14,7 @@ export function registeredNewsSourceForUrl({catalog,currency,url}) {
  if(u.protocol!=='https:'||u.username||u.password||u.port)return null
  const country=catalog?.countries?.find(c=>c.currency===currency)
  if(!country)return null
- const matches=country.newsRefs.map(id=>catalog.sources.find(s=>s.id===id)).filter(s=>s&&(
+ const matches=country.newsRefs.map(id=>catalog.sources.find(s=>s.id===id)).filter(s=>s&&(!s.admission||s.admission.url===u.href)&&(
   s.discovery?.domains?.includes(u.hostname)||s.url&&new URL(s.url).hostname===u.hostname
   ||s.localRecord&&!s.url&&(LOCAL_SOURCE_REGISTRY[currency]??[]).some(p=>p.hostnames.includes(u.hostname))))
  return matches.length===1?matches[0]:null
@@ -93,7 +93,7 @@ export function compileResearchSourceCatalog(sourcePlan, sourceRegister) {
   if(sourcePlan?.version!=='six-currency-explanatory-source-plan/1' || sourceRegister?.version!=='six-currency-source-research/1'
     || !Array.isArray(sourcePlan.sources) || sourcePlan.sources.length>100 || !Array.isArray(sourcePlan.countryPlans)
     || sourcePlan.countryPlans.length!==RESEARCH_CURRENCIES.length || !Array.isArray(sourceRegister.newsRoutes)
-    || sourceRegister.newsRoutes.length>50) throw new Error('invalid_source_catalog')
+    || sourceRegister.newsRoutes.length>100) throw new Error('invalid_source_catalog')
   const sources=[], seen=new Set()
   function add(source) {
     if(!id(source.id) || seen.has(source.id) || ![...RESEARCH_CURRENCIES,'COMMON'].includes(source.currency)
@@ -101,6 +101,15 @@ export function compileResearchSourceCatalog(sourcePlan, sourceRegister) {
       || typeof source.role!=='string' || !/^[a-z_]{1,80}$/.test(source.role)
       || typeof source.status!=='string' || source.status.length>160 || !safe(source)) throw new Error('invalid_source_catalog')
     if(source.url!==null) source.url=publicUrl(source.url)
+    if(source.admission){
+      const a=source.admission,keys=['discover','collect','analyze','publishNotes']
+      if(a.url!==source.url||!/^https:\/\//.test(a.url)||!/^[a-f0-9]{64}$/.test(a.proofBinding)
+        ||!/^[a-f0-9]{64}$/.test(a.captureHash)||!Number.isFinite(Date.parse(a.expiresAt))
+        ||!a.scopes||Object.keys(a.scopes).length!==4||keys.some(k=>typeof a.scopes[k]!=='boolean')
+        ||a.articleBinding!==null&&!/^[a-f0-9]{64}$/.test(a.articleBinding)
+        ||a.scopes.collect&&!a.scopes.discover||a.scopes.analyze&&!a.scopes.collect||a.scopes.publishNotes&&!a.scopes.analyze)
+        throw Error('invalid_source_admission_catalog_record')
+    }
     if(source.localRecord!==null && !/^docs\/2\.0\/[a-z0-9-]+\.json$/.test(source.localRecord)) throw new Error('invalid_local_catalog_record')
     if(!source.url && !source.localRecord) throw new Error('catalog_locator_required')
     seen.add(source.id); sources.push(source)
@@ -110,7 +119,7 @@ export function compileResearchSourceCatalog(sourcePlan, sourceRegister) {
   for(const source of sourceRegister.newsRoutes) add({id:source.id,currency:source.currency,questionIds:['cause','policy'],recordHash:fingerprint(source),
     role:'dated_market_reporting',kind:'news',url:source.listingUrl??source.sampleUrl??null,
     localRecord:source.localEvidence??null,status:source.verification,
-    ...(source.discovery?{discovery:newsDiscovery(source)}:{} )})
+    ...(source.discovery?{discovery:newsDiscovery(source)}:{} ),...(source.admission?{admission:structuredClone(source.admission)}:{})})
   // Missing metadata cannot enable an unapproved Yahoo automation route.
   for(const source of sourceRegister.newsRoutes)if(!source.discovery)newsDiscovery(source)
   const countries=sourcePlan.countryPlans.map(country=>{

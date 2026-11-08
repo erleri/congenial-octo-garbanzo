@@ -20,7 +20,7 @@ import {sourceContinuation} from './research-continuation.js'
 import {MAX_RESEARCH_PERIODS_PER_QUESTION} from './research-limits.js'
 import {materialRecipe} from './registered-material-adapters.js'
 import {LOCAL_SOURCE_REGISTRY} from './local-source-discovery.js'
-import {sourceAttemptMinimum,automaticSourceRequestLimit} from './source-request-budget.js'
+import {sourceAttemptMinimum,automaticSupplementalRequestLimit} from './source-request-budget.js'
 
 export const RUNTIME_SUPPLY_VERSION='currency-runtime-supply/1'
 const marketRoles=['market_observation','attributed_fx_explanation','global_context','countercontext']
@@ -165,9 +165,9 @@ export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sou
  const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister)
  const selection=planResearchSourceSelection({input,sourcePlan,sourceRegister})
  const sources=countryNewsCollectionSources(selection,catalog)
- if(maxNetworkRequests===undefined&&sources.length)maxNetworkRequests=automaticSourceRequestLimit(sources.map(sourceId=>
+ if(maxNetworkRequests===undefined&&sources.length)maxNetworkRequests=automaticSupplementalRequestLimit(sources.map(sourceId=>
   sourceAttemptMinimum(materialRecipe(selection.sourceRequests.find(r=>r.sourceId===sourceId),catalog,sourceRegister),
-   (LOCAL_SOURCE_REGISTRY[snapshot.currency]??[]).length)))
+   (LOCAL_SOURCE_REGISTRY[snapshot.currency]??[]).length)),sources.map(id=>Boolean(catalog.sources.find(s=>s.id===id)?.admission)))
  let officialInputs={inegiCaptures,officialDocuments,officialTerms},officialInputState=null
  if(officialInputLoader)try{
   const loaded=await officialInputLoader({currency:snapshot.currency,asOf,mode,fetchImpl,now})

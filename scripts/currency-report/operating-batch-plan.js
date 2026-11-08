@@ -13,6 +13,7 @@ import {savedSourceReview} from './operating-source-cache.js'
 import {inspectNewsPreselection} from './news-preselection.js'
 import {budgetedSourceDispatch} from './budgeted-source-dispatch.js'
 import {isolateUnregisteredArticles} from './registered-collection.js'
+import {admittedSourceCatalog} from './source-admission-catalog.js'
 
 export const OPERATING_PLAN_VERSION='operating-batch-plan/1'
 export const OPERATING_DESTINATION=Object.freeze({endpoint:'https://openrouter.ai/api/v1/chat/completions',
@@ -50,13 +51,14 @@ function assertPolicy(policy) {
   ||!Number.isFinite(limits.perCallUsd)||limits.perCallUsd<=0||limits.perCallUsd>.25)
   throw Error('bound_operating_policy_required')
 }
-export function prepareOperatingBatch({policy,dataset,countries,asOf,publicationsByCurrency,sourcePlan,sourceRegister,registry,processingRules,control}) {
+export function prepareOperatingBatch({policy,dataset,countries,asOf,publicationsByCurrency,sourcePlan,sourceRegister,registry,processingRules,control,sourceAdmissionState}) {
  assertPolicy(policy)
  if(!Array.isArray(countries)||countries.length!==6||REPORT_CURRENCIES.some(c=>countries.filter(r=>r.currency===c).length!==1))
   throw Error('complete_country_operating_input_required')
- const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister),holds=[],rows=[],privateCountries=[]
+ const expanded=sourceAdmissionState?admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf}):null
+ const catalog=compileResearchSourceCatalog(expanded?.sourcePlan??sourcePlan,expanded?.sourceRegister??sourceRegister),holds=[],rows=[],privateCountries=[]
  let plans=[]
- if(policy.sourceCatalogBinding!==catalog.catalogId)holds.push('source_configuration_changed')
+ if(policy.sourceCatalogBinding!==(expanded?.baseCatalogId??catalog.catalogId))holds.push('source_configuration_changed')
  if(policy.processingRulesBinding!==fingerprint(processingRules))holds.push('processing_configuration_changed')
  if(!['operator_configured','trial_configured'].includes(policy.state)||policy.externalTransmissionAuthorization!=='approved_by_operator')holds.push('external_processing_configuration_pending')
  if(policy.state==='trial_configured'){
@@ -155,9 +157,11 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
  const authorizationCandidate={version:'operational-report-batch-approval/1',authorized:false,maxReports:6,budgetUsd:policy.limits.batchUsd,
   maxCalls,sourceBudgetUsd:sourceNano/1e9,sourcePlanBindings:plans.map(p=>p.binding),writerCallAllowance,writerReserveUsd,
   sourceMaxCalls:2*plans.length,datasetBinding:fingerprint(dataset),
-  rulesBinding:fingerprint(processingRules),countriesBinding:fingerprint(privateCountries),asOf,policyBinding:policy.binding}
+  rulesBinding:fingerprint(processingRules),countriesBinding:fingerprint(privateCountries),asOf,policyBinding:policy.binding,
+  ...(expanded?{sourceAdmissionBinding:expanded.binding}:{})}
  const result={version:OPERATING_PLAN_VERSION,status:holds.length?'configuration_or_input_hold':'ready_for_authorized_executor',
   holds:[...new Set(holds)],policyBinding:policy.binding,rows,sourceMaximumUsd:sourceNano/1e9,maximumUsd,maxCalls,
   externalApprovalInherited:false,recurringSpendAuthorized:false,modelCalls:0,networkCalls:0,publicationApproved:false}
- return {...result,binding:fingerprint(result),privateCountries,sourcePlans:plans,authorizationCandidate}
+ return {...result,binding:fingerprint(result),privateCountries,sourcePlans:plans,authorizationCandidate,
+  ...(sourceAdmissionState?{sourceAdmissionState:structuredClone(sourceAdmissionState),sourceAdmissionBinding:expanded.binding}:{})}
 }

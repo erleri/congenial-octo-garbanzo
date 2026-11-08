@@ -66,4 +66,9 @@ it('continues registered preparation when candidate monitoring fails or a concur
  const concurrent=await planAutomaticSupply({...f,policy:f.state.policy,store:{...f.store,sourceMonitor:async()=>null,saveSourceMonitor:async()=>false}})
  expect(concurrent.rows).toEqual(baseline.rows)
  expect(concurrent.collectionResults.every(r=>r.sourceMonitorStatus==='concurrent_update_deferred')).toBe(true)
+ for(const sourceAdmissions of [async()=>{throw Error('source settings unavailable')},async()=>({proofs:[],decisions:[],policies:{invalid:true}})]){
+  const unavailable=await planAutomaticSupply({...f,policy:f.state.policy,store:{...f.store,sourceAdmissions}})
+  expect(unavailable.rows).toEqual(baseline.rows)
+  expect(unavailable.collectionResults.every(r=>r.sourceStates.some(s=>s.status==='source_admission_settings_unavailable'))).toBe(true)
+ }
 })

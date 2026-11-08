@@ -3,7 +3,7 @@
 import https from 'node:https'
 import {lookup} from 'node:dns/promises'
 import {candidateUrl} from './source-candidates.js'
-import {fingerprint} from './research-harness.js'
+import {sourceStateBinding} from './source-state-binding.js'
 import {inspectRobots,publisherAccessBarrier} from './news-publisher-access.js'
 import {publicationMetadata} from './public-research-adapter.js'
 
@@ -41,12 +41,13 @@ export async function readCandidatePage(url,{maxBytes=2_000_000,timeoutMs=6000,r
  }finally{clearTimeout(timer)}
 }
 
-export async function probeSourceCandidates(state,{mode='saved',read=readCandidatePage}={}) {
+export async function probeSourceCandidates(state,{mode='saved',read=readCandidatePage,observe=async()=>{}}={}) {
  if(mode!=='live'||!state.gaps.length||state.technicalChecks>=2)return state
  const candidate=state.candidates.find(c=>!c.nextCheckAt||c.nextCheckAt<=state.checkedAt)
  if(!candidate)return state
  const next=structuredClone(state),c=next.candidates.find(c=>c.domain===candidate.domain)
  let calls=0,access='access_failed',extraction='not_checked',status='temporary_failure'
+ let observation=null
  try{
   calls++;const robots=await read(new URL('/robots.txt',c.sampleUrl).href,{maxBytes:200_000})
   if(robots.status!==200)throw Error('candidate_robots_unavailable')
@@ -59,14 +60,16 @@ export async function probeSourceCandidates(state,{mode='saved',read=readCandida
     else{
      access='public_capture';status='conditions_unconfirmed'
      try{extraction=publicationMetadata(page.text,c.sampleUrl)?.publishedAt?'dated_metadata_present':'metadata_missing'}catch{extraction='metadata_missing'}
+     observation={url:c.sampleUrl,html:page.text,robotsText:robots.text,collectedAt:new Date().toISOString()}
     }
    }
   }
  }catch{/* Record a technical failure without retrying, body persistence or model calls. */}
+ if(observation)await observe(observation)
  Object.assign(c,{access,extraction,status,useScope:'unconfirmed',lastCheckedAt:state.checkedAt,
   attempts:Math.min(1000,c.attempts+1),checkHash:null})
  c.nextCheckAt=new Date(Date.parse(state.checkedAt)+[1,3,7,30][Math.min(c.attempts-1,3)]*86400000).toISOString()
  next.networkCalls=calls;next.technicalChecks++
  const {binding:_,...body}=next
- return {...body,binding:fingerprint(body)}
+ return {...body,binding:sourceStateBinding(body)}
 }

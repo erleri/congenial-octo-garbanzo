@@ -33,7 +33,8 @@ export function admitRuntimeNotes({collection,card,reviewed,asOf,registry}) {
  const origins=[...new Set([...(original.originHints?.creditedOrigins??[]),...articleOriginHints(original.url,original.blocks).creditedOrigins])]
  const note={version:'source-attribution/1',resourceId:e.id,resourceBinding:sourceUseBinding(e),sourceUrl:e.url,
   publisher:e.publisher,publishedAt:e.publishedAt,referencePeriod:e.period,
-  attribution:`출처: ${e.publisher} · ${e.url}${origins.length?' · 기사에 표기된 제공 출처: '+origins.join(', '):''}`,
+   attribution:`출처: ${e.publisher} · ${e.url}${origins.length?' · 기사에 표기된 제공 출처: '+origins.join(', '):''}${original.sourceAdmission?.credit?
+    `${original.sourceAdmission.credit.authors?.length?' · 작성자: '+original.sourceAdmission.credit.authors.join(', '):''}${original.sourceAdmission.credit.title?' · 원문 제목: '+original.sourceAdmission.credit.title:''}${original.sourceAdmission.credit.notice?' · 표시 조건: '+original.sourceAdmission.credit.notice:''}${original.sourceAdmission.credit.licenseUrl?' · 이용 조건: '+original.sourceAdmission.credit.licenseUrl:''} · 독립 정리·분석으로 변경`:''}`,
   transformation:'원문 대조를 거쳐 독립 작성한 사실·귀속 견해의 종합 분석이며 기사 원문·번역·대체물이 아니다.'}
  const sourceUse=connectSourceAttributionConditions({resources:[e],sourceUse:{evaluatedOn:asOf.slice(0,10),reviews:[use]},attributionNotes:[note]})
  const checked=inspectSourceUses({resources:[e],reviews:sourceUse.reviews,evaluatedOn:sourceUse.evaluatedOn,

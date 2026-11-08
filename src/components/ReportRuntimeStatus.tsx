@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react'
 import {getReportClient} from '../lib/reports/client'
 import {withConnectionDeadline} from '../lib/reports/connection-deadline'
+import ReportSourceManagement from './ReportSourceManagement'
 
 interface Status {enabled:boolean;reviewEnabled:boolean;writer:string;monthlyLimitUsd:number;confirmedUsd:number;reservedUsd:number;unresolvedCalls:number;monthBasis:string;checks?:{currency:string;checkedAt:string;result:{status:string;baseDate:string|null;sources?:{sourceId:string;statuses:string[]}[]}}[]}
 interface OperatingStatus {policyState:string;policyRevision:number|null;externalProcessingConfigured:boolean;recurringBudgetConfigured:boolean;cases:{currency:string;state:string;updatedAt:string;status:string|null;runId:string|null;testOnly?:boolean;sourceIssues?:{sourceId:string;status:string}[]}[]}
@@ -59,6 +60,7 @@ export default function ReportRuntimeStatus() {
   {status.checks?.length?<ul>{status.checks.map(c=><li key={c.currency}>{c.currency} · {statusLabels[c.result.status]??'확인 필요'} · {c.result.baseDate??'기준일 미확인'}
    {c.result.sources?.some(s=>s.statuses?.some(code=>statusLabels[code]))&&<details><summary>공식 자료·조회 상태</summary><ul>{c.result.sources.flatMap(s=>(s.statuses??[]).filter(code=>statusLabels[code]).map(code=><li key={`${s.sourceId}-${code}`}>{s.sourceId} · {statusLabels[code]}</li>))}</ul></details>}
   </li>)}</ul>:<p>새 실행 기록 수신 전입니다.</p>}
+  <ReportSourceManagement/>
   {monitors===null?<p className="table-help">출처 후보 관리 기록을 확인하지 못했습니다.</p>:monitors.some(m=>m.candidates.length||m.attentionRequired)&&<details><summary>뉴스 출처 후보·지속 장애</summary>
    <p className="table-help">후보는 리포트 근거로 사용하지 않습니다. 등록 출처의 처리는 계속됩니다. 수집 상태는 내용 검토 결과와 구분합니다.</p>
    <ul>{monitors.filter(m=>m.candidates.length||m.attentionRequired).map(m=><li key={m.currency}><strong>{m.currency}</strong> · {m.gaps.map(g=>gapLabels[g]??'자료 확인 필요').join(' · ')||'기존 출처 수집 유지'}

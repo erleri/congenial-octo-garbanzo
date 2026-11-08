@@ -12,6 +12,7 @@ import {fingerprint} from './research-harness.js'
 import {countryContinuation} from './research-continuation.js'
 import {buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
 import {evaluatePublicationCadence} from './publication-cadence.js'
+import {admittedSourceCatalog} from './source-admission-catalog.js'
 
 // Scheduling hint only; supply still validates every date, use decision and
 // claim. Do not let an optional pending source precede ready initial drafts.
@@ -31,7 +32,12 @@ export function countryWorkOrder(countries){
 }
 
 export async function runOperationalReportBatch({dataset,countries,asOf,store,env,approval,sourcePlan,sourceRegister,registry,processingRules,
- preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],testOnly=false,writer='sol'}) {
+ preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],testOnly=false,writer='sol',sourceAdmissionState}) {
+ if(sourceAdmissionState){
+  const expanded=admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf})
+  if(expanded.binding!==approval?.sourceAdmissionBinding)throw Error('source_admission_snapshot_changed')
+  sourcePlan=expanded.sourcePlan;sourceRegister=expanded.sourceRegister
+ }else if(approval?.sourceAdmissionBinding)throw Error('source_admission_snapshot_missing')
  if(!Array.isArray(countries)||countries.length!==REPORT_CURRENCIES.length
   ||new Set(countries.map(c=>c.currency)).size!==REPORT_CURRENCIES.length
   ||REPORT_CURRENCIES.some(c=>!countries.some(r=>r.currency===c)))throw Error('complete_registered_country_batch_required')
