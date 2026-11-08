@@ -12,6 +12,7 @@ import {writerProfile} from './writer-policy.js'
 import {savedSourceReview} from './operating-source-cache.js'
 import {inspectNewsPreselection} from './news-preselection.js'
 import {budgetedSourceDispatch} from './budgeted-source-dispatch.js'
+import {isolateUnregisteredArticles} from './registered-collection.js'
 
 export const OPERATING_PLAN_VERSION='operating-batch-plan/1'
 export const OPERATING_DESTINATION=Object.freeze({endpoint:'https://openrouter.ai/api/v1/chat/completions',
@@ -75,7 +76,9 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
    row.noReportDue=cadence.status==='no_active_trigger'&&!cadence.dataHolds.length&&!cadence.comparisonHolds.length
    if(!row.noReportDue&&(cadence.status!=='research_candidate'||cadence.dataHolds.length||cadence.comparisonHolds.length))row.holds.push('cadence_or_reference_hold')
   }
-  const collection=collectionAtReviewCutoff({collection:country.collection,asOf})
+  const isolated=isolateUnregisteredArticles(country.collection,catalog)
+  const collection=collectionAtReviewCutoff({collection:isolated.collection,asOf})
+  row.sources.push(...isolated.excluded)
   if(collection.currency!==currency)throw Error('collection_country_changed')
   if(country.acquisitionError){row.holds.push('source_acquisition_failed')
    if(['published_history_unavailable','correction_storage_failed','correction_history_unavailable','supply_status_storage_failed'].includes(country.acquisitionError))row.holds.push(country.acquisitionError)
@@ -113,7 +116,6 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
    row.sources.push({cardBinding:card.binding,status:'request_prepared_not_dispatched',planBinding:plan.binding,
     url:original.url,maximumUsd:plan.maximumUsd})
   }
-  if(row.sources.some(s=>s.status==='source_outside_registered_scope'))row.holds.push('unregistered_source_not_authorized')
   row.purpose=cadence?.anchorId===null?'initial_check':cadence?.triggers?.includes('cumulative')?'market':cadence?.triggers?.includes('periodic')?'periodic':'unverified'
   row.caseId=cadence?.caseId??null
   row.status=row.holds.length?'country_preparation_hold':row.noReportDue?'no_report_due':'planned'

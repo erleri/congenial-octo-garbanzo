@@ -60,12 +60,29 @@ it('does not authorize an unregistered host, an edited configuration or an unkno
  const result=prepareOperatingBatch(f)
  expect(result.sourcePlans).toHaveLength(0)
  expect(result.rows.find(r=>r.currency==='COP').sources[0].status).toBe('source_outside_registered_scope')
+ expect(result.rows.find(r=>r.currency==='COP').holds).not.toContain('unregistered_source_not_authorized')
+ expect(result.privateCountries.find(r=>r.currency==='COP').collection.reviewQueue).toEqual([])
  const changed={...f.sourcePlan,rules:[...f.sourcePlan.rules,'Synthetic changed configuration']}
  expect(prepareOperatingBatch({...f,sourcePlan:changed}).holds).toContain('source_configuration_changed')
  const missing=structuredClone(f.publicationsByCurrency);delete missing.MXN
  expect(prepareOperatingBatch({...f,publicationsByCurrency:missing}).rows.find(r=>r.currency==='MXN').holds).toContain('published_history_unavailable')
  const tampered=structuredClone(f.policy);tampered.destination.zdr=false
  expect(()=>prepareOperatingBatch({...f,policy:tampered})).toThrow('bound_operating_policy_required')
+})
+it('isolates an unregistered article while retaining a valid same-country source plan and all other country preparations',async()=>{
+ const f=await fixture(),country=f.countries.find(c=>c.currency==='COP'),record={...country.collection.originals[0],url:'https://outside.example.org/dolar',collectedAt:'2026-11-02T04:00:00Z'}
+ delete record.id
+ const bound=bindSelectedOriginalReview({request:{sourceId:'cop-larepublica',period:'2026-10-26'},record,
+  adapter:'reviewed_news_notes',requestIds:['synthetic'],currency:'COP',asOf:f.asOf,targets:[{needId:'market',requestedPeriod:'2026-10-26'}]})
+ const baseline=prepareOperatingBatch(f)
+ country.collection.originals.push(bound.original);country.collection.reviewQueue.push(bound.review)
+ const before=fingerprint(f),result=prepareOperatingBatch(f)
+ expect(result.sourcePlans.map(p=>p.binding)).toEqual(baseline.sourcePlans.map(p=>p.binding))
+ expect(result.rows.find(r=>r.currency==='COP')).toMatchObject({status:'planned',holds:[],maxCalls:4})
+ expect(result.privateCountries.find(r=>r.currency==='COP').collection.originals).toHaveLength(1)
+ expect(result.privateCountries.find(r=>r.currency==='COP').collection.originals[0].url).not.toContain('outside')
+ expect(result.rows.filter(r=>r.currency!=='COP')).toEqual(baseline.rows.filter(r=>r.currency!=='COP'))
+ expect(fingerprint(f)).toBe(before)
 })
 it('holds an oversized batch instead of truncating articles or adding calls beyond the proposed ceiling',async()=>{
  const f=await fixture(),country=f.countries.find(c=>c.currency==='COP'),original=country.collection.originals[0]

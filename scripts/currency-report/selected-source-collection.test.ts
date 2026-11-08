@@ -75,6 +75,7 @@ describe('Selected public sources -> private pending card review',()=>{
     expect(calls).toContain(child);expect(calls).toContain(locked)
     expect(calls).not.toContain(grandchild)
     expect(calls.some(url=>url.includes('unregistered.example')||url.includes('/deportes/'))).toBe(false)
+    expect(result.sourceCandidates).toEqual([expect.objectContaining({domain:'unregistered.example',writingEligible:false})])
     expect(result.originals.map(o=>o.url).sort()).toEqual([root,child].sort())
     expect(result.reviewQueue.find(q=>q.url===child).requestedPeriodMatch).toBe('different_publication_day')
     expect(result.publicationApproved).toBe(false)

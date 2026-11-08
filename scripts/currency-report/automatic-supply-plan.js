@@ -10,11 +10,16 @@ import {prepareOperatingBatch} from './operating-batch-plan.js'
 import {recordPublishedCorrections} from './published-corrections.js'
 import {collectionDiagnostics} from './collection-diagnostics.js'
 import {fingerprint} from './research-harness.js'
+import {compileResearchSourceCatalog} from './research-source-selection.js'
+import {isolateUnregisteredArticles} from './registered-collection.js'
+import {updateSourceMonitor} from './source-candidates.js'
+import {probeSourceCandidates} from './source-candidate-probe.js'
 
 export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store,policy,sourcePlan,sourceRegister,registry,processingRules,
- cachedByCurrency={},mode='saved',capturesByCurrency={},acquire=acquireRuntimeResearch,checkpoint=async()=>{}}) {
+ cachedByCurrency={},mode='saved',capturesByCurrency={},acquire=acquireRuntimeResearch,checkpoint=async()=>{},probeCandidates=probeSourceCandidates}) {
  if(!['saved','live'].includes(mode)||!store?.history||!calendarByCurrency)throw Error('automatic_supply_configuration_required')
  const countries=[],publicationsByCurrency={},collectionResults=[]
+ const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister)
  let cutoff=asOf
  for(const currency of REPORT_CURRENCIES){
   const calendar=calendarByCurrency[currency]??{status:'unverified'}
@@ -22,7 +27,8 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
   const snapshot=buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calendar})
   const cached=cachedByCurrency[currency]??{}
   const empty={version:'selected-source-collection/1',currency,asOf,originals:[],reviewQueue:[],outcomes:[]}
-  let collection=empty,status='not_due_or_reference_hold',acquisitionError=null,savedSourceReviews=cached.savedSourceReviews??[],eventCandidateIds=[],officialBackground=null,researchWindow=null,researchFeedback=null,historyRows=null
+  let monitorCollection=empty
+  let collection=empty,status='not_due_or_reference_hold',acquisitionError=null,savedSourceReviews=cached.savedSourceReviews??[],eventCandidateIds=[],officialBackground=null,researchWindow=null,researchFeedback=null,historyRows=null,sourceMonitor=null,sourceMonitorStatus='not_recorded'
   try{
    historyRows=await store.history(currency)
    try{publicationsByCurrency[currency]=runtimePublications(historyRows,currency)}catch{acquisitionError='published_anchor_snapshot_unavailable'}
@@ -36,7 +42,7 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
    {
     const acquired=await acquire({snapshot,asOf,commentaryTarget:target,sourcePlan,sourceRegister,mode,
      captures:capturesByCurrency[currency]??[],checkpoint:(stage,value)=>checkpoint(currency,stage,value)})
-    if(acquired.collection)collection=acquired.collection
+    if(acquired.collection){monitorCollection=acquired.collection;collection=isolateUnregisteredArticles(acquired.collection,catalog).collection}
     officialBackground=acquired.officialBackground??null;researchWindow=acquired.researchWindow??null;researchFeedback=acquired.researchFeedback??null
     target=acquired.commentaryTarget??latestCollectedCommentaryTarget(collection,target,acquired.completedAt??asOf)
     if(acquired.savedSourceReviews)savedSourceReviews=acquired.savedSourceReviews
@@ -55,6 +61,17 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
    acquisitionError=/^[a-z0-9_]+$/.test(error.message??'')?error.message:'automatic_collection_failed'
    status='collection_or_history_failed'
   }
+  // Candidate diagnostics remain independent of acquisition/writing success.
+  // A failed monitor never turns registered evidence into an approval or hold.
+  try{
+   const previous=store.sourceMonitor?await store.sourceMonitor(currency):cached.sourceMonitor??null
+   sourceMonitor=updateSourceMonitor({currency,collection:monitorCollection,catalog,previous,researchFeedback,asOf:cutoff,captures:capturesByCurrency[currency]??[]})
+   sourceMonitor=await probeCandidates(sourceMonitor,{mode})
+   if(store.saveSourceMonitor){
+    const saved=await store.saveSourceMonitor(sourceMonitor,previous?.binding??null)
+    sourceMonitorStatus=saved===false?'concurrent_update_deferred':'recorded'
+   }else sourceMonitorStatus='inspection_only'
+  }catch{sourceMonitorStatus='storage_or_validation_failed'}
   const correctionCheck=historyRows?await recordPublishedCorrections({currency,history:historyRows,collection,
    admission:officialBackground?.admission,asOf:cutoff},store):{status:'correction_history_unavailable'}
   const handoff=cached.handoff??emptySupplyCache({snapshot,commentaryTarget:target,asOf})
@@ -63,10 +80,11 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
   const cadence=publicationsByCurrency[currency]?evaluatePublicationCadence({snapshot,asOf:cutoff,calendar,publications:publicationsByCurrency[currency],eventCandidateIds}):null
   const publicationDecision=cadence?{status:cadence.status,cumulativePct:cadence.cumulativePct,thresholdPct:cadence.thresholdPct,
    periodicDueDate:cadence.periodicDueDate,dataHolds:cadence.dataHolds,comparisonHolds:cadence.comparisonHolds,comparisonDetails:cadence.comparisonDetails}:null
-  const row={currency,status,acquisitionError,correctionCheck,candidates:collection.reviewQueue.length,cadenceStatus:cadence?.status??'history_unavailable',publicationDecision,researchWindow,researchFeedback,
+  const row={currency,status,acquisitionError,correctionCheck,candidates:collection.reviewQueue.length,cadenceStatus:cadence?.status??'history_unavailable',publicationDecision,researchWindow,researchFeedback,sourceMonitor,sourceMonitorStatus,
    referenceStatus:calendar.reason??calendar.referenceState?.status??calendar.status,
    sourceStates:(collection.outcomes??[]).map(o=>({sourceId:o.sourceId,status:o.status})),
    ...collectionDiagnostics(collection),
+   sourceMonitorNetworkCalls:sourceMonitor?.networkCalls??0,
    officialBackground:officialBackground?{status:officialBackground.status,states:officialBackground.states,admissionStatus:officialBackground.admissionStatus,
     inputState:officialBackground.inputState??null,inputIssues:officialBackground.inputIssues??[],
     releaseLookups:officialBackground.releaseLookups??[],
@@ -77,6 +95,8 @@ export async function planAutomaticSupply({dataset,asOf,calendarByCurrency,store
   row.newMaterialCandidates=eventCandidateIds.length
   if(store.supplyCheck){
    const sources=new Map()
+   if(sourceMonitorStatus==='storage_or_validation_failed')sources.set('source-monitor',new Set(['source_monitor_storage_failed']))
+   if(sourceMonitorStatus==='concurrent_update_deferred')sources.set('source-monitor',new Set(['source_monitor_update_deferred']))
    for(const item of [...row.sourceStates,...(row.officialBackground?.states??[]).flatMap(s=>s.sourceStates??[])]){
     if(!sources.has(item.sourceId))sources.set(item.sourceId,new Set())
     sources.get(item.sourceId).add(item.status)

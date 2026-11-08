@@ -15,6 +15,7 @@ import {validDate} from './core.js'
 import {LOCAL_SOURCE_REGISTRY} from './local-source-discovery.js'
 import {MAX_RESEARCH_PERIODS_PER_QUESTION} from './research-limits.js'
 import {MAX_SOURCE_NETWORK_REQUESTS,sourceAttemptMinimum,allocateSourceRequests} from './source-request-budget.js'
+import {discoverSourceCandidates} from './source-candidates.js'
 
 export const SELECTED_COLLECTION_VERSION='selected-source-collection/1'
 const MAX_SELECTED_LOGICAL_REQUESTS=30*MAX_RESEARCH_PERIODS_PER_QUESTION*4 // routes × periods × core questions; not HTTP allowance
@@ -96,6 +97,11 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
   if(!Array.isArray(requestIds)||!requestIds.length||requestIds.length>MAX_SELECTED_LOGICAL_REQUESTS||new Set(requestIds).size!==requestIds.length
     ||requestIds.some(id=>!selection.sourceRequests.some(r=>r.requestId===id)))throw new Error('explicit_selected_requests_required')
   const chosen=selection.sourceRequests.filter(r=>requestIds.includes(r.requestId)),outcomes=[],originals=[],reviewQueue=[],receipts=[],cache=new Map(),publisherCache=new Map(),transportCache=new Map(),network=[]
+  const sourceCandidates=new Map()
+  const rememberCandidates=(text,url,sourceId)=>{
+    for(const c of discoverSourceCandidates({text,url,sourceId,currency:selection.currency,catalog}))
+      if(sourceCandidates.size<32&&!sourceCandidates.has(c.domain))sourceCandidates.set(c.domain,c)
+  }
   const sourceIds=[...new Set(chosen.map(r=>r.sourceId))]
   const weights=sourceIds.map(sourceId=>materialRecipe(chosen.find(r=>r.sourceId===sourceId),catalog,sourceRegister).kind==='existing_chile_publisher'
     ?Math.max(1,(LOCAL_SOURCE_REGISTRY[selection.currency]??[]).length):1)
@@ -280,6 +286,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
       row.reason=readResult.reason;continue
     }
     if(recipe.kind==='news_listing') {
+      rememberCandidates(readResult.text,recipe.url,request.sourceId)
       const discoveryOptions={sourceId:request.sourceId,period:request.period,limit:recipe.access?3:2,
         deprioritizeUrls:discoveryFeedback?.deprioritizeUrls??[]}
       let found=explicitArticle?{candidates:[{url:explicitArticle.url,title:'User-supplied URL; article title not verified'}]}
@@ -311,6 +318,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
           const index=await read(request.sourceId,recipe.access.indexUrl,{kind:'news_index',url:recipe.access.indexUrl},request.period)
           row.discoveryAttempts.push({url:recipe.access.indexUrl,status:index.status,reason:index.reason??null})
           if(index.status==='ok'){
+            rememberCandidates(index.text,recipe.access.indexUrl,request.sourceId)
             const indexed=discoverRegisteredNews(index.text,recipe.access.indexUrl,selection.currency,discoveryOptions)
             const combined=[...indexed.candidates,...found.candidates]
               .filter((candidate,index,all)=>all.findIndex(c=>c.url===candidate.url)===index)
@@ -345,6 +353,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
         if(page.status!=='ok'){row.issues.push({status:page.status==='not_attempted'?'not_attempted':'access_failed',reason:page.reason});continue}
         const barrier=publisherAccessBarrier(page.text)
         if(barrier){row.issues.push({status:'access_failed',reason:barrier});continue}
+        rememberCandidates(page.text,candidate.url,request.sourceId)
         const article=await collectOriginal({candidate,currency:selection.currency,baseDate:selection.baseDate,
           fetchImpl:async()=>new Response(page.text),robotsText:robots?.text})
         if(article.status!=='collected_pending_review'){row.issues.push({status:'extraction_failed',reason:article.reason});continue}
@@ -415,6 +424,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
     startedAt,selectionId:selection.selectionId,catalogId:catalog.catalogId,outcomes,originals,reviewQueue,receipts,network,
     ...(fairSourceBudgets?{sourceRequestBudgets:sourceIds.map(sourceId=>({sourceId,limit:sourceLimits.get(sourceId),spent:sourceSpent(sourceId)})),
       sourceBudgetCoverage:{minimumCoverage:budget.minimumCoverage,minimumRequired:budget.minimumRequired,maxNetworkRequests}}:{}),
+    sourceCandidates:[...sourceCandidates.values()],
     networkCalls:network.length,modelCalls:0,newPaidCostUsd:0,retries:0,writingEligibility:'not_assessed',publicationApproved:false}
   await checkpoint('result',result);return result
 }
