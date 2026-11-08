@@ -1,0 +1,71 @@
+{
+  "version": "news-notes-verification/1",
+  "date": "2026-10-27",
+  "historicalSession": "2026-09-10",
+  "implementation": {
+    "mode": "reviewer_authored_facts_and_attributed_views",
+    "promptVersion": "currency-input/6",
+    "notesVersion": "reviewed-news-notes/2",
+    "scopeProjection": "notes-reference/1",
+    "wholeArticleRequired": false,
+    "perClaimSupportingContentCheck": true,
+    "recheckPublisherReportingRequired": false
+  },
+  "case": {
+    "file": "docs/2.0/clp-news-notes-20260910.json",
+    "publishers": [
+      "Diario Financiero",
+      "Pulso / La Tercera",
+      "Emol",
+      "Yahoo Finance / Reuters"
+    ],
+    "factCards": 1,
+    "attributedViewCards": 5,
+    "yahooAccess": "publisher-attributed article content provided in search; no repeated direct download; full article not required",
+    "yahooScope": "Jamie McGeever authored commentary, global context, published after Chilean aggregation cutoff"
+  },
+  "result": {
+    "directory": ".local-reports/private/news-notes-preparation-djsPP4",
+    "status": "prepared_not_called",
+    "requestHash": "b2f857cc1cc2ad3bef2469d65116c3d7f997980ebf92b40c474f23bd16ff2533",
+    "originalArticleTextIncluded": false,
+    "noteCopiesInPromptEach": 1,
+    "sourceUseScope": "authored cards only; not publisher permission or a legal conclusion",
+    "paidCallAuthorized": false,
+    "publicationApproved": false
+  },
+  "checks": {
+    "newSyntheticBoundaryTests": 8,
+    "allTestFiles": 91,
+    "declaredTests": 532,
+    "executedCases": 639,
+    "parameterExpansions": 107,
+    "duplicateNames": 0,
+    "identicalCallbacks": 0,
+    "selfComparisons": 0,
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed",
+    "existingEntryBytes": 610348,
+    "existingChunkWarning": "over 500KB; unchanged",
+    "browserAssetFilesScanned": 23,
+    "browserMarkerLeaks": 0,
+    "protectedFilesCompared": 44,
+    "changedProtectedFiles": 0
+  },
+  "limitations": [
+    "No new AI report or generation-quality result.",
+    "Semantic support and independent wording remain reviewer judgments; flags and hashes do not prove truth or legality.",
+    "Search title or unidentified AI summary alone is not supporting article content.",
+    "Automated scraping, full translations, article substitution and publication remain separately constrained."
+  ],
+  "newPaidModelCalls": 0,
+  "newPaidDataCalls": 0,
+  "newApiCostUsd": 0,
+  "dbChanged": false,
+  "productionChanged": false,
+  "remotePush": false,
+  "existingReportsChanged": false
+}

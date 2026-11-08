@@ -1,0 +1,146 @@
+{
+  "version": "clp-publisher-research-verification/1",
+  "date": "2026-10-26",
+  "scope": "Registered Chilean publishers, original extraction and actual transaction-day alignment; local research only.",
+  "result": {
+    "realDiscovery": "passed",
+    "originalExtraction": "5_of_5_passed",
+    "writingEligibility": "hold_pending_admission_and_scope_review",
+    "newReport": false,
+    "publicationApproved": false
+  },
+  "connectionFinding": {
+    "defaultLocalAttempt": "Node returned ENOTFOUND for both registered publisher hosts.",
+    "explicitNetworkExecution": "Same public sitemap URLs returned HTTP 200; no credentials, login, paid API, captcha or subscription bypass used.",
+    "limitation": "Demonstrates that these publishers were reachable in the allowed network context. Does not prove GDELT availability or production-runtime connectivity.",
+    "requestAccounting": {"restrictedDnsAttempts": 2, "successfulSitemapProbes": 2, "collectionRequests": 7, "newModelCalls": 0, "newPaidCostUsd": 0}
+  },
+  "captures": {
+    "directory": ".local-reports/private/clp-publisher-discovery-84WFAi",
+    "manifest": ".local-reports/private/clp-publisher-discovery-84WFAi/ledger.json",
+    "sitemapCount": 2,
+    "articleCount": 5,
+    "discoveryLimits": {"registeredPublishers": 2, "maxEmolArticleReads": 4, "maxReporteMineroArticleReads": 3, "exhaustiveSearch": false},
+    "originalByteHashes": "All seven original byte files match the saved capture ledger after implementation and replay.",
+    "capturedAtRangeUtc": ["2026-10-26T10:52:17.745Z", "2026-10-26T10:52:20.650Z"],
+    "replayOutput": ".local-reports/private/publisher-research-ZfkJLP/result.json",
+    "replayNewNetworkRequests": 0,
+    "replayNote": "Source retrieval times retained from the original ledger; replay time is separate. Parsed body hashes bind extracted paragraphs, not full HTML bytes."
+  },
+  "implementation": {
+    "discoveryVersion": "v3",
+    "originalAdapterVersion": "registered-clp-original/1",
+    "orchestratorVersion": "publisher-research/1",
+    "command": "npm run report:research:publishers",
+    "replayCommand": "npm run report:research:publishers -- --mode replay --input .local-reports/private/bcch-report-input-uYxzrx/research-input.json --ledger .local-reports/private/clp-publisher-discovery-84WFAi/ledger.json",
+    "modes": {"plan": "Default, no reads of credentials or network.", "replay": "Hash-verified private originals, no network.", "collect": "Explicit registered public reads; no retries, AI, production write or automatic evidence admission."},
+    "reused": ["LOCAL_SOURCE_REGISTRY and sitemap discovery", "researchTimeScope for 22–23 October", "collectOriginal and source block extraction", "existing article publication/price-time relation checks"],
+    "changes": [
+      "Explicit startDate and month/year boundary sitemap coverage; existing default two-day window retained",
+      "Distinguish failed/partial source collection, invalid sitemap, metadata not admitted and valid empty window",
+      "Catch streaming body interruptions and preserve per-source issues",
+      "Require article canonical identity to match the fetched candidate",
+      "Emol extraction requires the unique visible cuDetalle_cuTexto_textoNoticia wrapper; hidden duplicate and recommendations are excluded",
+      "Reporte Minero extraction requires a unique ck-content wrapper and removes the exact comment CTA",
+      "Known-wrapper changes fail closed instead of falling back to an unrelated whole-page or JSON-LD body",
+      "Timezone-free Emol timestamps use registered America/Santiago with that assumption explicitly recorded; unregistered sites remain unresolved",
+      "Same download supplies metadata and original paragraphs; no second article network read"
+    ]
+  },
+  "priceBoundary": {
+    "reportDate": "2026-10-26",
+    "transactionDay": "2026-10-23",
+    "previousTransactionDay": "2026-10-22",
+    "officialWeightedAverageClpPerUsd": 990.35,
+    "previousOfficialWeightedAverage": 986.58,
+    "officialChangePct": 0.38212815990593585,
+    "aggregationCutoffAt": "2026-10-23T19:00:00Z",
+    "articlePricesInterchangeable": false,
+    "exactTickTime": null,
+    "directCauseApproved": false
+  },
+  "preliminaryOriginalReview": {
+    "origin": "agent",
+    "status": "findings_recorded_not_formal_evidence_admission",
+    "publicationApproval": false,
+    "articles": [
+      {
+        "id": "local-0bb70e0037ab",
+        "url": "https://www.emol.com/noticias/Economia/2026/10/23/1215016/dolar-sube-1000.html",
+        "bodyHash": "86bba59d0700d15be535d58a8f14edd0f75eaf43aa5155f30edf4965ca9221d6",
+        "paragraphCount": 8,
+        "publishedAt": "2026-10-23T17:41:00Z",
+        "publicationBasis": "registered_publisher_timezone",
+        "reviewCandidatePassages": ["p1", "p2", "p4", "p6"],
+        "possibleUse": "유가 상승을 주요 배경으로 보는 XTB 분석가의 해석과 구리 반등이라는 반대 요인을 출처에 귀속해 검토할 수 있다.",
+        "priceLabels": {"reportedBid": 993.2, "reportedAsk": 993.5, "unit": "CLP per USD"},
+        "limits": ["기사의 마감 호가와 중앙은행 거래 가중평균을 합치지 않는다.", "기사 발행이 집계 마감 전이라는 사실만으로 정확한 가격 관측시각이나 직접 원인을 입증하지 않는다.", "p5의 목표·지지 환율 전망은 사용하지 않는다."]
+      },
+      {
+        "id": "local-9764d3b9895f",
+        "url": "https://www.emol.com/noticias/Economia/2026/10/23/1214972/dolar-alza-990.html",
+        "bodyHash": "61e50c3f0887758e1993314e9e3cfcc68dd8a58e00ee497bb741269b20d28d9b",
+        "paragraphCount": 9,
+        "publishedAt": "2026-10-23T12:51:00Z",
+        "reviewCandidatePassages": ["p3", "p4", "p5", "p6", "p7"],
+        "possibleUse": "오전의 위험회피·금리 해석, 유가 부담과 구리의 완충 역할을 각각 분석가에게 귀속하는 검토 후보로 유지한다.",
+        "heldPassages": ["p2"],
+        "issue": "매도 987.5·매수 987.8이라는 표기가 통상적인 동일 시점 호가 순서와 반대다. 관측 기준 또는 라벨 오류를 확인하기 전까지 가격 쌍과 해당 변동률을 채택하지 않으며 값을 임의로 뒤집어 수정하지 않는다.",
+        "limits": ["오전의 달러·채권 해석을 저녁 기사와 같은 시점의 확정된 글로벌 방향으로 합치지 않는다.", "Capitaria의 에너지 수입 경로 설명은 분석가의 해석이며 업종별 수입 비중·판매 효과를 검증한 통계가 아니다."]
+      },
+      {
+        "id": "local-e54350ed90a1",
+        "url": "https://www.emol.com/noticias/Economia/2026/10/23/1215015/dolar-1000-pesos-expertos-analisis.html",
+        "bodyHash": "ace963257013a0e9eacb9e85642dd814bbeaa75a5dd0683ca3093c6b8f174055",
+        "paragraphCount": 36,
+        "publishedAt": "2026-10-23T23:00:14Z",
+        "timeRelation": "published_after_aggregation_cutoff",
+        "reviewCandidatePassages": ["p3", "p4", "p5", "p12", "p15", "p19", "p28", "p29", "p30", "p33", "p34", "p35"],
+        "possibleUse": "장 마감 뒤 보도된 해설·소비 환경·반대 견해를 출처와 조건을 붙여 검토한다. 거래일 당시 실시간으로 제공된 자료로 표시하지 않는다.",
+        "limits": ["환전소 소매 가격과 공식 시장·중앙은행 평균은 별도다.", "XTB 재인용을 독립 확인으로 세지 않는다.", "목표환율·발생 확률·예측은 원고에 넣지 않는다.", "광산 생산량·FedWatch 확률·실제 수입물가 효과는 공식 또는 직접 자료 대조 전까지 사실로 채택하지 않는다.", "유가 배경에 새 정보가 많지 않다는 인용과 단기성에 대한 반대 해석도 검토에서 누락하지 않는다."]
+      },
+      {
+        "id": "local-44e70b025a88",
+        "url": "https://www.emol.com/noticias/Economia/2026/10/22/1214865/dolar-mercado-cambiario-local.html",
+        "bodyHash": "487b10d7c401f6a7878a27ada85deefeb2f5b2b341fb0a58f01de63c848cd1a6",
+        "paragraphCount": 7,
+        "publishedAt": "2026-10-22T12:11:00Z",
+        "possibleUse": "전일 오전의 유가·위험회피·구리 맥락을 설명하는 후보다.",
+        "limits": ["22일 오전 호가를 22일 종가로 사용하지 않는다.", "23일 기사와 전일 종가 비교를 새로 계산하지 않는다.", "연료 소매가격 인상 수치는 공식 발표 대조 전에는 근거 후보로만 둔다.", "전망 구절은 사용하지 않는다."]
+      },
+      {
+        "id": "local-b5d228982a90",
+        "url": "https://www.reporteminero.cl/noticia/noticias/2026/10/cobre-sube-lme-octubre-2026-transicion-energetica",
+        "bodyHash": "7065abaffe5839cb108bd292aa3df53b1e1873277abd480c0ba313b0cf8834f0",
+        "paragraphCount": 8,
+        "publishedAt": "2026-10-23T13:06:00Z",
+        "status": "quantitative_claims_held",
+        "heldPassages": ["p0", "p1", "p2", "p3", "p4", "p5", "p6", "p7"],
+        "arithmeticCheck": {"reportedStart": 613.45, "reportedEnd": 653.85, "reportedCumulativePct": 40.24, "impliedPct": 6.585703806341181},
+        "issue": "제시된 시작값·종료값으로 계산한 상승률과 누적 상승률이 일치하지 않는다. 어떤 값이 잘못됐는지 추정해 고치지 않고 Cochilco 원자료 확인 전 수치 채택을 보류한다.",
+        "limits": ["다른 시각 기사의 구리 상승률 차이를 동일 가격·동일 관측시각의 모순으로 단정하지 않는다.", "매체가 Cochilco를 인용했다는 이유로 이 기사를 공식 원자료로 분류하지 않는다.", "미래 월 가격·전망과 광범위한 산업 설명을 당일 CLP 원인으로 채택하지 않는다."]
+      }
+    ],
+    "independence": "Four Emol articles are one publisher, and several repeat XTB or Capitaria analysts. Five downloaded articles do not equal five independent confirmations."
+  },
+  "checks": {
+    "newSyntheticContractCases": 7,
+    "focusedSuite": "6 files / 52 cases passed",
+    "fullSuite": {"files": 86, "declaredTests": 495, "executedCases": 598, "parameterExpansions": 103, "status": "passed"},
+    "inventoryAudit": "No exact duplicate names, identical bodies or detected tautologies; not proof of semantic uniqueness or actual report quality.",
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed; production entry 610348 bytes and existing size warning unchanged",
+    "secretScan": {"files": 355, "actualBcchTokenOrEncodedTokenHits": 0, "gitDiffContainsToken": false},
+    "operationalHashesUnchanged": {"public/data.json": "c7d75391561af63d4fc67cf05cd991cf12c7acbb6d1175ab56b5dbcfa35c3f9e", "data/fx-full-history.json": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f"}
+  },
+  "remaining": [
+    "Formal passage-level admission, price scope and independent interpretation review before building a writing packet.",
+    "Direct source corroboration for held commodity figures or numerical household impacts; no need to force every downloaded article into the report.",
+    "Public display/use terms for media excerpts remain separate from BCCh statistical-data rights.",
+    "The direct publisher path is an explicit local option, not a deployed automatic fallback.",
+    "No report generation, approval, production/DB/email/workflow change or remote push occurred."
+  ]
+}

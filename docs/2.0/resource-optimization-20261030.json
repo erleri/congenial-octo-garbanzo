@@ -1,0 +1,300 @@
+{
+  "version": "resource-optimization/1",
+  "workStarted": "2026-10-29",
+  "completedDate": "2026-10-30",
+  "status": "local_optimization_verified_live_capacity_pending",
+  "scope": {
+    "productionWrites": 0,
+    "pushes": 0,
+    "deployments": 0,
+    "mailSent": 0,
+    "paidModelCalls": 0,
+    "realDataDeletion": 0,
+    "localDatabaseWrites": 0
+  },
+  "completed": [
+    [
+      "원시표",
+      "관리 진입 시 전체 자동 조회 제거. 명시적으로 열 때 목록+선택 시트50행. CSV 요청 때 전체 시트 행 사용. 기존 전체 URL과 구 배포 폴백 유지"
+    ],
+    [
+      "배포 사본",
+      "원본 원시표는 보존하고 빌드 사본의 공백만 제거. 13개 시트 전체 값·순서·행수 동일, 작은 미리보기는 빌드에서 파생"
+    ],
+    [
+      "리포트 조회",
+      "DB에서 목록용 필드만 선택. 6통화 각각30건 상한·기존 상세 조회·익명 공개 권한/캐시 유지"
+    ],
+    [
+      "새 로컬 저장",
+      "report-data-ledger/2가 내용별 고유 파일을 공유. 동시 저장은 완료 파일만 공개. v1 읽기 호환과 기존 원고/장부 보존, 과거 자료 이전/정리 없음"
+    ],
+    [
+      "실행 분리",
+      "명시적 승인 후 워크플로 로컬 파일만 변경. review 모드는 FX/메일 뒤 별도5분·contents read·동일 커밋. automatic 모드의 기존 이메일 보강 순서 유지"
+    ]
+  ],
+  "measurements": {
+    "raw": {
+      "scope": "local saved workbook, not current production data",
+      "source": {
+        "bytes": 36812605,
+        "gzipComputedBytes": 1113556,
+        "brotliComputedBytes": 719723
+      },
+      "legacyBuildCopy": {
+        "bytes": 19284816,
+        "gzipComputedBytes": 1039532,
+        "brotliComputedBytes": 680256
+      },
+      "firstSelectedPreview": {
+        "bytes": 10119,
+        "gzipComputedBytes": 1220,
+        "brotliComputedBytes": 994
+      },
+      "sheets": 13,
+      "sourceUnchanged": true,
+      "allSheetCounts": [
+        {
+          "name": "Summary",
+          "rows": 4488
+        },
+        {
+          "name": "ARS",
+          "rows": 11940
+        },
+        {
+          "name": "BRL",
+          "rows": 11940
+        },
+        {
+          "name": "CLP",
+          "rows": 10886
+        },
+        {
+          "name": "COP",
+          "rows": 10886
+        },
+        {
+          "name": "GTQ",
+          "rows": 10626
+        },
+        {
+          "name": "MXN",
+          "rows": 11940
+        },
+        {
+          "name": "PYG",
+          "rows": 10626
+        },
+        {
+          "name": "PEN",
+          "rows": 10886
+        },
+        {
+          "name": "CNY",
+          "rows": 11940
+        },
+        {
+          "name": "UYU",
+          "rows": 10626
+        },
+        {
+          "name": "USD",
+          "rows": 11940
+        },
+        {
+          "name": "이동 比",
+          "rows": 39
+        }
+      ],
+      "note": "gzip/brotli are computed comparisons, not measured Netlify traffic. Legacy full URL remains; complete CSV is fetched only on request."
+    },
+    "reports": {
+      "environment": "isolated local DB; anonymous read only",
+      "countries": 6,
+      "publicRows": 2,
+      "oldDecodedResponseBytes": 18029,
+      "newDecodedResponseBytes": 895,
+      "requestsPerList": 6,
+      "valuesIdentical": true,
+      "note": "HTTP response payload bytes from local API; not database disk reads, cloud billable transfer or organic traffic."
+    },
+    "ledger": {
+      "version": "report-data-ledger/2",
+      "newPreparations": 12,
+      "uniqueResources": 21,
+      "logicalReferencedBytes": 15919838,
+      "uniqueObjectBytes": 2355369,
+      "requestHashesUnchanged": true,
+      "note": "New ledger object payloads only; manifests and compatibility source copies are additional. Existing v1 bundles were neither migrated nor removed. These are saved-input replays, not AI generations."
+    },
+    "paidCalls": 0,
+    "productionChanged": false
+  },
+  "httpMeasurements": {
+    "scope": "measured local HTTP, identity encoding; not Netlify invoice or gzip projection",
+    "results": [
+      {
+        "path": "/raw-sheets.json",
+        "port": "4176",
+        "responseBodyBytes": 36812605,
+        "encoding": "identity"
+      },
+      {
+        "path": "/raw-sheets-index.json",
+        "port": "4187",
+        "responseBodyBytes": 3286,
+        "encoding": "identity"
+      },
+      {
+        "path": "/raw-sheet-previews/8c9729c2c46ac84c2eb46cde77473787b20904096d1f2e307511640c32a289a1/0.json",
+        "port": "4187",
+        "responseBodyBytes": 6833,
+        "encoding": "identity"
+      },
+      {
+        "path": "/raw-sheets.json",
+        "port": "4187",
+        "responseBodyBytes": 19284816,
+        "encoding": "identity"
+      }
+    ],
+    "identicalFullJson": true,
+    "identicalSelectedPreview": true,
+    "initialHtmlJs": [
+      {
+        "root": "dist-app-local",
+        "initialJsBytes": 813072,
+        "files": [
+          {
+            "url": "/assets/index-C-xcXqkr.js",
+            "bytes": 615844
+          },
+          {
+            "url": "/assets/jsx-runtime-DUAcabCT.js",
+            "bytes": 1066
+          },
+          {
+            "url": "/assets/dist-ZQK6vhsk.js",
+            "bytes": 195213
+          },
+          {
+            "url": "/assets/exchangeRate-CgA2GoOG.js",
+            "bytes": 949
+          }
+        ]
+      },
+      {
+        "root": "dist",
+        "initialJsBytes": 813186,
+        "files": [
+          {
+            "url": "/assets/index-DJSqao3p.js",
+            "bytes": 812120
+          },
+          {
+            "url": "/assets/jsx-runtime-DUAcabCT.js",
+            "bytes": 1066
+          }
+        ]
+      }
+    ]
+  },
+  "buildStats": [
+    {
+      "root": "dist",
+      "bytes": 24881896,
+      "files": 34
+    },
+    {
+      "root": "dist-report-ui",
+      "bytes": 24374416,
+      "files": 29
+    },
+    {
+      "root": "dist-app-local",
+      "bytes": 24889116,
+      "files": 37
+    }
+  ],
+  "verification": {
+    "unitFiles": 247,
+    "unitCases": 1029,
+    "unitCasesNotAiQualitySamples": true,
+    "concurrentObjectStorageChecks": 8,
+    "types": "passed",
+    "lint": "passed",
+    "builds": [
+      "production",
+      "report",
+      "app-local"
+    ],
+    "valueAndPeriodComparisons": "passed",
+    "protectedFiles": 599,
+    "authorizedChangedFiles": [
+      "src/components/Admin.tsx",
+      "src/local-report/provider.ts",
+      "scripts/verify-bundle-boundary.js",
+      ".github/workflows/generate-data.yml",
+      "vite.config.ts",
+      "scripts/currency-report/data-ledger.js",
+      "scripts/currency-report/data-ledger.test.ts",
+      "scripts/currency-report/data-operations-local.js"
+    ],
+    "unexpectedChanges": [],
+    "preservedDataAndManuscriptFiles": 98,
+    "privateInputsUnchanged": 22,
+    "previousV1PreparationsReadable": 6,
+    "initialEntryBytes": 812120,
+    "initialHtmlJsBytes": 813186,
+    "existingChunkWarning": true,
+    "buildTextFilesScanned": 94,
+    "secretOrPrivateFixtureFindings": 0,
+    "emailWorkflowStepsUnchanged": [
+      "Compose email metadata",
+      "Create email chart",
+      "Validate mailing list",
+      "Send dashboard email",
+      "Upload dashboard artifacts"
+    ],
+    "browser": [
+      "환경/메일 API를 차단한 전용 로컬4188에서 확인",
+      "관리 진입 시 원본 자료 닫힘",
+      "명시적으로 연 Summary 목록과50행 표시",
+      "PEN 전환 후10,886행 중50행 표시",
+      "파일 업로드·메일·로그인 실행 없음"
+    ],
+    "actualGitHubRunner": "not_executed",
+    "actualNetlifyDeployment": "not_executed",
+    "htmlReportPreview": "static validation only"
+  },
+  "approval": {
+    "workflow": "사용자가 운영 워크플로 파일의 로컬 수정만 명시 승인. 자동 검토 최초 차단 뒤 승인 범위로 수정 완료",
+    "productionApproval": false
+  },
+  "limits": [
+    "측정은 로컬 저장 원시표와 격리 DB 공개본2건 기준. 운영 원시표의 최신본 또는 월 과금량으로 확대하지 않음",
+    "실제 로컬 HTTP 측정은 identity 응답이다. gzip/brotli 비교는 계산값이며 Netlify 실전 전송량은 미확인",
+    "중복 제거 수치는 새 장부의 내용 파일만 해당. manifest·기존 호환 사본·과거895MB 실험 전체가 줄었다는 뜻이 아님",
+    "전체 CSV는 비상용 기존 전체 파일을 요청한다. 이전 클라이언트 호환/복구가 있어 전체 URL 삭제하지 않음",
+    "automatic 모드에서는 기존 당일 이메일 보강 때문에 인라인 리포트 경로를 유지. 승인 방식의 새 Sol 집필 운영 자동화는 이번 범위가 아님",
+    "초기 단일 entry는615,654→812,120 bytes로 재묶였으나 HTML entry/preload 합계는 이전 앱 연결813,072→현재운영빌드813,186 bytes로 거의 동일. 동일 환경의 과거 운영 빌드 A/B는 아님",
+    "계정별 실제 월 한도/잔여량·기존 서비스 여유분, 정기 작업 지연 원인과 실제 장애/발송 검증은 운영 활성화 전 미확인 조건"
+  ],
+  "next": "5단계: 삭제 없는 보존·참조 점검과 별도 환경 백업/복원 검증. Sol High 구현, Astra High 정정·복구 기준 검토 권장. 실제 데이터 정리와 운영 적용은 별도 승인",
+  "sources": [
+    [
+      "Vite publicDir",
+      "https://vite.dev/config/shared-options#publicdir"
+    ],
+    [
+      "Supabase JSON 필드 선택",
+      "https://supabase.com/docs/reference/javascript/select"
+    ],
+    [
+      "GitHub 작업 의존성·timeout·continue-on-error",
+      "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax"
+    ]
+  ]
+}

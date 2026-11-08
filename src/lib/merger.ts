@@ -4,6 +4,7 @@ import type {
   ExchangeRateDataset,
   MonthlyRate,
   RawSheet,
+  FxPriceSource,
 } from '../types/exchangeRate'
 import { CURRENCIES, MONTHS, YEARS } from '../types/exchangeRate'
 import {
@@ -27,6 +28,7 @@ import { applyForwardFillToDaily, applyMonthlyFallbackFromDaily } from './imputa
 import { buildMovingComparisonRows } from './moving'
 import { parseExcelWorkbook } from './excel'
 import { loadAVSupplementalCache, saveAVSupplementalCache } from './cache'
+import {createPriceProvenanceRecorder,unknownPriceSource,prunePriceProvenance} from './price-provenance'
 
 export interface ExcelMergeOptions {
   excelPriority: boolean
@@ -35,6 +37,7 @@ export interface ExcelMergeOptions {
 
 export interface RemoteExchangeDataOptions {
   supplementalHistoryByCurrency?: Record<string, Record<string, number>>
+  supplementalPriceSources?: Record<string, FxPriceSource>
   manualBackfillByDate?: Record<string, Record<string, number>>
 }
 
@@ -252,6 +255,7 @@ export function mergeDatasetsWithExcel(
     monthlyRates: monthlyWithFill,
     movingComparison: [],
     rawSheets: excelDataset.rawSheets.length ? excelDataset.rawSheets : apiDataset.rawSheets,
+    priceProvenance:prunePriceProvenance(apiDataset.priceProvenance,dailyWithFill),
   }
 
   merged.movingComparison = buildMovingComparisonRows(merged, year, month)
@@ -279,6 +283,15 @@ export async function fetchRemoteExchangeData(
   const mergedRatesByDate: Record<string, Record<string, number>> = {
     ...historyPayload.rates,
   }
+  const provenance=createPriceProvenanceRecorder()
+  const unrecorded=unknownPriceSource('injected_without_source_record')
+  const recordMap=(date:string,rates:Record<string,number>,source:FxPriceSource|undefined,stage:string)=>{
+    for(const [currency,raw] of Object.entries(rates)){
+      const value=toNumber(raw)
+      if(value!==null)provenance.select(date,currency,value,source??unrecorded,stage)
+    }
+  }
+  for(const [date,rates] of Object.entries(historyPayload.rates))recordMap(date,rates,historyPayload.priceSource,'frankfurter_history')
 
   // Alpha Vantage로 CLP/COP/PEN 전체 히스토리 보충 (Frankfurter 미지원)
   // 캐시가 있으면 API 호출 없이 재사용 (무료 25 req/일 한도 보호)
@@ -287,6 +300,10 @@ export async function fetchRemoteExchangeData(
     ...(options.supplementalHistoryByCurrency ?? {}),
     ...(avCached?.rates ?? {}),
   }
+  const alphaSources:Record<string,FxPriceSource>={...options.supplementalPriceSources}
+  for(const currency of Object.keys(avCached?.rates??{})){
+    alphaSources[currency]=avCached?.priceSources?.[currency]??unknownPriceSource('cache_without_source_record')
+  }
 
   const missingCurrencies = ALPHA_VANTAGE_HISTORY_CURRENCIES.filter(
     (currency) => !alphaVantageRatesByCurrency[currency],
@@ -294,7 +311,7 @@ export async function fetchRemoteExchangeData(
 
   if (missingCurrencies.length > 0) {
     for (const currency of missingCurrencies) {
-      const rates = await fetchAlphaVantageFXDaily(currency)
+      const rates = await fetchAlphaVantageFXDaily(currency,source=>{alphaSources[currency]=source})
       if (rates) {
         alphaVantageRatesByCurrency[currency] = rates
       }
@@ -304,6 +321,7 @@ export async function fetchRemoteExchangeData(
       void saveAVSupplementalCache({
         fetchedAt: new Date().toISOString(),
         rates: alphaVantageRatesByCurrency,
+        priceSources:alphaSources,
       })
     }
   }
@@ -314,6 +332,7 @@ export async function fetchRemoteExchangeData(
       if (!mergedRatesByDate[date]) continue
       if (currency === 'ARS' || toNumber(mergedRatesByDate[date][currency]) === null) {
         mergedRatesByDate[date][currency] = rate
+        provenance.select(date,currency,rate,alphaSources[currency]??unrecorded,'alpha_history')
       }
     }
   }
@@ -341,8 +360,9 @@ export async function fetchRemoteExchangeData(
     )
 
     const monthlyAnchorDates = Object.values(monthlyAnchorDateByKey)
+    const anchorSources:Record<string,FxPriceSource>={}
     const supplementalMonthlyAnchors = monthlyAnchorDates.length
-      ? await fetchSupplementalHistoryFromCurrencyApi(monthlyAnchorDates)
+      ? await fetchSupplementalHistoryFromCurrencyApi(monthlyAnchorDates,(date,source)=>{anchorSources[date]=source})
       : {}
 
     for (const [date, supplementalRates] of Object.entries(supplementalMonthlyAnchors)) {
@@ -350,6 +370,7 @@ export async function fetchRemoteExchangeData(
         ...mergedRatesByDate[date],
         ...supplementalRates,
       }
+      recordMap(date,supplementalRates,anchorSources[date],'currency_monthly_anchor')
     }
   }
 
@@ -365,8 +386,9 @@ export async function fetchRemoteExchangeData(
     })
     .map(([date]) => date)
 
+  const historySources:Record<string,FxPriceSource>={}
   const supplementalHistory = supplementalHistoryDates.length
-    ? await fetchSupplementalHistoryFromCurrencyApi(supplementalHistoryDates)
+    ? await fetchSupplementalHistoryFromCurrencyApi(supplementalHistoryDates,(date,source)=>{historySources[date]=source})
     : {}
 
   for (const [date, supplementalRates] of Object.entries(supplementalHistory)) {
@@ -374,10 +396,13 @@ export async function fetchRemoteExchangeData(
       ...mergedRatesByDate[date],
       ...supplementalRates,
     }
+    recordMap(date,supplementalRates,historySources[date],'currency_supplemental_history')
   }
 
   if (latestPayload?.date) {
     mergedRatesByDate[latestPayload.date] = latestPayload.rates
+    provenance.replaceDate(latestPayload.date)
+    recordMap(latestPayload.date,latestPayload.rates,latestPayload.priceSource,'exchange_latest')
   }
 
   if (openErLatestPayload?.date) {
@@ -388,6 +413,7 @@ export async function fetchRemoteExchangeData(
       const supplemental = toNumber(openErLatestPayload.rates[currency])
       if (supplemental !== null) {
         merged[currency] = supplemental
+        provenance.select(openErLatestPayload.date,currency,supplemental,openErLatestPayload.priceSource??unrecorded,'open_er_latest')
       }
     }
 
@@ -402,6 +428,7 @@ export async function fetchRemoteExchangeData(
       const supplemental = toNumber(currencyApiLatestPayload.rates[currency])
       if (supplemental !== null) {
         merged[currency] = supplemental
+        provenance.select(currencyApiLatestPayload.date,currency,supplemental,currencyApiLatestPayload.priceSource??unrecorded,'currency_latest')
       }
     }
 
@@ -410,6 +437,7 @@ export async function fetchRemoteExchangeData(
 
   if (options.manualBackfillByDate) {
     const manualBackfillCurrencies = new Set<CurrencyCode>(['PYG', 'GTQ', 'UYU'])
+    const manualSource=unknownPriceSource('manual_input')
 
     for (const [date, currencyRates] of Object.entries(options.manualBackfillByDate)) {
       const existing = mergedRatesByDate[date]
@@ -425,6 +453,7 @@ export async function fetchRemoteExchangeData(
         const numeric = toNumber(value)
         if (numeric !== null) {
           existing[currency] = numeric
+          provenance.select(date,currency,numeric,manualSource,'manual_backfill')
         }
       }
     }
@@ -501,6 +530,7 @@ export async function fetchRemoteExchangeData(
     monthlyRates,
     movingComparison: [],
     rawSheets: [],
+    priceProvenance:provenance.finish(dailyRatesWithFill),
   }
 
   const { year, month } = parseDateParts(endDate)

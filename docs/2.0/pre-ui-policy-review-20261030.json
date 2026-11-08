@@ -1,0 +1,801 @@
+{
+  "version": "pre-ui-policy-review/1",
+  "date": "2026-10-30",
+  "source": ".local-reports/private/cadence-replay-20261027-TEny80/result.json",
+  "sourceSha256": "901e6a5d2365e9eb3f8a7b1253820e5e77ea04980fffef5e71551ab05e31e1cc",
+  "dataset": {
+    "path": "data/fx-full-history.json",
+    "sha256": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f",
+    "baseDate": "2026-09-12",
+    "pointInTimeRevisionArchive": false
+  },
+  "actualLocalRecordAudit": {
+    "count": 0,
+    "statusCounts": {},
+    "publishedTimestampCount": 0,
+    "scope": "only named currency JSONs in .local-reports/reviewable; no production DB queried"
+  },
+  "numericStudy": [
+    {
+      "currency": "PEN",
+      "diagnostics": {
+        "rawRows": 5573,
+        "acceptedRows": 3022,
+        "excludedRows": 2551,
+        "identicalDuplicates": 0,
+        "conflictingDates": [],
+        "providerMissing": 756,
+        "observedAtMissing": 756,
+        "recentRows": 756,
+        "sourceTags": [
+          "API"
+        ]
+      },
+      "studies": [
+        {
+          "observations": 252,
+          "start": "2025-09-16",
+          "end": "2026-09-11",
+          "thresholds": [
+            {
+              "threshold": 2,
+              "delayObservations": 0,
+              "assumedPublications": 24,
+              "cumulativeOnly": 2,
+              "periodicOnly": 22,
+              "merged": 0,
+              "triggerCheckDays": 24,
+              "mergedWaitingChecks": 3,
+              "dataDelayedDays": 7,
+              "meanIntervalCalendarDays": 14.5417,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 7,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 0,
+              "assumedPublications": 24,
+              "cumulativeOnly": 1,
+              "periodicOnly": 23,
+              "merged": 0,
+              "triggerCheckDays": 24,
+              "mergedWaitingChecks": 1,
+              "dataDelayedDays": 7,
+              "meanIntervalCalendarDays": 14.5417,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 9,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 0,
+              "assumedPublications": 24,
+              "cumulativeOnly": 0,
+              "periodicOnly": 24,
+              "merged": 0,
+              "triggerCheckDays": 24,
+              "mergedWaitingChecks": 1,
+              "dataDelayedDays": 7,
+              "meanIntervalCalendarDays": 14.5417,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 14,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 2,
+              "delayObservations": 3,
+              "assumedPublications": 17,
+              "cumulativeOnly": 1,
+              "periodicOnly": 14,
+              "merged": 2,
+              "triggerCheckDays": 71,
+              "mergedWaitingChecks": 56,
+              "dataDelayedDays": 7,
+              "meanIntervalCalendarDays": 20.7059,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 13,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 9
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 3,
+              "assumedPublications": 17,
+              "cumulativeOnly": 0,
+              "periodicOnly": 16,
+              "merged": 1,
+              "triggerCheckDays": 68,
+              "mergedWaitingChecks": 55,
+              "dataDelayedDays": 7,
+              "meanIntervalCalendarDays": 21.1176,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 17,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 2
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 3,
+              "assumedPublications": 17,
+              "cumulativeOnly": 0,
+              "periodicOnly": 17,
+              "merged": 0,
+              "triggerCheckDays": 68,
+              "mergedWaitingChecks": 55,
+              "dataDelayedDays": 7,
+              "meanIntervalCalendarDays": 21.1176,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 17,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 2
+            }
+          ],
+          "windows": [
+            {
+              "threshold": 2,
+              "crossed": 3,
+              "medianFirstObservation": 4
+            },
+            {
+              "threshold": 3,
+              "crossed": 1,
+              "medianFirstObservation": 18
+            },
+            {
+              "threshold": 4,
+              "crossed": 0,
+              "medianFirstObservation": null
+            }
+          ],
+          "windowCount": 12,
+          "anchorPhaseSensitivity": [
+            {
+              "threshold": 2,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 25,
+              "maxCrossedWindowPct": 45.4545,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 3,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 0,
+              "maxCrossedWindowPct": 27.2727,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 4,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 0,
+              "maxCrossedWindowPct": 16.6667,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            }
+          ],
+          "shortWindowCoverage": "not_evaluated"
+        },
+        {
+          "observations": 756,
+          "start": "2023-09-20",
+          "end": "2026-09-11",
+          "thresholds": [
+            {
+              "threshold": 2,
+              "delayObservations": 0,
+              "assumedPublications": 77,
+              "cumulativeOnly": 7,
+              "periodicOnly": 66,
+              "merged": 4,
+              "triggerCheckDays": 77,
+              "mergedWaitingChecks": 5,
+              "dataDelayedDays": 22,
+              "meanIntervalCalendarDays": 13.974,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 3,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 0,
+              "assumedPublications": 76,
+              "cumulativeOnly": 3,
+              "periodicOnly": 73,
+              "merged": 0,
+              "triggerCheckDays": 76,
+              "mergedWaitingChecks": 2,
+              "dataDelayedDays": 22,
+              "meanIntervalCalendarDays": 14.1579,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 9,
+              "maxIntervalCalendarDays": 19,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 0,
+              "assumedPublications": 76,
+              "cumulativeOnly": 0,
+              "periodicOnly": 76,
+              "merged": 0,
+              "triggerCheckDays": 76,
+              "mergedWaitingChecks": 2,
+              "dataDelayedDays": 22,
+              "meanIntervalCalendarDays": 14.1579,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 14,
+              "maxIntervalCalendarDays": 19,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 2,
+              "delayObservations": 3,
+              "assumedPublications": 53,
+              "cumulativeOnly": 4,
+              "periodicOnly": 41,
+              "merged": 8,
+              "triggerCheckDays": 217,
+              "mergedWaitingChecks": 167,
+              "dataDelayedDays": 22,
+              "meanIntervalCalendarDays": 20.3585,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 9,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 9
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 3,
+              "assumedPublications": 52,
+              "cumulativeOnly": 1,
+              "periodicOnly": 46,
+              "merged": 5,
+              "triggerCheckDays": 208,
+              "mergedWaitingChecks": 162,
+              "dataDelayedDays": 22,
+              "meanIntervalCalendarDays": 20.8846,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 14,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 2
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 3,
+              "assumedPublications": 51,
+              "cumulativeOnly": 0,
+              "periodicOnly": 51,
+              "merged": 0,
+              "triggerCheckDays": 204,
+              "mergedWaitingChecks": 157,
+              "dataDelayedDays": 22,
+              "meanIntervalCalendarDays": 21.0196,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 17,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 16
+            }
+          ],
+          "windows": [
+            {
+              "threshold": 2,
+              "crossed": 16,
+              "medianFirstObservation": 9
+            },
+            {
+              "threshold": 3,
+              "crossed": 5,
+              "medianFirstObservation": 12
+            },
+            {
+              "threshold": 4,
+              "crossed": 3,
+              "medianFirstObservation": 18
+            }
+          ],
+          "windowCount": 37,
+          "anchorPhaseSensitivity": [
+            {
+              "threshold": 2,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 24.3243,
+              "maxCrossedWindowPct": 44.4444,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 3,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 5.4054,
+              "maxCrossedWindowPct": 21.6216,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 4,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 0,
+              "maxCrossedWindowPct": 8.1081,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            }
+          ],
+          "shortWindowCoverage": "not_evaluated"
+        }
+      ]
+    },
+    {
+      "currency": "ARS",
+      "diagnostics": {
+        "rawRows": 6100,
+        "acceptedRows": 4271,
+        "excludedRows": 1829,
+        "identicalDuplicates": 0,
+        "conflictingDates": [],
+        "providerMissing": 756,
+        "observedAtMissing": 756,
+        "recentRows": 756,
+        "sourceTags": [
+          "API"
+        ]
+      },
+      "studies": [
+        {
+          "observations": 252,
+          "start": "2025-09-12",
+          "end": "2026-09-11",
+          "thresholds": [
+            {
+              "threshold": 2,
+              "delayObservations": 0,
+              "assumedPublications": 36,
+              "cumulativeOnly": 23,
+              "periodicOnly": 13,
+              "merged": 0,
+              "triggerCheckDays": 36,
+              "mergedWaitingChecks": 1,
+              "dataDelayedDays": 9,
+              "meanIntervalCalendarDays": 9.8056,
+              "medianIntervalCalendarDays": 11.5,
+              "minIntervalCalendarDays": 1,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 0,
+              "assumedPublications": 27,
+              "cumulativeOnly": 7,
+              "periodicOnly": 20,
+              "merged": 0,
+              "triggerCheckDays": 27,
+              "mergedWaitingChecks": 1,
+              "dataDelayedDays": 9,
+              "meanIntervalCalendarDays": 13.0741,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 3,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 0,
+              "assumedPublications": 27,
+              "cumulativeOnly": 5,
+              "periodicOnly": 21,
+              "merged": 1,
+              "triggerCheckDays": 27,
+              "mergedWaitingChecks": 0,
+              "dataDelayedDays": 9,
+              "meanIntervalCalendarDays": 13.0741,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 3,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 2,
+              "delayObservations": 3,
+              "assumedPublications": 21,
+              "cumulativeOnly": 7,
+              "periodicOnly": 11,
+              "merged": 3,
+              "triggerCheckDays": 98,
+              "mergedWaitingChecks": 78,
+              "dataDelayedDays": 9,
+              "meanIntervalCalendarDays": 16.9524,
+              "medianIntervalCalendarDays": 20,
+              "minIntervalCalendarDays": 7,
+              "maxIntervalCalendarDays": 23,
+              "rightCensoredDays": 9
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 3,
+              "assumedPublications": 18,
+              "cumulativeOnly": 1,
+              "periodicOnly": 13,
+              "merged": 4,
+              "triggerCheckDays": 79,
+              "mergedWaitingChecks": 65,
+              "dataDelayedDays": 9,
+              "meanIntervalCalendarDays": 19.7778,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 7,
+              "maxIntervalCalendarDays": 28,
+              "rightCensoredDays": 9
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 3,
+              "assumedPublications": 17,
+              "cumulativeOnly": 1,
+              "periodicOnly": 15,
+              "merged": 1,
+              "triggerCheckDays": 73,
+              "mergedWaitingChecks": 59,
+              "dataDelayedDays": 9,
+              "meanIntervalCalendarDays": 20.5294,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 9,
+              "maxIntervalCalendarDays": 26,
+              "rightCensoredDays": 16
+            }
+          ],
+          "windows": [
+            {
+              "threshold": 2,
+              "crossed": 9,
+              "medianFirstObservation": 6
+            },
+            {
+              "threshold": 3,
+              "crossed": 5,
+              "medianFirstObservation": 4
+            },
+            {
+              "threshold": 4,
+              "crossed": 4,
+              "medianFirstObservation": 7.5
+            }
+          ],
+          "windowCount": 12,
+          "anchorPhaseSensitivity": [
+            {
+              "threshold": 2,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 54.5455,
+              "maxCrossedWindowPct": 83.3333,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 3,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 33.3333,
+              "maxCrossedWindowPct": 75,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 4,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 16.6667,
+              "maxCrossedWindowPct": 50,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            }
+          ],
+          "shortWindowCoverage": "not_evaluated"
+        },
+        {
+          "observations": 756,
+          "start": "2023-09-19",
+          "end": "2026-09-11",
+          "thresholds": [
+            {
+              "threshold": 2,
+              "delayObservations": 0,
+              "assumedPublications": 99,
+              "cumulativeOnly": 46,
+              "periodicOnly": 52,
+              "merged": 1,
+              "triggerCheckDays": 99,
+              "mergedWaitingChecks": 3,
+              "dataDelayedDays": 23,
+              "meanIntervalCalendarDays": 10.8788,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 1,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 0,
+              "assumedPublications": 88,
+              "cumulativeOnly": 27,
+              "periodicOnly": 61,
+              "merged": 0,
+              "triggerCheckDays": 88,
+              "mergedWaitingChecks": 3,
+              "dataDelayedDays": 23,
+              "meanIntervalCalendarDays": 12.2386,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 1,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 0,
+              "assumedPublications": 83,
+              "cumulativeOnly": 16,
+              "periodicOnly": 66,
+              "merged": 1,
+              "triggerCheckDays": 83,
+              "mergedWaitingChecks": 0,
+              "dataDelayedDays": 23,
+              "meanIntervalCalendarDays": 12.9759,
+              "medianIntervalCalendarDays": 14,
+              "minIntervalCalendarDays": 2,
+              "maxIntervalCalendarDays": 20,
+              "rightCensoredDays": 12
+            },
+            {
+              "threshold": 2,
+              "delayObservations": 3,
+              "assumedPublications": 59,
+              "cumulativeOnly": 14,
+              "periodicOnly": 38,
+              "merged": 7,
+              "triggerCheckDays": 259,
+              "mergedWaitingChecks": 205,
+              "dataDelayedDays": 23,
+              "meanIntervalCalendarDays": 18.3051,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 4,
+              "maxIntervalCalendarDays": 25,
+              "rightCensoredDays": 9
+            },
+            {
+              "threshold": 3,
+              "delayObservations": 3,
+              "assumedPublications": 55,
+              "cumulativeOnly": 5,
+              "periodicOnly": 41,
+              "merged": 9,
+              "triggerCheckDays": 237,
+              "mergedWaitingChecks": 190,
+              "dataDelayedDays": 23,
+              "meanIntervalCalendarDays": 19.6364,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 4,
+              "maxIntervalCalendarDays": 28,
+              "rightCensoredDays": 9
+            },
+            {
+              "threshold": 4,
+              "delayObservations": 3,
+              "assumedPublications": 52,
+              "cumulativeOnly": 2,
+              "periodicOnly": 45,
+              "merged": 5,
+              "triggerCheckDays": 215,
+              "mergedWaitingChecks": 171,
+              "dataDelayedDays": 23,
+              "meanIntervalCalendarDays": 20.6346,
+              "medianIntervalCalendarDays": 21,
+              "minIntervalCalendarDays": 8,
+              "maxIntervalCalendarDays": 26,
+              "rightCensoredDays": 16
+            }
+          ],
+          "windows": [
+            {
+              "threshold": 2,
+              "crossed": 19,
+              "medianFirstObservation": 6
+            },
+            {
+              "threshold": 3,
+              "crossed": 13,
+              "medianFirstObservation": 11
+            },
+            {
+              "threshold": 4,
+              "crossed": 11,
+              "medianFirstObservation": 11
+            }
+          ],
+          "windowCount": 37,
+          "anchorPhaseSensitivity": [
+            {
+              "threshold": 2,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 51.3514,
+              "maxCrossedWindowPct": 64.8649,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 3,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 32.4324,
+              "maxCrossedWindowPct": 45.9459,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            },
+            {
+              "threshold": 4,
+              "phaseCount": 20,
+              "minCrossedWindowPct": 18.9189,
+              "maxCrossedWindowPct": 35.1351,
+              "note": "Overlapping shifts of the same history, not independent samples or publication counts."
+            }
+          ],
+          "shortWindowCoverage": "not_evaluated"
+        }
+      ]
+    }
+  ],
+  "syntheticSpecificationChecks": {
+    "passed": 12,
+    "note": "Legacy standalone model includes 3% scenarios; not all are tests of the current 2% contract."
+  },
+  "currentContractReplay": [
+    {
+      "currency": "PEN",
+      "classification": "stored_prices_with_simulated_publication_and_calendar",
+      "limitations": [
+        "fetchedAt and publication timestamps are synthetic",
+        "calendar is explicit scenario input, not verified local holiday calendar"
+      ],
+      "first": {
+        "version": "publication-cadence/2",
+        "policyVersion": "six-currency-cadence/2",
+        "currency": "PEN",
+        "checkedOnKst": "2026-09-13",
+        "policyStatus": "confirmed",
+        "thresholdPct": 2,
+        "anchorId": "PEN-hypothetical-anchor",
+        "anchorObservedDate": "2026-08-07",
+        "periodicDueDate": "2026-08-24",
+        "cumulativePct": -0.9526666005153728,
+        "direction": "local_currency_stronger",
+        "status": "research_candidate",
+        "triggers": [
+          "periodic"
+        ],
+        "caseId": "25c32cd59430b88e009cd8f602da471870c13f94f4de74cecce6983dcea11fa0",
+        "checkId": "d7ad78c86e44c45f53f619f41e2d2082579b0939eba816d02a983d3fc6f8f662",
+        "duplicateCheck": false,
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "correctionReportIds": [],
+        "researchAllowed": true,
+        "triggerIsEvidence": false,
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "resetPublicationAnchor": false,
+        "calendarMeaning": "expected_stored_reference_date_not_certified_local_close",
+        "calendarFreshnessAccepted": false,
+        "modelCalls": 0,
+        "networkCalls": 0
+      },
+      "repeat": {
+        "version": "publication-cadence/2",
+        "policyVersion": "six-currency-cadence/2",
+        "currency": "PEN",
+        "checkedOnKst": "2026-09-13",
+        "policyStatus": "confirmed",
+        "thresholdPct": 2,
+        "anchorId": "PEN-hypothetical-anchor",
+        "anchorObservedDate": "2026-08-07",
+        "periodicDueDate": "2026-08-24",
+        "cumulativePct": -0.9526666005153728,
+        "direction": "local_currency_stronger",
+        "status": "duplicate_check",
+        "triggers": [
+          "periodic"
+        ],
+        "caseId": "25c32cd59430b88e009cd8f602da471870c13f94f4de74cecce6983dcea11fa0",
+        "checkId": "d7ad78c86e44c45f53f619f41e2d2082579b0939eba816d02a983d3fc6f8f662",
+        "duplicateCheck": true,
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "correctionReportIds": [],
+        "researchAllowed": false,
+        "triggerIsEvidence": false,
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "resetPublicationAnchor": false,
+        "calendarMeaning": "expected_stored_reference_date_not_certified_local_close",
+        "calendarFreshnessAccepted": false,
+        "modelCalls": 0,
+        "networkCalls": 0
+      }
+    },
+    {
+      "currency": "ARS",
+      "classification": "stored_prices_with_simulated_publication_and_calendar",
+      "limitations": [
+        "fetchedAt and publication timestamps are synthetic",
+        "calendar is explicit scenario input, not verified local holiday calendar"
+      ],
+      "first": {
+        "version": "publication-cadence/2",
+        "policyVersion": "six-currency-cadence/2",
+        "currency": "ARS",
+        "checkedOnKst": "2026-09-13",
+        "policyStatus": "confirmed",
+        "thresholdPct": 2,
+        "anchorId": "ARS-hypothetical-anchor",
+        "anchorObservedDate": "2026-08-07",
+        "periodicDueDate": "2026-08-24",
+        "cumulativePct": 0.5984811264092116,
+        "direction": "local_currency_weaker",
+        "status": "research_candidate",
+        "triggers": [
+          "periodic"
+        ],
+        "caseId": "8d8e79e962ef8ec9688b4618574df0aaaa87cea8b762c257f5127a02696e6f73",
+        "checkId": "f93dd2fed477f7966685f2b0fd7d528abe351df341ca0f50b2bc61c8e3c16f90",
+        "duplicateCheck": false,
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "correctionReportIds": [],
+        "researchAllowed": true,
+        "triggerIsEvidence": false,
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "resetPublicationAnchor": false,
+        "calendarMeaning": "expected_stored_reference_date_not_certified_local_close",
+        "calendarFreshnessAccepted": false,
+        "modelCalls": 0,
+        "networkCalls": 0
+      },
+      "repeat": {
+        "version": "publication-cadence/2",
+        "policyVersion": "six-currency-cadence/2",
+        "currency": "ARS",
+        "checkedOnKst": "2026-09-13",
+        "policyStatus": "confirmed",
+        "thresholdPct": 2,
+        "anchorId": "ARS-hypothetical-anchor",
+        "anchorObservedDate": "2026-08-07",
+        "periodicDueDate": "2026-08-24",
+        "cumulativePct": 0.5984811264092116,
+        "direction": "local_currency_weaker",
+        "status": "duplicate_check",
+        "triggers": [
+          "periodic"
+        ],
+        "caseId": "8d8e79e962ef8ec9688b4618574df0aaaa87cea8b762c257f5127a02696e6f73",
+        "checkId": "f93dd2fed477f7966685f2b0fd7d528abe351df341ca0f50b2bc61c8e3c16f90",
+        "duplicateCheck": true,
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "correctionReportIds": [],
+        "researchAllowed": false,
+        "triggerIsEvidence": false,
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "resetPublicationAnchor": false,
+        "calendarMeaning": "expected_stored_reference_date_not_certified_local_close",
+        "calendarFreshnessAccepted": false,
+        "modelCalls": 0,
+        "networkCalls": 0
+      }
+    }
+  ],
+  "targetedTests": {
+    "files": 3,
+    "passed": 19,
+    "scope": "existing cadence contract, public cache and public selection tests; not UI/DB/browser verification",
+    "initialRun": "Sandbox temporary-file rename EPERM before any tests; rerun with workspace TEMP passed"
+  },
+  "preservation": {
+    "protectedFiles": 615,
+    "unchanged": true,
+    "sha256": "5e68467621b90a0c4ea2d1e05f265e1d1aee74888cbb5aa9feb91a34c8f4398b"
+  },
+  "networkCalls": 0,
+  "paidCalls": 0,
+  "newCostUsd": 0,
+  "productionChanges": 0
+}

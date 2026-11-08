@@ -1,6 +1,7 @@
-import type { CurrencyCode } from '../types/exchangeRate'
+import type { CurrencyCode, FxPriceSource } from '../types/exchangeRate'
 import { CURRENCIES } from '../types/exchangeRate'
 import { toNumber } from './utils'
+import { recordPriceResponse, recordPriceTransport } from './price-provenance'
 
 const REMOTE_ENDPOINT = 'https://v6.exchangerate-api.com/v6'
 const HISTORY_ENDPOINTS = ['https://api.frankfurter.dev/v1', 'https://api.frankfurter.app']
@@ -57,10 +58,16 @@ export type FrankfurterRangeResponse = {
   start_date: string
   end_date: string
   rates: Record<string, Record<string, number>>
+  priceSource?: FxPriceSource
 }
 
+type LatestRates = { date: string; rates: Record<string, number>; priceSource?: FxPriceSource }
+
 export async function fetchJsonWithFallback<T>(url: string): Promise<T> {
-  const candidates = [
+  const requestUrl=new URL(url)
+  const authenticated=Boolean(requestUrl.username||requestUrl.password)||requestUrl.hostname==='v6.exchangerate-api.com'
+    ||[...requestUrl.searchParams.keys()].some(key=>/(?:^|_)(?:api_?key|token|password|secret|authorization)$/i.test(key))
+  const candidates = authenticated?[url]:[
     url,
     `https://corsproxy.io/?${encodeURIComponent(url)}`,
     `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
@@ -68,7 +75,7 @@ export async function fetchJsonWithFallback<T>(url: string): Promise<T> {
 
   let lastError: unknown = null
 
-  for (const candidate of candidates) {
+  for (const [attempt,candidate] of candidates.entries()) {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
 
@@ -77,7 +84,9 @@ export async function fetchJsonWithFallback<T>(url: string): Promise<T> {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`)
       }
-      return (await response.json()) as T
+      const payload=await response.json()
+      recordPriceTransport(payload,attempt===0?'direct':attempt===1?'corsproxy':'allorigins')
+      return payload as T
     } catch (error) {
       lastError = error
     } finally {
@@ -99,7 +108,10 @@ export async function fetchFrankfurterRange(
     const url = `${endpoint}/${startDate}..${endDate}?from=USD&to=${targets}`
 
     try {
-      return await fetchJsonWithFallback<FrankfurterRangeResponse>(url)
+      const payload = await fetchJsonWithFallback<FrankfurterRangeResponse>(url)
+      return {...payload,priceSource:await recordPriceResponse('frankfurter_v1',endpoint,payload,{
+        providerUpdatedAt:null,providerDate:null,dateMeaning:'provider_series_date',priceKind:'conversion_reference',
+      })}
     } catch (error) {
       lastError = error
     }
@@ -110,7 +122,7 @@ export async function fetchFrankfurterRange(
 
 export async function fetchLatestRatesFromExchangeApi(
   baseCurrency: string,
-): Promise<{ date: string; rates: Record<string, number> } | null> {
+): Promise<LatestRates | null> {
   if (!API_KEY) {
     return null
   }
@@ -136,12 +148,16 @@ export async function fetchLatestRatesFromExchangeApi(
   return {
     date,
     rates: payload.conversion_rates,
+    priceSource:await recordPriceResponse('exchange_rate_api',REMOTE_ENDPOINT,payload,{
+      providerUpdatedAt:updateUtc?new Date(updateUtc).toISOString():null,providerDate:date,
+      dateMeaning:updateUtc?'utc_update_date':'collection_date_fallback',priceKind:'conversion_reference',
+    }),
   }
 }
 
 export async function fetchLatestRatesFromOpenErApi(
   baseCurrency: string,
-): Promise<{ date: string; rates: Record<string, number> } | null> {
+): Promise<LatestRates | null> {
   const url = `${OPEN_ER_API_ENDPOINT}/latest/${baseCurrency}`
 
   let payload: OpenErApiLatestResponse
@@ -163,12 +179,16 @@ export async function fetchLatestRatesFromOpenErApi(
   return {
     date,
     rates: payload.rates,
+    priceSource:await recordPriceResponse('open_er_api',OPEN_ER_API_ENDPOINT,payload,{
+      providerUpdatedAt:updateUtc?new Date(updateUtc).toISOString():null,providerDate:date,
+      dateMeaning:updateUtc?'utc_update_date':'collection_date_fallback',priceKind:'conversion_reference',
+    }),
   }
 }
 
 export async function fetchLatestRatesFromCurrencyApi(
   baseCurrency: string,
-): Promise<{ date: string; rates: Record<string, number> } | null> {
+): Promise<LatestRates | null> {
   const base = baseCurrency.toLowerCase()
   const url = `${CURRENCY_API_LATEST_ENDPOINT}/${base}.json`
 
@@ -201,12 +221,16 @@ export async function fetchLatestRatesFromCurrencyApi(
   return {
     date,
     rates: normalized,
+    priceSource:await recordPriceResponse('currency_api',CURRENCY_API_LATEST_ENDPOINT,payload,{
+      providerUpdatedAt:null,providerDate:date,dateMeaning:'provider_payload_date',priceKind:'conversion_reference',
+    }),
   }
 }
 
 export async function fetchCurrencyApiSnapshot(
   baseCurrency: string,
   date: string,
+  onSource?: (date: string, source: FxPriceSource) => void,
 ): Promise<Record<string, number> | null> {
   const base = baseCurrency.toLowerCase()
   const url = `${CURRENCY_API_SNAPSHOT_ENDPOINT}@${date}/v1/currencies/${base}.json`
@@ -223,6 +247,11 @@ export async function fetchCurrencyApiSnapshot(
     return null
   }
 
+  if(onSource)onSource(date,await recordPriceResponse('currency_api',`${CURRENCY_API_SNAPSHOT_ENDPOINT}@${date}/v1/currencies/${base}.json`,payload,{
+    providerUpdatedAt:null,providerDate:typeof payload.date==='string'?payload.date:null,
+    dateMeaning:typeof payload.date==='string'?'provider_payload_date':'requested_snapshot_date',priceKind:'conversion_reference',
+  }))
+
   return Object.entries(rateNode as Record<string, unknown>).reduce<Record<string, number>>(
     (acc, [currency, raw]) => {
       if (typeof raw !== 'number' || !Number.isFinite(raw)) {
@@ -238,10 +267,11 @@ export async function fetchCurrencyApiSnapshot(
 
 export async function fetchSupplementalHistoryFromCurrencyApi(
   dates: string[],
+  onSource?: (date: string, source: FxPriceSource) => void,
 ): Promise<Record<string, Record<string, number>>> {
   const snapshots = await Promise.all(
     dates.map(async (date) => {
-      const rates = await fetchCurrencyApiSnapshot('USD', date)
+      const rates = await fetchCurrencyApiSnapshot('USD', date, onSource)
       if (!rates) {
         return null
       }
@@ -272,6 +302,7 @@ export async function fetchSupplementalHistoryFromCurrencyApi(
 }
 
 export type AlphaVantageFXDailyResponse = {
+  'Meta Data'?: Record<string, string>
   'Time Series FX (Daily)'?: Record<
     string,
     { '1. open': string; '2. high': string; '3. low': string; '4. close': string }
@@ -287,6 +318,7 @@ export type AlphaVantageFXDailyResponse = {
  */
 export async function fetchAlphaVantageFXDaily(
   toSymbol: string,
+  onSource?: (source: FxPriceSource) => void,
 ): Promise<Record<string, number> | null> {
   if (!ALPHA_VANTAGE_API_KEY) {
     return null
@@ -305,6 +337,17 @@ export async function fetchAlphaVantageFXDaily(
   if (!timeSeries) {
     return null
   }
+
+  let providerTimeZone: string | null = null
+  const zone=payload['Meta Data']?.['6. Time Zone']
+  if(typeof zone==='string'&&zone.length<80){try{new Intl.DateTimeFormat('en',{timeZone:zone});providerTimeZone=zone}catch{/* Unrecognized metadata stays unknown. */}}
+  const localTimestamp=payload['Meta Data']?.['5. Last Refreshed']
+  const providerTimestampLocal=typeof localTimestamp==='string'&&/^\d{4}-\d{2}-\d{2} (?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/.test(localTimestamp)
+    &&Number.isFinite(Date.parse(localTimestamp.slice(0,10)))
+    &&new Date(localTimestamp.slice(0,10)).toISOString().slice(0,10)===localTimestamp.slice(0,10)?localTimestamp:null
+  if(onSource)onSource(await recordPriceResponse('alpha_vantage',ALPHA_VANTAGE_ENDPOINT,payload,{
+    providerUpdatedAt:null,providerDate:null,dateMeaning:'provider_series_date',priceKind:'provider_daily_close',providerTimeZone,providerTimestampLocal,
+  }))
 
   return Object.entries(timeSeries).reduce<Record<string, number>>((acc, [date, ohlc]) => {
     const close = parseFloat(ohlc['4. close'])

@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-16",
+  "sourceReportId": "CLP-2026-10-15-1792100753608",
+  "sourceSha256": "a91419636e5a0d2595c2da422137125d74b09b7cffdb8d7c9aa7e7945dae8c12",
+  "copyReportId": "CLP-2026-10-15-1792145210900",
+  "authorship": "ai_with_manual_edit",
+  "presentationVersion": "monthly-facts/1",
+  "changes": [
+    "제목을 상품군 수준이 아닌 증가율 비교로 구체화했다.",
+    "숫자·출처·차트는 보존하고 편집 사본의 본문에서 지표명과 정의 중복을 제거했다.",
+    "명시적으로 선택한 monthly-facts/1 원고만 월별 사실 라벨을 지표명·수치와 하단 비교 기준으로 나누어 표시한다.",
+    "과거 원고·알 수 없는 지표 형식·값 불일치·여러 대상 월은 원래 전체 라벨을 유지한다."
+  ],
+  "verification": {
+    "editedContentValidation": "passed",
+    "preservedSourceHash": "passed",
+    "targetedPresentationTests": 3,
+    "fullRegression": {"files":77,"declaredTests":434,"executedCases":533,"parameterExpansions":99,"passed":true},
+    "fullLint": "passed",
+    "productionBuildAndBundleBoundary": "passed; existing 610337-byte entry warning remains",
+    "typecheck": "passed",
+    "changedSourceLint": "passed",
+    "reportBuild": "passed",
+    "appReportBuild": "passed",
+    "desktop": "A안 실제 화면 확인",
+    "mobile": {"viewportWidth":390,"documentWidth":375,"horizontalOverflow":false,"visibleBasisRows":2},
+    "keyboardEvidenceLink": "Enter로 근거 펼침·발표일 확인",
+    "a4Pagination": "not_rechecked",
+    "localApprovalOfNewCopy": "not_performed",
+    "databasePropagationOfPresentationVersion": "not_verified"
+  },
+  "qualityScore": null,
+  "qualityNote": "수동 표시·문체 개선이며 실제 모델 품질 점수나 게시 승인으로 취급하지 않는다.",
+  "modelCalls": 0,
+  "newCostUsd": 0,
+  "productionChanged": false,
+  "publicationApproved": false
+}

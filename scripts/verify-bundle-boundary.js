@@ -16,5 +16,8 @@ const xlsxChunks = assetNames.filter((name) => /^xlsx-[\w-]+\.js$/.test(name))
 
 if (!xlsxChunks.length) throw new Error('xlsx was not emitted as a lazy production chunk.')
 if (entryBytes > 850_000) throw new Error(`Initial entry chunk is ${entryBytes} bytes; expected at most 850000 bytes.`)
+const initialJs=[...new Set([entryMatch[1],...Array.from(html.matchAll(/<link[^>]+rel="modulepreload"[^>]+href="([^"]+\.js)"/g),m=>m[1])])]
+const initialJsBytes=initialJs.reduce((n,url)=>n+fs.statSync(path.join(distPath,url.replace(/^\//,''))).size,0)
+if(initialJsBytes>900_000)throw new Error(`Initial entry and preloaded JS is ${initialJsBytes} bytes; expected at most 900000 bytes.`)
 
-console.log(`Bundle boundary verified: entry=${entryBytes} bytes, lazy xlsx=${xlsxChunks.join(', ')}`)
+console.log(`Bundle boundary verified: entry=${entryBytes} bytes, initial HTML JS=${initialJsBytes} bytes, lazy xlsx=${xlsxChunks.join(', ')}`)

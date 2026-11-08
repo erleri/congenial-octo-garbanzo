@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { formatCellValue } from '../lib/formatters'
-import { buildMovingComparisonRows } from '../lib/moving'
+import MovingComparisonTable from './MovingComparisonTable'
 import { CURRENCIES } from '../types/exchangeRate'
 import type {
   BusinessPlan,
@@ -9,10 +9,10 @@ import type {
   BusinessPlanStatus,
   CurrencyCode,
   ExchangeRateDataset,
-  MovingColumn,
 } from '../types/exchangeRate'
 
 interface MovingComparisonProps {
+  sharedAdminAccess?: boolean
   data: ExchangeRateDataset
   businessPlan: BusinessPlan
   businessPlanHistory: BusinessPlanHistoryEntry[]
@@ -24,49 +24,10 @@ interface MovingComparisonProps {
   onLoadMorePlanHistory: () => Promise<void>
 }
 
-const COLUMNS: Array<{ key: MovingColumn; label: string }> = [
-  { key: 'KRW', label: 'KRW' },
-  { key: 'BRL', label: 'BRL' },
-  { key: 'COP', label: 'COP' },
-  { key: 'CLP', label: 'CLP' },
-  { key: 'PEN', label: 'PEN' },
-  { key: 'ARS', label: 'ARS' },
-  { key: 'MXN', label: 'MXN' },
-  { key: 'PYG', label: 'PYG' },
-  { key: 'GTQ', label: 'GTQ' },
-  { key: 'UYU', label: 'UYU' },
-  { key: 'CNY', label: 'CNY' },
-  { key: 'OIL', label: 'Oil' },
-]
-
 const TARGET_CURRENCIES: CurrencyCode[] = ['USD', 'BRL', 'MXN', 'COP', 'CLP', 'PEN']
 const REST_CURRENCIES: CurrencyCode[] = CURRENCIES.filter(
   (currency) => !TARGET_CURRENCIES.includes(currency),
 )
-
-function formatMovingValue(value: number | null, column: MovingColumn, isPercent: boolean): string {
-  if (column === 'OIL') {
-    if (value === null) {
-      return '-'
-    }
-
-    if (isPercent) {
-      return `${(value * 100).toFixed(2)}%`
-    }
-
-    return new Intl.NumberFormat('ko-KR', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value)
-  }
-
-  return formatCellValue(
-    value,
-    value !== null ? 'ok' : 'empty',
-    column === 'KRW' ? 'KRW' : column,
-    isPercent,
-  )
-}
 
 function formatStatusDateTime(value: string | null): string {
   if (!value) {
@@ -143,6 +104,7 @@ function MovingComparison({
   businessPlan,
   businessPlanHistory,
   businessPlanHistoryStatus,
+  sharedAdminAccess = false,
   onUpdatePlan,
   businessPlanStatus,
   onRequestPlanAccess,
@@ -154,13 +116,6 @@ function MovingComparison({
   const [loginEmail, setLoginEmail] = useState('')
   const [authMessage, setAuthMessage] = useState<string | null>(null)
   const [saveMessage, setSaveMessage] = useState<{ tone: 'success' | 'warning' | 'error'; text: string } | null>(null)
-
-  const rows = useMemo(() => {
-    const baseDate = new Date(data.baseDate)
-    const year = baseDate.getFullYear()
-    const month = baseDate.getMonth() + 1
-    return buildMovingComparisonRows(data, year, month, businessPlan)
-  }, [data, businessPlan])
 
   const planStatusTone = getPlanStatusTone(businessPlanStatus)
   const planStatusSummary = getPlanStatusSummary(businessPlanStatus)
@@ -418,38 +373,7 @@ function MovingComparison({
         </div>
       </div>
 
-      <p className="mobile-table-hint">표는 좌우로 이동해 전체 데이터를 확인할 수 있습니다.</p>
-      <div className="moving-table-wrapper sticky-table-wrapper">
-        <table className="dense-table">
-          <thead>
-            <tr>
-              <th rowSpan={2}>항목</th>
-              <th colSpan={COLUMNS.length}>통화별 환율</th>
-            </tr>
-            <tr>
-              {COLUMNS.map((col) => (
-                <th key={col.key}>{col.label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.label} className={row.isPercent ? 'row-percent' : ''}>
-                <td style={{ whiteSpace: 'nowrap', fontWeight: row.isPercent ? 650 : 450 }}>
-                  {row.label}
-                </td>
-                {COLUMNS.map((col) => {
-                  const val = row.values[col.key]
-                  return <td key={`${row.label}-${col.key}`}>{formatMovingValue(val, col.key, row.isPercent)}</td>
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="table-help" style={{ marginTop: 10 }}>
-        계획 환율을 입력하지 않은 통화는 최근 3개월 평균값으로 자동 계산합니다.
-      </p>
+      <MovingComparisonTable data={data} businessPlan={businessPlan} />
 
       {isModalOpen && (
         <div className="modal-overlay">
@@ -480,7 +404,7 @@ function MovingComparison({
                 <strong>{lastVerifiedLabel}</strong>
               </div>
 
-              {!businessPlanStatus.isAuthenticated ? (
+              {!sharedAdminAccess && (!businessPlanStatus.isAuthenticated ? (
                 <div className="inline-controls plan-login-row">
                   <input
                     type="email"
@@ -496,7 +420,7 @@ function MovingComparison({
                 <button type="button" onClick={() => void onSignOutPlanAccess()} className="quiet-button">
                   로그아웃
                 </button>
-              )}
+              ))}
 
               {!businessPlanStatus.canEdit ? (
                 <p className="inline-notice warning-notice">

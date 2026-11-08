@@ -1,0 +1,62 @@
+{
+  "version": "narrative-placement-and-link-review/1",
+  "reasoningPolicyVersion": "report-reasoning/3",
+  "scope": "Local common generation and review, offline stored-manuscript validation. No paid calls or operational changes.",
+  "readerOrder": [
+    "New event or change",
+    "Supported transmission path",
+    "Supported relationship to the target currency"
+  ],
+  "placement": {
+    "body": "New information, attributed explanation, and material economic conditions.",
+    "sharedLimitations": "Common verification boundaries, once in their designated area; do not copy each input-card limit into prose.",
+    "sourceMetadata": "Publication time and price-reference relationship, computed from exact timestamps. Publication time is not event time."
+  },
+  "criteria": {
+    "expertComparison": "발언별 명시적 우선순위·조건을 대조한다. 나열·생략·counter 분류로 대립을 추정하지 않는다. 한쪽의 명시적 우선순위는 해당 배경에 귀속한다.",
+    "observationScope": "경로 부합 관찰과 경쟁 설명 판별을 구분한다. 판별할 추가 근거가 없으면 변화·반응을 비교하는 편집상 관찰로 한정하거나 생략한다. 변수 나열 대신 관찰 목적을 밝힌다.",
+    "causalScope": "가격 수준과 당일 등락을 구분한다. 동행·후속 반응만으로 원인·상대 기여·우열을 확정하지 않는다. 조건형에도 같은 기준을 적용한다.",
+    "caveatPlacement": "본문·요약은 사건과 연결을 설명한다. 기여도 미산출·한 전문가의 해석·입증된 순위 아님 같은 검증 안내로 끝내지 않는다. 발행시각은 sourceTiming과 출처 표시, 공통 한계는 별도 영역의 역할이다. 전문가 이름과 의미를 바꾸는 실제 조건은 유지한다.",
+    "currencyConnection": "달러 공통 요인은 현지 근거의 연결 또는 승인된 applicableMechanisms로 해당 통화까지 설명한다. 두 기사 ID만 붙여 연결을 입증하지 않는다. 연결 근거가 없으면 기존 배경의 맥락으로 한정하거나 생략한다. 미확인 현지 자금 이동·달러 매수·수출 물량은 금지한다."
+  },
+  "currencyLink": {
+    "allowed": "Use a local source that explains the same channel, or a reviewed applicable mechanism with its conditions. Keep attribution and both sources when combining claims.",
+    "notEnough": [
+      "Two source IDs",
+      "A country name",
+      "A generic global-USD phrase",
+      "A conditional verb",
+      "A long explanation field"
+    ],
+    "missing": "Keep only supported context within an existing explanation or omit an unsupported standalone driver. Do not invent CLP flows."
+  },
+  "automatedChecks": {
+    "explanationFields": "Nonempty letter/number presence only; no 10-character quality heuristic. Empty, whitespace-only and punctuation-only fields remain held.",
+    "semanticGate": "Separate source-based review and reader criteria remain mandatory. Presence is not accuracy or publication approval.",
+    "proseSignals": "Flag known verification prose for relocation, not factual rejection or automatic deletion. Material qualifications remain subject to review.",
+    "otherMinimumLengths": "Reviewer reasons and mechanism-admission records retain existing requirements; they are separate from the explanation-field heuristic investigated here."
+  },
+  "compatibility": {
+    "prompt": "currency-input/9",
+    "editorial": "currency-editorial/8",
+    "rule": "currency-rules/6",
+    "claimReview": "claim-review/6",
+    "generationWire": "generation-wire/1",
+    "oldManuscripts": "Preserved, including text, costs and approval records. Current-version replay uses an explicitly synthetic ledger-version copy and never reuses prior approval."
+  },
+  "offlineEvidence": {
+    "actualRun": "CLP wire retest 2026-10-27 / 2026-09-10 historical case",
+    "actualPlacementSignals": 5,
+    "manualPlacementSignals": 1,
+    "normalManuscriptTextUnchanged": true,
+    "newModelSamples": 0,
+    "newApiCostUsd": 0,
+    "prospectiveReservedMaximumUsd": 0.249924,
+    "result": "Prior 9-character structural hold removed. Repeated prose is still present and flagged, not repaired or claimed to be improved generation quality."
+  },
+  "remaining": [
+    "A future separately authorized live generation is required to test whether the model follows the new guide.",
+    "Regex placement signals do not establish economic truth or complete semantic recall.",
+    "No operational rollout or publication is approved."
+  ]
+}

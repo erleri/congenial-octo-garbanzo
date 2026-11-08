@@ -1,0 +1,86 @@
+{
+  "task": "월별 PDF 수치·기간·각주 검토 및 근거 카드 연결",
+  "reviewDate": "2026-10-15",
+  "supersedesStatusOnly": "chile-monthly-collector-review-20261015.json (이전 수집 기록 자체는 보존)",
+  "status": "local_reviewed_cards_and_offline_planner_replay_complete_not_report_publication",
+  "implementation": {
+    "entry": "scripts/currency-report/chile-monthly-evidence-local.js",
+    "extractor": "scripts/currency-report/extract-monthly-pdf.py",
+    "admission": "scripts/currency-report/chile-monthly-evidence.js",
+    "registry": "clp-consumption-scopes/1",
+    "receiptVersion": "monthly-pdf-review/1",
+    "dependencies": "명시적으로 지정한 Python + pypdf. 설치·네트워크 호출 없음. 추출기 버전은 스냅샷에 기록.",
+    "extractCommand": "node scripts/currency-report/chile-monthly-evidence-local.js --capture .local-reports/private/official-statistics/cl-ucFtrr --python <python-with-pypdf>",
+    "reviewCommand": "위 명령에 --review .local-reports/private/monthly-pdf-receipts-20261015.json 추가",
+    "manualReviewContract": "추출 결과의 페이지를 시각적으로 대조한 검토자가 정확한 발췌·수치·계열 대응·정의·반대 문맥을 선택한다. 코드의 해시·수치 일치는 내용상 진실이나 사용자 승인의 증명이 아니다.",
+    "bounds": "PDF 2MB, 최대 24쪽·쪽당 40000자, 파일당 추출 20초, 최대 4개 파일. 재시도·OCR·임의 URL 접근 없음.",
+    "storage": "새 private 디렉터리와 wx 쓰기. 기존 PDF·추출·검토·원고·비용 기록을 덮어쓰지 않음. 웹 제공 경로에 연결하지 않음."
+  },
+  "originalReview": [
+    {
+      "source": "INE Chile, IAC August 2026 bulletin, issue 335",
+      "sha256": "418834a7b14953f7022d42a4bc4b83b2bfe89041234c546a19c8a9cbe8419c6c",
+      "printedPublicationDate": "2026-09-30",
+      "publicationTime": null,
+      "period": "2026-08",
+      "pagesVisuallyCompared": [1, 2],
+      "facts": [
+        { "definitionId": "cl-iacm-total", "value": 3.4, "unit": "percent", "comparison": "year_over_year", "priceBasis": "real", "adjustment": "unadjusted", "baseYear": "2018" },
+        { "definitionId": "cl-iacm-electronics-home-tech", "value": 4.7, "unit": "percent", "comparison": "year_over_year", "priceBasis": "real", "adjustment": "unadjusted", "baseYear": "2018" }
+      ],
+      "criticalChecks": ["IAC 전체·division 47·IACM을 구분", "상품군 4.7%와 기여도 0.657pp 구분; 원문의 respectively 순서 대조", "계절조정 계열과 원계열 구분", "TV 단독 또는 기업 셀아웃으로 확대 금지"],
+      "independence": "두 카드는 같은 PDF·문서 식별자를 공유한다. 두 독립 출처가 아니다."
+    },
+    {
+      "source": "INE Chile, IR-ICL August 2026 bulletin, issue 335",
+      "sha256": "8d4612a04f34808874c32cb82fde368ed6d43ca7b0268585b680612944caf794",
+      "printedPublicationDate": "2026-10-07",
+      "publicationTime": null,
+      "period": "2026-08",
+      "pagesVisuallyCompared": [1, 6],
+      "facts": [{ "definitionId": "cl-ir-real", "value": 3.4, "unit": "percent", "comparison": "year_over_year", "priceBasis": "real", "adjustment": "unadjusted", "baseYear": "2023" }],
+      "criticalChecks": ["실질 시간당 보수이며 월급·전체 가구 소득이 아님", "동일 월 보수·근로시간 감소로 시간당 지수가 상승할 수 있는 조건 보존", "계절조정 전월비 하락 문맥을 원문 발췌에 보존"]
+    }
+  ],
+  "artifacts": {
+    "textSnapshot": ".local-reports/private/official-statistics-review/pdf-32hhXv/snapshots.json",
+    "reviewedEvidence": ".local-reports/private/official-statistics-review/pdf-9257XG/evidence.json",
+    "receipts": ".local-reports/private/monthly-pdf-receipts-20261015.json",
+    "plannerReplay": ".local-reports/private/monthly-evidence-replay-3ubif4/result.json",
+    "preservation": "편집본 2개와 기존 유료 호출 journal의 SHA-256 일치 확인"
+  },
+  "replayResult": {
+    "originalReportCutoff": "2026-10-09",
+    "sourceCaptureUtc": "2026-10-14",
+    "reason": "historical_version_unverified",
+    "reusedAsHistoricalFact": false,
+    "reportDateChanged": false,
+    "reuseTerms": "unverified: 기존에 식별한 공통 라이선스와 개별 파일의 배포·파생물 재사용 확인을 구분",
+    "coreRequirements": "변경하지 않음; 기존 core define_scope 상태 유지",
+    "writingEligibility": "not_assessed",
+    "contentQuality": "not_assessed",
+    "publicationApproved": false
+  },
+  "checks": {
+    "newTestCases": 9,
+    "allPassedCases": 522,
+    "testFiles": 75,
+    "declaredTests": 423,
+    "parameterExpansions": 99,
+    "exactDuplicateNamesOrBodies": 0,
+    "semanticUniquenessOrRealQualityClaimed": false,
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed; existing 610337-byte entry warning remains",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed",
+    "visualRendering": "필요 페이지 확인 완료. Poppler의 별도 언어 매핑 경로 경고가 있었으나 검토한 스페인어 페이지는 렌더링됨."
+  },
+  "boundaries": { "networkCalls": 0, "modelCalls": 0, "newApiCostUsd": 0, "productionChanges": false, "dbChanges": false, "reportChanges": false, "remotePush": false },
+  "remaining": [
+    "공식 이용 조건과 개별 파일의 재사용 범위 확인 후 reuse 상태를 새 검토 사본에 기록",
+    "현재 시점용 입력에서는 실제 자료 가용 시점과 보고서 기준시각을 다시 검토. 과거 보고서 날짜 변경으로 우회하지 않음",
+    "다음 월은 정의 레지스트리와 원문·수정본을 다시 확인. 이번 2026-08 수치를 자동 복사하지 않음",
+    "이 카드가 소비·영업 환경의 어떤 문장을 실제로 지지하는지 별도 내용 검토. 자동 집필·게시·새 모델 시험은 수행하지 않음"
+  ]
+}

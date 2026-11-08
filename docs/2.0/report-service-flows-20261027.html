@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LATAM FX — 발행 판단과 제작 흐름</title>
+<style>
+:root{font-family:"Malgun Gothic",system-ui,sans-serif;color:#172d43;background:#f2f5f8;line-height:1.7}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:36px 24px 64px}h1{font-size:30px;line-height:1.4;margin:8px 0 16px}h2{font-size:25px;margin:0 0 12px}h3{font-size:17px;margin:0 0 4px}p{margin:8px 0}.eyebrow{font-weight:bold;letter-spacing:.06em;color:#346883;font-size:13px}.notice{padding:16px 20px;background:#e4edf5;border-left:4px solid #35677e;border-radius:4px;margin:22px 0}.legend{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0}.badge{display:inline-block;font-size:12px;padding:2px 9px;background:#e5eef6;border-radius:5px;font-weight:bold}.proposal .badge{background:#fff0d4;color:#735014}.review .badge{background:#eee8f5;color:#574574}.diagram{background:white;border:1px solid #cbd7e2;border-radius:15px;padding:28px;margin:30px 0}.step{border:1px solid #b7cbd9;border-radius:9px;background:#f8fbfe;padding:16px 20px;max-width:800px;margin:0 auto}.step p{font-size:14px;margin:5px 0 0}.proposal{border:2px dashed #b38638;background:#fffaf1}.review{border-color:#b7a5ca;background:#fcfaff}.future{background:#fffaf1;border:2px dashed #b38638}.arrow{text-align:center;font-size:22px;line-height:1.2;padding:8px;color:#476d89}.parallel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 auto;max-width:900px}.parallel .step{width:100%}.branch{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:800px;margin:12px auto}.hold{border:1px solid #c4cdd5;border-radius:8px;padding:14px 18px;background:#f3f5f7;font-size:14px}.ready{border:1px solid #9bbdb2;border-radius:8px;padding:14px 18px;background:#edf6f1;font-size:14px}.note{font-size:14px;color:#435c70}.divider{margin:24px 0;border-top:1px solid #d7e1e9}.list{padding-left:22px}.list li{margin:10px 0}a{color:#155b92}footer{font-size:13px;color:#435c70}table{width:100%;border-collapse:collapse;font-size:14px}td,th{text-align:left;padding:12px;border-bottom:1px solid #d7e1e9;vertical-align:top}th{background:#f1f5f8}@media(max-width:650px){main{padding:22px 14px}h1{font-size:25px}h2{font-size:21px}.diagram{padding:20px 14px}.parallel,.branch{grid-template-columns:1fr}.step{padding:14px}table{font-size:13px}td,th{padding:8px}}@media print{body{background:white}main{max-width:none;padding:0}.diagram{break-before:page;border:0;padding:10px 0}.step,.branch,.parallel{break-inside:avoid}a{color:inherit}h1{font-size:24px}}
+</style></head><body><main>
+<div class="eyebrow">LATAM FX 2.0 · 2026.10.27 · 로컬 문서</div>
+<h1>발행할 이유를 판단하는 과정과<br>리포트를 만드는 과정은 다릅니다.</h1>
+<p>기본 집필 모델은 <strong>GPT Sol</strong>로 결정했습니다. 매일 무조건 생성하지 않으며, 자료 확인과 내용 검토를 거쳐 관리자 승인본만 공개하는 방향을 유지합니다.</p>
+<div class="notice"><strong>현재는 반자동 로컬 제작입니다.</strong><br>도식은 현재 요소와 앞으로 연결할 목표 절차를 함께 보여 줍니다. 선으로 연결되어 있다고 운영 자동화가 완료된 것은 아닙니다. 이번에는 문서만 작성했습니다.</div>
+<div class="legend"><span class="badge">현재 로컬 도구</span><span class="badge" style="background:#eee8f5">담당자 검토 필요</span><span class="badge" style="background:#fff0d4">제안·연결 미완료</span></div>
+<p><a href="report-service-baseline-20261027.md">상세 기준·남은 작업·기존 기록 목록 보기</a> · <a href="periodic-report-content-20261027.md">짧은 정기 점검본 구성안</a></p>
+
+<section class="diagram" aria-labelledby="publication"><div class="eyebrow">A · 발행 판단 흐름</div><h2 id="publication">언제 새 리포트가 필요한가?</h2><p class="note">큰 움직임, 누적 변화, 중요한 발표, 장기 미발행을 함께 보되 같은 사건은 하나로 묶습니다.</p>
+<div class="step"><span class="badge">현재 로컬 도구</span><h3>① 자료와 이전 기록 확인</h3><p>정상 환율 · 실제 발표 · 이전 발행본 · 보류·실패·검토 대기 기록. 결측을 ‘변화 없음’으로 처리하지 않습니다.</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="parallel"><div class="step"><span class="badge">현재 로컬 도구</span><h3>② 기존 조사 계기</h3><p>일간·5관측일·20관측일 변화<br>정책·물가·소비 등 중요한 사건</p></div><div class="step proposal"><span class="badge">기준 확정 · 운영 미연결</span><h3>② 확정된 발행 검토 계기</h3><p>CLP·MXN·BRL·COP<br>마지막 정상 환율 점검본 대비 <strong>절대 누적 2%</strong><br>한국 날짜 <strong>14일 경과 후 첫 월요일</strong> 정기 점검<br>운영 연결은 아직 미완료</p></div></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step review"><span class="badge">담당자 검토 필요</span><h3>③ 새로 설명할 가치와 중복 확인</h3><p>기존 설명에서 무엇이 달라졌는가? 정기 점검이라면 유지된 흐름과 다음 일정을 설명할 수 있는가?</p></div>
+<div class="branch"><div class="hold"><strong>가치 없음 / 같은 사건 반복</strong><br>기존 보고서의 날짜·본문 유지</div><div class="ready"><strong>변화 또는 점검 가치 있음</strong><br>아래 제작 흐름 B로 전달 ↓</div></div>
+<div class="step"><h3>④ 제작 결과와 예산·품질 확인</h3><p>자료가 부족하면 근거 대기. 비용 미확인·실패는 기록 보존. 자동 재시도·모델 교체로 우회하지 않습니다.</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step review"><span class="badge">별도 승인</span><h3>⑤ 관리자 승인 또는 반려</h3><p>자동 형식 통과 ≠ 내용 품질 통과 ≠ 게시 승인</p></div>
+<div class="branch"><div class="hold"><strong>반려 / 대기</strong><br>초안 비공개 · 이전 보고서 유지</div><div class="ready"><strong>승인</strong><br>공개본만 사이트에 제공<br>누적 비교 기준점 갱신은 새 설계</div></div>
+<div class="notice"><strong>정정은 별도 우선 경로입니다.</strong><br>기존 공개본에 중요한 오류가 확인되면 정상 추천 제외·정정 상태·캐시 반영을 처리해야 합니다. 새 원고가 나올 때까지 오류를 정상 정보로 두지 않습니다. 운영 연결 검증은 남아 있습니다.</div>
+<p class="note">예: 매일 +0.3%가 10관측일 이어지면 약 +3.04%. 마지막 발행본 기준으로도 볼 필요가 있습니다. 실패·반려·제목 수정으로 기준점을 초기화하지 않는 안을 권장합니다.</p></section>
+
+<section class="diagram" aria-labelledby="production"><div class="eyebrow">B · 리포트 제작 흐름</div><h2 id="production">어디서 자료를 가져와 누가 판단하는가?</h2><p class="note"><strong>외부 탐색은 집필 전 별도 단계입니다.</strong> Sol은 전달된 근거로 작성하며, 현재 집필 호출 자체에는 검색이 포함되지 않습니다.</p>
+<div class="step"><h3>① 질문 계획 — 코드 + 검토자</h3><p>어느 통화·기간인가? 왜 움직였나? 소비·판매 환경의 어떤 질문에 답할 자료가 부족한가?</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="parallel"><div class="step"><h3>② 환율 확인 — 코드</h3><p>CLP는 BCCh 공식 자료 연결 시험<br>공급자 · 현지 거래일 · 단위 · 거래 평균/호가 구분<br>수치와 차트를 발행 기준으로 고정</p></div><div class="step"><h3>② 외부 탐색·수집 — 기존 도구 + 검토자</h3><p>DF·Pulso·Emol·Yahoo 시장 기사 후보<br>INE 등 공식 통계·정책 발표<br>GDELT·사이트맵 등 기존 탐색 경로</p></div></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step review"><span class="badge">현재 Codex / 담당자 판단</span><h3>③ 원문 확인 → 사실·전문가 견해 카드</h3><p>URL · 발표 시각 · 지표 대상 기간 · 가격 기준 · 발언자 · 허용 주장 · 중요한 반대 근거 · 사용 범위. 검색 제목만으로 채택하지 않습니다.</p></div>
+<div class="branch"><div class="hold"><strong>근거 부족</strong><br>부족한 질문과 이유 반환<br>월간 소비 통계로 당일 환율 원인을 대신하지 않음</div><div class="ready"><strong>근거 충분</strong><br>짧게 정리한 카드로 집필 입력 고정 ↓<br>기사 원문 전체를 보내지 않음</div></div>
+<div class="step"><h3>④ 호출 전 확인 — 코드 + 승인 기록</h3><p>입력·출력 형식, 비용 상한, 제공 경로, 개인정보 보호 조건. 이번 문서는 신규 유료 호출을 승인하지 않습니다.</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step future"><span class="badge">모델 선택 확정 · 공통 설정 연결 남음</span><h3>⑤ OpenRouter → GPT Sol 집필</h3><p>제목 · 요약 · 변화 배경 · 근거 있는 영업 의미 · 관찰 변수와 출처 연결. 개수를 채우려고 없는 설명을 만들지 않습니다. Claude·Gemini 교체 구조는 후속 구현입니다.</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step"><span class="badge">현재 로컬 도구</span><h3>⑥ 코드 검사와 화면 조립</h3><p>구조·참조 ID·수치·기간 확인, 문장별 검토 준비. 코드가 기준시각·수치·출처·차트를 표시합니다.</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step review"><span class="badge">내용 검토 필요</span><h3>⑦ 문장의 모든 주장을 근거와 대조</h3><p>귀속·인과·기간·범위 오류는 필수 교정. 추상적 제목·반복 표현은 문체 개선. 형식이나 글자 수만으로 설명의 정확성을 판정하지 않습니다.</p></div>
+<div class="arrow" aria-hidden="true">↓</div>
+<div class="step"><h3>⑧ A안 검토 초안 + 실제 비용 + 평가</h3><p>원문·검토·수정본은 분리 보존. 실패하면 보류, 준비되면 발행 흐름 A의 관리자 승인으로 돌아갑니다.</p></div>
+<div class="notice">이 대화에서 수행하는 Codex의 판단은 운영에 자동 포함되지 않습니다. 자료 채택·새 정보 판단·문장 검토를 누가 언제 수행할지 연결하고 검증하는 작업이 남아 있습니다.</div></section>
+
+<section class="diagram"><div class="eyebrow">남은 작업</div><h2>다음은 이 순서로 정리합니다.</h2><table><thead><tr><th>순서</th><th>할 일</th><th>권장 모델</th></tr></thead><tbody><tr><td>1</td><td>네 통화 누적 2%·정기 점검 기준 확정, 짧은 점검본 구성 검토</td><td>Astra High</td></tr><tr><td>2</td><td>숫자 재생 완료. 공식 가격·휴장·실제 사건 검증 보강</td><td>Sol High</td></tr><tr><td>3</td><td>Sol 기본 설정과 교체 가능한 집필 경로</td><td>Sol High</td></tr><tr><td>4</td><td>반복 자료 조사·사용 범위·내용 검토 연결</td><td>Astra / Sol High</td></tr><tr><td>5</td><td>별도 예산 승인 후 실제 품질 시험</td><td>Astra High 검토</td></tr><tr><td>6</td><td>승인·공개·장애 처리와 UI 2.0 검토</td><td>Sol High</td></tr><tr><td>7</td><td>파일럿·전체 출시·복구 승인</td><td>Astra / Sol High</td></tr></tbody></table><p class="note">기존 로컬 검증은 재사용하되 최신 전체 운영 검증으로 간주하지 않습니다. 리포트 기능, UI 개선, 전체 2.0 출시는 별도 완료 기준입니다.</p></section>
+<footer>2026-10-27 저장 코드·기록 기준 · 신규 API 비용 $0 · 앱 코드·운영 변경 없음<br>이 페이지는 외부 글꼴·스크립트·추적 요청이 없는 문서입니다.</footer></main></body></html>

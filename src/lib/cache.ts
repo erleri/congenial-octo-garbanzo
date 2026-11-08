@@ -4,6 +4,7 @@ import type {
   DailyRate,
   ExchangeRateDataset,
   FxDatasetMetadata,
+  FxPriceSource,
   MonthlyRate,
 } from '../types/exchangeRate'
 
@@ -181,6 +182,7 @@ export async function loadDatasetFromCache(): Promise<ExchangeRateDataset | null
 export type AVSupplementalCache = {
   fetchedAt: string
   rates: Record<string, Record<string, number>>
+  priceSources?: Record<string, FxPriceSource>
 }
 
 export async function saveAVSupplementalCache(data: AVSupplementalCache): Promise<boolean> {

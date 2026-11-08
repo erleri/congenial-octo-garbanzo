@@ -19,6 +19,26 @@ const candidate = {
   limitations: ['뉴스는 가능한 배경으로만 해석했습니다.'],
 }
 
+const ultraModel = 'nvidia/nemotron-3-ultra-550b-a55b:free'
+
+function ultraResponse(argumentsValue = JSON.stringify(candidate)) {
+  return {
+    ok: true,
+    json: async () => ({
+      model: ultraModel,
+      choices: [{
+        message: {
+          content: null,
+          tool_calls: [{
+            type: 'function',
+            function: { name: 'submit_latam_fx_report', arguments: argumentsValue },
+          }],
+        },
+      }],
+    }),
+  }
+}
+
 describe('OpenRouter FX report enhancement', () => {
   it('uses strict structured output and records the selected free model', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
@@ -31,6 +51,47 @@ describe('OpenRouter FX report enhancement', () => {
     expect(request.model).toBe('openrouter/free')
     expect(request.provider).toMatchObject({ require_parameters: true, data_collection: 'deny', zdr: true })
     expect(request.response_format.type).toBe('json_schema')
+  })
+
+  it('uses a forced report tool call for Nemotron Ultra without response_format', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(ultraResponse())
+    const result = await enhanceReportWithOpenRouter({ apiKey: 'test', model: ultraModel, evidence, fetchImpl, timeoutMs: 100 })
+    expect(result).toMatchObject({ model: ultraModel, candidate, validation: { valid: true } })
+
+    const request = JSON.parse(fetchImpl.mock.calls[0][1].body)
+    expect(request.response_format).toBeUndefined()
+    expect(request.tool_choice).toEqual({
+      type: 'function',
+      function: { name: 'submit_latam_fx_report' },
+    })
+    expect(request.tools[0]).toMatchObject({
+      type: 'function',
+      function: { name: 'submit_latam_fx_report', parameters: { type: 'object' } },
+    })
+    expect(request.provider).toEqual({ require_parameters: true, data_collection: 'deny', zdr: true })
+  })
+
+  it('rejects a Nemotron Ultra response that omits the required tool call without retrying', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ model: ultraModel, choices: [{ message: { content: JSON.stringify(candidate) } }] }),
+    })
+    await expect(enhanceReportWithOpenRouter({ apiKey: 'test', model: ultraModel, evidence, fetchImpl, timeoutMs: 100 })).rejects.toMatchObject({
+      model: ultraModel,
+      raw: JSON.stringify(candidate),
+      validation: { valid: false, errors: ['missing_tool_call'] },
+    })
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
+  })
+
+  it('rejects malformed Nemotron Ultra tool arguments without retrying', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(ultraResponse('{not-json'))
+    await expect(enhanceReportWithOpenRouter({ apiKey: 'test', model: ultraModel, evidence, fetchImpl, timeoutMs: 100 })).rejects.toMatchObject({
+      model: ultraModel,
+      raw: '{not-json',
+      validation: { valid: false, errors: ['invalid_json'] },
+    })
+    expect(fetchImpl).toHaveBeenCalledTimes(1)
   })
 
   it('retries one transient failure and then stops', async () => {

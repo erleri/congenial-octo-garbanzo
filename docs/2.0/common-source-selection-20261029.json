@@ -1,0 +1,188 @@
+{
+  "version": "common-source-selection-implementation/1",
+  "checkedOnKst": "2026-10-29",
+  "selectionVersion": "material-selection/2",
+  "historicalContractPreserved": "material-selection/1",
+  "currencyExceptions": [],
+  "savedAsOf": "2026-10-28T15:51:31.302Z",
+  "commentaryDate": "2026-10-27",
+  "behavior": [
+    "explicit_bound_optional_source_selection",
+    "remove_current_archived_held_claims_and_delivery_credits",
+    "source_scoped_transitive_dependency_removal",
+    "required_dependency_loss_hold",
+    "recheck_essential_local_roles_current_dependencies_source_use_and_price_holds",
+    "no_prior_review_or_call_approval_inheritance",
+    "reviewed_note_permission_does_not_grant_raw_original_permission"
+  ],
+  "results": [
+    {
+      "currency": "BRL",
+      "publishers": 3,
+      "claims": 7,
+      "roleCounts": {
+        "market_observation": 1,
+        "attributed_fx_explanation": 1,
+        "global_context": 0,
+        "countercontext": 1,
+        "consumer_background": 2,
+        "policy_background": 0,
+        "watch_context": 2
+      },
+      "savedMaterialPreparation": "materials_prepared_for_content_review",
+      "holds": [],
+      "referenceSnapshotUnchanged": true,
+      "omittedSourceIds": [],
+      "contentQuality": "not_newly_evaluated",
+      "hypotheticalMissingSources": "materials_connected_with_gaps",
+      "publicationApproved": false,
+      "evidenceResources": 3
+    },
+    {
+      "currency": "COP",
+      "publishers": 3,
+      "claims": 6,
+      "roleCounts": {
+        "market_observation": 2,
+        "attributed_fx_explanation": 2,
+        "global_context": 1,
+        "countercontext": 0,
+        "consumer_background": 1,
+        "policy_background": 0,
+        "watch_context": 0
+      },
+      "savedMaterialPreparation": "materials_prepared_for_content_review",
+      "holds": [],
+      "referenceSnapshotUnchanged": true,
+      "omittedSourceIds": [],
+      "contentQuality": "not_newly_evaluated",
+      "hypotheticalMissingSources": "materials_connected_with_gaps",
+      "publicationApproved": false,
+      "evidenceResources": 3
+    },
+    {
+      "currency": "PEN",
+      "publishers": 1,
+      "claims": 2,
+      "roleCounts": {
+        "market_observation": 1,
+        "attributed_fx_explanation": 1,
+        "global_context": 0,
+        "countercontext": 0,
+        "consumer_background": 0,
+        "policy_background": 0,
+        "watch_context": 0
+      },
+      "savedMaterialPreparation": "materials_prepared_for_content_review",
+      "holds": [],
+      "referenceSnapshotUnchanged": true,
+      "omittedSourceIds": [
+        "stat-pen-production-202608"
+      ],
+      "contentQuality": "not_newly_evaluated",
+      "hypotheticalMissingSources": "materials_connected_with_gaps",
+      "publicationApproved": false,
+      "evidenceResources": 1
+    },
+    {
+      "currency": "ARS",
+      "publishers": 2,
+      "claims": 4,
+      "roleCounts": {
+        "market_observation": 1,
+        "attributed_fx_explanation": 1,
+        "global_context": 0,
+        "countercontext": 1,
+        "consumer_background": 1,
+        "policy_background": 0,
+        "watch_context": 0
+      },
+      "savedMaterialPreparation": "materials_prepared_for_content_review",
+      "holds": [],
+      "referenceSnapshotUnchanged": true,
+      "omittedSourceIds": [],
+      "contentQuality": "not_newly_evaluated",
+      "hypotheticalMissingSources": "materials_connected_with_gaps",
+      "publicationApproved": false,
+      "evidenceResources": 2
+    },
+    {
+      "currency": "CLP",
+      "publishers": 1,
+      "claims": 5,
+      "roleCounts": {
+        "market_observation": 1,
+        "attributed_fx_explanation": 2,
+        "global_context": 0,
+        "countercontext": 2,
+        "consumer_background": 0,
+        "policy_background": 0,
+        "watch_context": 0
+      },
+      "savedMaterialPreparation": "materials_prepared_for_content_review",
+      "holds": [],
+      "referenceSnapshotUnchanged": true,
+      "omittedSourceIds": [
+        "news-clp-df-close-20261027",
+        "news-clp-bcch-rpm-20261027"
+      ],
+      "contentQuality": "not_newly_evaluated",
+      "hypotheticalMissingSources": "materials_connected_with_gaps",
+      "publicationApproved": false,
+      "evidenceResources": 2
+    },
+    {
+      "currency": "MXN",
+      "publishers": 3,
+      "claims": 8,
+      "roleCounts": {
+        "market_observation": 1,
+        "attributed_fx_explanation": 2,
+        "global_context": 0,
+        "countercontext": 2,
+        "consumer_background": 3,
+        "policy_background": 0,
+        "watch_context": 0
+      },
+      "savedMaterialPreparation": "materials_prepared_for_content_review",
+      "holds": [],
+      "referenceSnapshotUnchanged": true,
+      "omittedSourceIds": [],
+      "contentQuality": "not_newly_evaluated",
+      "hypotheticalMissingSources": "materials_connected_with_gaps",
+      "publicationApproved": false,
+      "evidenceResources": 5
+    }
+  ],
+  "evidenceResourceCountIncludesStatistics": true,
+  "dfScenario": "fallback_replay_not_actual_new_outage",
+  "actualOriginalReviewOrGenerationPerformed": false,
+  "protectedFilesUnchanged": 283,
+  "browserFilesScanned": 56,
+  "privateSecretMatches": 0,
+  "checks": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "fullTests": {
+      "files": 128,
+      "executedCases": 979,
+      "newDeclaredTests": 4
+    },
+    "productionBuild": "pass",
+    "appReportBuild": "pass",
+    "reportBuild": "pass",
+    "bundleBoundary": "pass"
+  },
+  "warnings": [
+    "existing_500kB_chunk_warning_entry_615654_bytes"
+  ],
+  "modelCalls": 0,
+  "newPaidCostUsd": 0,
+  "productionChanged": false,
+  "publicationApproved": false,
+  "browserScanFolders": [
+    "dist",
+    "dist-app-local",
+    "dist-report-ui"
+  ]
+}

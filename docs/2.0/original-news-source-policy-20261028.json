@@ -1,0 +1,352 @@
+{
+  "version": "original-news-use-policy/1",
+  "scope": "local_original_material_policies_not_production_config",
+  "checkedOn": "2026-10-28",
+  "policies": [
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-brl-cnn",
+      "sourceId": "brl-cnn",
+      "currency": "BRL",
+      "origin": "https://www.cnnbrasil.com.br",
+      "pathPrefix": "/economia/money/mercado/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://conteudos.cnnbrasil.com.br/termos-de-uso-da-cnn-brasil/",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "80ba3cf0e9d2058b76ea718d85dc05f6fc165d53f380a77c93a2796275c5ef4f"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-mxn-forbes",
+      "sourceId": "mxn-forbes",
+      "currency": "MXN",
+      "origin": "https://forbes.com.mx",
+      "pathPrefix": "/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://forbes.com.mx/terminos-y-condiciones/",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "a335884b60f344c701d64607cb3f7ecd4ae7c3877436973fa693b12663e42114"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-mxn-elfinanciero",
+      "sourceId": "mxn-elfinanciero",
+      "currency": "MXN",
+      "origin": "https://www.elfinanciero.com.mx",
+      "pathPrefix": "/mercados/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://www.elfinanciero.com.mx/robots.txt",
+        "role": "access_only_not_reuse_permission",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "0558824b3a01439a6fc5c1b9a8b1905cc8b5bbe8066d9fcfc339447f459c133a"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-cop-valora",
+      "sourceId": "cop-valora",
+      "currency": "COP",
+      "origin": "https://www.valoraanalitik.com",
+      "pathPrefix": "/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://www.valoraanalitik.com/robots.txt",
+        "role": "access_only_not_reuse_permission",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "df31819d3f62222ac63d88aee75229f49b30fc5332bd2aa0f5dd6f8c651f87c9"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-clp-biobio",
+      "sourceId": "clp-biobio",
+      "currency": "CLP",
+      "origin": "https://www.biobiochile.cl",
+      "pathPrefix": "/noticias/economia/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://www.biobiochile.cl/robots.txt",
+        "role": "access_only_not_reuse_permission",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "f5deda9655f4352eda21e9e5ef94c02df1bd0e913f318940ce68a2f92ff3c7a2"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-clp-cooperativa",
+      "sourceId": "clp-cooperativa",
+      "currency": "CLP",
+      "origin": "https://www.cooperativa.cl",
+      "pathPrefix": "/noticias/economia/divisas/",
+      "materialKind": "publisher_article_text",
+      "status": "reviewed",
+      "checkedOn": "2026-10-28",
+      "reason": "게시자 안내가 별도 서면 허가를 요구한다. 이번에는 해당 원문 처리 허가를 확보하지 않았으므로 이 자동 처리 경로에서 제외한다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": {
+        "version": "source-use/1",
+        "terms": {
+          "url": "https://www.cooperativa.cl/noticias/corporativo/politica-de-privacidad/2018-03-16/235704.html",
+          "version": "publisher-copyright-notice-accessed-20261028",
+          "reviewedOn": "2026-10-28"
+        },
+        "scope": "Cooperativa 기사 원문 전체의 자동 로컬 분석·모델 전달·재배포를 이번 경로에서 허용하지 않는다. 기존 자체 작성 사실·견해 카드의 별도 판단은 변경하지 않는다.",
+        "review": {
+          "origin": "agent",
+          "status": "checked",
+          "reason": "게시자 안내가 별도 서면 허가를 요구한다. 이번에는 해당 원문 처리 허가를 확보하지 않았으므로 이 자동 처리 경로에서 제외한다."
+        },
+        "conditions": [],
+        "uses": {
+          "local_analysis": {
+            "status": "denied",
+            "reason": "게시자 안내가 별도 서면 허가를 요구한다. 이번에는 해당 원문 처리 허가를 확보하지 않았으므로 이 자동 처리 경로에서 제외한다.",
+            "conditionIds": []
+          },
+          "external_model": {
+            "status": "denied",
+            "reason": "게시자 안내가 별도 서면 허가를 요구한다. 이번에는 해당 원문 처리 허가를 확보하지 않았으므로 이 자동 처리 경로에서 제외한다.",
+            "conditionIds": []
+          },
+          "public_display": {
+            "status": "denied",
+            "reason": "게시자 안내가 별도 서면 허가를 요구한다. 이번에는 해당 원문 처리 허가를 확보하지 않았으므로 이 자동 처리 경로에서 제외한다.",
+            "conditionIds": []
+          }
+        }
+      },
+      "evidence": {
+        "url": "https://www.cooperativa.cl/noticias/corporativo/politica-de-privacidad/2018-03-16/235704.html",
+        "role": "publisher_written_authorization_required",
+        "localRecord": "docs/2.0/original-source-trial-preparation-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "54cf056df7e564467107a46e61bd4410907d63ca498e5b4de9cca5bedb54bb65"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-ars-iprofesional",
+      "sourceId": "ars-iprofesional",
+      "currency": "ARS",
+      "origin": "https://www.iprofesional.com",
+      "pathPrefix": "/finanzas/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://www.iprofesional.com/secciones/terminos-y-condiciones-de-uso.html",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "1d50d8011952580d6e860b5ed8c09320eccc288f7fa2b40a6684ec218011b38c"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-pen-elcomercio",
+      "sourceId": "pen-elcomercio",
+      "currency": "PEN",
+      "origin": "https://elcomercio.pe",
+      "pathPrefix": "/economia/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://elcomercio.pe/terminos-y-condiciones/",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "f250ded12b6feca402d8be4ff47b6ed346c0065409980cdda739d0e7e8c3e5db"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-pen-andina",
+      "sourceId": "pen-andina",
+      "currency": "PEN",
+      "origin": "https://andina.pe",
+      "pathPrefix": "/agencia/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://andina.pe/agencia/legal/andinatyc.html",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "690891a082ed4b69f89c4cfcd2b5d5e1b18a2d38ef416246af230f6c040fe285"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-pen-infobae",
+      "sourceId": "pen-infobae",
+      "currency": "PEN",
+      "origin": "https://www.infobae.com",
+      "pathPrefix": "/peru/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "무료 접근·robots·기존 요지 카드와 원문 외부 모델 처리를 구분한다. 이 원문 용도는 아직 적용 범위를 확정하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://www.infobae.com/terminos-y-condiciones/",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "fb5ac4987bbd10efbf35a52b3a9b9f4a390e3174d19170dd6399f3916124fe96"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-brl-agenciabrasil",
+      "sourceId": "brl-agenciabrasil",
+      "currency": "BRL",
+      "origin": "https://agenciabrasil.ebc.com.br",
+      "pathPrefix": "/economia/noticia/",
+      "materialKind": "publisher_article_text",
+      "status": "pending",
+      "checkedOn": "2026-10-28",
+      "reason": "현행 안내는 보도 목적 재현과 상업·제휴/전재 예외를 구분한다. 기존 카드 판단을 원문 모델 전송 허가로 확대하지 않았다.",
+      "thirdParty": "hold_on_credited_origin",
+      "reviewedUse": null,
+      "evidence": {
+        "url": "https://agenciabrasil.ebc.com.br/sobre",
+        "role": "publisher_notice_scope_requires_resolution",
+        "localRecord": "docs/2.0/free-news-expansion-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "8d4b43756793b9059ed92bef6814c608d188e7af226a000dc1f67fb64b191188"
+    },
+    {
+      "version": "original-news-use-policy/1",
+      "id": "original-brl-camara-radio",
+      "sourceId": "brl-camara-radio",
+      "currency": "BRL",
+      "origin": "https://www.camara.leg.br",
+      "pathPrefix": "/radio/programas/1081042-alta-do-dolar-afeta-economia-como-um-todo-e-consumidor-deve-estar-alerta/",
+      "materialKind": "publisher_article_text",
+      "status": "reviewed",
+      "checkedOn": "2026-10-28",
+      "reason": "직접 확인한 자체 제작 프로그램 설명 텍스트 한 건의 원문 대조 시험 범위다. 다른 프로그램의 제작/권리나 최신 통화 움직임으로 확대하지 않는다.",
+      "thirdParty": "hold_on_credited_origin",
+      "attribution": "Fonte: Rádio Câmara; Creative Commons BY (version unspecified); https://www.camara.leg.br/radio/termos-de-uso . Korean notes are adapted by LATAM FX; no endorsement implied.",
+      "reviewedUse": {
+        "version": "source-use/1",
+        "terms": {
+          "url": "https://www.camara.leg.br/radio/termos-de-uso",
+          "version": "publisher-radio-CC-BY-notice-accessed-20261028-version-unspecified",
+          "reviewedOn": "2026-10-28"
+        },
+        "scope": "자체 제작 Rádio Câmara 프로그램의 공개 설명 텍스트만 로컬 분석·출처를 동봉한 ZDR 모델 처리. 음성·음악·사진·타사 제작물과 공개 재배포 승인은 제외.",
+        "review": {
+          "origin": "agent",
+          "status": "checked",
+          "reason": "게시자의 Creative Commons BY 및 부분 사용 출처 조건을 이 텍스트 시험에 적용한 판단이다. AI 전용 별도 허가를 받았다는 주장이 아니다."
+        },
+        "conditions": [
+          {
+            "id": "radio-credit",
+            "text": "출처·라이선스 안내 링크·원자료 링크와 요지 가공 표시를 모델 요청에 함께 전달한다.",
+            "status": "satisfied",
+            "delivery": {
+              "field": "attribution",
+              "equals": "@attribution",
+              "uses": [
+                "external_model"
+              ]
+            }
+          },
+          {
+            "id": "radio-source-link",
+            "text": "처리하는 실제 프로그램 페이지의 원문 링크를 요청에 동봉한다.",
+            "status": "satisfied",
+            "delivery": {
+              "field": "sourceUrl",
+              "equals": "@sourceUrl",
+              "uses": [
+                "external_model"
+              ]
+            }
+          }
+        ],
+        "uses": {
+          "local_analysis": {
+            "status": "allowed",
+            "reason": "자체 제작 텍스트의 로컬 분석에 한정한 출처 정책 판단.",
+            "conditionIds": []
+          },
+          "external_model": {
+            "status": "allowed",
+            "reason": "원문 및 사용 조건 표시를 포함한 ZDR·수집 금지 모델 처리에 한정한다.",
+            "conditionIds": [
+              "radio-credit",
+              "radio-source-link"
+            ]
+          },
+          "public_display": {
+            "status": "pending",
+            "reason": "원문이나 새 요지의 공개 화면·라이선스 표시는 별도 검토 대상이다.",
+            "conditionIds": []
+          }
+        }
+      },
+      "evidence": {
+        "url": "https://www.camara.leg.br/radio/termos-de-uso",
+        "role": "publisher_own_radio_production_reuse_notice",
+        "localRecord": "docs/2.0/original-source-trial-preparation-20261028.md",
+        "notPublisherAiPermission": true
+      },
+      "binding": "0be72e93096734bba8fb03ab98239bcba8a9984d9dcb3194f0a2ba3fe6b27378"
+    }
+  ],
+  "productionIntegrated": false,
+  "publicationApproved": false
+}

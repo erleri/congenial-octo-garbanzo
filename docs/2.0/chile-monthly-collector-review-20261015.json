@@ -1,0 +1,78 @@
+{
+  "task": "실질 보수 정의와 월별 공식 원문 수집 연결",
+  "reviewDate": "2026-10-15",
+  "status": "local_original_capture_verified_not_evidence_admission",
+  "newRegistry": "clp-consumption-scopes/1",
+  "oldRegistryPreserved": "clp-retail-scopes/1",
+  "definitionReview": {
+    "period": "2026-08",
+    "source": "INE IR-ICL August 2026 bulletin, pages 1 and 6; methodology base 2023, page 6",
+    "locatorModule": "scripts/currency-report/chile-consumption-scopes.js",
+    "criticalQualification": "실질 보수는 시간당 지표다. 계약시간 감소 시 월급 증가 없이 상승할 수 있으므로 가구 구매력·소비 증가로 단정하지 않는다.",
+    "comparison": "동일 월 전년동월비의 맥락 대조. 기준년 2023과 2018의 지수 수준 비교나 인과 판정은 하지 않는다.",
+    "newPeriodPolicy": "해당 월의 정의 검토 전에는 기존 정의를 자동 승인하지 않는다."
+  },
+  "execution": {
+    "planCommand": "node scripts/currency-report/chile-monthly-local.js --period 2026-08",
+    "captureCommand": "node scripts/currency-report/chile-monthly-local.js --period 2026-08 --live",
+    "plannerCommand": "node scripts/currency-report/research-needs-local.js --input <local-envelope.json> --scope-profile clp-consumption --period 2026-08",
+    "defaultMode": "plan_without_network_or_writes",
+    "environmentFilesRead": false,
+    "maxRequests": 6,
+    "maxBytesPerRequest": 2000000,
+    "timeoutMsPerRequest": 15000,
+    "automaticRetries": 0,
+    "redirects": "blocked; official index HTTP link normalized to same-host HTTPS before request",
+    "output": ".local-reports/private/official-statistics/cl-<unique>/",
+    "storage": "new directory each time; immutable prior captures; byte hashes; partial failures remain in manifest"
+  },
+  "liveVerification": {
+    "firstCapture": ".local-reports/private/official-statistics/cl-s2dZFn/manifest.json",
+    "firstOutcome": "공식 색인의 HTTP 링크가 거부되어 후보 없음. 자료 미발표로 판정하지 않았으며 실패 기록 보존.",
+    "successfulCapture": ".local-reports/private/official-statistics/cl-ucFtrr/manifest.json",
+    "successfulRoundRequests": 4,
+    "capturedPdfs": 2,
+    "retailBytes": 1774562,
+    "payBytes": 1454490,
+    "hashesVerifiedAfterSaving": true,
+    "collectedAtIsNotPublishedAt": true,
+    "historicalVintageVerified": false,
+    "numericFactsAdmitted": false,
+    "evidenceReady": false
+  },
+  "replay": {
+    "path": ".local-reports/private/consumption-replay-wiw5mw/verification.json",
+    "consumptionAction": "review_inventory",
+    "categoryAction": "review_inventory",
+    "reason": "새 비교 정의는 확정됐으나 저장된 미분류 근거는 원문 범위 검토가 필요하다.",
+    "oldReportAndCostHashesPreserved": true
+  },
+  "checks": {
+    "newCases": 8,
+    "allPassedCases": 513,
+    "testFiles": 74,
+    "declaredTests": 414,
+    "parameterExpansions": 99,
+    "exactDuplicateNamesOrBodies": 0,
+    "semanticUniquenessOrRealQualityClaimed": false,
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed; existing 610337-byte entry warning",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed"
+  },
+  "boundaries": {
+    "newPaidCalls": 0,
+    "newApiCostUsd": 0,
+    "reportChanges": false,
+    "productionChanges": false,
+    "dbChanges": false,
+    "remotePush": false
+  },
+  "remaining": [
+    "PDF 본문의 기간·수치 추출과 원문 대조 및 근거 카드 분류",
+    "페이지의 최근 파일 목록 밖 과거 기간은 별도 원문 확인 필요; 파일명 추측이나 차단 우회 없음",
+    "발표시각·개정 이력·수집 이전 가용성 검토",
+    "실제 집필 품질 시험과 게시 승인은 별도 단계"
+  ]
+}

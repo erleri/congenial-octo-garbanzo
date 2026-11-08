@@ -1,0 +1,235 @@
+{
+  "version": "shared-input-final-audit/1",
+  "reviewedOn": "2026-10-29",
+  "decision": "revise_common_contract_before_new_paid_trial",
+  "scope": "저장된 6개 요청·37개 요지·공통 생성/검토 코드와 합성 경계 재현. 새 원문/법률/독립 모델 심사 아님.",
+  "currentCodeNotChanged": true,
+  "paidCalls": 0,
+  "newCostUsd": 0,
+  "findings": [
+    {
+      "id": "F01",
+      "priority": "before_paid_trial",
+      "category": "중복",
+      "title": "같은 공통 설명 지침을 두 번 전송",
+      "evidence": "6개 실제 요청 모두 reasoning/4 블록이 2회 포함된다. 제목 포함 7개 행이 정확히 반복된다. EDITORIAL_INSTRUCTIONS가 이미 포함한 지침을 shared-writer가 다시 붙인다.",
+      "impact": "오류 방지와 설명보다 반복 제약의 비중을 키우며 입력 비용을 낭비한다. 품질 저하의 유일 원인으로 단정하지 않는다.",
+      "fix": "규칙 본문은 한 곳에서 조립하고 다른 단계는 규칙 ID·버전으로 참조한다. 전송문을 대상으로 중복을 확인한다.",
+      "refs": [
+        "scripts/currency-report/shared-writer.js:47",
+        "scripts/currency-report/editorial.js:20",
+        "scripts/currency-report/shared-writing-brief.js:44"
+      ]
+    },
+    {
+      "id": "F02",
+      "priority": "before_paid_trial",
+      "category": "누락",
+      "title": "소비 배경·중요 설명의 본문 누락을 묻는 검토가 새 경로에서 빠짐",
+      "evidence": "실제 저장 자료 6개 모두 writingCoverageRequirements가 비어 있다. BRL·COP·ARS·MXN에는 소비 카드가 각각 2·1·2·3개 있지만 합성 응답에서 영업 환경을 모두 빼도 구조/자동 검사는 통과하고 누락 질문이 만들어지지 않았다.",
+      "impact": "자료가 없어서 생략한 경우와 충분한 자료를 모델이 놓친 경우를 구분하지 못한다. 자동 통과가 게시 승인은 아니며 의미 검토는 여전히 미검증이다.",
+      "fix": "특정 달러·소비 플래그 대신 채택 근거의 역할·주요 질문에서 검토 항목을 만든다. 사용·합침·생략과 이유를 남기되 모든 자료의 본문 사용을 강제하지 않는다.",
+      "refs": [
+        "scripts/currency-report/fx-writing-focus.js:40",
+        "scripts/currency-report/claim-review.js:70"
+      ]
+    },
+    {
+      "id": "F03",
+      "priority": "before_paid_trial",
+      "category": "정보 손실",
+      "title": "집필자에게 준 시점·판본 조건 일부가 검토자에게 전달되지 않음",
+      "evidence": "집필 입력의 writingContext 32개와 sourceVersion 객체 16개가 대응하는 문장 검토 입력 필드에 없다. referencePeriod·sourceSessionDate 및 일부 텍스트 조건은 남으므로 모든 시점 정보가 사라졌다는 뜻은 아니다.",
+      "impact": "장중/마감/최근 기간/예정 사건·수정판 확인 조건을 검토자가 집필자와 같은 자료로 확인할 수 없다.",
+      "fix": "글쓴이와 검토자가 같은 최소 근거 계약을 사용하도록 문맥·판본·기사 가격 종류·귀속을 보존한다. 미확인 관측시각을 생성하지 않는다.",
+      "refs": [
+        "scripts/currency-report/shared-writing-contract.js:34",
+        "scripts/currency-report/claim-review.js:52"
+      ]
+    },
+    {
+      "id": "F04",
+      "priority": "before_paid_trial",
+      "category": "검사 충돌",
+      "title": "새 6통화 검사와 옛 3통화 검사가 서로 다른 판정을 함",
+      "evidence": "근거 자체에 다른 국가가 명시된 합성 설명은 sharedRoleIssues를 통과한다. 이후 BRL→멕시코 설명은 currency_mismatch로 거부되지만 COP→멕시코 및 ARS→브라질 설명은 통과한다. 옛 예외는 newsNotes만 읽고 sharedNotes는 읽지 않는다.",
+      "impact": "같은 계약을 사용해도 통화별 정상 설명 허용 범위가 달라진다. 현재 원고의 경제적 정확성을 판정한 시험은 아니다.",
+      "fix": "한 개의 국가/시장 범위 검사로 합치고, 단순 국가명 대신 해당 설명에 연결한 근거를 검사한다. 옛 원고는 옛 규칙으로 보존한다.",
+      "refs": [
+        "scripts/currency-report/core.js:165",
+        "scripts/currency-report/core.js:176",
+        "scripts/currency-report/shared-writing-contract.js:70"
+      ]
+    },
+    {
+      "id": "F05",
+      "priority": "before_paid_trial",
+      "category": "검사 충돌",
+      "title": "같은 월간 소비 근거를 본문에는 허용하고 요약에는 거부",
+      "evidence": "합성 요약을 소비 근거에 정확히 연결하면 구조 검사는 통과하지만 R04가 출처 통화·기간·발표일 불일치로 막는다. eventDate=null 허용이 implications 위치에만 한정되어 있다.",
+      "impact": "제목·요약에도 같은 근거 기준을 적용한다는 설계와 다르다. 소비 환경이 핵심인 보고서를 요약하기 어려워진다.",
+      "fix": "본문 위치가 아니라 주장의 용도·원래 대상 기간·발표 조건으로 판정한다. 소비 근거의 당일 환율 원인 승격 금지는 그대로 유지한다.",
+      "refs": [
+        "scripts/currency-report/rules.js:164",
+        "scripts/currency-report/rules.js:165"
+      ]
+    },
+    {
+      "id": "F06",
+      "priority": "before_paid_trial",
+      "category": "입력 분류",
+      "title": "COP 전문가 해석이 사실 카드로 분류됨",
+      "evidence": "La República 카드의 Francesco Pesole/ING 설명은 글로벌 달러에 대한 견해 문장인데 kind=source_fact, attributions=[]로 전달된다. 사람이 읽을 수 있는 본문에는 이름이 남아 있다.",
+      "impact": "발언했다는 사실과 그 발언의 경제적 해석을 혼동할 수 있다. 실제 견해의 진위를 새로 판정한 것이 아니라 내부 분류 불일치다.",
+      "fix": "기존 저장 원문·귀속 기록으로 견해/발언 사실 유형을 정리하고 새 사본에만 반영한다. 다른 국가에도 동일한 귀속 검사 계약을 적용한다.",
+      "refs": [
+        "scripts/currency-report/shared-writing-contract.js:65"
+      ]
+    },
+    {
+      "id": "F07",
+      "priority": "generalize",
+      "category": "사례 편향",
+      "title": "칠레 전용 예문과 달러만을 다루는 초점 계약",
+      "evidence": "공통 검토 프롬프트에는 칠레 현지 달러 수요 문구가 있다. 기존 fx-writing-focus는 topic=global_dollar만 받는다. 새 경로에서는 이 초점 계약이 아예 연결되지 않았다.",
+      "impact": "예문이 모든 나라의 규칙인 것처럼 읽힐 위험과 비달러 사건의 누락 검토 공백이 있다. DF나 특정 신문을 새 집필 입력의 필수 출처로 강제하는 코드는 이번 경로에서 발견하지 않았다.",
+      "fix": "공통 본문에는 국제 요인·현지 전달 경로·귀속 범위의 일반 규칙만 둔다. 칠레/달러 사례는 회귀 예제로 이동한다. 정책·원자재·국내 사건도 같은 질문 계약으로 다룬다.",
+      "refs": [
+        "scripts/currency-report/reasoning-policy.js:25",
+        "scripts/currency-report/fx-writing-focus.js:13"
+      ]
+    },
+    {
+      "id": "F08",
+      "priority": "generalize",
+      "category": "의미 중복",
+      "title": "텍스트 중복은 없지만 같은 발언·사건 묶음은 자동 관리되지 않음",
+      "evidence": "37개 카드의 통화 내 동일 본문 중복은 0. CLP의 Emol/BioBio는 Lucas Santillán/Capitaria 해석이 겹친다. MXN 금리차·캐리 카드도 역할/시점이 부분 중첩한다. INEGI 동일 URL 2개는 전월비·전년비이므로 중복 삭제 대상이 아니다.",
+      "impact": "다른 기사 수를 독립 확인 수로 오인하거나 같은 경로를 여러 문단에 반복할 수 있다. 현재 주의 문구는 있으나 의미 묶음/독립성은 자동 보장되지 않는다.",
+      "fix": "같은 사건·발언 원출처·시각·지표 정의를 묶어 관리한다. 같은 기관이라는 이유만으로 서로 다른 발언을 삭제하지 않는다. 자동 동일성 확정 대신 불확실한 관계를 미검증으로 남긴다.",
+      "refs": [
+        "scripts/currency-report/rules.js:142",
+        "scripts/currency-report/editorial.js:23"
+      ]
+    },
+    {
+      "id": "F09",
+      "priority": "generalize",
+      "category": "과잉 제한",
+      "title": "제목의 모든 방향 표현·본문의 모든 숫자 금지가 너무 넓음",
+      "evidence": "합성 제목 소매 매출 상승과 구매 여건의 차이가 환율 방향 오류 검사에 걸린다. 소비 본문의 8월도 숫자 금지에 걸린다. 근거 기간은 펼침 영역에 표시되지만 요약·본문의 기간별 고정 표시가 새 경로에는 없다.",
+      "impact": "검증된 핵심 결론과 기간을 표현하기 어렵고 모호한 문장을 유도할 수 있다. 숫자 생성 금지 자체를 없애라는 결론은 아니다.",
+      "fix": "환율/소비 지표의 방향을 구분하고 코드가 승인된 값·기간을 문장 위치에 연결하게 한다. 검증되지 않은 숫자·방향 추가는 계속 차단한다.",
+      "refs": [
+        "scripts/currency-report/openrouter.js:26",
+        "scripts/currency-report/openrouter.js:126",
+        "scripts/currency-report/core.js:42"
+      ]
+    },
+    {
+      "id": "F10",
+      "priority": "scope_gap",
+      "category": "전체 범위",
+      "title": "현재 새 경로는 시장 해설 부분집합이며 모든 발행 유형을 포함하지 않음",
+      "evidence": "새 경로는 현지 관측+귀속 원인을 요구하고 일반 원리는 항상 빈 배열, 기본 review purpose는 fx_explanation이다. 기존 정기 점검 경로는 별도로 존재한다. 정책/소비만의 업데이트·정정·주기 분기와 승인 원리 전달까지 하나로 연결한 상태가 아니다.",
+      "impact": "전용 시장해설 시험에서는 의도한 제한이다. 그러나 전체 공통 리포트 기능이 마감됐다고 부를 수는 없다. 준비된 카드에 승인되지 않은 일반 원리를 임의 추가하면 안 된다.",
+      "fix": "공통 핵심 규칙 위에 시장해설/정기점검/경제업데이트/정정의 용도 계약을 구분한다. 원리는 새로 추정하지 않고 기존 승인·적용 조건이 유효할 때만 전달한다.",
+      "refs": [
+        "scripts/currency-report/shared-writing-brief.js:22",
+        "scripts/currency-report/shared-writer.js:32",
+        "scripts/currency-report/claim-review.js:47"
+      ]
+    }
+  ],
+  "countries": [
+    {
+      "currency": "BRL",
+      "sources": 3,
+      "claims": 7,
+      "consumerClaims": 2,
+      "note": "시장 되돌림·소매 배경을 구분해 보유. 소비 누락 검토와 날짜 조건 전달을 먼저 복구."
+    },
+    {
+      "currency": "COP",
+      "sources": 3,
+      "claims": 6,
+      "consumerClaims": 1,
+      "note": "TRM 비교와 전일비 구분 유지. ING 귀속 카드 유형 정리, 기술적 지지를 원인 확증으로 확대하지 않음."
+    },
+    {
+      "currency": "PEN",
+      "sources": 1,
+      "claims": 2,
+      "consumerClaims": 0,
+      "note": "시장·분석가 견해 2개만 보유. 현재 소비 배경 미포함을 표시하며 빈 섹션을 억지로 채우지 않음."
+    },
+    {
+      "currency": "ARS",
+      "sources": 3,
+      "claims": 5,
+      "consumerClaims": 2,
+      "note": "도매시장과 소매/blue 구분. 헤알 동행은 기사 귀속 해석. 슈퍼마켓·조건부 구매력 범위를 보존."
+    },
+    {
+      "currency": "MXN",
+      "sources": 6,
+      "claims": 10,
+      "consumerClaims": 3,
+      "note": "당일 달러와 최근 금리차·소비 자료 보유. 금리차 설명은 역할/시점별 통합, MoM·YoY는 보존."
+    },
+    {
+      "currency": "CLP",
+      "sources": 3,
+      "claims": 7,
+      "consumerClaims": 0,
+      "note": "오전·장중·유동성 구간 마감 분리. 같은 Capitaria 발언 중복 취급 주의. 소비 배경 미포함."
+    }
+  ],
+  "proposedSeparation": [
+    [
+      "공통 핵심",
+      "숫자 출처·실제 기간·사실/귀속/원리·근거 범위·중복·내용 검토·사용 범위·비공개 경계"
+    ],
+    [
+      "용도별 계약",
+      "시장해설 / 정기점검 / 경제·소비 업데이트 / 정정. 필요 근거와 허용 생략을 각각 명시"
+    ],
+    [
+      "국가 설정",
+      "출처·가격 종류·달력·지표 정의. 국가 이름을 조건으로 새로운 품질 기준을 만들지 않음"
+    ],
+    [
+      "사례 자료",
+      "기사의 사건·시각·발언·적용 조건. 해당 입력에만 존재하며 공통 지침으로 복사하지 않음"
+    ],
+    [
+      "회귀 사례",
+      "실패 문장과 정상 문장을 짝으로 유지. 키워드 추가만으로 의미 검토를 대체하지 않음"
+    ]
+  ],
+  "verification": {
+    "savedInputs": 6,
+    "savedPlansProtected": 12,
+    "syntheticBoundaryProbes": 6,
+    "existingTestFiles": 2,
+    "existingTestCases": 16,
+    "existingTestsPassed": true,
+    "fullBuildNotRepeated": "실행 코드 변경 없이 검토 문서와 진단 결과만 추가",
+    "qualitySamples": 0,
+    "preservation": {
+      "files": 434,
+      "changed": [],
+      "sourceFiles": 428,
+      "sourceChanged": []
+    },
+    "evidence": ".local-reports/private/shared-input-audit-20261029/results.json",
+    "supplement": ".local-reports/private/shared-input-audit-20261029/summary-probe.json"
+  },
+  "nextOrder": [
+    "검토 입력 누락·월간 근거·국가 검사 충돌·귀속 유형 수정",
+    "중복 지침 정리와 사건/발언 묶음·본문 반영 검토 통합",
+    "6개 저장 입력 및 정상/실패 짝 재생",
+    "그 뒤 제공 조건/비용을 확인하고 별도 승인된 소규모 유료 시험"
+  ],
+  "publicationApproved": false
+}

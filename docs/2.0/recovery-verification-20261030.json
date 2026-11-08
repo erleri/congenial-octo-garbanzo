@@ -1,0 +1,161 @@
+{
+  "version": "report-recovery/1",
+  "date": "2026-10-30",
+  "status": "local_recovery_verified_production_pending",
+  "scope": {
+    "productionWrites": 0,
+    "sourceLocalDatabaseWrites": 0,
+    "paidModelCalls": 0,
+    "mailSent": 0,
+    "pushes": 0,
+    "deployments": 0,
+    "realDataCleanup": 0
+  },
+  "completed": [
+    [
+      "보존 예행연습",
+      "보호 참조·미완료·미확인 비용·저장 제한을 구분하고 공유 객체/외부 DB 참조를 대조. 실제 삭제 기능 없음"
+    ],
+    [
+      "복구본",
+      "로컬 DB·연결된 파일·기존 환율/폴백/원시표·migration을 인증된 암호화 묶음으로 보존. 키 별도, 사용자/SYSTEM만 접근"
+    ],
+    [
+      "새 DB 복원",
+      "별도 새 로컬 DB에 복원해 모든 대상 테이블 내용과 RLS/GRANT/함수 정의를 원본과 대조"
+    ],
+    [
+      "이후 변경 보호",
+      "새 계획값 저장·현재값 동기화, 보고서 철회, 동일 로그인 정보의 관리자 비활성화를 별도 시험 DB에서 검증"
+    ],
+    [
+      "복원 차단",
+      "최신 상태 미확인·기존 상태 차이·파일 변경·잘못된 키·암호문 변조는 보류/거부. 일치해도 운영 자동 전환 없음"
+    ],
+    [
+      "공개 경계",
+      "철회 캐시 회귀와 로컬 웹의 키/백업/비공개 기록 경로 차단을 확인"
+    ]
+  ],
+  "inventory": {
+    "bundles": 43,
+    "statuses": {
+      "protected": 43
+    },
+    "databaseReferences": 12,
+    "verifiedDatabaseReferences": 12,
+    "uniqueObjectFiles": 124,
+    "logicalReferencedBytes": 24254193,
+    "uniqueReferencedBytes": 10634613,
+    "orphanFiles": 0,
+    "externalReferencesVerified": false,
+    "deleteEnabled": false,
+    "cleanupExecutable": false
+  },
+  "backup": {
+    "encryptedBytes": 4322619,
+    "selectedFiles": 94,
+    "restoredFiles": 93,
+    "databaseDumpBytes": 723713,
+    "plainFileBytes": 76467506,
+    "encryption": "AES-256-GCM with authenticated manifest and file hashes",
+    "keyOutsideRepository": true,
+    "keyStoredSeparately": true,
+    "restrictedFolders": 3,
+    "sourcePublicTables": 13,
+    "sourceTotalTables": 37,
+    "linkedFileBundlesSynthetic": 12,
+    "articleOriginalFilesIncluded": 0,
+    "samePhysicalPc": true,
+    "offsiteCopyVerified": false,
+    "productionBackup": false
+  },
+  "verification": {
+    "unitFiles": 250,
+    "unitCases": 1039,
+    "recoveryCases": 10,
+    "restoredDbChecks": [
+      "empty_database_restore_all_rows_match",
+      "rls_grants_functions_match",
+      "source_database_unchanged",
+      "all_selected_file_hashes_match",
+      "all_db_receipts_resolve_in_restored_files",
+      "fx_full_light_raw_files_exact",
+      "later_plan_save_in_rehearsal_preserved",
+      "later_withdrawal_hidden_to_anon",
+      "revoked_admin_same_claims_hidden",
+      "old_backup_cannot_automatically_replace_current_state",
+      "unknown_current_authority_blocks_readiness",
+      "matched_withdrawn_audit_is_not_a_new_conflict",
+      "wrong_key_rejected",
+      "tampered_archive_rejected",
+      "changed_evidence_blocks_restored_receipt",
+      "restored_anon_public_rows_match",
+      "restored_anon_private_access_denied"
+    ],
+    "pgtapFiles": 5,
+    "pgtapChecks": 74,
+    "types": "passed",
+    "lint": "passed",
+    "builds": [
+      "production",
+      "report",
+      "app-local"
+    ],
+    "privateWebRoutesDenied": 6,
+    "protectedFiles": 614,
+    "authorizedChangedExistingFiles": [
+      "package.json"
+    ],
+    "unchangedOriginalFiles": 98,
+    "unchangedPrivateInputs": 22,
+    "unchangedLedgerBundles": 43,
+    "buildTextFilesScanned": 94,
+    "secretFindings": 0,
+    "sourceDbUnchanged": true,
+    "actualNewAiReports": 0,
+    "note": "Automated cases and synthetic post-backup changes are not new AI quality or pilot samples. pgTAP rolls back rows; scratch sequence allocations may advance."
+  },
+  "resolvedFindings": [
+    [
+      "로컬 소유권",
+      "일반 postgres로는 원래 Supabase 객체 소유자를 재설정할 수 없어 복원이 중단됨. 기존 로컬 supabase_admin으로 복원해 소유권·권한을 유지. 원본 권한 변경 없음"
+    ],
+    [
+      "철회 이력 오탐",
+      "복원본과 최신본 양쪽에서 이미 철회된 동일 이력을 새 충돌로 세던 비교를 수정. 새 철회나 판본 변경은 계속 차단"
+    ],
+    [
+      "검사 도구의 경로 가정",
+      "새 공유 파일만 있다고 가정한 손상 재현 도구를 기존 v1 파일도 검사하도록 보완. 기존 장부를 이전하거나 고치지 않음"
+    ]
+  ],
+  "remaining": [
+    "운영 DB의 승인된 실제 백업·복원, 이후 계획 저장·비용/진행 작업·출처 제한 장부의 완전한 재결합은 운영 전 조건",
+    "이번 새 DB는 같은 로컬 PostgreSQL 클러스터에 생성했다. 별도 장비/클러스터의 역할·확장·Auth 설정 복구는 미검증",
+    "암호화 백업과 별도 키는 같은 PC에 있다. 독립 비공개 보관 위치·키 담당자·분실 복구·목표 복구 시간/허용 손실은 미확정",
+    "연결된 파일12묶음은 합성 시험 자료다. 실제 수집 원문 전체·895MB 실험·전체 비용 파일을 백업하거나 원문 이용 권한을 승인한 결과가 아님",
+    "장부 밖 참조와 보관 권한은 미확인이므로 정리 후보를 실제로 삭제할 수 없다. 기간·경보는 예행연습 상태 유지",
+    "출처 허가 변경이나 비용/실행 장부는 별도 최신 확인 대상이다. 상태 비교 함수 하나가 내용·권한·운영 전체를 승인하지 않음",
+    "영구 오프라인 기기는 새 철회를 즉시 알 수 없다. 알려진 철회 우선·확인 시각/유효기간·복원 서버 공개 전 재결합이 필요",
+    "시험 DB3개와 새 복원 사본은 확인용으로 보존했다. 기존 로컬 앱이 연결된 원본 DB와 포트는 그대로이며 자동 정리하지 않음",
+    "실제 월 잔여 한도·운영 여유·구형/새 생성기 단일 전환·UI2.0·6통화 실제 품질·파일럿/출시 승인은 남아 있음"
+  ],
+  "next": "6단계 운영 전환 준비: 최신 main/운영과 로컬 변경을 대조하고 작은 PR 단위를 설계. 운영 백업/한도/복구 책임 공백을 먼저 정리. 배포·운영 DB 변경·메일·유료 호출은 별도 승인",
+  "recommendedModel": "Sol High 정리·연결 / Astra High 전환·복구 판단",
+  "sources": [
+    [
+      "Supabase 백업",
+      "https://supabase.com/docs/guides/platform/backups"
+    ],
+    [
+      "PostgreSQL pg_dump",
+      "https://www.postgresql.org/docs/17/app-pgdump.html"
+    ],
+    [
+      "PostgreSQL pg_restore",
+      "https://www.postgresql.org/docs/17/app-pgrestore.html"
+    ]
+  ],
+  "documentationFetch": "Supabase changelog.md web fetch rejected unsupported markdown content type; official backup docs and installed PostgreSQL17.6 help verified"
+}

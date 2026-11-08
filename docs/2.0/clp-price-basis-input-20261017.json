@@ -1,0 +1,44 @@
+{
+  "currency": "CLP",
+  "datasetFile": ".local-reports/private/market-snapshots/clp-investigation-a18c55c55b614be0a5167aa950e7ff59/dataset.json",
+  "datasetSha256": "0c7413894e24b2499bd9422c3835ceeadbeb2f4db496275fb96b8e567ef0060f",
+  "providerCaptures": [
+    {
+      "rawFile": ".local-reports/private/price-provenance-20261017/provider-2026-10-14.json",
+      "sha256": "20c37c70e8b25e6d25e2579df3d5080819504cb7705b3d3a15120b68699100fe",
+      "requestedDate": "2026-10-14",
+      "url": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-14/v1/currencies/usd.json",
+      "capturedAt": "2026-10-16T15:34:14.822Z"
+    },
+    {
+      "rawFile": ".local-reports/private/price-provenance-20261017/provider-2026-10-15.json",
+      "sha256": "51704139cb2e4f1af3873abc882adf823c6b33cd6979c30f6ad3a06999d5e9a0",
+      "requestedDate": "2026-10-15",
+      "url": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-15/v1/currencies/usd.json",
+      "capturedAt": "2026-10-16T15:34:14.909Z"
+    }
+  ],
+  "articleOriginalsFile": ".local-reports/private/market-snapshots/clp-investigation-a18c55c55b614be0a5167aa950e7ff59/article-originals.json",
+  "articleReviews": [
+    {
+      "id": "emol-14-close",
+      "rawFile": ".local-reports/private/market-snapshots/clp-investigation-a18c55c55b614be0a5167aa950e7ff59/emol-14-close.html",
+      "quoteSide": "ask",
+      "review": {
+        "originalVerified": true, "sessionDate": "2026-10-14", "blockIndex": 0,
+        "publishedAt": "2026-10-14T17:36:00Z", "checkedAt": "2026-10-16T15:36:19Z",
+        "rawAnchor": "$984,7 comprador y $985 vendedor"
+      }
+    },
+    {
+      "id": "emol-15-close",
+      "rawFile": ".local-reports/private/market-snapshots/clp-investigation-a18c55c55b614be0a5167aa950e7ff59/emol-15-close.html",
+      "quoteSide": "ask",
+      "review": {
+        "originalVerified": true, "sessionDate": "2026-10-15", "blockIndex": 0,
+        "publishedAt": "2026-10-15T17:05:00Z", "checkedAt": "2026-10-16T15:36:19Z",
+        "rawAnchor": "$981,8 comprador y $982,1 vendedo</b>r"
+      }
+    }
+  ]
+}

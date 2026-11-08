@@ -1,0 +1,110 @@
+{
+  "version": "bcch-public-reuse-review/1",
+  "checkedAtUtc": "2026-10-16T17:14:05Z",
+  "reviewDateSeoul": "2026-10-17",
+  "status": "bde_republication_permitted_subject_to_conditions_not_yet_enabled",
+  "scope": "CLP 리포트용 공식 Dólar observado 시계열의 공개 사용 조건 조사. 계정·토큰·실제 게시·운영은 변경하지 않음.",
+  "conclusion": {
+    "finding": "일반 홈페이지 조건과 달리, BDE·API의 별도 약관은 출처를 표시한 통계의 공개·배포·가공을 명시적으로 허용한다.",
+    "separatePermission": "검토한 BDE 이용 범위에서는 별도의 개별 허가 신청이 필요하다는 근거가 없다. 등록·약관 동의와 출처·가공 표시 등 조건은 이행해야 한다.",
+    "recommendedPath": "BDE 계정 등록·약관 동의 후 공식 API에서 F073.TCO.PRE.Z.D를 수집. 기존 익명 HTML 조사 경로를 즉시 공개 배포 승인으로 바꾸지 않는다.",
+    "legalOpinion": false,
+    "previousReview": "clp-official-price-verification-20261017.json은 일반 조건만 확인한 당시 기록으로 보존한다. 이 후속 검토는 당시의 미확인 항목을 보완하며 원고·승인·코드의 상태를 소급 변경하지 않는다."
+  },
+  "primarySources": [
+    {
+      "role": "BDE와 API의 직접 적용 조건",
+      "url": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/terminos_condiciones.html",
+      "discoveredFrom": "현재 BDE의 Condiciones uso BDE와 API FAQ의 Términos y Condiciones 링크가 같은 문서를 가리킴",
+      "localFile": ".local-reports/private/bcch-reuse-review-20261017/bde-terms.html",
+      "sha256": "9a71a85c4c7fe26162f8e19da0fb755324eeec583f867e0638a152df19f54f26",
+      "reviewed": "웹 전체 본문과 실제 다운로드 HTML을 대조. 등록·동의, 공개·가공 허용, 출처·가공 책임, 무상 권리, 요청 제한, 제3자 자료, 소프트웨어 조건을 구분함."
+    },
+    {
+      "role": "재배포와 무료 접근에 대한 공식 FAQ",
+      "url": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/ayuda_soporte.html",
+      "localFile": ".local-reports/private/bcch-reuse-review-20261017/bde-help.html",
+      "sha256": "3b772b9e2741e3a93e9c716f5d5576f9ab89e5443bde923b1a2f9d7fc9922af4",
+      "reviewed": "재배포 허용을 재확인. 계정·API 활성화 후 즉시 무료 접근이며 별도 신청 서류·계약·외부 승인 절차가 불필요하다는 안내 확인."
+    },
+    {
+      "role": "현재 계정·API Token 절차",
+      "url": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/acceso_api.html",
+      "localFile": ".local-reports/private/bcch-reuse-review-20261017/bde-access.html",
+      "sha256": "776e8ec9f1e14f86b009661eb647933cbb14f428793679ac902638d9a533fbff"
+    },
+    {
+      "role": "이전 보류의 근거인 일반 홈페이지 조건",
+      "url": "https://www.bcentral.cl/web/banco-central/condiciones-de-uso",
+      "scopeLimit": "통계의 별도 조건을 검토하지 않고 일반 콘텐츠의 유통 제한만 적용한 결론으로 공개 가능성을 부정하지 않는다. 반대로 통계 허용을 홈페이지 전체 저작물의 허용으로 확대하지 않는다."
+    }
+  ],
+  "publicUseChecklist": [
+    {"item": "BDE 이용자 등록과 현재 약관 동의", "status": "not_verified_user_action_required"},
+    {"item": "API 사용 활성화·Token 발급", "status": "not_verified_user_action_required"},
+    {"item": "원자료의 Banco Central de Chile 소유와 BDE 시리즈·원문 링크 표시", "status": "ui_not_implemented"},
+    {"item": "계산·날짜 연결·한국어 해석은 LATAM FX의 가공 및 책임이라고 표시", "status": "ui_not_implemented"},
+    {"item": "고시일과 실제 거래일, 가중평균과 종가의 차이 보존", "status": "local_price_adapter_verified_prior_turn"},
+    {"item": "다른 기관 원자료는 해당 원천 조건도 확인", "status": "required_if_expanding_series"},
+    {"item": "정책 변경·접근 중단·토큰 만료에 대응", "status": "future_integration_requirement"}
+  ],
+  "proposedAttribution": {
+    "original": "자료: Banco Central de Chile, Base de Datos Estadísticos(BDE), F073.TCO.PRE.Z.D. 원자료는 Banco Central de Chile 소유입니다.",
+    "adaptation": "변화율 계산·거래일 연결 및 한국어 해석: LATAM FX. 가공·해석의 책임은 LATAM FX에 있습니다.",
+    "links": ["공식 시리즈 또는 BDE 원문", "BDE 이용 조건"],
+    "notImplemented": true,
+    "notCovered": ["중앙은행 로고", "뉴스 기사 본문·사진", "기타 기관의 별도 저작물"]
+  },
+  "technicalRequirementsNotImplemented": {
+    "seriesId": "F073.TCO.PRE.Z.D",
+    "cost": "공식 FAQ 기준 무료. 외부 서비스나 유료 계약은 체결하지 않음.",
+    "limit": "계정당 초당 최대 5개 시리즈. 여러 IP로 한도를 우회하지 않음.",
+    "tokenValidity": "현재 안내상 1년. 갱신·연장 절차 필요.",
+    "secretHandling": "공식 REST는 Token이 query parameter에 들어간다. Node 측에서만 호출하고 요청 URL·에러·로그를 마스킹해야 한다. Token은 AI·브라우저·번들·디자인 도구로 보내지 않는다.",
+    "localSetup": "현재 설정 파서에 BCCh Token 연결이 구현되지 않았으므로 기존 키 파일에 임의 필드를 추가하도록 안내하지 않는다. 토큰 값은 채팅으로 받지 않는다.",
+    "accountEntry": "https://si3.bcentral.cl/Siete/ES/Siete/API",
+    "softwareClause": "은행이 제공하는 소프트웨어의 상업화 제한과 통계 데이터의 공개·가공 권한을 혼동하지 않는다."
+  },
+  "alternativeReview": [
+    {
+      "provider": "BIS Data Portal",
+      "termsUrl": "https://data.bis.org/help/legal",
+      "dataUrl": "https://data.bis.org/topics/XRU",
+      "permission": "통계 출처·비공식 번역 표시·비보증·비후원 등 조건 아래 이용 허용. 상업 제품에서도 통계를 포함해 이용자에게 추가 요금을 부과하지 않는 조건이 있다.",
+      "fitness": "일별 환율 관측을 제공하지만 발표·갱신은 주간이다. 최신 당일 칠레 해석의 즉시 대체재로 채택하지 않는다.",
+      "decision": "과거 비교·교차 점검의 예비 후보",
+      "remaining": "개별 CLP 시리즈의 공급자·관측 기준·최신 날짜와 실제 API 응답은 이번에 검증하지 않았다."
+    },
+    {
+      "provider": "IMF",
+      "termsUrl": "https://www.imf.org/en/About/copyright-and-terms",
+      "permission": "통계에 별도 재사용 조건이 있으나 상업적 재사용에는 허가 요청 문구도 있다. 무료 웹사이트라는 이유만으로 비상업 이용으로 단정하지 않는다.",
+      "decision": "허가 문제를 더 단순하게 만드는 대안으로 추천하지 않음",
+      "remaining": "CLP 당일 가격 자료의 실제 가용성 미검증"
+    },
+    {
+      "provider": "Mindicador",
+      "sourceUrl": "https://mindicador.cl/",
+      "permission": "소개에서는 중앙은행 자료를 수집해 앱·웹용 API로 제공한다고 설명한다. 오픈소스라는 설명만으로 원천 데이터의 재배포 권리가 모두 정리됐다고 보지 않는다.",
+      "access": "검색에 색인된 원문은 확인했지만 추가 웹 열기는 Internal Server Error였다.",
+      "decision": "원천 조건과 날짜 의미가 독립적으로 해결되지 않아 법적 대체 경로로 채택하지 않음"
+    }
+  ],
+  "verification": {
+    "runtimeCodeChanged": false,
+    "publicReuseFlagChanged": false,
+    "accountCreated": false,
+    "termsAcceptedOnBehalfOfUser": false,
+    "supportMessageSent": false,
+    "paidCalls": 0,
+    "newApiCostUsd": 0,
+    "productionOrDbChanged": false,
+    "testsAndBuilds": "not_rerun_documentation_and_terms_review_only",
+    "localOriginals": "공식 HTML 3건을 private에 보존하고 핵심 문단 및 바이트 해시를 대조함. 대체 공급원의 원문은 웹 도구로 확인했으며 로컬 원문 해시가 있다고 표시하지 않음.",
+    "operationalDataHashesUnchanged": {
+      "public/data.json": "c7d75391561af63d4fc67cf05cd991cf12c7acbb6d1175ab56b5dbcfa35c3f9e",
+      "data/fx-full-history.json": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f"
+    }
+  },
+  "next": "사용자가 BDE 계정을 등록하고 약관 동의·API 활성화를 완료한 다음, 별도 승인 범위에서 Token을 안전하게 읽는 로컬 전용 API 어댑터와 출처 표시를 준비한다. 운영 반영과 원고 게시 승인은 계속 별도다."
+}

@@ -19,6 +19,8 @@ concurrency:
 jobs:
   generate-data-and-send-email:
     runs-on: ubuntu-latest
+    outputs:
+      dataset_ref: ${{ steps.data_commit.outputs.sha }}
 
     steps:
       - name: Check out repository
@@ -86,6 +88,8 @@ jobs:
           FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED || 'false' }}
 
       - name: Generate optional FX 2.0 report
+        # Keep same-day enrichment intact for the separately approved automatic mode.
+        if: vars.FX_REPORT_PUBLISH_MODE == 'automatic' && vars.FX_REPORT_GENERATOR != 'currency'
         continue-on-error: true
         run: npm run generate:report
         env:
@@ -101,6 +105,7 @@ jobs:
           FX_REPORT_AI_MODEL: ${{ vars.FX_REPORT_AI_MODEL || 'openrouter/free' }}
 
       - name: Store optional FX 2.0 report
+        if: vars.FX_REPORT_PUBLISH_MODE == 'automatic' && vars.FX_REPORT_GENERATOR != 'currency'
         continue-on-error: true
         shell: bash
         run: |
@@ -117,10 +122,14 @@ jobs:
         id: email
         run: node scripts/compose-email.js
         env:
+          FX_EMAIL_REPORT_MODE: ${{ vars.FX_EMAIL_REPORT_MODE || 'legacy' }}
+          FX_EMAIL_SEND_APPROVED: ${{ vars.FX_EMAIL_SEND_APPROVED || 'false' }}
+          FX_EMAIL_HOLD: ${{ vars.FX_EMAIL_HOLD || 'false' }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: Commit updated dataset
+        id: data_commit
         run: |
           if git diff --quiet -- public/data.json data/fx-full-history.json data/alpha-vantage-history.json src/generated/fxReportConfig.ts; then
             echo "No dataset changes"
@@ -131,6 +140,7 @@ jobs:
             git commit -m "chore: refresh static exchange data"
             git push
           fi
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Install Puppeteer browser
         run: npx puppeteer browsers install chrome
@@ -138,6 +148,7 @@ jobs:
       - name: Create email chart
         run: node scripts/create-email-chart.js
         env:
+          FX_EMAIL_REPORT_MODE: ${{ steps.email.outputs.report_mode }}
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           FX_EMAIL_DATA_SOURCE: auto
@@ -161,7 +172,7 @@ jobs:
           echo "emails=$EMAILS" >> "$GITHUB_OUTPUT"
 
       - name: Send dashboard email
-        if: steps.mailing.outputs.emails != ''
+        if: steps.mailing.outputs.emails != '' && steps.email.outputs.delivery_mode == 'legacy'
         env:
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
@@ -215,6 +226,27 @@ jobs:
               smtp.send_message(message)
           PY
 
+      # Opt-in only. The default legacy sender above remains exclusive.
+      # Plan performs reads only; the explicit send approval is a release setting.
+      - name: Send approved-report dashboard email
+        if: steps.mailing.outputs.emails != '' && steps.email.outputs.report_mode != 'legacy' && steps.email.outputs.mail_hold != 'true'
+        timeout-minutes: 15
+        continue-on-error: ${{ steps.email.outputs.delivery_mode != 'approved' }}
+        env:
+          FX_EMAIL_REPORT_MODE: approved
+          FX_EMAIL_HOLD: ${{ steps.email.outputs.mail_hold }}
+          FX_EMAIL_SEND_APPROVED: ${{ steps.email.outputs.delivery_mode == 'approved' && 'true' || 'false' }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SMTP_USERNAME: ${{ steps.email.outputs.delivery_mode == 'approved' && secrets.SMTP_USERNAME || '' }}
+          SMTP_PASSWORD: ${{ steps.email.outputs.delivery_mode == 'approved' && secrets.SMTP_PASSWORD || '' }}
+        run: |
+          if [ "$FX_EMAIL_SEND_APPROVED" = "true" ]; then
+            node scripts/send-dashboard-email.mjs --send
+          else
+            node scripts/send-dashboard-email.mjs --plan
+          fi
+
       - name: Upload dashboard artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -226,3 +258,108 @@ jobs:
             email-market-context.json
             fx-report-published.json
           if-no-files-found: warn
+
+  # Review-mode generation runs separately; it cannot block the existing FX/email job.
+  # The selected generator is exclusive. Existing deployments default to legacy.
+  optional-review-report:
+    needs: generate-data-and-send-email
+    if: >-
+      ${{ always() && !cancelled() && vars.FX_REPORT_PUBLISH_MODE != 'automatic'
+          && vars.FX_REPORT_GENERATOR != 'currency'
+          && vars.FX_REPORT_OPERATIONAL_HOLD != 'true'
+          && needs.generate-data-and-send-email.outputs.dataset_ref != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.generate-data-and-send-email.outputs.dataset_ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - run: npm ci
+      - name: Generate review report from the committed full dataset
+        run: npm run generate:report
+        env:
+          VITE_ALPHA_VANTAGE_API_KEY: ${{ secrets.VITE_ALPHA_VANTAGE_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          FX_EMAIL_DATA_SOURCE: json
+          FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED || 'true' }}
+          FX_REPORT_PUBLISH_MODE: review
+          FX_REPORT_AI_MODE: ${{ vars.FX_REPORT_AI_MODE || 'optional' }}
+          FX_REPORT_AI_MODEL: ${{ vars.FX_REPORT_AI_MODEL || 'openrouter/free' }}
+      - name: Store review report without publishing or sending email
+        shell: bash
+        run: |
+          if [ -f fx-report-run.json ]; then
+            npm run persist:report
+          fi
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+  # Future opt-in only: DB control starts disabled with zero approved budget.
+  # Default plan mode never calls a model. Only an explicit execution variable
+  # plus server-owned processing policy, controls and budget can dispatch.
+  # No raw request/response artifacts, paid retry, free fallback, email or publish.
+  currency-review-report:
+    needs: generate-data-and-send-email
+    if: >-
+      ${{ always() && !cancelled() && vars.FX_REPORT_GENERATOR == 'currency'
+          && vars.FX_REPORT_ENABLED == 'true'
+          && vars.FX_REPORT_OPERATIONAL_HOLD != 'true'
+          && (vars.FX_REPORT_PUBLISH_MODE == 'review' || vars.FX_REPORT_PUBLISH_MODE == '') }}
+    runs-on: ubuntu-latest
+    # Up to 60 x 120s model requests, collection/setup, and safe checkpointing.
+    # The coordinator stops starting requests before its own 138-minute limit.
+    timeout-minutes: 150
+    continue-on-error: true
+    permissions:
+      contents: read
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      FX_EMAIL_DATA_SOURCE: json
+      FX_REPORT_GENERATOR: currency
+      FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED }}
+      FX_REPORT_OPERATIONAL_HOLD: ${{ vars.FX_REPORT_OPERATIONAL_HOLD }}
+      FX_REPORT_PUBLISH_MODE: review
+      # Official indicator credentials stay server-only and are never echoed.
+      INEGI_INDICATORS_TOKEN: ${{ secrets.INEGI_INDICATORS_TOKEN }}
+      FX_REPORT_PDF_PYTHON: python
+      # A missing new data commit may still collect free news against the saved
+      # reference, but cannot certify a successful FX refresh for paid writing.
+      FX_REPORT_DATA_REFRESH: ${{ needs.generate-data-and-send-email.outputs.dataset_ref != '' && 'committed' || 'not_confirmed' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.generate-data-and-send-email.outputs.dataset_ref || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install bounded official PDF extractor
+        run: python -m pip install --disable-pip-version-check -r scripts/currency-report/requirements-official.txt
+      - name: Verify official PDF extraction environment
+        run: python -c "import pypdf; assert pypdf.__version__ == '6.10.0'; print('Official PDF extractor ready')"
+      - run: npm ci
+      - name: Inspect operating supply without model requests
+        if: vars.FX_REPORT_EXECUTION_MODE != 'execute'
+        run: npm run report:operate -- --action plan
+      # A missing/other mode remains plan. No inline interpolation into a shell
+      # command; changing this variable alone cannot bypass the DB policy.
+      - name: Process authorized original reviews and currency drafts
+        if: vars.FX_REPORT_EXECUTION_MODE == 'execute'
+        run: npm run report:operate -- --action execute
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}

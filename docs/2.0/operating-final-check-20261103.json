@@ -1,0 +1,102 @@
+{
+  "date": "2026-11-03",
+  "status": "local_release_verified_operational_actions_pending",
+  "production": {
+    "commit": "dc24f69c38060fad1bdaf108a5ba707829d0d249",
+    "netlifyDeploy": "6ae984a748715bf4115575dd",
+    "currentDataDate": "2026-11-03",
+    "appliedMigrations": 9,
+    "pendingMigrations": 24,
+    "legacyCurrentPlanRows": 110,
+    "legacyPlanHistoryRows": 176,
+    "legacyReportRuns": 52,
+    "newCurrencyPublicTables": false,
+    "newMailLedger": false,
+    "databaseBytes": 32140435
+  },
+  "verification": {
+    "latestSourceBuild": "passed",
+    "sourceFiles": 991,
+    "protectedDataFiles": 4,
+    "sqlFiles": 21,
+    "sqlAssertions": 368,
+    "migrationUpgrade": "9_to_33_passed",
+    "legacyRowsAndPrivileges": "preserved_local_rehearsal",
+    "browserSecretMatches": 0,
+    "baselineScopeAndFreshnessGuards": "passed",
+    "mailSettingsCombinations": 12,
+    "iphoneAndPcEmailDesign": "confirmed_by_user",
+    "selfTestTransport": "connected_Gmail",
+    "operatingSmtpInboxDelivery": "unverified"
+  },
+  "recipients": {
+    "count": 1,
+    "keepExistingAddress": "confirmed_by_user",
+    "addressChanged": false,
+    "todayPermanentBounceConfirmed": true,
+    "newTestSent": false
+  },
+  "pending": [
+    {
+      "id": "T1",
+      "status": "keep_existing_address_delivery_unverified"
+    },
+    {
+      "id": "T2",
+      "status": "new_GitHub_settings_not_readable_without_admin_sign_in"
+    },
+    {
+      "id": "T3",
+      "status": "recurring_budget_not_approved"
+    },
+    {
+      "id": "T4",
+      "status": "actual_production_backup_not_verified"
+    },
+    {
+      "id": "T5",
+      "status": "not_applied_or_activated"
+    }
+  ],
+  "recurrence": {
+    "schedule": "09:15_Asia_Seoul",
+    "recentRunStarts": "14:45_to_15:50_Asia_Seoul",
+    "exactDeliveryTimeNotGuaranteed": true
+  },
+  "oldSecurityWarning": {
+    "name": "auth_leaked_password_protection",
+    "previouslyPresent": true,
+    "changed": false,
+    "remediation": "https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection"
+  },
+  "changes": {
+    "productCode": 0,
+    "localPreparationTool": 1,
+    "documentation": true,
+    "productionDatabaseWrites": 0,
+    "pushes": 0,
+    "deploys": 0,
+    "settingWrites": 0,
+    "newEmails": 0,
+    "newModelCalls": 0
+  },
+  "artifacts": {
+    "candidate": "release-orf17e",
+    "rehearsal": "upgrade-jsnIVX",
+    "privateDirectory": ".local-reports/private/operating-readiness-20261103"
+  },
+  "evidenceHashes": [
+    {
+      "file": "scripts/currency-report/prepare-operating-release-local.mjs",
+      "sha256": "6e3dbc802ef92144b5c0bb88e7f5f92246621706f0129e542fe77f9c3cf3d9ca"
+    },
+    {
+      "file": "supabase/migrations/20261103112417_dashboard_email_delivery.sql",
+      "sha256": "4ba0297bfe621010f546d93c059c1a263614f3bc477f9b40c83ae881e6b2ac6b"
+    },
+    {
+      "file": "docs/2.0/operating-final-check-20261103.md",
+      "sha256": "96c9b46d9133448b412b9058d303b9ee15a1cd798e8be98cc59c68ada934c0ce"
+    }
+  ]
+}

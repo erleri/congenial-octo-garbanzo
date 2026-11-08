@@ -1,0 +1,90 @@
+{
+  "version": "report-source-route-review/1",
+  "reviewDate": "2026-10-27",
+  "currency": "CLP",
+  "purpose": "반복 가능한 출처 경로와 다음 검증을 기록. 수집기 설정이나 자동 이용 승인 파일이 아님.",
+  "runtimeIntegrated": false,
+  "automaticGenerationAuthorized": false,
+  "routes": [
+    {
+      "id": "bcch-bde-fx",
+      "role": "official_fx_observations",
+      "status": "existing_local_adapter_verified_conditions_apply",
+      "termsUrl": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/terminos_condiciones.html",
+      "helpUrl": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/ayuda_soporte.html",
+      "item": "F073.TCO.PRE.Z.D",
+      "localAdapter": "scripts/currency-report/bcch-report-input-local.js",
+      "reuse": "BDE 통계의 출처·가공 책임 표시를 조건으로 공개·가공 허용. 제3자 원천은 개별 확인.",
+      "externalModelUse": "공개 통계 수치·출처·가공 설명만 입력하는 범위의 후보. 토큰·요청 URL·계정 정보는 제외. 이번 전송 없음.",
+      "temporalRule": "적용일·실제 거래일·가중평균·집계 마감·미상 관측시각을 구별",
+      "cannotSupport": ["종가·장중 호가의 대체", "수치만으로 당일 원인 확정"],
+      "next": "기존 로컬 출력의 출처·가공 표시를 집필 및 UI 계약에 연결. 계정 확인·기존 사용 조건 기록 유지."
+    },
+    {
+      "id": "ine-chile-consumer",
+      "role": "consumer_background",
+      "status": "existing_local_collector_license_conditions_reviewed_public_presentation_pending",
+      "termsUrl": "https://www.ine.gob.cl/terminos-de-uso-y-licencia-de-datos-abiertos",
+      "dataUrls": ["https://www.ine.gob.cl/estadisticas-por-tema/comercio-y-servicios/actividad-mensual-del-comercio", "https://www.ine.gob.cl/estadisticas-por-tema/mercado-laboral/remuneraciones-y-costos-laborales"],
+      "localAdapter": "scripts/currency-report/chile-monthly-refresh-local.js",
+      "reuse": "CC-BY-SA-4.0. 출처·라이선스·수정 표시 및 파생물 동일조건 공유를 적용할 범위를 정리해야 함.",
+      "externalModelUse": "검토한 공개 집계 지표·제한 발췌의 요약 후보. 모델로 보내도 라이선스 의무는 사라지지 않음.",
+      "temporalRule": "발표일과 지표 대상 월을 별도 기록. 월간 지표는 영업 환경 배경이며 당일 FX 충격의 직접 원인으로 사용하지 않음.",
+      "cannotSupport": ["회사별 셀아웃·마진 추정", "8월 지표를 10월 실적 또는 당일 환율 원인으로 표현"],
+      "next": "기존 수집·범위 카드 재사용. 공개 시 파생 콘텐츠의 표시·라이선스 범위를 구현하고 확인."
+    },
+    {
+      "id": "eia-energy-context",
+      "role": "energy_facts_and_context_candidate",
+      "status": "candidate_only_item_source_and_timeliness_gate_required",
+      "termsUrl": "https://www.eia.gov/about/copyrights_reuse.php",
+      "accessUrl": "https://www.eia.gov/opendata/",
+      "itemUrl": "https://www.eia.gov/dnav/pet/hist/RBRTED.htm",
+      "itemSourceUrl": "https://www.eia.gov/dnav/pet/TblDefs/pet_pri_spt_tbldef2.asp",
+      "reuse": "EIA 자체 자료는 이용·배포를 허용하나 제3자 보호 자료 예외가 존재. Brent spot 원천은 Refinitiv/LSEG이므로 일반 허용만으로 이번 시리즈의 공개 재사용을 승인하지 않음.",
+      "externalModelUse": "EIA 자체 작성 부분과 제3자 자료를 식별한 뒤 결정. 이번 후보는 미전송·미채택.",
+      "observedAvailability": {"pageReleaseDate": "2026-10-21", "lastNonEmptyDate": "2026-10-20", "targetSessionDate": "2026-10-23", "targetValueAvailable": false, "nextReleaseShown": "2026-10-28", "recordType": "web_read_not_adapter_capture"},
+      "temporalRule": "현물·선물·거래일·발표일을 구분. 빈 값을 직전값으로 채워 당일 가격처럼 표시하지 않음.",
+      "cannotSupport": ["10월 23일 당일 유가 수치의 검증", "유가와 CLP 동행만으로 직접 인과 확인"],
+      "next": "EIA 자체 작성 공개 자료부터 항목별 원천·갱신 주기를 확인. Brent spot은 제3자 이용 범위가 해결되기 전 대체값으로 연결하지 않음."
+    },
+    {
+      "id": "cochilco-copper",
+      "role": "copper_context_candidate",
+      "status": "candidate_only_reuse_and_original_validation_pending",
+      "homeUrl": "https://www.cochilco.cl/web/",
+      "helpUrl": "https://www.cochilco.cl/web/preguntas-frecuentes/",
+      "itemUrl": "https://www.cochilco.cl/web/informe-del-mercado-internacional-del-cobre-semana-del-01-al-05-de-junio-de-2026/",
+      "observedTitle": "Informe del Mercado Internacional del Cobre, semana del 19 a 23 de octubre de 2026",
+      "reuse": "검토한 홈페이지·FAQ에서 반복 서비스 재이용 근거를 확인하지 못함. 공식기관이라는 이유로 자동 허용하지 않음.",
+      "externalModelUse": "미확인·이번 입력에 추가하지 않음",
+      "temporalRule": "URL은 6월이지만 제목은 10월. 원문·수정본·기간을 대조해야 하며 URL 날짜만으로 기간 승인 금지. 주간 비교와 일간 비교를 혼합하지 않음.",
+      "cannotSupport": ["주간 하락을 당일 하락으로 재표현", "공식 보고서 전체를 확인한 것으로 기록"],
+      "next": "원 보고서·가격 원천·허용 범위를 확인한 뒤 새 범위 카드 작성. 연락·허가 신청은 이번에 하지 않음."
+    },
+    {
+      "id": "emol-market-commentary",
+      "role": "attributed_market_interpretation",
+      "status": "existing_local_review_only_service_use_basis_unverified",
+      "termsUrl": "https://www.emol.com/terminos/terminosycondiciones.aspx",
+      "localAdapter": "scripts/currency-report/publisher-research-local.js",
+      "reuse": "저장 원문의 내용 검토와 서비스 재사용을 분리. 기존 미확인 상태 유지.",
+      "externalModelUse": "미확인·유료 생성기 연결 보류",
+      "temporalRule": "보도시각·사건시각·기사 호가·BCCh 평균을 분리",
+      "cannotSupport": ["원문 접근 성공을 이용 허가로 판단", "매체 해석을 공식 인과 결론으로 승격"],
+      "next": "서비스 이용 근거 확보 또는 적합한 허용 출처로 주장을 다시 검증. 통계로 문장을 바꿔 출처 의존을 숨기지 않음."
+    }
+  ],
+  "commonAdmission": {
+    "separateStates": ["access", "sourceUseBasis", "freshness", "claimSupport", "novelty", "writingEligibility", "publicationApproval"],
+    "sourceUseRecord": ["sourceId", "resourceScope", "ownerAndThirdPartyOrigin", "termsUrl", "termsVersionOrHash", "reviewDate", "localAnalysisScope", "externalModelScope", "publicDisplayScope", "attributionAndAdaptationConditions", "recheckTriggers"],
+    "recheckTriggers": ["약관 또는 라이선스 변경", "새 제3자 원천·자료 종류 추가", "수집 방식·이용 목적·공개 범위 변경", "원자료 권리 표시 변경"],
+    "stableSources": "검토한 동일 자료 범위·동일 조건은 매 원고마다 새 허가 절차를 만들지 않는다. 수집 무결성·날짜·범위 검사는 각 실행에서 유지한다.",
+    "fallback": "미확인 출처의 주장만 제외·보류하고 적합한 출처의 로컬 작업은 계속한다. 핵심 설명이 사라지면 집필을 보류하며 이미 발행된 보고서 날짜를 갱신하지 않는다.",
+    "noCausalityByCoMovement": true,
+    "noMediaRewordingAsOfficialEvidence": true
+  },
+  "newPaidCalls": 0,
+  "newApiCostUsd": 0,
+  "productionChanged": false
+}

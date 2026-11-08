@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import DatasetSourceBadge from './DatasetSourceBadge'
 import FxReportAdmin from './FxReportAdmin'
-import { fetchRawSheetsDataset } from '../lib'
+import { loadRawSheetCatalog, loadRawSheetExport, loadRawSheetPreview } from '../lib/rawSheetRepository'
+import type { RawSheetCatalog } from '../types/rawSheets'
 import {
   DATASET_SOURCE_LABELS,
   type DatasetSource,
@@ -88,6 +89,12 @@ function Admin({
   const [localFillMissing, setLocalFillMissing] = useState(fillMissing)
   const [sheetName, setSheetName] = useState('Summary')
   const [fetchedRawSheets, setFetchedRawSheets] = useState<RawSheet[]>([])
+  const [rawOpen,setRawOpen]=useState(false)
+  const [rawCatalog,setRawCatalog]=useState<RawSheetCatalog|null>(null)
+  const [rawPreview,setRawPreview]=useState<RawSheet|null>(null)
+  const [rawError,setRawError]=useState('')
+  const [rawBusy,setRawBusy]=useState(false)
+  const [rawExportBusy,setRawExportBusy]=useState(false)
   const [excelNotice, setExcelNotice] = useState<InlineNotice | null>(null)
 
   const [isMailingModalOpen, setIsMailingModalOpen] = useState(initialMailingOpen)
@@ -102,33 +109,27 @@ function Admin({
     return host === '127.0.0.1' || host === 'localhost'
   }, [])
 
-  useEffect(() => {
-    let isMounted = true
-
-    if (dataset?.rawSheets?.length) {
-      return () => {
-        isMounted = false
-      }
-    }
-
-    void fetchRawSheetsDataset().then((payload) => {
-      if (!isMounted || !payload?.rawSheets?.length) {
-        return
-      }
-
-      setFetchedRawSheets(payload.rawSheets)
-    })
-
-    return () => {
-      isMounted = false
-    }
-  }, [dataset?.rawSheets])
-
   const rawSheets = dataset?.rawSheets?.length ? dataset.rawSheets : fetchedRawSheets
-  const activeSheetName = rawSheets.some((sheet) => sheet.name === sheetName)
-    ? sheetName
-    : (rawSheets[0]?.name ?? '')
-  const selectedSheet = rawSheets.find((sheet) => sheet.name === activeSheetName) ?? rawSheets[0]
+  const rawEntries=useMemo(()=>rawSheets.length?rawSheets.map(s=>({name:s.name,headers:s.headers,totalRows:s.rows.length})):rawCatalog?.sheets??[],[rawSheets,rawCatalog])
+  const activeSheetName=rawEntries.some(s=>s.name===sheetName)?sheetName:(rawEntries[0]?.name??'')
+  const selectedLocalSheet=rawSheets.find(s=>s.name===activeSheetName)
+  const selectedSheet=selectedLocalSheet?{...selectedLocalSheet,rows:selectedLocalSheet.rows.slice(0,50)}:rawPreview?.name===activeSheetName?rawPreview:null
+  useEffect(()=>{
+    if(!rawOpen||rawSheets.length||rawCatalog)return
+    let active=true;const controller=new AbortController()
+    void loadRawSheetCatalog(controller.signal).then(r=>{if(active){setRawCatalog(r.catalog);setFetchedRawSheets(r.legacy?.rawSheets??[]);setRawError('')}})
+      .catch(()=>{if(active)setRawError('원본 목록을 불러오지 못했습니다. 다시 열어 주세요.')})
+      .finally(()=>{if(active)setRawBusy(false)})
+    return ()=>{active=false;controller.abort()}
+  },[rawOpen,rawSheets.length,rawCatalog])
+  useEffect(()=>{
+    if(!rawOpen||selectedLocalSheet||!rawCatalog||!activeSheetName)return
+    let active=true;const controller=new AbortController()
+    void loadRawSheetPreview(rawCatalog,activeSheetName,controller.signal).then(sheet=>{if(active){setRawPreview(sheet);setRawError('')}})
+      .catch(()=>{if(active)setRawError('원본 미리보기를 불러오지 못했습니다. 다시 열어 주세요.')})
+      .finally(()=>{if(active)setRawBusy(false)})
+    return ()=>{active=false;controller.abort()}
+  },[rawOpen,selectedLocalSheet,rawCatalog,activeSheetName])
 
   const loadMailingList = async () => {
     try {
@@ -306,14 +307,17 @@ function Admin({
 
       <div className="table-card" style={{ marginTop: 12 }}>
         <h3>원본 데이터 미리보기</h3>
+        <button type="button" className="quiet-button" aria-expanded={rawOpen} onClick={()=>{if(rawOpen&&!rawSheets.length){setRawCatalog(null);setRawPreview(null)}setRawOpen(v=>!v);setRawError('');setRawBusy(!rawOpen&&!selectedLocalSheet)}}>{rawOpen?'원본 자료 닫기':'원본 자료 열기'}</button>
+        <p className="table-help">원본 자료는 필요할 때 열 수 있습니다. 미리보기는 최대 50행이며 CSV 내보내기는 선택한 시트의 전체 행을 포함합니다.</p>
+        {rawOpen ? <>
         <div className="inline-controls" style={{ marginBottom: 8 }}>
           <select
             value={activeSheetName}
-            onChange={(event) => setSheetName(event.target.value)}
+            onChange={(event) => {setSheetName(event.target.value);setRawError('');setRawBusy(!rawSheets.length)}}
             aria-label="시트 선택"
-            disabled={!rawSheets.length}
+            disabled={!rawEntries.length||rawExportBusy}
           >
-            {rawSheets.map((sheet) => (
+            {rawEntries.map((sheet) => (
               <option key={sheet.name} value={sheet.name}>
                 {sheet.name}
               </option>
@@ -322,24 +326,30 @@ function Admin({
           <button
             type="button"
             className="quiet-button"
-            disabled={!selectedSheet}
-            onClick={() => {
-              if (!selectedSheet) {
-                return
-              }
-
-              downloadCsv(selectedSheet.name, selectedSheet.headers, selectedSheet.rows)
+            disabled={!activeSheetName||rawExportBusy}
+            onClick={async () => {
+              setRawExportBusy(true);setRawError('')
+              try{const sheet=selectedLocalSheet??(rawCatalog?await loadRawSheetExport(rawCatalog,activeSheetName):null)
+                if(!sheet)throw Error('missing_sheet')
+                downloadCsv(sheet.name,sheet.headers,sheet.rows)
+              }catch{setRawError('전체 CSV를 불러오지 못했습니다. 원본 자료를 다시 열어 확인해 주세요.')}
+              finally{setRawExportBusy(false)}
             }}
           >
-            CSV 내보내기
+            {rawExportBusy?'전체 CSV 준비 중…':'CSV 내보내기'}
           </button>
         </div>
         <p className="table-help">
           메인 대시보드 데이터와 별개로, 원본 시트 자체를 확인할 때 사용합니다.
         </p>
-        {!rawSheets.length ? (
+        {rawBusy ? <p role="status">선택한 원본 자료를 불러오는 중입니다.</p> : null}
+        {rawError ? <p role="alert" className="error-message">{rawError}</p> : null}
+        {selectedSheet ? <><p className="table-help">전체 {rawEntries.find(s=>s.name===activeSheetName)?.totalRows.toLocaleString('ko-KR')}행 중 {selectedSheet.rows.length}행 미리보기</p>
+          <div className="table-scroll" style={{maxHeight:360}}><table className="dense-table"><thead><tr>{selectedSheet.headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{selectedSheet.rows.map((row,i)=><tr key={i}>{selectedSheet.headers.map(h=><td key={h}>{row[h]??''}</td>)}</tr>)}</tbody></table></div></> : null}
+        {!rawEntries.length&&!rawBusy&&!rawError ? (
           <p className="table-help">원본 시트 데이터를 아직 불러오지 못했습니다.</p>
         ) : null}
+        </> : null}
       </div>
 
       {reportEnabled ? <>

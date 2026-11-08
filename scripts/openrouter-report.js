@@ -1,6 +1,8 @@
 import { FX_REPORT_JSON_SCHEMA, validateAiReport } from './fx-report-core.js'
 
 const OPENROUTER_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions'
+const NEMOTRON_ULTRA_FREE_MODEL = 'nvidia/nemotron-3-ultra-550b-a55b:free'
+const REPORT_TOOL_NAME = 'submit_latam_fx_report'
 
 function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds))
@@ -28,6 +30,49 @@ function systemPrompt() {
   ].join(' ')
 }
 
+function usesReportTool(model) {
+  return model === NEMOTRON_ULTRA_FREE_MODEL
+}
+
+function outputConstraint(model) {
+  if (usesReportTool(model)) {
+    return {
+      tools: [{
+        type: 'function',
+        function: {
+          name: REPORT_TOOL_NAME,
+          description: '검증 가능한 LATAM FX 한국어 리포트 후보를 제출합니다.',
+          parameters: FX_REPORT_JSON_SCHEMA,
+        },
+      }],
+      tool_choice: {
+        type: 'function',
+        function: { name: REPORT_TOOL_NAME },
+      },
+    }
+  }
+  return {
+    response_format: {
+      type: 'json_schema',
+      json_schema: { name: 'latam_fx_report', strict: true, schema: FX_REPORT_JSON_SCHEMA },
+    },
+  }
+}
+
+function extractRawCandidate(payload, model) {
+  const message = payload?.choices?.[0]?.message
+  if (!usesReportTool(model)) return message?.content
+  const toolCall = message?.tool_calls?.find((item) => (
+    item?.type === 'function' && item?.function?.name === REPORT_TOOL_NAME
+  ))
+  if (!toolCall) {
+    const error = new Error('OpenRouter did not return the required report tool call.')
+    error.validation = { valid: false, errors: ['missing_tool_call'] }
+    throw error
+  }
+  return toolCall.function.arguments
+}
+
 async function requestOnce({ apiKey, model, evidence, fetchImpl, timeoutMs }) {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), timeoutMs)
@@ -49,10 +94,7 @@ async function requestOnce({ apiKey, model, evidence, fetchImpl, timeoutMs }) {
           { role: 'system', content: systemPrompt() },
           { role: 'user', content: JSON.stringify(promptPayload(evidence)) },
         ],
-        response_format: {
-          type: 'json_schema',
-          json_schema: { name: 'latam_fx_report', strict: true, schema: FX_REPORT_JSON_SCHEMA },
-        },
+        ...outputConstraint(model),
         provider: {
           require_parameters: true,
           data_collection: 'deny',
@@ -67,7 +109,14 @@ async function requestOnce({ apiKey, model, evidence, fetchImpl, timeoutMs }) {
       throw error
     }
     const actualModel = payload.model ?? model
-    const raw = payload?.choices?.[0]?.message?.content
+    let raw
+    try {
+      raw = extractRawCandidate(payload, model)
+    } catch (error) {
+      error.model = actualModel
+      error.raw = payload?.choices?.[0]?.message?.content ?? null
+      throw error
+    }
     let candidate
     try {
       candidate = typeof raw === 'string' ? JSON.parse(raw) : raw

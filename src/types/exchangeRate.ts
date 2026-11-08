@@ -150,6 +150,33 @@ export interface ExchangeRateDataset {
   movingComparison: MovingComparisonRow[]
   rawSheets?: RawSheet[]
   coverage?: DatasetCoverage
+  priceProvenance?: FxPriceProvenance
+}
+
+// Optional for backward compatibility. Dataset dates are not local sessions.
+export interface FxPriceSource {
+  provider: 'frankfurter_v1' | 'exchange_rate_api' | 'open_er_api' | 'currency_api' | 'alpha_vantage' | 'unverified_supplemental' | 'manual_backfill'
+  endpoint: string | null
+  capturedAt: string | null
+  responseSha256: string | null
+  digestMeaning: 'parsed_json' | 'unavailable'
+  providerUpdatedAt: string | null
+  providerTimestampLocal: string | null
+  providerDate: string | null
+  dateMeaning: 'utc_update_date' | 'collection_date_fallback' | 'provider_payload_date' | 'provider_series_date' | 'requested_snapshot_date' | 'unverified'
+  priceKind: 'conversion_reference' | 'provider_daily_close' | 'unverified'
+  providerTimeZone: string | null
+  observedAt: null
+  localSessionDate: null
+  origin: 'response' | 'cache_without_source_record' | 'injected_without_source_record' | 'manual_input'
+  transport: 'direct' | 'corsproxy' | 'allorigins' | 'unknown'
+}
+
+export interface FxPriceProvenance {
+  version: 'fx-price-provenance/1'
+  sources: Record<string, FxPriceSource>
+  quotesByDate: Record<string, Record<string, { sourceId: string; value: number }>>
+  selectionAudit: Record<string, { assignments: number; replacements: number }>
 }
 
 export interface DatasetCoverage {

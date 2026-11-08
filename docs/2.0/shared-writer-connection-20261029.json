@@ -1,0 +1,689 @@
+{
+  "version": "shared-writer-closeout/1",
+  "completedAt": "2026-10-29T07:43:42.844Z",
+  "scope": "local_offline_writer_request_and_output_validation_no_model_execution",
+  "baseline": {
+    "branch": "codex/2.0-local-experience",
+    "head": "b08305e",
+    "mixedPriorChangesPreserved": true,
+    "newCommitCreated": false
+  },
+  "fixedCase": {
+    "referenceDate": "2026-10-28",
+    "commentaryDate": "2026-10-27",
+    "currentMarketReport": false
+  },
+  "implementation": {
+    "compiler": "scripts/currency-report/shared-writer.js",
+    "localCommand": "npm run report:writer:prepare -- --input <private manifest>",
+    "contract": "scripts/currency-report/shared-writing-contract.js",
+    "reused": [
+      "draftSchemaForPacket",
+      "applyWriterPolicy",
+      "generationWire",
+      "decodeGenerationOutput",
+      "composeDraft",
+      "assembleWritingLedger",
+      "validateContent",
+      "evaluateRules",
+      "prepareClaimReview",
+      "executeEventTrial",
+      "eventTrialEndpointPreflight",
+      "runLocalTrial",
+      "callOpenRouterStream",
+      "reconcileGenerationCost"
+    ],
+    "added": [
+      "Exact per-target material claim IDs with source IDs",
+      "Consumer/policy vs market role checks",
+      "Reference facts derived only from the same saved dashboard snapshot",
+      "Single-copy note text with source/scope references",
+      "Legacy compiler and weakened contract rejection",
+      "Private shared notes excluded from public report projection"
+    ],
+    "missing": [
+      "Fresh live endpoint preflight before a separately approved call",
+      "New model prose quality and independent source/claim review",
+      "Publication cadence dispatch, live pilot, UI2.0 and release approval"
+    ],
+    "defaultWriterChanged": false,
+    "publisherUseExpanded": false,
+    "periodicWriterChanged": false,
+    "paidExecutionEnabled": false,
+    "paidExecutionImplemented": true,
+    "paidExecutionAuthorized": false,
+    "runner": {
+      "entryPoint": "npm run report:trial -- --input <private approved input>",
+      "consentVersion": "shared-paid-trial-consent/1",
+      "maximumNewCalls": 1,
+      "maxPerCallUsd": 0.25,
+      "existingCampaignCeilingUsd": 0.75,
+      "fullPlanRequestSnapshotAndJournalBindings": true,
+      "privateJournal": ".local-reports/private/shared-reference-trials/journal.json",
+      "priorLegacyCampaignPreserved": true,
+      "automaticPublication": false,
+      "unresolvedCostBlocks": true,
+      "tests": "mock_transport_only_no_api_key_or_network_used"
+    }
+  },
+  "savedInputReplay": {
+    "version": "shared-writer-saved-replay/1",
+    "preparedAt": "2026-10-29T07:26:52.030Z",
+    "rows": [
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-dqOgbF",
+        "status": "prepared_not_called",
+        "currency": "BRL",
+        "writer": "sol",
+        "requestHash": "a91395b50dca75d082de8a3f000e7ff49667588441a7b2598ab9cecd2ab6f21a",
+        "inputTokenBound": 31306,
+        "maximumUsd": 0.160185,
+        "endpoint": {
+          "status": "hold",
+          "reason": "writer_endpoint_privacy_support_or_price_hold",
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 7,
+        "consumerClaims": 2,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-142qp8",
+        "status": "prepared_not_called",
+        "currency": "BRL",
+        "writer": "sol-us",
+        "requestHash": "c457416ecb9e9028d8c0a38145fc41f7f4a574e2830a0bde164bd1564751d427",
+        "inputTokenBound": 31306,
+        "maximumUsd": 0.1762035,
+        "endpoint": {
+          "status": "saved_metadata_pass",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "zdr": true,
+          "dataCollection": "deny",
+          "pricing": {
+            "prompt": "0.0000022",
+            "completion": "0.000011",
+            "web_search": "0.01",
+            "input_cache_read": "0.00000011",
+            "input_cache_write": "0.00000275",
+            "discount": 0,
+            "overrides": [
+              {
+                "min_prompt_tokens": 272000,
+                "prompt": "0.0000044",
+                "completion": "0.0000165",
+                "input_cache_read": "0.00000022",
+                "input_cache_write": "0.0000055"
+              }
+            ]
+          },
+          "modelCalls": 0,
+          "freshLivePreflightRequired": true,
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 7,
+        "consumerClaims": 2,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-LRwZRC",
+        "status": "prepared_not_called",
+        "currency": "COP",
+        "writer": "sol",
+        "requestHash": "f2232a55242bee3fa290164c0c4c5532eda4ae174283cf6f135b74e6ea4ad430",
+        "inputTokenBound": 31804,
+        "maximumUsd": 0.16143,
+        "endpoint": {
+          "status": "hold",
+          "reason": "writer_endpoint_privacy_support_or_price_hold",
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 6,
+        "consumerClaims": 1,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-eO3X7d",
+        "status": "prepared_not_called",
+        "currency": "COP",
+        "writer": "sol-us",
+        "requestHash": "d5582bc34e718ba4643cee226176edf0d2a4b4e8a6eeaeda982446a012e965a9",
+        "inputTokenBound": 31804,
+        "maximumUsd": 0.177573,
+        "endpoint": {
+          "status": "saved_metadata_pass",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "zdr": true,
+          "dataCollection": "deny",
+          "pricing": {
+            "prompt": "0.0000022",
+            "completion": "0.000011",
+            "web_search": "0.01",
+            "input_cache_read": "0.00000011",
+            "input_cache_write": "0.00000275",
+            "discount": 0,
+            "overrides": [
+              {
+                "min_prompt_tokens": 272000,
+                "prompt": "0.0000044",
+                "completion": "0.0000165",
+                "input_cache_read": "0.00000022",
+                "input_cache_write": "0.0000055"
+              }
+            ]
+          },
+          "modelCalls": 0,
+          "freshLivePreflightRequired": true,
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 6,
+        "consumerClaims": 1,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-K5rqOs",
+        "status": "prepared_not_called",
+        "currency": "PEN",
+        "writer": "sol",
+        "requestHash": "a74214860ab8cd9f09d2d09383f4a2086c079b2daf4f2ae9221fadcb4471ca18",
+        "inputTokenBound": 23921,
+        "maximumUsd": 0.1417225,
+        "endpoint": {
+          "status": "hold",
+          "reason": "writer_endpoint_privacy_support_or_price_hold",
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 2,
+        "consumerClaims": 0,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-mCSyNZ",
+        "status": "prepared_not_called",
+        "currency": "PEN",
+        "writer": "sol-us",
+        "requestHash": "60ea6a68baa79d2c12a0b3c46f2bebe106be94d69f8c6eba0ed26660afaef94e",
+        "inputTokenBound": 23921,
+        "maximumUsd": 0.15589475,
+        "endpoint": {
+          "status": "saved_metadata_pass",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "zdr": true,
+          "dataCollection": "deny",
+          "pricing": {
+            "prompt": "0.0000022",
+            "completion": "0.000011",
+            "web_search": "0.01",
+            "input_cache_read": "0.00000011",
+            "input_cache_write": "0.00000275",
+            "discount": 0,
+            "overrides": [
+              {
+                "min_prompt_tokens": 272000,
+                "prompt": "0.0000044",
+                "completion": "0.0000165",
+                "input_cache_read": "0.00000022",
+                "input_cache_write": "0.0000055"
+              }
+            ]
+          },
+          "modelCalls": 0,
+          "freshLivePreflightRequired": true,
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 2,
+        "consumerClaims": 0,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-gT8B9E",
+        "status": "prepared_not_called",
+        "currency": "ARS",
+        "writer": "sol",
+        "requestHash": "192c6e16d7f2efb77637762eb7d9883ba8a3e0f516a09332991234bddc1c73de",
+        "inputTokenBound": 31223,
+        "maximumUsd": 0.1599775,
+        "endpoint": {
+          "status": "hold",
+          "reason": "writer_endpoint_privacy_support_or_price_hold",
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 5,
+        "consumerClaims": 2,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-cOczTy",
+        "status": "prepared_not_called",
+        "currency": "ARS",
+        "writer": "sol-us",
+        "requestHash": "78e20e60c9832b1e92305f24fa11fa299546bcbb9ba0858bcc8e50babc02286e",
+        "inputTokenBound": 31223,
+        "maximumUsd": 0.17597525,
+        "endpoint": {
+          "status": "saved_metadata_pass",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "zdr": true,
+          "dataCollection": "deny",
+          "pricing": {
+            "prompt": "0.0000022",
+            "completion": "0.000011",
+            "web_search": "0.01",
+            "input_cache_read": "0.00000011",
+            "input_cache_write": "0.00000275",
+            "discount": 0,
+            "overrides": [
+              {
+                "min_prompt_tokens": 272000,
+                "prompt": "0.0000044",
+                "completion": "0.0000165",
+                "input_cache_read": "0.00000022",
+                "input_cache_write": "0.0000055"
+              }
+            ]
+          },
+          "modelCalls": 0,
+          "freshLivePreflightRequired": true,
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 5,
+        "consumerClaims": 2,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-yLJqdh",
+        "status": "prepared_not_called",
+        "currency": "MXN",
+        "writer": "sol",
+        "requestHash": "074cf3fa9269f3d1f3d35f8357de4cde40402806e21307abeb3b57a06997144c",
+        "inputTokenBound": 39339,
+        "maximumUsd": 0.1802675,
+        "endpoint": {
+          "status": "hold",
+          "reason": "writer_endpoint_privacy_support_or_price_hold",
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 10,
+        "consumerClaims": 3,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-XP4QNn",
+        "status": "prepared_not_called",
+        "currency": "MXN",
+        "writer": "sol-us",
+        "requestHash": "ca2a61749fde6a5906eb7b208e77b4a6937adc64fa1197bd66157857020dd736",
+        "inputTokenBound": 39339,
+        "maximumUsd": 0.19829425,
+        "endpoint": {
+          "status": "saved_metadata_pass",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "zdr": true,
+          "dataCollection": "deny",
+          "pricing": {
+            "prompt": "0.0000022",
+            "completion": "0.000011",
+            "web_search": "0.01",
+            "input_cache_read": "0.00000011",
+            "input_cache_write": "0.00000275",
+            "discount": 0,
+            "overrides": [
+              {
+                "min_prompt_tokens": 272000,
+                "prompt": "0.0000044",
+                "completion": "0.0000165",
+                "input_cache_read": "0.00000022",
+                "input_cache_write": "0.0000055"
+              }
+            ]
+          },
+          "modelCalls": 0,
+          "freshLivePreflightRequired": true,
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 10,
+        "consumerClaims": 3,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-58g1P9",
+        "status": "prepared_not_called",
+        "currency": "CLP",
+        "writer": "sol",
+        "requestHash": "9a1465d939768ffdfba2da4e6f815aaef8ce8d6ba3fecdcd1983d289aad410c2",
+        "inputTokenBound": 30957,
+        "maximumUsd": 0.1593125,
+        "endpoint": {
+          "status": "hold",
+          "reason": "writer_endpoint_privacy_support_or_price_hold",
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 7,
+        "consumerClaims": 0,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      },
+      {
+        "version": "shared-writer-preparation/1",
+        "directory": ".local-reports\\private\\shared-writer-uGx09H",
+        "status": "prepared_not_called",
+        "currency": "CLP",
+        "writer": "sol-us",
+        "requestHash": "d378f6a015489c798c0d9ffbb8707de4b801cd717b5f501bd8886d676106c069",
+        "inputTokenBound": 30957,
+        "maximumUsd": 0.17524375,
+        "endpoint": {
+          "status": "saved_metadata_pass",
+          "model": "openai/gpt-6.1-sol",
+          "route": "azure/us",
+          "zdr": true,
+          "dataCollection": "deny",
+          "pricing": {
+            "prompt": "0.0000022",
+            "completion": "0.000011",
+            "web_search": "0.01",
+            "input_cache_read": "0.00000011",
+            "input_cache_write": "0.00000275",
+            "discount": 0,
+            "overrides": [
+              {
+                "min_prompt_tokens": 272000,
+                "prompt": "0.0000044",
+                "completion": "0.0000165",
+                "input_cache_read": "0.00000022",
+                "input_cache_write": "0.0000055"
+              }
+            ]
+          },
+          "modelCalls": 0,
+          "freshLivePreflightRequired": true,
+          "executionAuthorized": false
+        },
+        "paidCallAuthorized": false,
+        "publicationApproved": false,
+        "modelCalls": 0,
+        "networkCalls": 0,
+        "newPaidCostUsd": 0,
+        "commentaryDate": "2026-10-27",
+        "referenceSnapshotUnchanged": true,
+        "claims": 7,
+        "consumerClaims": 0,
+        "automaticContractReplay": "pass_synthetic_prose_only",
+        "semanticReview": "unverified",
+        "newQualitySamples": 0
+      }
+    ],
+    "oldManuscripts": [
+      {
+        "currency": "CLP",
+        "file": "CLP-2026-10-28-1793170440635.json",
+        "status": "old_public_manuscript_not_reinterpreted_as_new_wire_output",
+        "reason": "writing_contract_required"
+      },
+      {
+        "currency": "BRL",
+        "file": "BRL-2026-10-28-1793170440647.json",
+        "status": "old_public_manuscript_not_reinterpreted_as_new_wire_output",
+        "reason": "writing_contract_required"
+      },
+      {
+        "currency": "MXN",
+        "file": "MXN-2026-10-28-1793187444717.json",
+        "status": "old_public_manuscript_not_reinterpreted_as_new_wire_output",
+        "reason": "writing_contract_required"
+      }
+    ],
+    "referenceDate": "2026-10-28",
+    "commentaryDate": "2026-10-27",
+    "defaultWriterChanged": false,
+    "savedEndpointMetadataAt": "2026-10-29T02:40:47Z",
+    "freshLivePreflightRequired": true,
+    "modelCalls": 0,
+    "newPaidCostUsd": 0,
+    "newNetworkCalls": 0,
+    "newAiQualitySamples": 0,
+    "publicationApproved": false
+  },
+  "currencyReadiness": [
+    {
+      "currency": "BRL",
+      "connected": [
+        "CNN Brasil (시장·귀속 해석)",
+        "Agência Brasil/EBC (8월 소매 배경)"
+      ],
+      "remainingSourceConditions": "소비 통계는 10월 환율의 직접 원인이 아님. CNN/Reuters 전재와 발언자 중복 보존.",
+      "requestPrepared": true,
+      "newAiProseGenerated": false,
+      "unattendedOriginalSemanticReviewPassed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "COP",
+      "connected": [
+        "La República (시장·달러 배경)",
+        "Valora Analitik (기술적 해석·필자 유가 견해)",
+        "DANE (8월 소매)"
+      ],
+      "remainingSourceConditions": "기술 분석팀 견해와 필자의 유가 설명을 분리. 실제 수급·기여도를 추가하지 않음.",
+      "requestPrepared": true,
+      "newAiProseGenerated": false,
+      "unattendedOriginalSemanticReviewPassed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "PEN",
+      "connected": [
+        "Revista Economía (시장·귀속 해석)"
+      ],
+      "remainingSourceConditions": "당일 원인은 기존 한 매체에 의존. 소비 배경 공백 유지; INEI 자동 복원 안 함.",
+      "requestPrepared": true,
+      "newAiProseGenerated": false,
+      "unattendedOriginalSemanticReviewPassed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "ARS",
+      "connected": [
+        "Infobae (도매시장 해설)",
+        "iProfesional (구매력의 조건부 경로)",
+        "INDEC (8월 슈퍼마켓)"
+      ],
+      "remainingSourceConditions": "소비 배경 전용. 실질환율·명목 도매·소매·CCL·blue와 서로 다른 기간을 섞지 않음.",
+      "requestPrepared": true,
+      "newAiProseGenerated": false,
+      "unattendedOriginalSemanticReviewPassed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "MXN",
+      "connected": [
+        "El Economista (시장·귀속 해석)",
+        "Forbes México (당일 달러·금리차 전망)",
+        "INEGI (8월 소매·9월 물가)"
+      ],
+      "remainingSourceConditions": "기사 장중/막바지 호가를 기준환율·FIX·확정 종가로 쓰지 않음. El Financiero 판본 시각 충돌 보류.",
+      "requestPrepared": true,
+      "newAiProseGenerated": false,
+      "unattendedOriginalSemanticReviewPassed": false,
+      "publicationApproved": false
+    },
+    {
+      "currency": "CLP",
+      "connected": [
+        "Emol (기존 2기사)",
+        "BioBioChile (당일 귀속 요지)"
+      ],
+      "remainingSourceConditions": "동일 전문가 발언을 복수 독립 견해로 계산하지 않음. 소비 배경의 선택 제외 유지.",
+      "requestPrepared": true,
+      "newAiProseGenerated": false,
+      "unattendedOriginalSemanticReviewPassed": false,
+      "publicationApproved": false
+    }
+  ],
+  "verification": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "unitTestFiles": 131,
+    "declaredTests": 830,
+    "executedCases": 1005,
+    "parameterExpansions": 175,
+    "exactDuplicateNames": 0,
+    "identicalTestBodies": 0,
+    "testTautologies": 0,
+    "builds": [
+      "production",
+      "existing-app-local-report",
+      "standalone-local-report"
+    ],
+    "bundleBoundary": "pass",
+    "entryBytes": 615654,
+    "existingWarning": "entry chunk exceeds 500kB",
+    "preservation": {
+      "verifiedAt": "2026-10-29T07:41:58.912Z",
+      "protectedFiles": 422,
+      "changedProtectedFiles": [],
+      "buildArtifacts": 62,
+      "secretValuesCompared": 5,
+      "rawParagraphsCompared": 147,
+      "secretMatchFiles": [],
+      "rawParagraphMatchFiles": [],
+      "browserServingNotRetested": true,
+      "uiDatabaseUnchanged": true,
+      "modelCalls": 0,
+      "newPaidCostUsd": 0,
+      "limitations": "Exact hashes and selected strings only; no new browser, database permission, model quality or publication approval."
+    },
+    "newBrowserOrDatabasePermissionTest": false,
+    "newAiQualitySamples": 0,
+    "mockRunnerContracts": [
+      "Fresh bound consent/budget/journal checked before POST",
+      "Reservation persisted before mock transport and draft stored only privately",
+      "Duplicate request blocked before a second mock send",
+      "Timeout and missing usage cost retain reserved amount",
+      "Malformed output and cost exceeded are held; zero retries or fallback"
+    ]
+  },
+  "cost": {
+    "newPaidCostUsd": 0,
+    "modelCalls": 0,
+    "newNetworkCalls": 0
+  },
+  "existingReportsChanged": false,
+  "existingFxChanged": false,
+  "productionChanged": false,
+  "nextFixedWork": "Review prepared input and sentence-review context, then propose a limited actual quality trial with fresh endpoint verification and separate budget approval; no new source or manual manuscript loop."
+}

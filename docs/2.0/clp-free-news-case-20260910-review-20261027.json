@@ -1,0 +1,280 @@
+{
+  "schemaVersion": "free-news-case-review/1",
+  "reviewedAt": "2026-10-27T04:23:39Z",
+  "reviewType": "agent_original_page_review_not_external_model_or_legal_opinion",
+  "localOnly": true,
+  "requestedSources": [
+    "DF",
+    "Pulso",
+    "Emol",
+    "Yahoo Finance"
+  ],
+  "scope": {
+    "currency": "CLP",
+    "sessionDate": "2026-09-10",
+    "historicalCase": true,
+    "preliminaryDate": "2026-09-11",
+    "dateCorrectionReason": "September 11 reports describe a smaller daily increase. September 10 DF and Pulso reports identify the largest daily USD/CLP increase in three months.",
+    "reportDateChanged": false
+  },
+  "priceChecks": {
+    "unit": "CLP per USD",
+    "increaseMeans": "USD more expensive; CLP weaker",
+    "observations": [
+      {
+        "id": "df-close",
+        "source": "DF",
+        "sessionDate": "2026-09-10",
+        "previousSessionDate": "2026-09-09",
+        "previous": 927.8,
+        "current": 941.9,
+        "reportedChangeClp": 14.1,
+        "calculatedChangePct": 1.51972407846519,
+        "kind": "reported_market_close",
+        "publicationDisplay": "2026-09-10 16:05 hrs",
+        "preciseQuoteObservationTime": null,
+        "provider": "September 9 article attributes its price to Bloomberg; identical September 10 feed not independently verified",
+        "sourceUrls": [
+          "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-um5rm",
+          "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-h9i5c"
+        ]
+      },
+      {
+        "id": "pulso-close",
+        "source": "Pulso",
+        "sessionDate": "2026-09-10",
+        "previous": 927.5,
+        "previousMethod": "inferred from reported increase",
+        "current": 941.4,
+        "reportedChangeClp": 13.9,
+        "calculatedChangePct": 1.4986522911051292,
+        "kind": "at_editorial_close",
+        "publicationDisplay": "2026-09-10; no hour in reviewed body",
+        "preciseQuoteObservationTime": null
+      },
+      {
+        "id": "emol-liquid-session",
+        "source": "Emol",
+        "sessionDate": "2026-09-10",
+        "previous": 928.1,
+        "previousMethod": "inferred from reported increase",
+        "currentAsk": 940,
+        "currentBid": 939.9,
+        "reportedAskChangeClp": 11.9,
+        "calculatedAskChangePct": 1.2821894192436067,
+        "kind": "end_of_most_liquid_operations",
+        "publicationDisplay": "2026-09-10 14:48",
+        "preciseQuoteObservationTime": null
+      },
+      {
+        "id": "sii-observed-average",
+        "source": "SII, observed dollar based on previous business day bank transactions",
+        "effectiveDates": [
+          "2026-09-10",
+          "2026-09-11"
+        ],
+        "underlyingSessionDates": [
+          "2026-09-09",
+          "2026-09-10"
+        ],
+        "previous": 925.97,
+        "current": 937.17,
+        "calculatedChangePct": 1.2095424257805298,
+        "kind": "previous_business_day_average_not_market_close",
+        "sourceUrl": "https://www.sii.cl/valores_y_fechas/dolar/dolar2026.htm"
+      }
+    ],
+    "sameDirection": true,
+    "mergeDifferentQuotes": false,
+    "officialDataRole": "price-direction cross-check only; not cause evidence",
+    "legacyDashboardDateOrPriceReconciled": false
+  },
+  "articles": [
+    {
+      "id": "df-20260910",
+      "publisher": "Diario Financiero",
+      "url": "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-h9i5c",
+      "author": "Benjamín Pescio",
+      "publicationDisplay": "2026-09-10 16:05",
+      "access": {
+        "status": "original_body_read",
+        "method": "web read of canonical public URL; no login or purchase",
+        "stableAutomaticAccessVerified": false
+      },
+      "claimSupport": "Supports copper weakness, US yields and oil-risk context. Vantrust's Juan Pablo Iturriaga gives yields more weight than copper. Relative contribution not measured.",
+      "references": [
+        "body paragraphs at read lines 295-315"
+      ],
+      "rights": {
+        "termsUrl": "https://www.df.cl/terminos-y-condiciones",
+        "reviewMethod": "original_terms_read",
+        "basis": "Personal use and reproduction/transmission/adaptation restrictions; third-party rights also reserved.",
+        "externalWriterInput": "pending_use_basis",
+        "publicReportReuse": "pending_use_basis",
+        "aiSpecificallyBannedByNameEstablished": false
+      }
+    },
+    {
+      "id": "pulso-20260910",
+      "publisher": "Pulso / La Tercera",
+      "url": "https://www.latercera.com/pulso/noticia/el-valor-del-dolar-en-chile-el-10-de-septiembre-de-2026/",
+      "author": "Emiliano Carrizo",
+      "publicationDisplay": "2026-09-10; hour not verified",
+      "access": {
+        "status": "original_body_read",
+        "method": "canonical public URL returned body; search also reported robots restriction and AMP preview paywall",
+        "stableAutomaticAccessVerified": false
+      },
+      "claimSupport": "Supports sharp USD/CLP increase, dollar strengthening and copper weakness. XTB Ignacio Moraga attributes safe-haven dollar demand to geopolitical risk. Reuters-sourced global context is shared evidence, not an independent Reuters confirmation.",
+      "references": [
+        "body paragraphs at read lines 127-142"
+      ],
+      "rights": {
+        "termsUrl": "https://www.latercera.com/terminos-y-condiciones/",
+        "reviewMethod": "original_terms_read",
+        "basis": "Personal noncommercial copy only; duplication/adaptation restrictions include nonprofit use.",
+        "externalWriterInput": "pending_use_basis",
+        "publicReportReuse": "pending_use_basis",
+        "aiSpecificallyBannedByNameEstablished": false
+      }
+    },
+    {
+      "id": "emol-20260910",
+      "publisher": "Emol",
+      "url": "https://www.emol.com/noticias/Economia/2026/09/10/1211142/dolar-mercado-cambiario-local.html",
+      "author": "José Tomás Guzmán",
+      "publicationDisplay": "2026-09-10 14:48",
+      "access": {
+        "status": "original_body_read",
+        "method": "canonical public URL returned body; no login or purchase",
+        "stableAutomaticAccessVerified": false
+      },
+      "claimSupport": "Capitaria Lucas Santillán attributes dollar strength to copper correction, oil and higher US rate expectations. Supports attributed market interpretation, not quantified causality.",
+      "references": [
+        "body paragraphs at read lines 119-125"
+      ],
+      "rights": {
+        "termsUrl": "https://www.emol.com/terminos/terminosycondiciones.aspx",
+        "reviewMethod": "original_terms_read",
+        "basis": "Personal noncommercial default; prior written permission for reuse; attribution alone insufficient.",
+        "externalWriterInput": "pending_use_basis",
+        "publicReportReuse": "pending_use_basis",
+        "aiSpecificallyBannedByNameEstablished": false
+      }
+    },
+    {
+      "id": "yahoo-reuters-20260910",
+      "publisher": "Yahoo Finance / Reuters",
+      "url": "https://finance.yahoo.com/economy/policy/articles/trading-day-inflation-palpitations-210458989.html",
+      "title": "Trading Day: Inflation palpitations",
+      "author": "Jamie McGeever",
+      "publicationDisplay": "2026-09-10 17:04 EDT",
+      "publicationTimeUtc": "2026-09-10T21:04:00Z",
+      "access": {
+        "status": "search_index_only_original_request_limited",
+        "directReadResult": "429 Too Many Requests",
+        "directArticleReadAttemptsThisReview": 1,
+        "restrictionBypassed": false
+      },
+      "candidateContent": "Index describes oil-driven inflation fears, rising global yields and Chilean peso weakness. Article-level commentary attribution and complete context remain unverified.",
+      "claimSupport": "not_admitted_original_not_read",
+      "timing": "Evening wrap; cannot treat publication as pre-close information.",
+      "rights": {
+        "termsUrl": "https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html",
+        "reviewMethod": "official_terms_index_excerpt; direct terms request returned 999",
+        "basis": "Prior permission for automated collection; underlying Reuters rights not cleared.",
+        "externalWriterInput": "pending_use_basis_and_original_review",
+        "publicReportReuse": "pending_use_basis_and_original_review"
+      }
+    }
+  ],
+  "explanationReview": {
+    "status": "sufficient_for_limited_attributed_multifactor_explanation_from_three_read_articles",
+    "claims": [
+      {
+        "id": "sharp-move",
+        "status": "supported_as_reported",
+        "sources": [
+          "df-20260910",
+          "pulso-20260910",
+          "emol-20260910"
+        ],
+        "scope": "USD/CLP rose sharply on September 10; quote endpoints remain separate."
+      },
+      {
+        "id": "copper",
+        "status": "supported_as_market_attribution",
+        "sources": [
+          "df-20260910",
+          "pulso-20260910",
+          "emol-20260910"
+        ],
+        "scope": "Copper correction was reported as a pressure on CLP. Do not infer its contribution size."
+      },
+      {
+        "id": "us-rates-dollar",
+        "status": "supported_as_market_attribution",
+        "sources": [
+          "df-20260910",
+          "pulso-20260910",
+          "emol-20260910"
+        ],
+        "scope": "US yield and rate-expectation pressure supported USD according to reporting/quoted analysts."
+      },
+      {
+        "id": "oil-risk",
+        "status": "supported_as_market_attribution",
+        "sources": [
+          "df-20260910",
+          "pulso-20260910",
+          "emol-20260910"
+        ],
+        "scope": "Oil/geopolitical risks were identified as part of the dollar-supportive background."
+      }
+    ],
+    "importantQualifications": [
+      "DF's quoted analyst emphasizes US yields over copper; avoid a single-cause copper headline.",
+      "Copper spot/futures and LME/Comex descriptions differ. Emol assigns -1.92%/6.52 to LME, while Pulso assigns that pair to Comex spot; DF reports other futures. Exact venue/contract/percentage not approved for combined input.",
+      "Pulso and DF both cite Reuters for part of their global explanation; three pages are not three wholly independent data sources.",
+      "This is source-attributed explanation, not an econometric identification or an official central-bank cause finding.",
+      "Search results, article headlines, current page tickers and next-day articles were not promoted into same-session cause facts."
+    ],
+    "excluded": [
+      "numeric forecasts and target exchange rates",
+      "company sell-out or margin inference",
+      "past consumer statistics as same-day FX cause",
+      "Yahoo indexed text as verified original"
+    ],
+    "exhaustiveCounterEvidenceSearch": false,
+    "independentUnderlyingMarketSeriesVerified": false,
+    "editorialScore": null
+  },
+  "conclusion": {
+    "discoveredRequestedPublishers": 4,
+    "originalArticleBodiesReviewed": 3,
+    "yahooOriginalAdmitted": false,
+    "priceDirectionCheck": "consistent_across_separate_price_bases",
+    "contentSupport": "limited_yes_with_attribution_and_price_basis_separation",
+    "approvedExternalWriterInputs": 0,
+    "publicReportReady": false,
+    "next": "Resolve zero-fee reuse basis or find an independently permitted original source for necessary market interpretations; do not substitute official statistics or paraphrase to conceal source dependence.",
+    "licensingNote": "Pending means service-use basis not established; this review does not adjudicate copyright exceptions or assert that all AI uses are unlawful."
+  },
+  "safeguards": {
+    "newPaidModelCalls": 0,
+    "newPaidDataCalls": 0,
+    "newApiCostUsd": 0,
+    "modelGenerationRun": false,
+    "productionChanged": false,
+    "dbChanged": false,
+    "existingManuscriptsChanged": false,
+    "sourceUseApprovalsChanged": false,
+    "remotePush": false,
+    "fullArticleCopiesSaved": false
+  },
+  "verification": {
+    "kind": "research record and arithmetic only; no application code change",
+    "unitTestsRun": false,
+    "buildRun": false
+  }
+}

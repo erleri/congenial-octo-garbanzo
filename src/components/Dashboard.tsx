@@ -9,6 +9,9 @@ import {
   YAxis,
 } from 'recharts'
 import { formatCellValue, monthLabel } from '../lib/formatters'
+import { getDashboardDaily as getDaily, getDashboardPreviousDaily as getPreviousDaily, getDashboardDailyChange } from '../lib/dashboard-price.js'
+import { datasetStatus } from '../lib/dataStatus'
+import type { ReactNode } from 'react'
 import type {
   BusinessPlan,
   CellStatus,
@@ -23,6 +26,7 @@ interface DashboardProps {
   data: ExchangeRateDataset
   filters: DashboardFilters
   businessPlan: BusinessPlan
+  renderReportLink?: (currency: CurrencyCode) => ReactNode
 }
 
 interface MiniChartPoint {
@@ -107,8 +111,8 @@ const CHART_TOOLTIP_STYLE = {
   fontSize: '12px',
 } as const
 const CHART_LABEL_STYLE = {
-  fill: '#8a94a3',
-  fontSize: 9,
+  fill: '#526478',
+  fontSize: 11,
   fontWeight: 600,
 } as const
 
@@ -153,17 +157,6 @@ function average(values: number[]): number | null {
   return sum / values.length
 }
 
-function getDaily(
-  rows: DailyRate[],
-  currency: (typeof KPI_CURRENCIES)[number],
-  date: string,
-): DailyRate | undefined {
-  return rows.find(
-    (row) =>
-      row.currency === currency && row.date === date && row.rateType === 'LOCAL_PER_USD',
-  )
-}
-
 function getDailyRate(
   rows: DailyRate[],
   currency: CurrencyCode,
@@ -173,22 +166,6 @@ function getDailyRate(
   return rows.find(
     (row) => row.currency === currency && row.date === date && row.rateType === rateType,
   )
-}
-
-function getPreviousDaily(
-  rows: DailyRate[],
-  currency: (typeof KPI_CURRENCIES)[number],
-  date: string,
-): DailyRate | undefined {
-  return rows
-    .filter(
-      (row) =>
-        row.currency === currency &&
-        row.rateType === 'LOCAL_PER_USD' &&
-        row.date < date &&
-        typeof row.value === 'number',
-    )
-    .sort((a, b) => b.date.localeCompare(a.date))[0]
 }
 
 function formatChartRate(value: unknown, currency: (typeof KPI_CURRENCIES)[number]): string {
@@ -463,7 +440,7 @@ function renderLatestDot(color: string) {
   }
 }
 
-function Dashboard({ data, businessPlan }: DashboardProps) {
+function Dashboard({ data, businessPlan, renderReportLink }: DashboardProps) {
   const baseDate = new Date(data.baseDate)
   const latestYear = baseDate.getFullYear()
   const latestMonth = baseDate.getMonth() + 1
@@ -583,14 +560,7 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
       previous.value !== 0
         ? (current.value - previous.value) / previous.value
         : null
-    const dailyChange =
-      today?.value !== undefined &&
-      today.value !== null &&
-      previousDaily?.value !== undefined &&
-      previousDaily.value !== null &&
-      previousDaily.value !== 0
-        ? (today.value - previousDaily.value) / previousDaily.value
-        : null
+    const dailyChange = getDashboardDailyChange(today, previousDaily)
     const movingVs = calculatePlanDelta(businessPlan.moving[currency], cumulativeValue)
 
     return {
@@ -669,10 +639,12 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
 
   return (
     <div className="dashboard-container">
+      <h1 className="sr-only">대시보드</h1>
       <div className="dashboard-meta">
         <span className="base-date-chip">기준일 {baseDateText}</span>
         <span className="data-pill">당월 누적 평균</span>
       </div>
+      <nav className="currency-shortcuts" aria-label="통화 바로가기">{KPI_CURRENCIES.map(c=><a key={c} href={`#currency-${c}`} onClick={event=>{event.preventDefault();const card=document.getElementById(`currency-${c}`);card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true})}}>{c}</a>)}</nav>
 
       <div className="usd-krw-anchor">
         <div className="usd-krw-anchor-main">
@@ -723,7 +695,7 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
           <strong>오늘의 주목 포인트</strong>
         </div>
         <div className="today-focus-content">
-          <div className="today-focus-items">
+          <div className="today-focus-items" tabIndex={0} role="group" aria-label="주목 포인트 · 좁은 화면에서 좌우 이동">
             {focusItems.map((item) => (
               <div key={item.label} className={`today-focus-item focus-${item.tone}`}>
                 <span>{item.label}</span>
@@ -737,10 +709,10 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
 
       <div className="kpi-grid">
         {kpis.map((kpi) => (
-          <div key={kpi.currency} className="kpi-card">
+          <div key={kpi.currency} id={`currency-${kpi.currency}`} className="kpi-card" tabIndex={-1}>
             <div className="kpi-header">
               <span>{kpi.currency} / USD</span>
-              <div className={`source-badge badge-${kpi.todaySource.toLowerCase()}`}>
+              <div className={`source-badge badge-${kpi.todaySource.toLowerCase()}`} title={(()=>{const q=datasetStatus(data).quotes.find(q=>q.currency===kpi.currency);return `${q?.source??'출처 미기록'} · ${q?.price??'가격 정의 미확인'}. 상세는 상단 자료 정보에서 확인합니다.`})()}>
                 {SOURCE_LABELS[kpi.todaySource]}
               </div>
             </div>
@@ -757,7 +729,7 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
             </div>
             {kpi.mom !== null ? (
               <em className={kpi.mom >= 0 ? 'up' : 'down'}>
-                {formatPercent(kpi.mom)} MoM
+                {formatPercent(kpi.mom)} <abbr title="당월 누적 평균을 전월 평균과 비교">MoM</abbr>
               </em>
             ) : (
               <em className="kpi-today">MoM -</em>
@@ -788,18 +760,19 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
                 <div className="gauge-marker" style={{ left: `${kpi.percent52}%` }} />
               </div>
             </div>
+            {renderReportLink?.(kpi.currency)}
           </div>
         ))}
       </div>
 
-      <p className="kpi-tag-note">
-        태그 기준: 52주 상·하단 구간을 먼저 표시하고, 그 외에는 MoM ±1.00% 기준으로 강세/약세를 구분합니다.
-      </p>
+      <div className="kpi-tag-note">
+        <details><summary>표시 기준</summary>값은 1 USD당 현지통화입니다. 큰 값은 당월 누적 평균이며 MoM은 전월 평균 대비입니다. 값 상승은 현지통화 약세 방향입니다. 52주 상·하단 태그가 우선이고 나머지는 MoM ±1% 기준입니다. 평균 계산은 저장된 일별 값과 기존 보정 규칙을 유지합니다.</details>
+      </div>
 
       <div className="chart-card chart-card-full dashboard-chart-card">
         <div className="section-title-row">
           <div>
-            <h3>최근 30일 추이</h3>
+            <h3>최근 30일 추이 <small className="axis-note">통화별 독립 축</small></h3>
             <p className="section-kicker">단기 움직임과 30일 평균선을 먼저 확인합니다.</p>
           </div>
         </div>
@@ -864,7 +837,7 @@ function Dashboard({ data, businessPlan }: DashboardProps) {
       <div className="chart-card chart-card-full dashboard-chart-card">
         <div className="section-title-row">
           <div>
-            <h3>통화별 월간 추이</h3>
+            <h3>통화별 월간 추이 <small className="axis-note">통화별 독립 축</small></h3>
             <p className="section-kicker">단기 움직임을 더 긴 월간 흐름 안에서 확인합니다.</p>
           </div>
           <span className="section-range-label">{monthlyRangeLabel}</span>

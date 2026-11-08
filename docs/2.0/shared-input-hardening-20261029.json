@@ -1,0 +1,232 @@
+{
+  "version": "shared-input-hardening-closeout/1",
+  "date": "2026-10-29",
+  "policyVersion": "shared-input-policy/2",
+  "reasoningVersion": "report-reasoning/5",
+  "status": "common_input_gaps_fixed_offline_replayed_not_actual_prose_approved",
+  "findings": [
+    {
+      "id": "F01",
+      "status": "fixed",
+      "result": "공통 설명 지침은 실제 전송문에 한 번만 포함"
+    },
+    {
+      "id": "F02",
+      "status": "fixed_contract_semantics_unverified",
+      "result": "채택 역할별 검토 질문과 사용·통합·생략·부족·미검증 처리, 본문 위치 연결 추가. 모든 카드의 사용을 강제하지 않음"
+    },
+    {
+      "id": "F03",
+      "status": "fixed",
+      "result": "32개 시점/문맥과 16개 판본 정보를 검토 입력까지 전달. 가격 종류·출처 표시·수집 시점도 보존"
+    },
+    {
+      "id": "F04",
+      "status": "fixed",
+      "result": "6개 통화가 같은 국가 범위 함수를 사용. 근거 있는 국가 간 설명과 없는 치환을 짝으로 검증"
+    },
+    {
+      "id": "F05",
+      "status": "fixed",
+      "result": "월간 소비·정책 근거는 제목·요약에서도 허용. 원래 기간 유지, 당일 환율 원인 승격 차단"
+    },
+    {
+      "id": "F06",
+      "status": "fixed_new_bound_copy",
+      "result": "COP ING/Pesole 해석을 저장 원문 block4와 대조해 새 입력에서만 귀속 견해로 분류. 본문·원본·역할·이용 범위는 보존"
+    },
+    {
+      "id": "F07",
+      "status": "fixed_shared_path_legacy_retained",
+      "result": "칠레 전용 공통 문구 제거, 국가·국제/현지 사건 공통 규칙으로 일반화. 새 질문은 달러 전용 플래그에 의존하지 않음. 이전 저장 경로는 유지"
+    },
+    {
+      "id": "F08",
+      "status": "relation_signals_added_semantics_unverified",
+      "result": "같은 문구·귀속 주체 관련성 표시. 사건 동일성/독립성 자동 확정·자동 삭제 없음. 시점이 다른 발언과 같은 URL의 다른 지표 보존"
+    },
+    {
+      "id": "F09",
+      "status": "partly_fixed_numeric_policy_retained",
+      "result": "소비·정책 근거에만 연결한 제목/요약의 지표 방향 허용. 자유 숫자·날짜 생성은 계속 차단. 기간은 출처 메타데이터로 전달; 문장 내 코드 삽입 확장은 별도 미구현"
+    },
+    {
+      "id": "F10",
+      "status": "separate_release_work_remaining",
+      "result": "현재 새 공통 경로는 시장 해설용. 정기 점검/경제 업데이트/정정 실행 분기, 승인 원리 전달, 실제 UI/공개/파일럿은 기존 다음 단계"
+    }
+  ],
+  "replay": {
+    "sixCountries": 6,
+    "explicitRoutes": 2,
+    "preparedRequests": 12,
+    "referenceDate": "2026-10-28",
+    "commentaryDate": "2026-10-27",
+    "rows": [
+      {
+        "currency": "BRL",
+        "claims": 7,
+        "consumerClaims": 2,
+        "contextPassed": 7,
+        "coverageRoles": [
+          "market_observation",
+          "attributed_fx_explanation",
+          "countercontext",
+          "consumer_background",
+          "watch_context"
+        ],
+        "inputBound": 34199,
+        "conservativeMaximumUsd": 0.1674175,
+        "directory": ".local-reports\\private\\shared-writer-P36fwl",
+        "syntheticAutomaticCheck": "pass",
+        "semanticQuality": "unverified"
+      },
+      {
+        "currency": "MXN",
+        "claims": 10,
+        "consumerClaims": 3,
+        "contextPassed": 8,
+        "coverageRoles": [
+          "market_observation",
+          "attributed_fx_explanation",
+          "countercontext",
+          "consumer_background"
+        ],
+        "inputBound": 42068,
+        "conservativeMaximumUsd": 0.18709,
+        "directory": ".local-reports\\private\\shared-writer-AIDG7m",
+        "syntheticAutomaticCheck": "pass",
+        "semanticQuality": "unverified"
+      },
+      {
+        "currency": "COP",
+        "claims": 6,
+        "consumerClaims": 1,
+        "contextPassed": 6,
+        "coverageRoles": [
+          "market_observation",
+          "attributed_fx_explanation",
+          "global_context",
+          "consumer_background"
+        ],
+        "inputBound": 33534,
+        "conservativeMaximumUsd": 0.165755,
+        "directory": ".local-reports\\private\\shared-writer-swQIg4",
+        "syntheticAutomaticCheck": "pass",
+        "semanticQuality": "unverified"
+      },
+      {
+        "currency": "PEN",
+        "claims": 2,
+        "consumerClaims": 0,
+        "contextPassed": 2,
+        "coverageRoles": [
+          "market_observation",
+          "attributed_fx_explanation"
+        ],
+        "inputBound": 24120,
+        "conservativeMaximumUsd": 0.14222,
+        "directory": ".local-reports\\private\\shared-writer-KFZmFi",
+        "syntheticAutomaticCheck": "pass",
+        "semanticQuality": "unverified"
+      },
+      {
+        "currency": "CLP",
+        "claims": 7,
+        "consumerClaims": 0,
+        "contextPassed": 5,
+        "coverageRoles": [
+          "market_observation",
+          "attributed_fx_explanation",
+          "countercontext"
+        ],
+        "inputBound": 33286,
+        "conservativeMaximumUsd": 0.165135,
+        "directory": ".local-reports\\private\\shared-writer-1WgjaK",
+        "syntheticAutomaticCheck": "pass",
+        "semanticQuality": "unverified"
+      },
+      {
+        "currency": "ARS",
+        "claims": 5,
+        "consumerClaims": 2,
+        "contextPassed": 4,
+        "coverageRoles": [
+          "market_observation",
+          "attributed_fx_explanation",
+          "countercontext",
+          "consumer_background"
+        ],
+        "inputBound": 32801,
+        "conservativeMaximumUsd": 0.1639225,
+        "directory": ".local-reports\\private\\shared-writer-ta4OUV",
+        "syntheticAutomaticCheck": "pass",
+        "semanticQuality": "unverified"
+      }
+    ],
+    "articleNoteTextChanges": 0,
+    "referenceAndChartChanges": 0,
+    "copRepresentationCorrectionOnly": true,
+    "newAiManuscripts": 0,
+    "olderPreparedPlanExecutable": false,
+    "olderPlanReason": "paid runner requires current shared-input-policy/2; no approval inherited"
+  },
+  "checks": {
+    "typecheck": "pass",
+    "lint": "pass",
+    "testFiles": 132,
+    "declaredTests": 836,
+    "executedCases": 1011,
+    "parameterExpansions": 175,
+    "exactDuplicateNames": 0,
+    "exactDuplicateBodies": 0,
+    "tautologies": 0,
+    "finalGuardRegressionCases": 46,
+    "productionBuild": "pass",
+    "appLocalBuild": "pass",
+    "reportBuild": "pass",
+    "bundleBoundary": "pass",
+    "existingEntryBytes": 615654,
+    "existing500kbWarning": true,
+    "protection": {
+      "verifiedAt": "2026-10-29T11:37:05.110Z",
+      "protectedFiles": 440,
+      "changedProtectedFiles": [],
+      "buildArtifacts": 62,
+      "secretValuesCompared": 5,
+      "rawParagraphsCompared": 147,
+      "secretMatchFiles": [],
+      "rawParagraphMatchFiles": [],
+      "browserServingNotRetested": true,
+      "uiDatabaseUnchanged": true,
+      "modelCalls": 0,
+      "newPaidCostUsd": 0,
+      "limitations": "Exact hashes and selected strings only; no new browser, database permission, model quality or publication approval."
+    },
+    "logs": [
+      ".local-reports/private/shared-input-hardening-20261029/final-check.log",
+      ".local-reports/private/shared-input-hardening-20261029/final-review-guard.log",
+      ".local-reports/private/shared-input-hardening-20261029/app-build.log",
+      ".local-reports/private/shared-input-hardening-20261029/report-build.log"
+    ],
+    "limitations": "Exact duplicate auditing and synthetic boundary cases do not prove semantic uniqueness, economic entailment, or AI prose quality."
+  },
+  "newModelCalls": 0,
+  "newNetworkCalls": 0,
+  "newCostUsd": 0,
+  "publicationApproved": false,
+  "operationsChanged": false,
+  "newCommitCreated": false,
+  "next": "Current input/endpoint/budget check for a separately approved limited actual writer trial; assess original prose and cost without manual rewriting as AI success.",
+  "futureLimits": [
+    "Independent source/claim semantic review",
+    "Current live endpoint availability/price/privacy preflight",
+    "Periodic/economic/correction dispatch and approved mechanism applications",
+    "Approval/public UI2.0 and pilot/release"
+  ],
+  "files": {
+    "policy": "scripts/currency-report/shared-input-policy.js",
+    "typing": "scripts/currency-report/shared-claim-typing.js",
+    "tests": "scripts/currency-report/shared-input-policy.test.ts"
+  }
+}

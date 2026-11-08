@@ -1,0 +1,25 @@
+.api-status-panel { margin: 20px 0; }
+.api-status-heading,.api-status-toolbar { display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap; }
+.api-status-heading h3 { margin:8px 0; }
+.api-status-toolbar { margin:16px 0;font-size:13px;color:#475569; }
+.api-status-toolbar select { margin-left:8px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;background:white;color:#0f172a; }
+.api-status-table-wrap { overflow-x:auto; }
+.api-status-table { width:100%;border-collapse:collapse;text-align:left;font-size:13px; }
+.api-status-table th { padding:10px;background:#f1f5f9;color:#334155;border-bottom:1px solid #cbd5e1; }
+.api-status-table td { padding:12px 10px;vertical-align:top;border-bottom:1px solid #e2e8f0; }
+.api-status-table td:first-child { width:40%; }
+.api-status-table td:nth-child(2) { width:34%; }
+.api-status-table small { display:block;margin-top:5px;color:#475569;line-height:1.5; }
+.api-status-table p { margin:6px 0 0;line-height:1.6; }
+.api-status-badge { display:inline-block;padding:3px 8px;border-radius:5px;font-weight:600;white-space:nowrap; }
+.api-status-badge.sample_ok { background:#e7f5ee;color:#14532d; }
+.api-status-badge.not_checked { background:#f1f5f9;color:#475569; }
+.api-status-badge.needs_configuration { background:#fff5dc;color:#854d0e; }
+.api-status-badge.check_failed { background:#fef2f2;color:#991b1b; }
+.api-status-limit { margin-top:14px; }
+@media(max-width:600px) {
+  .api-status-table { min-width:0;font-size:12px;table-layout:fixed; }
+  .api-status-table th,.api-status-table td { padding:9px 6px;overflow-wrap:anywhere; }
+  .api-status-table td:first-child { width:37%; }
+  .api-status-table td:nth-child(2) { width:34%; }
+}

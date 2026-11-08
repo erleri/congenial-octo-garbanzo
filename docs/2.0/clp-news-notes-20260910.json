@@ -1,0 +1,571 @@
+{
+  "version": "news-notes-case/2",
+  "checkedOn": "2026-10-27",
+  "sessionDate": "2026-09-10",
+  "historicalCase": true,
+  "purpose": "2026-09-10 칠레 급변일의 사실·견해 카드와 기존 집필 입력 연결을 오프라인 검증. 현재 시장 리포트·새 원고가 아님.",
+  "excludedSources": [],
+  "excludedDetails": [
+    "구리의 거래소·현물·선물별 하락률은 원문 표기가 엇갈려 정확한 수치를 채택하지 않음.",
+    "전문가의 목표환율·가격 범위·수치 전망을 제외함.",
+    "2026-09-11 기사와 2025년 Yahoo 기사를 9월 10일 근거로 사용하지 않음.",
+    "Yahoo는 직접 페이지 429 이력을 보존하되 출처가 확인되는 관련 기사 내용으로 검토를 보완했다. 전체 본문 확보를 필수로 하지 않고, 제목만 확인된 자료는 계속 제외한다."
+  ],
+  "contentReview": {
+    "origin": "agent",
+    "status": "checked",
+    "reason": "네 매체에서 필요한 기사 내용을 확인하고 사실·견해 요지를 새로 작성했다. Yahoo는 출처가 확인된 본문 제공 부분을 사용했다. 매체 취재의 재검증·기사 전체 확보를 요구하지 않으며 원문·번역·최종 게시 승인은 아니다.",
+    "counterevidenceChecked": true,
+    "counterevidenceReason": "DF의 Vantrust 해석은 구리보다 국채금리를 중시한다. 상충 가격 기준과 전망 부분도 검토해 제외했다. 모든 시장의 반대 근거를 망라한 조사는 아니다.",
+    "newExplanationValue": true,
+    "newExplanationReason": "소비 통계가 아닌 실제 당일 시장 보도의 구리·금리·위험회피 설명을 연결하는 역사 사례 시험이다. 현재 날짜의 신규 발행 자격을 뜻하지 않는다."
+  },
+  "priceUseReview": {
+    "terms": {
+      "url": "https://si3.bcentral.cl/estadisticas/Principal1/Web_Services/terminos_condiciones.html",
+      "version": "reviewed-2026-10-27-notes-scope",
+      "reviewedOn": "2026-10-27"
+    },
+    "scope": "이 자료에 결합된 검토자 작성 사실·견해 카드만 해당. 기사 원문·번역·자동 수집·본문 공개의 이용 허가가 아님.",
+    "review": {
+      "origin": "agent",
+      "status": "checked",
+      "reason": "기존 검토된 BCCh 공개 통계와 산정 문서를 재사용한다. 통계 수치·가공 책임·거래일 표시를 보존하고 가격 사실 확인에만 사용한다. API를 새로 호출하거나 평균값을 기사 종가로 바꾸지 않는다."
+    },
+    "conditions": [
+      {
+        "id": "notes-only",
+        "text": "원문 발췌·번역·기사 대체 구성을 제외하고 독자적으로 작성한 요지만 전달한다.",
+        "status": "satisfied"
+      },
+      {
+        "id": "attribution-and-basis",
+        "text": "매체·발언자·거래일·가격 기준을 보존하고 견해를 입증된 인과나 공식 값으로 승격하지 않는다.",
+        "status": "satisfied"
+      }
+    ],
+    "uses": {
+      "local_analysis": {
+        "status": "allowed",
+        "reason": "사용자가 승인한 로컬 검토 범위에서 사실·귀속 견해를 구분하여 검토한다.",
+        "conditionIds": [
+          "notes-only"
+        ]
+      },
+      "external_model": {
+        "status": "allowed",
+        "reason": "사실·아이디어와 표현을 구분한 명시적 범위 판단. 이 검토 카드만 향후 입력 후보로 인정하며 호출 승인은 별도다.",
+        "conditionIds": [
+          "notes-only",
+          "attribution-and-basis"
+        ]
+      },
+      "public_display": {
+        "status": "pending",
+        "reason": "이 카드와 리포트의 최종 공개 표현·인용·출처 표시는 별도 검토하며 자동으로 승인하지 않는다.",
+        "conditionIds": []
+      }
+    },
+    "basis": {
+      "kind": "public_statistical_facts",
+      "notPublisherPermission": true,
+      "references": [
+        "https://www.wipo.int/en/web/copyright/protection",
+        "https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1033063839",
+        "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025517657"
+      ],
+      "limitation": "이용 범위에 대한 검토자의 실무 판단이며 국가별 계약·저작권 분쟁의 법률적 결론은 아니다. 출처 표시나 문장 길이만으로 허용을 판단하지 않는다."
+    }
+  },
+  "entries": [
+    {
+      "source": {
+        "id": "news-df-20260910",
+        "country": "CLP",
+        "publisher": "Diario Financiero",
+        "author": "Benjamín Pescio",
+        "url": "https://www.df.cl/mercados/bolsa-monedas/dolar-hoy-h9i5c",
+        "publishedAt": "2026-09-10",
+        "publicationDisplay": "2026-09-10 16:05; 원문 표시시각, 정확한 가격 관측시각 아님",
+        "eventDate": "2026-09-10",
+        "collectedAt": "2026-10-27T04:23:39Z"
+      },
+      "notes": [
+        {
+          "id": "n0",
+          "kind": "fact",
+          "text": "DF는 칠레 달러 마감값을 941.9페소, 전일 대비 상승폭을 14.1페소로 보도했다. 이는 DF의 마감 보도값이며 중앙은행의 거래가중평균이나 다른 매체의 호가와 동일한 값이 아니다.",
+          "attribution": null,
+          "reportedPrice": {
+            "previous": 927.8,
+            "current": 941.9,
+            "delta": 14.1,
+            "unit": "CLP_per_USD",
+            "basis": "reported_market_close",
+            "observedAt": null
+          }
+        },
+        {
+          "id": "n1",
+          "kind": "attributed_view",
+          "text": "Vantrust Capital의 Juan Pablo Iturriaga는 미국 국채금리의 매력이 자금을 미국으로 유인해 달러 압력을 지지하는 경로를 강조했다. 칠레와 미국의 금리 여건 차이를 짚은 견해다.",
+          "attribution": {
+            "person": "Juan Pablo Iturriaga",
+            "organization": "Vantrust Capital"
+          },
+          "reportedPrice": null
+        },
+        {
+          "id": "n2",
+          "kind": "attributed_view",
+          "text": "같은 전문가는 구리 조정의 영향을 인정하면서도 구리 가격은 여전히 높은 수준이고 국채금리가 더 중요한 압력이라고 평가했다. 구리 하락만을 유일한 원인으로 정리하기 어렵다는 중요도에 관한 이견이다.",
+          "attribution": {
+            "person": "Juan Pablo Iturriaga",
+            "organization": "Vantrust Capital"
+          },
+          "reportedPrice": null
+        }
+      ],
+      "review": {
+        "origin": "agent",
+        "status": "checked",
+        "reason": "DF 원문의 마감값, 국채금리 경로와 구리 대비 중요도에 관한 발언을 대조했다. 고유 문장·기사 구성·전망은 옮기지 않고 확인된 사실과 귀속 견해만 별도로 정리했다.",
+        "independentlyWorded": true,
+        "notTranslation": true,
+        "notArticleSubstitute": true,
+        "checkedOn": "2026-10-27",
+        "supportingContentChecked": true,
+        "contentAccess": "publisher_page"
+      },
+      "useReview": {
+        "terms": {
+          "url": "https://www.df.cl/terminos-y-condiciones",
+          "version": "reviewed-2026-10-27-notes-scope",
+          "reviewedOn": "2026-10-27"
+        },
+        "scope": "이 자료에 결합된 검토자 작성 사실·견해 카드만 해당. 기사 원문·번역·자동 수집·본문 공개의 이용 허가가 아님.",
+        "review": {
+          "origin": "agent",
+          "status": "checked",
+          "reason": "DF 기사 전체나 데이터피드 재사용이 아니라, 검토자가 작성한 개별 사실과 귀속 견해의 요지만 대상으로 범위를 판단했다. 기사 원문·차트·번역·계속적인 자동 수집은 이 판단에 포함하지 않는다."
+        },
+        "conditions": [
+          {
+            "id": "notes-only",
+            "text": "원문 발췌·번역·기사 대체 구성을 제외하고 독자적으로 작성한 요지만 전달한다.",
+            "status": "satisfied"
+          },
+          {
+            "id": "attribution-and-basis",
+            "text": "매체·발언자·거래일·가격 기준을 보존하고 견해를 입증된 인과나 공식 값으로 승격하지 않는다.",
+            "status": "satisfied"
+          }
+        ],
+        "uses": {
+          "local_analysis": {
+            "status": "allowed",
+            "reason": "사용자가 승인한 로컬 검토 범위에서 사실·귀속 견해를 구분하여 검토한다.",
+            "conditionIds": [
+              "notes-only"
+            ]
+          },
+          "external_model": {
+            "status": "allowed",
+            "reason": "사실·아이디어와 표현을 구분한 명시적 범위 판단. 이 검토 카드만 향후 입력 후보로 인정하며 호출 승인은 별도다.",
+            "conditionIds": [
+              "notes-only",
+              "attribution-and-basis"
+            ]
+          },
+          "public_display": {
+            "status": "pending",
+            "reason": "이 카드와 리포트의 최종 공개 표현·인용·출처 표시는 별도 검토하며 자동으로 승인하지 않는다.",
+            "conditionIds": []
+          }
+        },
+        "basis": {
+          "kind": "reviewer_facts_and_attributed_ideas",
+          "notPublisherPermission": true,
+          "references": [
+            "https://www.wipo.int/en/web/copyright/protection",
+            "https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1033063839",
+            "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025517657"
+          ],
+          "limitation": "이용 범위에 대한 검토자의 실무 판단이며 국가별 계약·저작권 분쟁의 법률적 결론은 아니다. 출처 표시나 문장 길이만으로 허용을 판단하지 않는다."
+        }
+      },
+      "claims": [
+        {
+          "noteId": "n0",
+          "questionId": "market",
+          "role": "market",
+          "eventKey": "clp-20260910-market",
+          "independenceKey": "df-market-close",
+          "relation": "supports",
+          "supported": true,
+          "review": {
+            "origin": "agent",
+            "status": "checked",
+            "reason": "DF의 9월 10일 마감값과 상승폭은 원문에서 확인했다. 전일 927.8은 9월 9일 보도와도 대조했으며 실제 호가 시각은 미상이다."
+          }
+        },
+        {
+          "noteId": "n1",
+          "questionId": "global",
+          "role": "driver",
+          "eventKey": "clp-20260910-rates",
+          "independenceKey": "vantrust-iturriaga",
+          "relation": "supports",
+          "supported": true,
+          "review": {
+            "origin": "agent",
+            "status": "checked",
+            "reason": "Vantrust의 국채금리·자금 유인 설명에 귀속한다. 시장 전체의 실측 자금 이동이나 요인 기여율을 입증한 것으로 확대하지 않는다."
+          }
+        },
+        {
+          "noteId": "n2",
+          "questionId": "counter",
+          "role": "counter",
+          "eventKey": "clp-20260910-rates",
+          "independenceKey": "vantrust-iturriaga",
+          "relation": "qualifies",
+          "supported": true,
+          "review": {
+            "origin": "agent",
+            "status": "checked",
+            "reason": "구리의 영향을 부정한 반증이 아니라 설명의 중요도를 제한하는 동일 발언자의 견해다. 반대 방향의 환율 움직임으로 표현하지 않는다."
+          }
+        }
+      ]
+    },
+    {
+      "source": {
+        "id": "news-emol-20260910",
+        "country": "CLP",
+        "publisher": "Emol",
+        "author": "José Tomás Guzmán",
+        "url": "https://www.emol.com/noticias/Economia/2026/09/10/1211142/dolar-mercado-cambiario-local.html",
+        "publishedAt": "2026-09-10",
+        "publicationDisplay": "2026-09-10 14:48; 원문 표시시각, 정확한 가격 관측시각 아님",
+        "eventDate": "2026-09-10",
+        "collectedAt": "2026-10-27T04:23:39Z"
+      },
+      "notes": [
+        {
+          "id": "n0",
+          "kind": "attributed_view",
+          "text": "Capitaria의 Lucas Santillán은 구리 조정, 유가 상승과 미국 금리 인상 기대가 겹쳐 칠레 시장의 달러를 밀어 올렸다고 해석했다. 구리의 페소 지지력 약화와 대외 달러 압력이 함께 작용했다는 견해다.",
+          "attribution": {
+            "person": "Lucas Santillán",
+            "organization": "Capitaria"
+          },
+          "reportedPrice": null
+        }
+      ],
+      "review": {
+        "origin": "agent",
+        "status": "checked",
+        "reason": "Emol의 전문가 이름·기관과 당일 구리·유가·금리 연결을 원문과 대조했다. 거래소가 엇갈리는 구리 수치, 인상 확률과 목표환율은 제외하고 독자적인 요지만 작성했다.",
+        "independentlyWorded": true,
+        "notTranslation": true,
+        "notArticleSubstitute": true,
+        "checkedOn": "2026-10-27",
+        "supportingContentChecked": true,
+        "contentAccess": "publisher_page"
+      },
+      "useReview": {
+        "terms": {
+          "url": "https://www.emol.com/terminos/terminosycondiciones.aspx",
+          "version": "reviewed-2026-10-27-notes-scope",
+          "reviewedOn": "2026-10-27"
+        },
+        "scope": "이 자료에 결합된 검토자 작성 사실·견해 카드만 해당. 기사 원문·번역·자동 수집·본문 공개의 이용 허가가 아님.",
+        "review": {
+          "origin": "agent",
+          "status": "checked",
+          "reason": "개인 이용 약관을 기사 재전송 허가로 바꾸지 않는다. 해당 발언의 아이디어를 귀속해 작성한 짧은 요지의 로컬·향후 모델 입력 범위만 별도 판단했다. 원문·번역·자동 수집·공개 복제는 승인하지 않는다."
+        },
+        "conditions": [
+          {
+            "id": "notes-only",
+            "text": "원문 발췌·번역·기사 대체 구성을 제외하고 독자적으로 작성한 요지만 전달한다.",
+            "status": "satisfied"
+          },
+          {
+            "id": "attribution-and-basis",
+            "text": "매체·발언자·거래일·가격 기준을 보존하고 견해를 입증된 인과나 공식 값으로 승격하지 않는다.",
+            "status": "satisfied"
+          }
+        ],
+        "uses": {
+          "local_analysis": {
+            "status": "allowed",
+            "reason": "사용자가 승인한 로컬 검토 범위에서 사실·귀속 견해를 구분하여 검토한다.",
+            "conditionIds": [
+              "notes-only"
+            ]
+          },
+          "external_model": {
+            "status": "allowed",
+            "reason": "사실·아이디어와 표현을 구분한 명시적 범위 판단. 이 검토 카드만 향후 입력 후보로 인정하며 호출 승인은 별도다.",
+            "conditionIds": [
+              "notes-only",
+              "attribution-and-basis"
+            ]
+          },
+          "public_display": {
+            "status": "pending",
+            "reason": "이 카드와 리포트의 최종 공개 표현·인용·출처 표시는 별도 검토하며 자동으로 승인하지 않는다.",
+            "conditionIds": []
+          }
+        },
+        "basis": {
+          "kind": "reviewer_facts_and_attributed_ideas",
+          "notPublisherPermission": true,
+          "references": [
+            "https://www.wipo.int/en/web/copyright/protection",
+            "https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1033063839",
+            "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025517657"
+          ],
+          "limitation": "이용 범위에 대한 검토자의 실무 판단이며 국가별 계약·저작권 분쟁의 법률적 결론은 아니다. 출처 표시나 문장 길이만으로 허용을 판단하지 않는다."
+        }
+      },
+      "claims": [
+        {
+          "noteId": "n0",
+          "questionId": "local",
+          "role": "driver",
+          "eventKey": "clp-20260910-copper-oil",
+          "independenceKey": "capitaria-santillan",
+          "relation": "supports",
+          "supported": true,
+          "review": {
+            "origin": "agent",
+            "status": "checked",
+            "reason": "당일 칠레 시장과 구리·유가·미국 금리 기대를 연결한 Capitaria의 귀속 해석이다. 공식 평균의 정확한 인과나 기여도를 확정하지 않는다."
+          }
+        }
+      ]
+    },
+    {
+      "source": {
+        "id": "news-pulso-20260910",
+        "country": "CLP",
+        "publisher": "Pulso / La Tercera",
+        "author": "Emiliano Carrizo",
+        "url": "https://www.latercera.com/pulso/noticia/el-valor-del-dolar-en-chile-el-10-de-septiembre-de-2026/",
+        "publishedAt": "2026-09-10",
+        "publicationDisplay": "2026-09-10; 원문에서 시각을 확인하지 못함",
+        "eventDate": "2026-09-10",
+        "collectedAt": "2026-10-27T04:23:39Z"
+      },
+      "notes": [
+        {
+          "id": "n0",
+          "kind": "attributed_view",
+          "text": "XTB의 Ignacio Moraga는 지정학적 불안과 유가 급등이 위험회피와 달러 선호를 강화했다고 설명했다. 이는 당일 글로벌 달러 수요에 관한 해석이며 칠레 환율 상승분의 크기를 계산한 설명은 아니다.",
+          "attribution": {
+            "person": "Ignacio Moraga",
+            "organization": "XTB"
+          },
+          "reportedPrice": null
+        }
+      ],
+      "review": {
+        "origin": "agent",
+        "status": "checked",
+        "reason": "Pulso 원문의 XTB 발언을 확인하고 이름·기관·위험회피 경로를 보존했다. Reuters 재인용을 독립 기사로 세지 않고, 원문 문장이나 단락 구성을 옮기지 않은 요지를 작성했다.",
+        "independentlyWorded": true,
+        "notTranslation": true,
+        "notArticleSubstitute": true,
+        "checkedOn": "2026-10-27",
+        "supportingContentChecked": true,
+        "contentAccess": "publisher_page"
+      },
+      "useReview": {
+        "terms": {
+          "url": "https://www.latercera.com/terminos-y-condiciones/",
+          "version": "reviewed-2026-10-27-notes-scope",
+          "reviewedOn": "2026-10-27"
+        },
+        "scope": "이 자료에 결합된 검토자 작성 사실·견해 카드만 해당. 기사 원문·번역·자동 수집·본문 공개의 이용 허가가 아님.",
+        "review": {
+          "origin": "agent",
+          "status": "checked",
+          "reason": "기사 적응·복제나 자동 수집 허용을 주장하지 않는다. XTB 발언의 개념을 귀속한 검토자 작성 요지만 별도 입력 범위로 판단했다. 유료벽 우회·전문 번역·기사 대체 제공은 포함하지 않는다."
+        },
+        "conditions": [
+          {
+            "id": "notes-only",
+            "text": "원문 발췌·번역·기사 대체 구성을 제외하고 독자적으로 작성한 요지만 전달한다.",
+            "status": "satisfied"
+          },
+          {
+            "id": "attribution-and-basis",
+            "text": "매체·발언자·거래일·가격 기준을 보존하고 견해를 입증된 인과나 공식 값으로 승격하지 않는다.",
+            "status": "satisfied"
+          }
+        ],
+        "uses": {
+          "local_analysis": {
+            "status": "allowed",
+            "reason": "사용자가 승인한 로컬 검토 범위에서 사실·귀속 견해를 구분하여 검토한다.",
+            "conditionIds": [
+              "notes-only"
+            ]
+          },
+          "external_model": {
+            "status": "allowed",
+            "reason": "사실·아이디어와 표현을 구분한 명시적 범위 판단. 이 검토 카드만 향후 입력 후보로 인정하며 호출 승인은 별도다.",
+            "conditionIds": [
+              "notes-only",
+              "attribution-and-basis"
+            ]
+          },
+          "public_display": {
+            "status": "pending",
+            "reason": "이 카드와 리포트의 최종 공개 표현·인용·출처 표시는 별도 검토하며 자동으로 승인하지 않는다.",
+            "conditionIds": []
+          }
+        },
+        "basis": {
+          "kind": "reviewer_facts_and_attributed_ideas",
+          "notPublisherPermission": true,
+          "references": [
+            "https://www.wipo.int/en/web/copyright/protection",
+            "https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1033063839",
+            "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025517657"
+          ],
+          "limitation": "이용 범위에 대한 검토자의 실무 판단이며 국가별 계약·저작권 분쟁의 법률적 결론은 아니다. 출처 표시나 문장 길이만으로 허용을 판단하지 않는다."
+        }
+      },
+      "claims": [
+        {
+          "noteId": "n0",
+          "questionId": "global",
+          "role": "driver",
+          "eventKey": "clp-20260910-oil-risk",
+          "independenceKey": "xtb-moraga",
+          "relation": "supports",
+          "supported": true,
+          "review": {
+            "origin": "agent",
+            "status": "checked",
+            "reason": "확인한 XTB 발언의 지정학·유가·위험회피·달러 수요 경로에 한정한다. Reuters 공통 수치를 추가하거나 직접적인 CLP 기여도를 추정하지 않는다."
+          }
+        }
+      ]
+    },
+    {
+      "source": {
+        "id": "news-yahoo-reuters-20260910",
+        "country": "GLOBAL",
+        "publisher": "Yahoo Finance / Reuters",
+        "author": "Jamie McGeever",
+        "url": "https://finance.yahoo.com/economy/policy/articles/trading-day-inflation-palpitations-210458989.html",
+        "publishedAt": "2026-09-10T21:04:00Z",
+        "publicationDisplay": "2026-09-10 17:04 EDT; 칠레 집계 마감 뒤의 종합 해설",
+        "eventDate": "2026-09-10",
+        "collectedAt": "2026-10-27T04:50:30Z"
+      },
+      "notes": [
+        {
+          "id": "n0",
+          "kind": "attributed_view",
+          "text": "Yahoo에 전재된 Jamie McGeever의 Reuters 해설 칼럼은 중동 분쟁에 따른 유가 급등, 물가 우려와 세계 채권금리 상승을 함께 다루고 달러가 전반적으로 강세였다고 정리했다. 저자 개인의 해설이며 칠레의 요인별 기여도를 입증한 결론은 아니다.",
+          "attribution": {
+            "person": "Jamie McGeever",
+            "organization": "Reuters 해설 칼럼 저자"
+          },
+          "reportedPrice": null
+        }
+      ],
+      "review": {
+        "origin": "agent",
+        "status": "checked",
+        "reason": "Yahoo 원주소로 귀속된 검색 서비스 제공 기사 내용에서 제목·저자·발행일·관련 본문과 개인 의견 표시를 확인했다. 매체의 취재를 다시 심사하거나 전체 원문 확보를 요구하지 않았다. 제목만으로 내용을 추정하지 않고 확인된 글로벌 해설에 한정한다.",
+        "supportingContentChecked": true,
+        "contentAccess": "publisher_attributed_excerpt",
+        "independentlyWorded": true,
+        "notTranslation": true,
+        "notArticleSubstitute": true,
+        "checkedOn": "2026-10-27"
+      },
+      "useReview": {
+        "terms": {
+          "url": "https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html",
+          "version": "reviewed-2026-10-27-notes-scope",
+          "reviewedOn": "2026-10-27"
+        },
+        "scope": "이 자료에 결합된 검토자 작성 사실·견해 카드만 해당. 기사 원문·번역·자동 수집·본문 공개의 이용 허가가 아님.",
+        "review": {
+          "origin": "agent",
+          "status": "checked",
+          "reason": "기사 자체를 자동 수집하는 경로를 만들지 않았다. 출처가 명시된 관련 내용에서 사실·아이디어를 독립적으로 정리한 카드만 다룬다. Yahoo 원문·Reuters 표현의 복제·전문 번역·재배포 권리를 얻었다는 판단은 아니다."
+        },
+        "conditions": [
+          {
+            "id": "notes-only",
+            "text": "원문 발췌·번역·기사 대체 구성을 제외하고 독자적으로 작성한 요지만 전달한다.",
+            "status": "satisfied"
+          },
+          {
+            "id": "attribution-and-basis",
+            "text": "매체·발언자·거래일·가격 기준을 보존하고 견해를 입증된 인과나 공식 값으로 승격하지 않는다.",
+            "status": "satisfied"
+          }
+        ],
+        "uses": {
+          "local_analysis": {
+            "status": "allowed",
+            "reason": "사용자가 승인한 로컬 검토 범위에서 사실·귀속 견해를 구분하여 검토한다.",
+            "conditionIds": [
+              "notes-only"
+            ]
+          },
+          "external_model": {
+            "status": "allowed",
+            "reason": "사실·아이디어와 표현을 구분한 명시적 범위 판단. 이 검토 카드만 향후 입력 후보로 인정하며 호출 승인은 별도다.",
+            "conditionIds": [
+              "notes-only",
+              "attribution-and-basis"
+            ]
+          },
+          "public_display": {
+            "status": "pending",
+            "reason": "이 카드와 리포트의 최종 공개 표현·인용·출처 표시는 별도 검토하며 자동으로 승인하지 않는다.",
+            "conditionIds": []
+          }
+        },
+        "basis": {
+          "kind": "reviewer_facts_and_attributed_ideas",
+          "notPublisherPermission": true,
+          "references": [
+            "https://www.wipo.int/en/web/copyright/protection",
+            "https://www.law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1033063839",
+            "https://law.go.kr/lsLinkCommonInfo.do?chrClsCd=010202&lsJoLnkSeq=1025517657"
+          ],
+          "limitation": "이용 범위에 대한 검토자의 실무 판단이며 국가별 계약·저작권 분쟁의 법률적 결론은 아니다. 출처 표시나 문장 길이만으로 허용을 판단하지 않는다."
+        }
+      },
+      "claims": [
+        {
+          "noteId": "n0",
+          "questionId": "global",
+          "role": "driver",
+          "eventKey": "clp-20260910-oil-rates",
+          "independenceKey": "reuters-mcgeever",
+          "relation": "supports",
+          "supported": true,
+          "review": {
+            "origin": "agent",
+            "status": "checked",
+            "reason": "확인한 당일 글로벌 시장 해설에만 귀속한다. Reuters 기관의 공식 견해나 칠레 환율 원인의 단독 입증으로 바꾸지 않는다. 발표시각은 칠레 평균 집계 마감 이후이므로 사전 정보로 소급하지 않는다."
+          }
+        }
+      ]
+    }
+  ],
+  "reportDate": "2026-09-10"
+}

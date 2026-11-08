@@ -1,0 +1,57 @@
+{
+  "version": "economic-evidence-card-proposal/1",
+  "reviewStandard": "economic-scope-review/1",
+  "status": "proposal_not_wired",
+  "origin": "agent",
+  "currency": "CLP",
+  "baseDate": "2026-10-09",
+  "sourceReviewDate": "2026-10-11",
+  "publicationApproved": false,
+  "purpose": "economic_update_not_fx_causation",
+  "cards": [
+    {
+      "evidenceId": "ine-cl-ipc-september",
+      "sourceDocumentHash": "85e015e8a3bcb1a249e6364eb5887c77bbe3c13869e3f2d0bef066c8f87a9464",
+      "passageIds": ["p0", "p1", "p2", "p3", "p4"],
+      "period": "2026-09",
+      "scope": {
+        "subject": "IPC 및 구성 분류",
+        "metric": "분류 가격 변화율과 전체 IPC 기여도를 구분",
+        "unit": "변화율 percent, 기여도 percentage_point",
+        "comparison": "분류 기여는 전월 대비; 연간 전체 IPC와 혼합하지 않음",
+        "rankingStatus": "full_division_ranking_unverified"
+      },
+      "admittedClaims": [
+        {"id": "ipc-mixed-directions", "kind": "source_fact", "passageIds": ["p1", "p2", "p4"], "text": "식품·교통 가격은 상승하고 보험·금융 가격은 하락했다."},
+        {"id": "ipc-offset", "kind": "same_index_arithmetic", "passageIds": ["p4"], "text": "보험·금융의 음의 기여는 전체 IPC 상승을 일부 상쇄했다."}
+      ],
+      "allowedUse": "전체 상승률과 품목별 방향의 차이를 설명한다. 식품·교통을 원문이 강조한 상승 분류로 귀속할 수 있다.",
+      "countercontext": "일부 분류는 반대로 움직였다. 가계별 실제 부담이나 판매 변화는 이번 자료의 측정 대상이라고 확인하지 않았다.",
+      "excludedExpansions": ["확인되지 않은 전체 기여도 순위", "가계 부담의 상대적 크기", "당일 환율 원인", "실제 판매량 변화"],
+      "coverageGaps": [{"subject": "전체 분류별 기여도 표", "status": "not_in_packet"}, {"subject": "가구별 지출·소득 및 내구재 판매", "status": "not_in_packet"}],
+      "approvedMechanismApplications": []
+    },
+    {
+      "evidenceId": "ine-cl-real-wage-august",
+      "sourceDocumentHash": "5da4fc0731de1bfc6062848cfb29ebf0d521e1f746aedcc14c6adf0172bdad05",
+      "passageIds": ["p1", "p2", "p3"],
+      "period": "2026-08",
+      "scope": {
+        "subject": "실질보수 지수; 전 가구 소득 아님",
+        "metric": "물가 조정된 보수 지수의 변화",
+        "unit": "percent",
+        "comparison": "전년 동월 대비",
+        "surveyPopulationDetail": "methodology_not_reviewed_do_not_invent"
+      },
+      "admittedClaims": [
+        {"id": "real-wage-definition-and-direction", "kind": "source_fact", "passageIds": ["p2"], "text": "물가 변동을 반영해 조정한 실질보수 지수가 전년 대비 증가했다."}
+      ],
+      "allowedUse": "실질보수 정의와 증가를 별도 월의 임금 맥락으로 설명한다. 소비·판매 결과를 관측한 것으로 쓰지 않는다.",
+      "countercontext": "8월 보수와 9월 IPC는 대상 월이 다르다. 이번 입력에는 실제 내구재 판매 자료가 포함되지 않았다.",
+      "crossSourceClaims": [{"subject": "보수와 IPC의 대상 월 비교", "requiredEvidenceIds": ["ine-cl-real-wage-august", "ine-cl-ipc-september"]}],
+      "excludedExpansions": ["9월 IPC를 다시 차감한 실질보수", "모든 가구 구매력 상승", "9월 생활 부담의 실제 상쇄", "판매 통계 미발표 단정"],
+      "coverageGaps": [{"subject": "실제 내구재 판매", "status": "not_in_packet"}],
+      "approvedMechanismApplications": []
+    }
+  ]
+}

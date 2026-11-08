@@ -1,7 +1,8 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import puppeteer from 'puppeteer'
-import { loadOperationalFxDataset } from './load-fx-dataset.js'
+import { loadEmailChartDataset } from './email/frozen-dataset.js'
+import { emailHash } from './email/delivery-core.js'
 
 const CHART_PATH = path.resolve('email-chart.png')
 const META_PATH = path.resolve('email-chart-meta.json')
@@ -334,7 +335,7 @@ function buildHtml(dataset, chartData, chartNotes) {
 }
 
 async function main() {
-  const dataset = await loadOperationalFxDataset()
+  const { dataset, frozen } = await loadEmailChartDataset()
   const dailyRates = Array.isArray(dataset.dailyRates) ? dataset.dailyRates : []
   const [baseYear, baseMonth] = dataset.baseDate.split('-').map(Number)
 
@@ -395,6 +396,9 @@ async function main() {
       status: 'ok',
       generatedAt: new Date().toISOString(),
       baseDate: dataset.baseDate,
+      datasetHash: emailHash(JSON.stringify(dataset)),
+      chartHash: emailHash(await fs.readFile(CHART_PATH)),
+      frozen,
       chart: path.basename(CHART_PATH),
       currencies: CURRENCIES,
       pointsPerCurrency: Object.fromEntries(

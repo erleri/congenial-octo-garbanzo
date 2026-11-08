@@ -1,0 +1,74 @@
+{
+  "task": "보강한 영업 환경 입력 확정 및 실제 칠레 원고 1회 생성",
+  "reviewDate": "2026-10-15",
+  "status": "generated_pending_content_review",
+  "authorization": {
+    "source": "사용자의 현재 지시: 1~2번 진행해",
+    "scope": "기존 Claude 설정으로 칠레 로컬 입력 준비와 실제 생성 1회",
+    "callCount": 1,
+    "newCostCapUsd": 0.18,
+    "calculatedMaximumUsd": 0.179844,
+    "retries": 0,
+    "fallbacks": false,
+    "publicationAuthorized": false
+  },
+  "input": {
+    "preparation": ".local-reports/private/consumer-trial-preparation-4Y51NX",
+    "planHash": "7e8fd98affb83da7345f6293dad3e5e699100d613a0f7aa0f3d0605caf626d7c",
+    "reportDate": "2026-10-15",
+    "priceObservationDate": "2026-10-15",
+    "statisticPeriod": "2026-08",
+    "novelty": "기존 원고에 없던 소매 전체·관련 상품군 관측을 설명에 추가. 당일 통계 발표로 간주하지 않음.",
+    "marketSource": "현재 원격 main의 공개 fallback을 SHA 고정 URL로 별도 취득. 운영 데이터 파일과 기존 원고는 변경하지 않음.",
+    "sourceVersion": "이전에 확보·대조한 PDF 버전 사용. 최신 PDF 해시를 새로 검증한 것으로 표시하지 않음.",
+    "comparisonLimit": "이전 원고와 근거 및 입력이 함께 바뀌었으므로 동일 근거 프롬프트 A/B가 아님.",
+    "inputTokenBound": 24481,
+    "maxOutputTokens": 8192
+  },
+  "execution": {
+    "modelRequested": "anthropic/claude-sonnet-5.5",
+    "modelReturned": "anthropic/claude-sonnet-5.5",
+    "providerRoute": "google-vertex/global",
+    "reasoning": "medium",
+    "zdr": true,
+    "dataCollection": "deny",
+    "timeoutMs": 120000,
+    "latencyMs": 12418,
+    "promptTokens": 9179,
+    "completionTokens": 1831,
+    "reportedReasoningTokens": 0,
+    "newCostUsd": 0.036668,
+    "costSource": "OpenRouter usage.cost",
+    "reservedUsdRemaining": 0,
+    "priorCampaignCostUsd": 0.11686,
+    "priorCampaignJournalPreserved": true,
+    "oneShotRoot": ".local-reports/private/consumer-context-trial-20261015",
+    "rawResult": ".local-reports/private/consumer-context-trial-20261015/run-Bjwr5i/result.json",
+    "newReportId": "CLP-2026-10-15-1792075926349"
+  },
+  "result": {
+    "transport": "completed",
+    "localSchemaAndReferenceValidation": "passed",
+    "validationErrors": [],
+    "reportStatus": "pending_review",
+    "humanReaderApproval": "pending",
+    "independentQualityScore": "not_evaluated",
+    "publicationApproved": false,
+    "preliminaryEditorialObservations": [
+      "새 소매 발표라는 표현은 보고서 작성일의 새 발표처럼 읽힐 여지가 있어 발표일·대상 월 표시와 함께 검토 필요",
+      "상품군 정의의 재진술과 지표 읽기 경고가 남아 있어 실제 독자 가치 개선은 별도 평가 필요"
+    ]
+  },
+  "verification": {
+    "relatedTestsPassed": 30,
+    "testFiles": 5,
+    "preservedExistingArtifactHashes": true,
+    "newPaidCalls": 1,
+    "automaticRegeneration": false,
+    "runtimeSourceChangedThisTurn": "로컬 미리보기의 출처 투영 보완: 검토된 INE PDF의 기관명·공식 유형을 기존 계약에 맞춰 제공하고 내부 provenance 감사 해시는 제외. 저장 원고·응답 원문 변경 없음.",
+    "operationalDeployment": false,
+    "operationalDbChanges": false,
+    "mailSent": false
+  },
+  "next": "기존 원고와 나란히 읽으며 근거·영업 관련성·읽기 편의성을 평가하고 A안에서 확인. 재생성은 이번 1회 범위에 포함하지 않음."
+}

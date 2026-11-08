@@ -1,0 +1,75 @@
+{
+  "version": "publisher-admission-verification/1",
+  "verifiedOn": "2026-10-26",
+  "purpose": "반복 사용 가능한 원문 채택 경계와 기존 집필 입력 연결의 실제 칠레 재현. 새 AI 원고나 게시 승인 아님.",
+  "policy": "publisher-admission/1",
+  "standard": "publisher-admission-standard.md",
+  "sourceReviewOrigin": "agent",
+  "independentSemanticReview": "not_performed",
+  "inputs": {
+    "price": ".local-reports/private/bcch-report-input-uYxzrx/research-input.json",
+    "research": ".local-reports/private/publisher-research-ZfkJLP/result.json",
+    "rawCaptureLedger": ".local-reports/private/clp-publisher-discovery-84WFAi/ledger.json",
+    "receipt": ".local-reports/private/publisher-receipt-7Wu5r9/receipt.json",
+    "receiptFileSha256": "1e13496ae9ed7258cb62c4859a3af765f2566b04258debb9a9a3552c16a8db78",
+    "receiptObjectBinding": "3c5a0da5c3dc89de821380870bc6eb8cec86a44f74db9e9ec32126017f897aff"
+  },
+  "output": {
+    "file": ".local-reports/private/publisher-admission-cJEoyg/review-input.json",
+    "sha256": "b8482a552a53665451e225e879876dcf68adab97ad3614f7719c8a7e6514ac74",
+    "reportDate": "2026-10-26",
+    "priceSessionDate": "2026-10-23",
+    "previousPriceSessionDate": "2026-10-22",
+    "status": "prepared_for_local_review",
+    "admittedSources": 3,
+    "admittedClaims": 5,
+    "heldSources": 1,
+    "excludedSources": 1,
+    "coveredQuestions": ["market", "local", "global", "counter"],
+    "missingQuestions": ["consumer", "watch"],
+    "writingEligibility": false,
+    "contentQuality": "not_assessed",
+    "publicationApproved": false,
+    "holds": ["independent_content_review_required", "writing_value_not_assessed", "public_reuse_not_approved", "external_model_transfer_terms_unverified"]
+  },
+  "decisions": [
+    {"sourceId": "local-0bb70e0037ab", "decision": "admit", "claims": ["clp-close-report"], "scope": "Emol 마감 호가 상승 보도. BCCh 평균 수치와 혼합하지 않음."},
+    {"sourceId": "local-9764d3b9895f", "decision": "admit", "claims": ["clp-energy-channel", "clp-morning-dollar", "clp-copper-counter"], "scope": "Capitaria의 에너지 수입 경로, XTB의 오전 달러·국채 해석과 구리의 상쇄 요인. 매수·매도 표기 및 가격 수치 제외."},
+    {"sourceId": "local-e54350ed90a1", "decision": "admit", "claims": ["clp-novelty-counter"], "scope": "PKF Chile의 유가 신규성에 대한 마감 뒤 반대 견해. 소비 실적, 목표환율, 확률, 광산 생산 수치 제외."},
+    {"sourceId": "local-b5d228982a90", "decision": "hold", "claims": [], "scope": "누적 변동률 산술 불일치. 원자료 확인 전 해당 기사에서 주장 채택 없음. 다른 모든 수치가 틀렸다는 판정은 아님."},
+    {"sourceId": "local-44e70b025a88", "decision": "exclude", "claims": [], "scope": "전일 오전의 중복 설명. 이번 입력에서 제외하되 원문 보존."}
+  ],
+  "independence": "채택 세 기사는 모두 Emol이다. XTB·Capitaria·PKF 인용을 기록하지만 기사 다섯 건을 독립 확인 다섯 번으로 세지 않는다.",
+  "countercontext": {
+    "energyClaimRequires": ["clp-copper-counter", "clp-novelty-counter"],
+    "reviewerReason": "유가 압력에 대한 해석과 추가된 새 정보가 없다는 견해는 동일한 수치의 부정이 아니다. qualifies로 연결하되 이견을 생략하거나 단독 원인 확신으로 바꾸지 않는다.",
+    "morningVersusEvening": "오전 달러 약세 해석은 오전에만 귀속한다. 저녁 달러 강세 설명을 같은 시점으로 합치지 않는다.",
+    "notProven": "직접 원인·지속성·새 리포트의 작성 가치는 미확정이다. 원리 적용을 새로 승인하지 않았다."
+  },
+  "verification": {
+    "actualCase": "저장 원문 HTML 5건을 동일 바이트에서 재추출해 본문·발표 메타데이터를 대조하고 기존 scope/dossier/brief에 연결",
+    "rawCaptureHashesUnchanged": true,
+    "marketSnapshotUnchanged": true,
+    "newSyntheticCases": 9,
+    "fullSuite": {"files": 87, "declaredTests": 503, "executedCases": 607, "parameterExpansions": 104, "status": "passed"},
+    "inventoryAudit": "Exact duplicates not detected; not proof of semantic uniqueness or actual AI quality.",
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "bundleBoundary": "passed; entry 610348 bytes, existing size warning unchanged",
+    "secretScan": {"files": 337, "actualBcchTokenOrEncodedTokenHits": 0, "gitDiffContainsToken": false},
+    "gitIgnore": "private input/output/receipts and BCCh env file confirmed ignored",
+    "publicDataSha256": "c7d75391561af63d4fc67cf05cd991cf12c7acbb6d1175ab56b5dbcfa35c3f9e",
+    "fullHistorySha256": "c111e8f02d373f5867f69c73d1c0b1791dac5069a515cd3b2ad67e466822a31f",
+    "notRun": ["UI smoke: no UI change", "DB tests: no DB change", "actual model generation", "independent content review"]
+  },
+  "cost": {"externalRequests": 0, "modelCalls": 0, "newApiCostUsd": 0},
+  "preserved": ["existing manuscripts", "existing approval and cost records", "operational datasets", "production workflows and deployment", "all original captures"],
+  "remaining": [
+    "독립 내용 검토에서 주장의 모든 요소·시간 범위·귀속·신규성을 확인한다.",
+    "기사 발췌의 외부 모델 전송·공개 이용 범위를 확인하고 원문 전체를 공개 UI에 전달하지 않는다.",
+    "소비 및 구체적인 관찰 자료는 이번 입력에서 미확보이며 채우기 위한 추정을 하지 않는다.",
+    "자동 의미 채택 또는 운영 연결은 구현하지 않았다. 실제 생성은 검토 뒤 별도 예산 범위에서 결정한다."
+  ]
+}

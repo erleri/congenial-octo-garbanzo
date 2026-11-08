@@ -1,0 +1,68 @@
+{
+  "checkedAt": "2026-10-16T10:24:08.962Z",
+  "scope": "local-only; no paid API, production DB, deploy, push or mail",
+  "candidate": {
+    "id": "CLP-2026-10-15-1792145210900",
+    "sha256": "78e0408b71c0c41eb7c8eb6f713be9508a41ad791ecfe0bf0af2b791d1180e17",
+    "localRunId": "f354b800-c8c5-40e4-9ab5-689882899f46",
+    "status": "pending_review",
+    "qualityAverage": null,
+    "approvalResult": "blocked: content review and quality/evidence scores absent; no fabricated score, review audit or public copy",
+    "previousApprovedReportPreserved": "CLP-2026-10-09-1791893507884"
+  },
+  "changes": [
+    "Additive presentation-version trigger allowlists monthly-facts/1 in public projection; no RLS or approval threshold change.",
+    "Approval UI states missing review/scores and disables ineligible approval; DB remains authoritative.",
+    "Observed REST outage leaving private drafts visible because overlapping polling invalidated unresolved requests. Added bounded request deadline and late-result protection: admin 1500 ms, public 5000 ms. Repeated actual local REST stop/restart verified hiding drafts."
+  ],
+  "verification": {
+    "unitTests": { "passed": 538, "failed": 0, "report": ".local-reports/private/unit-tests.json", "notQualitySamples": true },
+    "typecheck": "passed",
+    "lint": "passed",
+    "builds": ["production", "report studio", "integrated local app", "isolated report-disabled production preview"],
+    "pgTAP": { "passed": 61, "files": 4, "environment": "latamfx-2x-isolated", "method": "psql with extensions search_path; installed CLI cannot parse existing private config" },
+    "authRestIntegration": { "passed": 13, "report": ".local-reports/private/local-db/verification.json" },
+    "readerProjection": { "passed": 15, "report": ".local-reports/private/reader-release-gJiR9b/result.json", "approvalFixture": "explicit synthetic future-date copy, approved then withdrawn; not an assessed real report" },
+    "httpAndSecrets": { "passed": 15, "filesScanned": 42, "report": ".local-reports/private/app-report-verification-Zml67W/result.json" },
+    "browser": [
+      "Actual unscored candidate visible to local admin with approval disabled and explicit reasons.",
+      "REST outage: private drafts hidden; logout removes private state.",
+      "Warm public cache retains original approved date; cold tab displays retry/error, not a draft.",
+      "REST restored; approved October 9 report reads without cache badge. Test fixtures remain withdrawn.",
+      "During report DB outage existing static FX dashboard remains available.",
+      "Report-disabled preview: dashboard, monthly table and CLP filter, daily CLP values, plan comparison and admin render. Direct #report/CLP falls back to dashboard.",
+      "Static regression dataset is September 12, not current production data. USD/KRW 1341, monthly 1351, MoM -3.76%; CLP spot 942.4, monthly 934 and MoM +1.62%."
+    ],
+    "screenshots": [
+      ".local-reports/reviewable/release-admin-outage-20261016.png",
+      ".local-reports/reviewable/release-public-cache-20261016.png",
+      ".local-reports/reviewable/release-public-restored-20261016.png"
+    ]
+  },
+  "deploymentReadiness": {
+    "status": "blocked",
+    "gaps": [
+      "Currency A report and review are gated by __LOCAL_CURRENCY_REPORTS__ and use local-db provider. Production flag selects older multi-currency FxReports; production provider/admin integration remains.",
+      "Generated FX_REPORT_ENABLED is build-time, not immediate runtime shutdown. Workflow generation and UI-sync fallbacks differ; unified shutdown contract not verified.",
+      "New real manuscript independent content review and honest quality scores are missing.",
+      "Ten-business-day pilot, supported currency scope and operational release approval remain.",
+      "Actual Netlify preview/production deployment, production migration and rollback rehearsal not performed."
+    ],
+    "recoveryContract": [
+      "Disable report generation separately from UI; preserve FX data, mail, drafts and audit records.",
+      "Local disabled build smoke-tested. Compile-time UI flag requires a new build/deploy.",
+      "Failed deploy must leave existing production intact. Published faulty changes require reviewed fix/revert commit and a fresh verified deploy; no restoreSiteDeploy/publishDeploy of older deploy.",
+      "Keep DB tables/audits; use compatible read path or feature disable, not deleting history or restoring public access to private data."
+    ]
+  },
+  "limitations": [
+    "No fresh npm ci, dependency audit, live production FX/plan save, real email, Excel upload, full accessibility or A4 print verification in this turn.",
+    "Existing entry bundle warning remains: 610414 bytes; boundary check passed, not a performance guarantee.",
+    "New migration applied only to isolated local DB via SQL. CLI migration history and copied private rebuild directory not updated; fresh CLI-based rebuild remains a release gate.",
+    "Earlier verification assertion expected private market snapshot fields in public projection; corrected test to existing public allowlist. Failed synthetic public fixture was withdrawn and audit retained.",
+    "Git ownership mismatch handled with per-command safe.directory, not global configuration."
+  ],
+  "costUsd": 0,
+  "modelCalls": 0,
+  "productionWrites": 0
+}
