@@ -16,6 +16,15 @@ function fixture() {
 const inspect=(x:ReturnType<typeof fixture>,renderings:Record<string,unknown>={})=>inspectSourceUses({resources:[x.e],reviews:[x.r],evaluatedOn:'2026-10-28',renderings}).items[0]
 
 describe('Bound source attribution delivery',()=>{
+ it('retains supplied authors and licence credits beyond a short label without allowing an unbounded field or mismatched delivery',()=>{
+  const x=fixture()
+  x.n.attribution='Publisher · '+Array.from({length:8},(_,i)=>`Author ${i}: `+'a'.repeat(120)).join(' · ')+' · https://creativecommons.org/licenses/by/4.0/'
+  x.r.conditions[0].delivery.equals=x.n.attribution
+  const rows=projectSourceAttributions([x.e],[x.n])
+  expect(inspect(x,{external_model:rows}).uses.external_model.status).toBe('allowed')
+  expect(inspect(x,{external_model:[{...rows[0],attribution:rows[0].attribution.slice(0,480)}]}).uses.external_model.status).toBe('pending')
+  expect(()=>projectSourceAttributions([x.e],[{...x.n,attribution:'a'.repeat(4097)}])).toThrow('source_attribution_binding_required')
+ })
  it('connects recurring labels in a new review copy without changing scope decisions or duplicating conditions',()=>{
   const x=fixture(),sourceUse={evaluatedOn:'2026-10-28',reviews:[x.r]},before=structuredClone(sourceUse)
   x.r.uses.public_display.status='pending';before.reviews[0].uses.public_display.status='pending'

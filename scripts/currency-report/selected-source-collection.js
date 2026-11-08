@@ -14,7 +14,10 @@ import {inspectRobots,publisherAccessBarrier} from './news-publisher-access.js'
 import {validDate} from './core.js'
 import {LOCAL_SOURCE_REGISTRY} from './local-source-discovery.js'
 import {MAX_RESEARCH_PERIODS_PER_QUESTION} from './research-limits.js'
-import {MAX_SOURCE_NETWORK_REQUESTS,sourceAttemptMinimum,allocateSourceRequests} from './source-request-budget.js'
+import {MAX_SOURCE_NETWORK_REQUESTS,sourceAttemptMinimum,allocateSupplementalSources} from './source-request-budget.js'
+import {discoverSourceCandidates} from './source-candidates.js'
+import {collectAdmittedArticle} from './admitted-article-collection.js'
+import {readCandidatePage} from './source-candidate-probe.js'
 
 export const SELECTED_COLLECTION_VERSION='selected-source-collection/1'
 const MAX_SELECTED_LOGICAL_REQUESTS=30*MAX_RESEARCH_PERIODS_PER_QUESTION*4 // routes × periods × core questions; not HTTP allowance
@@ -70,7 +73,8 @@ export function bindSelectedOriginalReview({request,record,adapter,requestIds,ta
 }
 
 export async function collectSelectedResearch({input,sourcePlan,sourceRegister,requestIds,articleUrls=[],captures=[],pdfCaptures=[],inegiCaptures=[],mode='saved',fetchImpl,
-  maxNetworkRequests=8,fairSourceBudgets=false,timeoutMs=15000,now=()=>new Date().toISOString(),checkpoint=async()=>{},discoveryFeedback}) {
+  maxNetworkRequests=8,fairSourceBudgets=false,timeoutMs=15000,now=()=>new Date().toISOString(),checkpoint=async()=>{},discoveryFeedback,signal}) {
+  signal?.throwIfAborted()
   if(!['saved','live'].includes(mode)||mode==='live'&&typeof fetchImpl!=='function'||!bounded(maxNetworkRequests,1,MAX_SOURCE_NETWORK_REQUESTS)
     ||typeof fairSourceBudgets!=='boolean'||!bounded(timeoutMs,1,20000)||!Array.isArray(captures)||captures.length>32||!Array.isArray(pdfCaptures)||pdfCaptures.length>8)throw new Error('invalid_selected_collection_options')
   captures.forEach(validateCapture)
@@ -95,12 +99,18 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
   // Keep transport/capture budgets unchanged and deduplicate physical articles.
   if(!Array.isArray(requestIds)||!requestIds.length||requestIds.length>MAX_SELECTED_LOGICAL_REQUESTS||new Set(requestIds).size!==requestIds.length
     ||requestIds.some(id=>!selection.sourceRequests.some(r=>r.requestId===id)))throw new Error('explicit_selected_requests_required')
-  const chosen=selection.sourceRequests.filter(r=>requestIds.includes(r.requestId)),outcomes=[],originals=[],reviewQueue=[],receipts=[],cache=new Map(),publisherCache=new Map(),transportCache=new Map(),network=[]
+  const chosen=selection.sourceRequests.filter(r=>requestIds.includes(r.requestId))
+   .sort((a,b)=>Number(Boolean(catalog.sources.find(s=>s.id===a.sourceId)?.admission))-Number(Boolean(catalog.sources.find(s=>s.id===b.sourceId)?.admission))),outcomes=[],originals=[],reviewQueue=[],receipts=[],cache=new Map(),publisherCache=new Map(),transportCache=new Map(),network=[]
+  const sourceCandidates=new Map(),admittedCache=new Map()
+  const rememberCandidates=(text,url,sourceId)=>{
+    for(const c of discoverSourceCandidates({text,url,sourceId,currency:selection.currency,catalog}))
+      if(sourceCandidates.size<32&&!sourceCandidates.has(c.domain))sourceCandidates.set(c.domain,c)
+  }
   const sourceIds=[...new Set(chosen.map(r=>r.sourceId))]
   const weights=sourceIds.map(sourceId=>materialRecipe(chosen.find(r=>r.sourceId===sourceId),catalog,sourceRegister).kind==='existing_chile_publisher'
     ?Math.max(1,(LOCAL_SOURCE_REGISTRY[selection.currency]??[]).length):1)
   const minimums=sourceIds.map((id,i)=>sourceAttemptMinimum(materialRecipe(chosen.find(r=>r.sourceId===id),catalog,sourceRegister),weights[i]))
-  const budget=allocateSourceRequests({minimums,weights,maxNetworkRequests}),limits=budget.limits
+  const budget=allocateSupplementalSources({minimums,weights,maxNetworkRequests,admitted:sourceIds.map(id=>Boolean(catalog.sources.find(s=>s.id===id)?.admission))}),limits=budget.limits
   const sourceLimits=new Map(sourceIds.map((id,index)=>[id,fairSourceBudgets?limits[index]:maxNetworkRequests]))
   let activeSource=null
   const sourceSpent=id=>network.filter(r=>r.sourceId===id).length
@@ -172,6 +182,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
     reviewQueue.push(review);return id
   }
   for(const request of chosen) {
+    signal?.throwIfAborted()
     activeSource=request.sourceId
     let recipe=materialRecipe(request,catalog,sourceRegister)
     const row={requestId:request.requestId,sourceId:request.sourceId,
@@ -179,6 +190,19 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
     outcomes.push(row)
     // Defensive guard: excluded sources are normally removed by the planner.
     if(recipe.kind==='excluded')throw new Error('excluded_source_not_collectable')
+    if(recipe.kind==='admitted_article'){
+      if(!admittedCache.has(request.sourceId))admittedCache.set(request.sourceId,await collectAdmittedArticle({
+        source:recipe.source,mode,captures,asOf:selection.asOf,now,read:async(url,options)=>{
+          if(network.length>=maxNetworkRequests||sourceSpent(activeSource)>=sourceLimits.get(activeSource))throw Error('local_source_request_limit')
+          const attempt={url,sourceId:activeSource,status:'started'};network.push(attempt)
+          try{signal?.throwIfAborted();const result=await readCandidatePage(url,{...options,signal});attempt.status=`http_${result.status}`;return result}
+          catch(error){attempt.status='transport_failed';throw error}
+        }}))
+      const result=admittedCache.get(request.sourceId)
+      row.status=result.status==='collected_pending_review'?'collected_pending_review':'access_failed';row.reason=result.reason??null
+      if(result.record)row.originalIds.push(addOriginal(request,result.record,'reviewed_news_notes'))
+      continue
+    }
     if(request.sourceId==='mxn-consumer'&&inegiCaptures.length) {
       row.adapter='inegi_report_projection';row.issues=[]
       const targets=selection.questions.flatMap(q=>q.targets.filter(t=>t.sources.some(s=>s.requestId===request.requestId)))
@@ -280,6 +304,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
       row.reason=readResult.reason;continue
     }
     if(recipe.kind==='news_listing') {
+      rememberCandidates(readResult.text,recipe.url,request.sourceId)
       const discoveryOptions={sourceId:request.sourceId,period:request.period,limit:recipe.access?3:2,
         deprioritizeUrls:discoveryFeedback?.deprioritizeUrls??[]}
       let found=explicitArticle?{candidates:[{url:explicitArticle.url,title:'User-supplied URL; article title not verified'}]}
@@ -311,6 +336,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
           const index=await read(request.sourceId,recipe.access.indexUrl,{kind:'news_index',url:recipe.access.indexUrl},request.period)
           row.discoveryAttempts.push({url:recipe.access.indexUrl,status:index.status,reason:index.reason??null})
           if(index.status==='ok'){
+            rememberCandidates(index.text,recipe.access.indexUrl,request.sourceId)
             const indexed=discoverRegisteredNews(index.text,recipe.access.indexUrl,selection.currency,discoveryOptions)
             const combined=[...indexed.candidates,...found.candidates]
               .filter((candidate,index,all)=>all.findIndex(c=>c.url===candidate.url)===index)
@@ -345,6 +371,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
         if(page.status!=='ok'){row.issues.push({status:page.status==='not_attempted'?'not_attempted':'access_failed',reason:page.reason});continue}
         const barrier=publisherAccessBarrier(page.text)
         if(barrier){row.issues.push({status:'access_failed',reason:barrier});continue}
+        rememberCandidates(page.text,candidate.url,request.sourceId)
         const article=await collectOriginal({candidate,currency:selection.currency,baseDate:selection.baseDate,
           fetchImpl:async()=>new Response(page.text),robotsText:robots?.text})
         if(article.status!=='collected_pending_review'){row.issues.push({status:'extraction_failed',reason:article.reason});continue}
@@ -415,6 +442,7 @@ export async function collectSelectedResearch({input,sourcePlan,sourceRegister,r
     startedAt,selectionId:selection.selectionId,catalogId:catalog.catalogId,outcomes,originals,reviewQueue,receipts,network,
     ...(fairSourceBudgets?{sourceRequestBudgets:sourceIds.map(sourceId=>({sourceId,limit:sourceLimits.get(sourceId),spent:sourceSpent(sourceId)})),
       sourceBudgetCoverage:{minimumCoverage:budget.minimumCoverage,minimumRequired:budget.minimumRequired,maxNetworkRequests}}:{}),
+    sourceCandidates:[...sourceCandidates.values()],
     networkCalls:network.length,modelCalls:0,newPaidCostUsd:0,retries:0,writingEligibility:'not_assessed',publicationApproved:false}
   await checkpoint('result',result);return result
 }

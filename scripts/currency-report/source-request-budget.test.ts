@@ -1,10 +1,26 @@
 import {it,expect,vi} from 'vitest'
 import fs from 'node:fs'
-import {sourceAttemptMinimum,allocateSourceRequests,automaticSourceRequestLimit} from './source-request-budget.js'
+import {sourceAttemptMinimum,allocateSourceRequests,automaticSourceRequestLimit,allocateSupplementalSources,automaticSupplementalRequestLimit} from './source-request-budget.js'
 import {collectionDiagnostics} from './collection-diagnostics.js'
 import {runtimeFixture} from './runtime-fixture.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
 import {fetchLocalSourceDiscovery} from './local-source-discovery.js'
+
+it('adds optional article requests without taking the registered routes allowance and defers extras at the ceiling',()=>{
+ const base=[4,4,3],weights=[2,1,1],minimums=[...base,2,2],admitted=[false,false,false,true,true]
+ const maxNetworkRequests=automaticSupplementalRequestLimit(minimums,admitted)
+ expect(maxNetworkRequests).toBe(20)
+ const result=allocateSupplementalSources({minimums,weights:[...weights,1,1],admitted,maxNetworkRequests})
+ expect(result.limits.slice(0,3)).toEqual(allocateSourceRequests({minimums:base,weights,maxNetworkRequests:16}).limits)
+ expect(result.limits.slice(3)).toEqual([2,2]);expect(result.minimumCoverage).toBe(true)
+ const capped=Array(8).fill(4).concat([2,2]),flags=Array(8).fill(false).concat([true,true])
+ expect(automaticSupplementalRequestLimit(capped,flags)).toBe(32)
+ expect(allocateSupplementalSources({minimums:capped,weights:capped.map(()=>1),admitted:flags,maxNetworkRequests:32}))
+  .toEqual({limits:Array(8).fill(4).concat([0,0]),minimumCoverage:false,minimumRequired:36})
+ const explicit=allocateSupplementalSources({minimums,weights:[...weights,1,1],admitted,maxNetworkRequests:8})
+ expect(explicit.limits.slice(3)).toEqual([0,0]);expect(explicit.limits.reduce((a,b)=>a+b,0)).toBe(8)
+ expect(()=>allocateSupplementalSources({minimums:[2,0],weights:[1,1],admitted:[false,true],maxNetworkRequests:16})).toThrow('source_request_budget_invalid')
+})
 
 it('reserves discovery plus one article without raising an explicit small budget or exceeding the free ceiling',()=>{
  const minimums=[2,6,2,3,4,4],weights=minimums.map(()=>1)

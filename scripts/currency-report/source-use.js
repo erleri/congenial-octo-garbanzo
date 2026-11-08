@@ -13,6 +13,9 @@ const url=v=>{try {const u=new URL(v);return u.protocol==='https:' && !u.usernam
 export const sourceUseBinding=resource=>fingerprint(resource)
 
 const deliveryFields=['sourceUrl','publisher','publishedAt','referencePeriod','attribution','transformation']
+// Publisher, supplied authors/title/notices and licence links must fit without
+// dropping mandatory credit. Other fields and aggregate request limits stay bounded.
+export const sourceDeliveryLimit=field=>field==='attribution'?4096:480
 export function inspectSourceUses({resources,reviews,evaluatedOn,renderings={}}) {
   if(!day(evaluatedOn) || !Array.isArray(resources) || resources.length>61 || resources.some(r=>!id(r?.id))
     || new Set(resources.map(r=>r.id)).size!==resources.length || !Array.isArray(reviews) || reviews.length>61
@@ -25,7 +28,7 @@ export function inspectSourceUses({resources,reviews,evaluatedOn,renderings={}})
       ||rows.some(row=>!id(row?.resourceId)||!resources.some(e=>e.id===row.resourceId)
         ||!/^[a-f0-9]{64}$/.test(row.resourceBinding??'')
         ||Object.keys(row).some(k=>!['resourceId','resourceBinding',...deliveryFields].includes(k))
-        ||deliveryFields.some(k=>row[k]!=null&&(typeof row[k]!=='string'||row[k].length>480))))
+        ||deliveryFields.some(k=>row[k]!=null&&(typeof row[k]!=='string'||row[k].length>sourceDeliveryLimit(k)))))
     ||Buffer.byteLength(JSON.stringify(renderings))>250_000)throw new Error('invalid_source_use_renderings')
   for(const r of reviews) {
     if(r?.version!==SOURCE_USE_VERSION || !resources.some(e=>e.id===r.resourceId)
@@ -36,7 +39,7 @@ export function inspectSourceUses({resources,reviews,evaluatedOn,renderings={}})
       || !Array.isArray(r.conditions) || r.conditions.length>12 || new Set(r.conditions.map(c=>c?.id)).size!==r.conditions.length
       || r.conditions.some(c=>!id(c?.id) || !text(c.text) || !['satisfied','pending'].includes(c.status))
       || r.conditions.some(c=>c.delivery!==undefined&&(!c.delivery||Object.keys(c.delivery).sort().join(',')!=='equals,field,uses'
-        ||!deliveryFields.includes(c.delivery.field)||typeof c.delivery.equals!=='string'||!c.delivery.equals.trim()||c.delivery.equals.length>480
+        ||!deliveryFields.includes(c.delivery.field)||typeof c.delivery.equals!=='string'||!c.delivery.equals.trim()||c.delivery.equals.length>sourceDeliveryLimit(c.delivery.field)
         ||!Array.isArray(c.delivery.uses)||!c.delivery.uses.length||c.delivery.uses.length>3
         ||new Set(c.delivery.uses).size!==c.delivery.uses.length||c.delivery.uses.some(use=>!SOURCE_USES.includes(use))))
       || !r.uses || Object.keys(r.uses).length!==SOURCE_USES.length

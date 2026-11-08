@@ -15,6 +15,7 @@ export const IBGE_RETAIL_SIDRA_URL='https://apisidra.ibge.gov.br/values/t/8880/n
 export function materialRecipe(request,catalog,sourceRegister) {
   const source=catalog.sources.find(s=>s.id===request.sourceId)
   if(!source) throw new Error('unknown_selected_source')
+  if(source.admission)return {kind:'admitted_article',url:source.admission.url,source}
   const month=/^\d{4}-(0[1-9]|1[0-2])$/.test(request.period)
   if(['brl-policy','brl-retail'].includes(source.id)) {
     const existing=SOURCE_CATALOG.find(s=>s.id===(source.id==='brl-policy'?'bcb-selic':'ibge-retail-volume'))

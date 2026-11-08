@@ -1,6 +1,6 @@
 // Explicit, bound source labels for a local writer handoff. These labels do not
 // grant source-use permission or prove that a public page has rendered them.
-import {sourceUseBinding} from './source-use.js'
+import {sourceUseBinding,sourceDeliveryLimit} from './source-use.js'
 
 export const SOURCE_ATTRIBUTION_VERSION='source-attribution/1'
 export const ATTRIBUTION_FIELDS=Object.freeze(['sourceUrl','publisher','publishedAt','referencePeriod','attribution','transformation'])
@@ -16,7 +16,7 @@ export function projectSourceAttributions(resources,notes=[]) {
    ||Object.keys(n).some(k=>!['version','resourceId','resourceBinding',...ATTRIBUTION_FIELDS].includes(k))
    ||n.sourceUrl!==e.url||n.publisher!==(e.publisher??e.source)
    ||n.publishedAt!==(e.publishedAt??null)||n.referencePeriod!==(e.period??null)
-   ||!safeText(n.attribution,480)||!safeText(n.transformation,480))throw new Error('source_attribution_binding_required')
+   ||!safeText(n.attribution,sourceDeliveryLimit('attribution'))||!safeText(n.transformation,480))throw new Error('source_attribution_binding_required')
   // Only the text that will actually accompany this handoff is projected.
   return {resourceId:e.id,resourceBinding:n.resourceBinding,...Object.fromEntries(ATTRIBUTION_FIELDS.map(k=>[k,n[k]]))}
  })

@@ -45,8 +45,8 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
  if(!key)throw Error('runtime_service_key_required')
  const endpoint=assertRuntimeDestination(url,mode,env)
  const db=client??createClient(endpoint,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}})
- const rpc=async(name,args)=>{
-  const {data,error,status}=await db.rpc(name,args).abortSignal(AbortSignal.timeout(15000))
+ const rpc=async(name,args,signal)=>{
+  const {data,error,status}=await db.rpc(name,args).abortSignal(signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000))
   if(error)throw new RuntimeStoreError(name,error,status)
   return data
  }
@@ -77,6 +77,11 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
   escrowTerminalCost:(id,authorization)=>rpc('escrow_currency_report_terminal_failure',{p_id:id,p_authorization:authorization}),
   releaseUnsent:id=>rpc('release_currency_report_operating_unsent',{p_id:id}),
   supplyCheck:r=>rpc('record_currency_report_supply_check',{p_key:r.key,p_currency:r.currency,p_checked_at:r.checkedAt,p_result:r.result}),
+  sourceMonitor:currency=>rpc('load_currency_report_source_monitor',{p_currency:currency}),
+    sourceAdmissions:({signal}={})=>rpc('load_currency_report_source_admissions',{},signal),
+    saveSourceProof:proof=>rpc('save_currency_report_source_proof',{p_proof:proof}),
+    saveSourceTerms:(check,{signal}={})=>rpc('save_currency_report_source_terms',{p_check:check},signal),
+  saveSourceMonitor:(state,previousBinding)=>rpc('save_currency_report_source_monitor',{p_state:state,p_previous_binding:previousBinding}),
   claimBatch:r=>rpc('claim_currency_report_operating_batch',{p_batch_key:r.key,p_owner:r.owner,p_revision:r.revision,
    p_payload:preserveOrder(r.payload,'serializedOperatingPayload'),p_budget_nano:r.budgetNano,p_max_calls:r.maxCalls}),
   batchCheckpoint:r=>rpc('checkpoint_currency_report_operating_batch',{p_batch_key:r.key,p_owner:r.owner,p_state:r.state,p_result:r.result}),

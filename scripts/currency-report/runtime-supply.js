@@ -20,7 +20,7 @@ import {sourceContinuation} from './research-continuation.js'
 import {MAX_RESEARCH_PERIODS_PER_QUESTION} from './research-limits.js'
 import {materialRecipe} from './registered-material-adapters.js'
 import {LOCAL_SOURCE_REGISTRY} from './local-source-discovery.js'
-import {sourceAttemptMinimum,automaticSourceRequestLimit} from './source-request-budget.js'
+import {sourceAttemptMinimum,automaticSupplementalRequestLimit} from './source-request-budget.js'
 
 export const RUNTIME_SUPPLY_VERSION='currency-runtime-supply/1'
 const marketRoles=['market_observation','attributed_fx_explanation','global_context','countercontext']
@@ -155,7 +155,8 @@ export function recontextualizeSupplyCache({handoff,snapshot,commentaryTarget,as
 
 export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sourcePlan,sourceRegister,
  mode='saved',captures=[],fetchImpl=fetch,checkpoint=async()=>{},now=()=>new Date().toISOString(),maxNetworkRequests,
- inegiCaptures=[],pdfCaptures=[],officialDocuments=[],officialTerms,officialInputLoader,researchNeeds}) {
+ inegiCaptures=[],pdfCaptures=[],officialDocuments=[],officialTerms,officialInputLoader,researchNeeds,supplementalOnly=false,signal}) {
+ signal?.throwIfAborted()
  const input=runtimeResearchInput({snapshot,asOf,commentaryTarget})
  const window=runtimeResearchDates(snapshot,asOf)
  for(const rows of Object.values(input.requirements)){
@@ -164,17 +165,18 @@ export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sou
  }
  const catalog=compileResearchSourceCatalog(sourcePlan,sourceRegister)
  const selection=planResearchSourceSelection({input,sourcePlan,sourceRegister})
- const sources=countryNewsCollectionSources(selection,catalog)
- if(maxNetworkRequests===undefined&&sources.length)maxNetworkRequests=automaticSourceRequestLimit(sources.map(sourceId=>
+ const sources=countryNewsCollectionSources(selection,catalog).filter(id=>!supplementalOnly||catalog.sources.find(s=>s.id===id)?.admission)
+ if(maxNetworkRequests===undefined&&sources.length)maxNetworkRequests=automaticSupplementalRequestLimit(sources.map(sourceId=>
   sourceAttemptMinimum(materialRecipe(selection.sourceRequests.find(r=>r.sourceId===sourceId),catalog,sourceRegister),
-   (LOCAL_SOURCE_REGISTRY[snapshot.currency]??[]).length)))
+   (LOCAL_SOURCE_REGISTRY[snapshot.currency]??[]).length)),sources.map(id=>Boolean(catalog.sources.find(s=>s.id===id)?.admission)))
  let officialInputs={inegiCaptures,officialDocuments,officialTerms},officialInputState=null
- if(officialInputLoader)try{
+ if(!supplementalOnly&&officialInputLoader)try{
   const loaded=await officialInputLoader({currency:snapshot.currency,asOf,mode,fetchImpl,now})
   officialInputs={...officialInputs,...loaded};officialInputState=loaded.inputState??null
  }catch{officialInputState='official_input_acquisition_failed'}
  const officialAsOf=mode==='live'&&Date.parse(now())>Date.parse(asOf)?now():asOf
- const officialBackground=await acquireOfficialBackground({snapshot,asOf:officialAsOf,sourcePlan,sourceRegister,mode,captures,fetchImpl,checkpoint,now,pdfCaptures,...officialInputs})
+ const officialBackground=supplementalOnly?null:await acquireOfficialBackground({snapshot,asOf:officialAsOf,sourcePlan,sourceRegister,mode,captures,fetchImpl,checkpoint,now,pdfCaptures,...officialInputs})
+ if(officialBackground){
  officialBackground.inputState=officialInputState
  officialBackground.inputIssues=officialInputs.inputIssues??[]
  officialBackground.cache=officialInputs.officialCache??null
@@ -189,11 +191,12 @@ export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sou
   }
  }
  officialBackground.networkCalls+=officialInputs.inputNetworkCalls??0
- if(!sources.length)return {collection:null,reason:'no_enabled_country_news_route',sources:[],networkCalls:officialBackground.networkCalls,officialBackground}
+ }
+ if(!sources.length)return {collection:null,reason:'no_enabled_country_news_route',sources:[],networkCalls:officialBackground?.networkCalls??0,officialBackground}
  const collection=await collectSelectedResearch({input,sourcePlan,sourceRegister,
   requestIds:selection.sourceRequests.filter(r=>sources.includes(r.sourceId)).map(r=>r.requestId),
-  mode,captures,fetchImpl,maxNetworkRequests,fairSourceBudgets:true,checkpoint,now,discoveryFeedback:researchNeeds})
- return {collection,sources,networkCalls:collection.networkCalls+officialBackground.networkCalls,officialBackground,completedAt:now(),researchWindow:window,
+  mode,captures,fetchImpl,maxNetworkRequests,fairSourceBudgets:true,checkpoint,now,discoveryFeedback:researchNeeds,signal})
+ return {collection,sources,networkCalls:collection.networkCalls+(officialBackground?.networkCalls??0),officialBackground,completedAt:now(),researchWindow:window,
   researchFeedback:researchNeeds??null,
   commentaryTarget:latestCollectedCommentaryTarget(collection,commentaryTarget,now())}
 }

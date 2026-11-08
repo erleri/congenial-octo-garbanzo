@@ -16,6 +16,7 @@ import {researchFeedback} from './research-continuation.js'
 import {classifyCountryRefresh,frozenSourceReviewHolds} from './operating-refresh.js'
 import {operatingCheckpoint} from './operating-checkpoint.js'
 import {retainRegisteredResearch} from './retained-research.js'
+import {currentSourceAdmissionHold} from './source-admission-catalog.js'
 export {operatingMaterialHash} from './operating-source-cache.js'
 
 const safeReason=error=>/^[a-z0-9_]+$/.test(error?.message??'')?error.message:'operating_execution_hold'
@@ -47,7 +48,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
    const feedback=researchFeedback(cached)
    const acquired=await (acquire??acquireRuntimeResearch)({...args,researchNeeds:feedback})
    if(!acquired.collection)return acquired
-   const collection=retainRegisteredResearch({collection:acquired.collection,cache:cached,asOf:acquired.completedAt??asOf,sourcePlan,sourceRegister,
+   const collection=retainRegisteredResearch({collection:acquired.collection,cache:cached,asOf:acquired.completedAt??asOf,sourcePlan:args.sourcePlan,sourceRegister:args.sourceRegister,
     requestedPeriods:acquired.researchWindow?.dates})
    return {...acquired,...reuseOperatingSources(collection,cached,policy.processingRulesBinding),researchFeedback:feedback}
   }})
@@ -183,17 +184,21 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
  const batch=await store.claimBatch({key,owner,revision:configured.revision,payload,
   budgetNano:Math.round(policy.limits.batchUsd*1e9),maxCalls:policy.limits.maxCalls})
  if(!batch.claimed)return {...summary,status:batch.reason}
- let currentCase=null,deadlineHeld=false
+ let currentCase=null,currentCountry=null,deadlineHeld=false
  const callsBefore=spending.calls,costBefore=spending.confirmedNano
  const heartbeat=async result=>store.batchCheckpoint({key,owner,state:'running',result:operatingCheckpoint(result,key)})
  const scoped={...store,reserve:async request=>{
   if(clock()+125000>=deadlineMs){deadlineHeld=true;return {reserved:false,reason:'execution_time_budget_wait'}}
+  if(currentCountry){
+   const hold=await currentSourceAdmissionHold({country:currentCountry,store,sourcePlan,sourceRegister,asOf:new Date(clock()).toISOString()})
+   if(hold)return {reserved:false,reason:hold}
+  }
   return store.reserve({...request,context:{...request.context,operatingBatchKey:key,operatingOwner:owner,operatingCaseKey:currentCase,
    ...(testOnly?{testOnly:true}:{} )}})
  }}
  try{
   const result=await runOperationalReportBatch({dataset:executionDataset,countries:prepared.privateCountries,asOf:prepared.asOf,store:scoped,env,approval,writer:policy.writer,
-   sourcePlan,sourceRegister,registry,processingRules,preflightSource,preflightWriter,send,reconcile,testOnly,
+   sourcePlan,sourceRegister,registry,processingRules,preflightSource,preflightWriter,send,reconcile,testOnly,sourceAdmissionState:prepared.sourceAdmissionState,
    excludedCountries:[...owned].filter(([,batchKey])=>batchKey!==key).map(([currency])=>currency),
    beforeCountry:async country=>{
     if(owned.has(country.currency)&&owned.get(country.currency)!==key)return {claimed:false,reason:'country_owned_by_prior_batch'}
@@ -201,6 +206,9 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
     // each country. Resume must honour the original recorded country holds.
     const planned=prepared.rows.find(row=>row.currency===country.currency)
     if(!planned||planned.status!=='planned')return {claimed:false,reason:planned?.status??'country_preparation_hold'}
+    currentCountry=country
+    const admissionHold=await currentSourceAdmissionHold({country,store,sourcePlan,sourceRegister,asOf:new Date(clock()).toISOString()})
+    if(admissionHold)return {claimed:false,reason:admissionHold}
     if(clock()+125000>=deadlineMs){deadlineHeld=true;return {claimed:false,reason:'execution_time_budget_wait'}}
     // Store private unreviewed backlog before this country's first POST.
     // A temporary write failure pauses this country through beforeCountry's
