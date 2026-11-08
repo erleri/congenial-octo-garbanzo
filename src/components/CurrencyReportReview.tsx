@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getReportClient, localReportMode } from '../lib/reports/client'
-import type { CurrencyReport } from '../types/currencyReport'
-import { approvalBlockers, type ReviewValidation } from '../lib/reports/approval-readiness'
+import ReportReviewCard, { type ReviewRun as Run } from './ReportReviewCard'
+import './admin-review.css'
 import { withConnectionDeadline } from '../lib/reports/connection-deadline'
 import AdminOverview from './AdminOverview'
 import type { AdminAccess } from '../hooks/useAdminAccess'
@@ -10,7 +10,6 @@ import AdminReviewInbox from './AdminReviewInbox'
 import type {InboxItem} from './AdminReviewInbox'
 import {parseReviewRequest} from '../lib/review-request.js'
 
-interface Run { id: string; status: string; candidate: CurrencyReport; validation: ReviewValidation; attempt: number; created_at:string; cost?:{costUsd?:number|null}; storage_required?:boolean; storageComplete?:boolean; expectedPublicId?:string|null }
 interface Correction {key:string;revision:number;createdAt:string;status:string;lastReview?:{reason:string;decision:string;createdAt:string}|null;record:{currency:string;reportId:string;baseDate:string;claimId:string;quote:string;kind:string;reason:string;sourceUrl:string;before:{value?:number;period?:string};after:{value?:number;period?:string};testOnly:boolean}}
 interface Corrections {items:Correction[];pending:number;checks:{currency:string;checkedAt:string;coverage:{reportsChecked:number;missingSnapshotReports:number;unmappedEvidence:number;historyWindowLimited?:boolean;issues:string[]}}[]}
 const correctionIssues:Record<string,string>={current_article_binding_unverified:'기사 원자료 검사 미확인',current_statistics_binding_unverified:'새 통계 입력 검사 미확인',published_snapshot_binding_unverified:'발행 당시 입력 일치 여부 미확인',published_indicator_definition_unavailable:'과거 지표 정의 복원 불가',candidate_display_safety_hold:'후보 문장의 표시 안전성 확인 필요',candidate_capacity_review_required:'후보 상한에 도달해 일부 기록 보류'}
@@ -126,24 +125,11 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
     finally{setBusy(false)}
   }
   return <section className="generation-status db-review" aria-label="관리자 리포트 검토">
-    <h2>데이터·리포트 관리</h2>{localReportMode()&&<p className="local-notice">격리된 로컬 DB · 운영 반영 없음</p>}
-    <p role="status">{notice}</p>
-    {access.canManage && admin ? <><AdminReviewInbox target={target} state={targetState} item={targetItem}/><AdminOverview focus={targetState==='current'?targetItem:null} runs={runs} pendingTotal={pendingTotal} dataset={dataset} datasetSource={datasetSource}/><h2>리포트 검토</h2><button disabled={busy} onClick={()=>void load()}>상태 다시 읽기</button>{localReportMode()&&<label><input type="checkbox" checked={includeTest} onChange={event=>{reset();setIncludeTest(event.target.checked)}}/>합성 연결 시험 포함</label>}{pendingTotal>20&&<p>검토 대기 {pendingTotal}건 중 최근 20건과 메일에서 요청한 대상을 표시합니다.</p>}<label>반려·철회 사유 <input maxLength={500} value={reason} onChange={e=>setReason(e.target.value)}/></label>
-      {runs.filter(r=>['pending_review','published'].includes(r.status)).map(run=><article key={run.id} id={`review-target-${run.id}`} tabIndex={-1} className="db-review-run"><h2>{run.candidate.content.title}</h2>
-        <p>{run.candidate.currency} · {run.candidate.baseDate} · 시도 {run.attempt} · {run.status==='published' ? '승인' : '검토 대기'}</p>
-        {run.storage_required ? <p>{run.storageComplete ? '자료 저장 완료 기록 있음 · 승인 시 일치 여부 재확인' : '자료 저장 확인 필요 — 승인 보류'}</p> : <p>기존 저장 방식의 보존 원고</p>}
-        {run.candidate.testOnly ? <p>합성 연결 시험 · AI 미사용</p> : null}<p>{run.candidate.content.summary}</p>
-        <details open={target?.kind==='report'&&target.id===run.id||undefined}><summary>본문·근거·검증 결과</summary>
-          <p className="table-help">환율 관측일 {run.candidate.observedDate}{run.candidate.observationAt?` · 관측시각 ${run.candidate.observationAt}`:''}</p>
-          {[run.candidate.content.change,...run.candidate.content.drivers,...run.candidate.content.implications,...run.candidate.content.watch].filter(Boolean).map((claim,i)=><p key={i}><strong>{claim.title}</strong><br/>{claim.text}</p>)}
-          <details><summary>사용한 수치와 출처</summary><dl>{run.candidate.facts.map(f=><div key={f.id}><dt>{f.label}</dt><dd>{String(f.value)}</dd></div>)}</dl><ul>{run.candidate.evidence.map(e=><li key={e.id}>{e.url.startsWith('https://')?<a href={e.url} target="_blank" rel="noreferrer">{e.publisher} · {e.title}</a>:e.title}<small> · 대상 기간 {e.period} · 발표 {e.publishedAt}</small></li>)}</ul></details>
-          <p>구조 검사 {run.validation.structureValid ? '통과' : '미통과'} · 내용 검토 {run.validation.contentReview ?? '미검증'}</p>
-        </details>
-        {run.status==='pending_review' && approvalBlockers(run.validation).length > 0 ? <p>승인 보류: {approvalBlockers(run.validation).join(' · ')}</p> : null}
-        {run.status==='pending_review'&&run.expectedPublicId?<label>현재 공개 ID {run.expectedPublicId} · 교체 유형 <select aria-label="공개본 교체 유형" value={revisions[run.id]??''} onChange={e=>setRevisions(old=>({...old,[run.id]:e.target.value}))}><option value="">유형 선택</option><option value="correction">사실·출처 정정</option><option value="editorial">문체·표현 편집</option><option value="replacement">동일 날짜 리포트 교체</option></select></label>:null}
-        {run.status==='published' ? <button disabled={busy || !reason.trim()} onClick={()=>void review(run.id,'withdrawn')}>철회</button> : <><button disabled={busy || target?.kind==='report'&&target.id===run.id&&targetState!=='current' || approvalBlockers(run.validation).length > 0 || !!run.expectedPublicId&&!revisions[run.id]} onClick={()=>void review(run.id,'approved')}>승인</button><button disabled={busy||target?.kind==='report'&&target.id===run.id&&targetState!=='current'} onClick={()=>void review(run.id,'rejected')}>반려</button></>}
-      </article>)}{!runs.length ? <p>검토 대기 원고가 없습니다.</p> : null}
-      <section aria-label="공개 리포트 정정 후보"><h2>공개 리포트 재검토</h2>
+    <div className="review-page-heading"><h2>데이터·리포트 관리</h2><a className="quiet-button" href="#report">승인 보고서 목록 →</a></div>{localReportMode()&&<p className="local-notice">격리된 로컬 DB · 운영 반영 없음</p>}
+    {notice&&<p role="status" className="review-notice">{notice}</p>}
+    {access.canManage && admin ? <><AdminReviewInbox target={target} state={targetState} item={targetItem}/><AdminOverview focus={targetState==='current'?targetItem:null} runs={runs} pendingTotal={pendingTotal} dataset={dataset} datasetSource={datasetSource}/><div className="review-section-heading"><h2>리포트 검토</h2><button disabled={busy} onClick={()=>void load()}>상태 다시 읽기</button></div><div className="review-toolbar">{localReportMode()&&<label><input type="checkbox" checked={includeTest} onChange={event=>{reset();setIncludeTest(event.target.checked)}}/>합성 연결 시험 포함</label>}{pendingTotal>20&&<p>검토 대기 {pendingTotal}건 중 최근 20건과 메일에서 요청한 대상을 표시합니다.</p>}<label>반려·철회 사유 <input maxLength={500} value={reason} onChange={e=>setReason(e.target.value)} placeholder="반려·철회할 원고의 사유"/></label></div>
+      {runs.filter(r=>['pending_review','published'].includes(r.status)).map(run=><ReportReviewCard key={run.id} run={run} busy={busy} reason={reason} revision={revisions[run.id]??''} focused={target?.kind==='report'&&target.id===run.id} targetUnavailable={target?.kind==='report'&&target.id===run.id&&targetState!=='current'} onRevision={value=>setRevisions(old=>({...old,[run.id]:value}))} onReview={decision=>void review(run.id,decision)}/>)}{!runs.length ? <p>검토 대기 원고가 없습니다.</p> : null}
+      <section className="review-corrections" aria-label="공개 리포트 정정 후보"><h2>공개 리포트 재검토</h2>
         <p className="table-help">수정값·인용 출처의 변경 신호입니다. 과거 원고의 오류 확정이나 자동 정정이 아닙니다.</p>
         {corrections?<><p>미확인 후보 {corrections.pending}건</p>
           {corrections.items.slice(0,30).map(item=><article className="db-review-run" key={item.key} id={`review-target-${item.key}`} tabIndex={-1}>
@@ -162,6 +148,5 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
             <ul>{corrections.checks.map(c=><li key={c.currency}>{c.currency} · {new Date(c.checkedAt).toLocaleString('ko-KR')} · {c.coverage.reportsChecked?`발행본 ${c.coverage.reportsChecked}건`:'비교할 운영 발행본 없음'} · 입력 원자료 미확보 {c.coverage.missingSnapshotReports}건 · 문장 연결 미확인 {c.coverage.unmappedEvidence}건{c.coverage.historyWindowLimited?' · 이력 범위 확인 필요':''}{c.coverage.issues.map(code=><p key={code}>{correctionIssues[code]??'입력 자료 확인 필요'}</p>)}</li>)}</ul>
           </details></>:<p role="status">정정 후보 저장·조회 연결을 확인하지 못했습니다. 검사 완료로 처리하지 않습니다.</p>}
       </section></> : null}
-    <p><a href="#report">승인 보고서 목록</a></p>
   </section>
 }

@@ -46,12 +46,27 @@
  .app-shell .report-experience .brief-stats{gap:10px;padding:12px 9px;grid-template-columns:repeat(2,minmax(0,1fr))}.app-shell .report-experience .brief-stats>div{padding:0 6px;min-width:0}.app-shell .report-experience .paper-masthead{gap:8px;flex-wrap:wrap}.app-shell .report-experience .paper-hero h1{font-size:clamp(25px,7.5vw,35px)}
  .app-shell .report-experience .range-tabs button,.app-shell .report-experience .currency-tabs a{min-height:40px}.app-shell .report-experience .paper-footer{flex-wrap:wrap;gap:6px}.admin-ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .app-shell .top-header{position:relative;-webkit-backdrop-filter:none;backdrop-filter:none}.app-shell .title-wrap h1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
- /* Keep the admin button anchored to the header, not the filtered actions row. */
- .app-shell .header-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;position:static;padding:0;background:transparent;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
- .app-shell .header-actions .admin-entry{position:absolute;top:14px;right:14px}.app-shell .title-wrap{padding-right:65px}
  .app-shell .data-status{font-size:11px;gap:5px}.app-shell .data-info>summary{padding:3px 0}
  .app-shell .kpi-navigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:stretch}
  .app-shell .kpi-navigation .kpi-trend-link{justify-content:center;text-align:center;min-height:44px;padding:5px 7px;background:#f6f9fc;border:1px solid var(--border-soft);border-radius:6px}
  .app-shell .kpi-navigation .kpi-report-link{min-height:44px;margin:0;padding:5px 7px;border:1px solid var(--border-soft);border-radius:6px;background:#f0f5fa}
 }
 @media print{.data-status,.currency-shortcuts,.skip-link{display:none!important}.app-shell .report-experience .currency-paper{box-shadow:none}.claim-basis-details{display:block}.claim-basis-details>div{display:block!important}}
+
+/* One shared data row; dashboard no longer repeats this date in a second strip. */
+.brand-home { color:inherit; text-decoration:none; }
+.brand-home:hover { color:var(--accent); }
+.app-shell .top-header .screen-nav { border-bottom:0; }
+.data-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:12px 0; padding:7px 10px; border:1px solid var(--border-soft); border-radius:8px; background:var(--surface); }
+.data-toolbar .data-status { flex:1; min-width:0; }
+.data-toolbar-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-shrink:0; margin-left:auto; }
+.data-toolbar-actions button { white-space:nowrap; }
+.dashboard-print-date { display:none; }
+@media(max-width:760px) {
+ .data-toolbar { flex-wrap:wrap; gap:8px; }
+ .data-toolbar .data-status { flex-basis:100%; }
+ .data-toolbar-actions button { min-height:40px; }
+ .app-shell .title-wrap { padding-right:0; }
+ .app-shell .title-wrap h1 { flex-direction:row; }
+}
+@media print { .data-toolbar { display:none!important; } .dashboard-print-date { display:block; } }

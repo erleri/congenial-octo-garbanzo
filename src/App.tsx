@@ -152,13 +152,15 @@ function App() {
 
   return <div className="app-shell">
     <a className="skip-link" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>본문으로 건너뛰기</a>
-    <header className="top-header"><div className="title-wrap"><h1><span className="title-primary">LATAM FX</span><span className="title-secondary">환율 대시보드</span></h1></div>
+    <header className="top-header"><div className="title-wrap"><h1><a className="title-primary brand-home" href="#dashboard" aria-label="LATAM FX 대시보드로" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();openScreen('dashboard')}}>LATAM FX</a><span className="title-secondary">환율 대시보드</span></h1></div>
       <nav className="screen-nav" aria-label="화면 선택">{([['dashboard','대시보드'],['trends','환율 추이'],...(HAS_REPORTS?[['reports','환율 리포트']]:[])] as [FxScreen,string][]).map(([key,label])=><button type="button" key={key} className={screen===key?'tab active':'tab'} aria-current={screen===key?'page':undefined} onClick={()=>openScreen(key)}>{label}</button>)}</nav>
-      <div className="header-actions"><DataStatus data={dataset} source={datasetSource} busy={loading||dailyRangeLoading} error={error}/>
+    </header>
+      <div className="data-toolbar" aria-label="자료 기준 및 관리"><DataStatus data={dataset} source={datasetSource} busy={loading||dailyRangeLoading} error={error} showAverage={screen==='dashboard'}/>
+        <div className="data-toolbar-actions">
         <button className="header-refresh-button" onClick={()=>void refreshData()} disabled={loading}>{loading?'갱신 중':'데이터 갱신'}</button>
         <button className={`quiet-button admin-entry ${screen==='admin'||screen==='plan'?'selected':''}`} onClick={()=>openScreen('admin')}>관리자</button>
+        </div>
       </div>
-    </header>
     <main id="main-content" tabIndex={-1}>{(screen==='admin'||screen==='plan')&&<AdminAccessPanel access={adminAccess}/>}<Suspense fallback={<div className="panel empty loading-panel"><h2>화면을 불러오는 중입니다.</h2></div>}>{content}</Suspense></main>
   </div>
 }
