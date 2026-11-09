@@ -1,0 +1,56 @@
+[
+  {
+    "source": "01-navigation.mmd",
+    "sourceSha256": "ddf816915e0768fec74a63e969ab05de112698feb0492adaabc7146fe56e05d4",
+    "render": "01-navigation.svg",
+    "renderSha256": "8211644af0424ca248b537ad050a3598a43fb1e5df53c87e48e67ae52a579fdf",
+    "renderer": "Mermaid 11.12.0",
+    "renderedInBrowser": true,
+    "visuallyInspected": true
+  },
+  {
+    "source": "02-services.mmd",
+    "sourceSha256": "9c876132b45c47539249dac80703bdb5b7f7001a32526b452b68bcb72dbd331e",
+    "render": "02-services.svg",
+    "renderSha256": "045a3781524bd36f96b4b0589ca2ce8cfafbb008eb48b55ad03a063df56621ab",
+    "renderer": "Mermaid 11.12.0",
+    "renderedInBrowser": true,
+    "visuallyInspected": true
+  },
+  {
+    "source": "03-rates.mmd",
+    "sourceSha256": "2269b20c1cc09290048a8131440360ff688da974e1c98dbfc87e06e00ec4c415",
+    "render": "03-rates.svg",
+    "renderSha256": "dc4d840c670d525e8d40b7de20547e68679a2f419d52a80059b494a25dc7eb4c",
+    "renderer": "Mermaid 11.12.0",
+    "renderedInBrowser": true,
+    "visuallyInspected": true
+  },
+  {
+    "source": "04-cadence.mmd",
+    "sourceSha256": "04f174a7d39cc36f2de8e99fde8c4b09c9abcf3b1080d91df82ad51475eada7f",
+    "render": "04-cadence.svg",
+    "renderSha256": "407aa5fd4dd4d35726284b01d7d50d941118c660bc7adfaa515495888ad469ab",
+    "renderer": "Mermaid 11.12.0",
+    "renderedInBrowser": true,
+    "visuallyInspected": true
+  },
+  {
+    "source": "05-production.mmd",
+    "sourceSha256": "47cded45e40ba260d172fc26ca0904403ebe7478ba0dd32e857fde4e0a0200e0",
+    "render": "05-production.svg",
+    "renderSha256": "00c74f408d72b364f0e9e9ac4e2d9ea349f5aa29c2c9a0a0d0f285815275dcbd",
+    "renderer": "Mermaid 11.12.0",
+    "renderedInBrowser": true,
+    "visuallyInspected": true
+  },
+  {
+    "source": "06-email.mmd",
+    "sourceSha256": "5573fcdf2a43f9a26a796e061de284a1997c67e52b28c48dd70b2af5d0d02960",
+    "render": "06-email.svg",
+    "renderSha256": "be7705364048f7b0295dce19f3a42e1c0bebe6e1e133a7d8b7f12350c8d18aa8",
+    "renderer": "Mermaid 11.12.0",
+    "renderedInBrowser": true,
+    "visuallyInspected": true
+  }
+]

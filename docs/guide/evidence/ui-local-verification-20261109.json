@@ -1,0 +1,56 @@
+{
+  "baseline": "8cf4eb0",
+  "localOnly": true,
+  "tests": 1397,
+  "testFiles": 200,
+  "typecheck": "passed",
+  "lint": "passed",
+  "productionBuild": "passed",
+  "reportBuild": "passed",
+  "localAppBuild": "passed",
+  "bundleBoundary": "passed",
+  "viewports": [
+    320,
+    390,
+    768,
+    1440
+  ],
+  "sourceManuscriptsAndDataChanged": false,
+  "paidCalls": 0,
+  "databaseChanges": 0,
+  "deployment": false,
+  "behaviorChecks": {
+    "monthlyNewest": "2026.11",
+    "unitScrollPreserved": [
+      390,
+      390
+    ],
+    "currencyScrollReset": 0,
+    "sharedIndividual": "MXN",
+    "allRetainedAfterTabReturn": "ALL",
+    "individualOverridesAll": "PEN",
+    "comparisonSummaryFirst": true,
+    "dailyTableCollapsed": true,
+    "priceDetailsCollapsed": true,
+    "readerMetadataMinFont": 12,
+    "metadataContrastOnLightSurface": 5.65,
+    "priceDetailsKeyboardEnter": true
+  },
+  "limitations": [
+    "Actual iPhone Safari not inspected",
+    "200% browser text enlargement not verified",
+    "Native print preview could not be inspected: Windows UI tool stopped because browser URL could not be established; print CSS only checked",
+    "Authenticated admin UI not inspected; shared calculation and combined order tested with saved synthetic data",
+    "Standalone report build retains existing ineffective dynamic import warning"
+  ],
+  "commit": "76c12cf",
+  "sevenItemsImplemented": [
+    "shared_currency",
+    "mobile_latest_month",
+    "comparison_summary_first",
+    "reader_metadata",
+    "single_refresh",
+    "readable_supporting_text",
+    "consistent_labels"
+  ]
+}

@@ -1,41 +1,38 @@
-# LATAM FX
+# LATAM FX 2.0
 
-중남미 환율을 빠르게 확인하고, 환율이 왜 움직였는지 근거와 함께 읽는 업무용 웹앱입니다.
+중남미 환율을 빠르게 확인하고, 환율이 왜 움직였는지 근거와 함께 읽는 업무용 웹앱입니다. BRL·MXN·COP·PEN·CLP·ARS를 다룹니다.
 
-**운영 사이트:** https://latamforex.netlify.app/ · **상태 확인일:** 2026-11-08
+[운영 앱](https://latamforex.netlify.app/) · 문서 기준: **2026-11-09 / 배포 `fa9b58f`**
 
-## 먼저 구분하세요
-
-- **현재 운영:** 11월8일 PR #18 초기 반영에 이어 PR #19의 수집·채택값 보관·검증된 과거 복구·동기화 코드를 운영 배포했습니다. PR #20의 메일 없는 자료 점검 옵션도 배포했으며 현재 build `ac6f2e0`입니다. 기존 환율·계획환율·공개6건·메일은 유지합니다. [실제 반영 기록](docs/guide/release-readiness-20261104.md)을 확인하세요.
-- **생성 잠금 유지:** 자동 생성·유료 검토·자동 게시·새 메일 발송은 활성화하지 않았습니다. 기존6개 실제 원고는 운영 승인 대기로 이전한 뒤 사용자가 운영에서 승인해 공개6건이 됐습니다. 원고 기준일11월2일을 보존합니다.
-- **남은 활성화 조건:** PR·main CI와 운영 배포, 실제 runner의 메일 없는 갱신·복구·DB/정적 자료 일치·6통화 가격 준비 확인은 완료했습니다. PEN·CLP 일부 뉴스 경로와 MXN 일부 발표문 공백은 남아 있습니다. 새 자료의 내용 검토·생성 활성화·새 메일 전환은 별도 단계입니다. [운영 안내](docs/guide/operations.md)를 따릅니다.
+자동 생성·자동 내용 검토, 승인된 리포트를 포함하는 독자 메일, 관리자 알림은 활성화돼 있습니다. **공개는 관리자 승인 방식**입니다. 설정 활성화와 실행 성공은 다릅니다. 최근 일일 실행의 리포트 단계에는 입력 저장 용량 보류가 확인됐습니다. 확인 시각·실행 결과·남은 제한은 [운영 상태 확인표](docs/guide/operational-status.md)를 기준으로 봅니다.
 
 ## 문서 시작점
 
-| 알고 싶은 것 | 읽을 문서 |
+| 알고 싶은 것 | 담당 문서 |
 | --- | --- |
-| 사용자와 관리자가 무엇을 하는가 | [앱 개요](docs/guide/app.md) |
-| 어디서 자료를 가져와 어떻게 발행하는가 | [설계도와 실행 경로](docs/guide/architecture.md) |
-| 현재 적용할 규칙은 무엇인가 | [공통 규칙과 코드 기준점](docs/guide/rules.md) |
-| 실행·장애·복구·운영 전환은 어떻게 하는가 | [운영 안내](docs/guide/operations.md) |
-| 옛 문서와 시험 기록은 어디 있는가 | [문서 목록과 상태](docs/guide/catalog.md) |
-| 이번 평가·정리·청소 결과 | [정비 결과](docs/guide/maintenance-20261104.md) |
-| 최신 운영 설정·백업 상태와 출시 코드 | [운영 대조·출시 기준점](docs/guide/release-readiness-20261104.md) |
+| 독자·관리자의 화면과 사용 방법 | [앱 개요·이용 안내](docs/guide/app.md) |
+| 서비스 연결과 6개 흐름도 | [설계도·실행 경로](docs/guide/architecture.md) |
+| 환율·발행·근거·모델·비용 기준 | [공통 규칙](docs/guide/rules.md) |
+| 일정·설정·장애·복구·정기 점검 | [운영 안내](docs/guide/operations.md) |
+| 국가별 출처·가격·달력·지표 차이 | [6통화 비교표](docs/guide/countries.md) |
+| 실제로 무엇을 확인했는가 | [운영 상태](docs/guide/operational-status.md) / [검증·변경 이력](docs/guide/verification.md) |
+| 과거 문서와 실행 코드가 읽는 자료 | [전수 문서 색인](docs/guide/catalog.md) |
+| 사내 개발·AI 역량 인증 발표의 근거 | [발표 근거 패키지](docs/guide/presentation-evidence.md) |
 
 ## 로컬 개발
 
-Node.js 20.19.0과 잠금 파일을 사용합니다. 새 체크아웃에서는 `npm ci`, 앱은 `npm run dev:local`로 실행합니다. Windows PowerShell에서 실행 정책 문제가 있으면 `npm.cmd`를 사용하세요.
+Node.js 20.19.0과 잠금 파일 기준입니다. 새 체크아웃에서 `npm ci`, 일반 앱은 `npm run dev:local`로 실행합니다. Windows 실행 정책 문제가 있으면 `npm.cmd`를 사용합니다.
 
-| 명령 | 용도 |
+| 명령 | 목적 |
 | --- | --- |
-| `npm run dev:local` | 기본 앱 개발 서버, 127.0.0.1:5173 |
-| `npm run dev:app-report` | 격리 로컬 리포트 DB를 연결하는 앱 검증 |
-| `npm run dev:report` | 비공개 실행을 검토하는 별도 A안 도구 |
-| `npm run check` | 타입·린트·단위검사·운영 빌드·번들 경계 |
-| `npm run build:app-report` / `npm run build:report` | 로컬 검토용 빌드. 운영 배포 대상 아님 |
+| `npm run dev:local` | 기본 앱 개발 서버 |
+| `npm run dev:app-report` | 격리 로컬 리포트 DB를 사용하는 앱 검증 |
+| `npm run dev:report` | 로컬 원고·실행을 보는 별도 A안 도구 |
+| `npm run check` | 타입·린트·테스트·운영 빌드·공개 번들 경계 |
+| `npm run build:app-report` / `npm run build:report` | 로컬 검토용 빌드 |
+| `node scripts/maintenance/verify-docs.mjs` | 현재 문서 링크 확인 |
 
-운영 배포 대상은 `netlify.toml`의 `dist`입니다. `artifacts`, `.local-reports`, 로컬 검토용 빌드를 운영 사이트로 올리지 않습니다. Netlify 빌드는 환율 수집이나 모델 집필을 실행하지 않습니다.
+운영 배포 대상은 [Netlify 설정](netlify.toml)의 `dist`입니다. 비공개 `.local-reports`, `artifacts`, 로컬 검토 빌드를 운영 배포하지 않습니다. Netlify 빌드는 모델 집필을 실행하지 않습니다. 키는 Git·채팅·공개 번들에 넣지 않습니다. 생성·메일 명령은 운영 영향을 갖기 때문에 [실행 구분](docs/guide/operations.md#실행-구분)을 먼저 확인합니다.
 
-키는 `.env.*.local` 등에 직접 보관하고 채팅·Git·브라우저 번들에 넣지 않습니다. 모델·공식 자료 키는 Node 서버 경로에서만 읽습니다. 기존 수신자 설정은 유지하며 메일 시험은 발송 승인과 수신 범위를 따로 확인합니다.
-
-개별 시험 명령과 기록의 실행 옵션은 당시 실험용일 수 있습니다. 현재 자동 운영은 [운영 안내](docs/guide/operations.md)의 진입점에서 시작하세요.
+<a id="먼저-구분하세요"></a>
+이전 상태 설명은 [정비 전 README](docs/history/documentation-before-20261109/README.md)에 보존했습니다. 현재 상태는 위 운영 확인표를 기준으로 합니다.

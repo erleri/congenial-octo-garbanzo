@@ -1,0 +1,20 @@
+flowchart TD
+  HOME[독자: LATAM FX 로고] --> DASH[대시보드: 통화별 숫자]
+  DASH --> TREND[환율 추이: 일별 / 월별 / 상세 비교]
+  DASH --> REPORT[국가별 리포트 카드]
+  TREND --> REPORT
+  REPORT -->|리포트 읽기| READ[선택한 판본 읽기]
+  REPORT --> HIST[지난 리포트: 국가별 목록]
+  HIST -->|과거 판본 선택| READ
+  READ --> STATUS{자동: 공개 상태 재확인}
+  STATUS -->|정상| BODY[본문·출처·자료 정보·인쇄]
+  STATUS -->|실패·철회| NOTICE[상태 표시·재확인]
+  HOME --> LOGIN[관리자 로그인]
+  LOGIN --> AUTH{서버: 활성 관리자 확인}
+  AUTH -->|허용| ADMIN[리포트·출처·정정 / 계획환율·이력]
+  AUTH -->|거절| DENY[비공개 자료 차단]
+  ADMIN --> DECIDE[관리자 결정·이력 보존]
+  classDef normal fill:#edf4f8,stroke:#25465d,color:#162f43;
+  classDef decision fill:#fff4d6,stroke:#8a6416,color:#42330e;
+  classDef human fill:#e5f3ee,stroke:#19745f,color:#104b3e;
+  classDef hold fill:#fceceb,stroke:#a64e45,color:#71302a;

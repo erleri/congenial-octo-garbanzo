@@ -1,0 +1,19 @@
+flowchart TD
+  INPUT[자동: 채택 환율·기준일·새 자료] --> BASE[최근 유효 공개본의 기준점 확인]
+  BASE --> REASON{조사 계기?}
+  REASON -->|첫 보고서| FIRST[첫 정기 점검 후보]
+  REASON -->|누적 절대 2퍼센트| MOVE[변화 설명 후보]
+  REASON -->|기준일 14일 후 첫 월요일| PERIOD[정기 점검 후보]
+  REASON -->|새 사건·정정| EVENT[신규성·충돌 확인 후보]
+  REASON -->|없음| KEEP[기존 날짜의 원고 유지]
+  FIRST --> DUP[자동: 중복·열린 실행·자료 상태 검사]
+  MOVE --> DUP
+  PERIOD --> DUP
+  EVENT --> DUP
+  DUP -->|적합| RESEARCH[근거 수집·AI 내용 검토 단계]
+  DUP -->|중복·부족·실패| HOLD[사유별 보류]
+  RESEARCH --> HUMAN[최종 공개는 관리자 결정]
+  classDef normal fill:#edf4f8,stroke:#25465d,color:#162f43;
+  classDef decision fill:#fff4d6,stroke:#8a6416,color:#42330e;
+  classDef human fill:#e5f3ee,stroke:#19745f,color:#104b3e;
+  classDef hold fill:#fceceb,stroke:#a64e45,color:#71302a;

@@ -1,0 +1,340 @@
+{
+  "meaning": "보존한 과거 기록의 로컬 참조 문제; 비공개 증거의 별도 보관 포함. 원문을 고치거나 삭제하지 않음. 외부 URL 재조회 안 함.",
+  "issues": [
+    {
+      "file": "docs/2.0/app-flow-verification-20261030.md",
+      "link": "../../artifacts/app-flow-approved-20261030.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/app-flow-verification-20261030.md",
+      "link": "../../artifacts/app-flow-cache-20261030.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/app-flow-verification-20261030.md",
+      "link": "../../artifacts/app-flow-withdrawn-20261030.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-layout-comparison-20261030.md",
+      "link": "../../artifacts/ui2-dashboard/comparison.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-layout-comparison-20261030.md",
+      "link": "../../artifacts/ui2-dashboard/a-desktop.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-layout-comparison-20261030.md",
+      "link": "../../artifacts/ui2-dashboard/b-desktop.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-layout-comparison-20261030.md",
+      "link": "../../artifacts/ui2-dashboard/a-mobile.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-layout-comparison-20261030.md",
+      "link": "../../artifacts/ui2-dashboard/b-mobile.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-trends-implementation-20261031.md",
+      "link": "../../artifacts/ui2-integration-before-20261030.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-trends-implementation-20261031.md",
+      "link": "../../artifacts/ui2-dashboard-connected-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-trends-implementation-20261031.md",
+      "link": "../../artifacts/ui2-trends-desktop-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/dashboard-trends-implementation-20261031.md",
+      "link": "../../artifacts/ui2-trends-mobile-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/webapp-navigation-20261030.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/transition-preparation-20261030.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/recovery-verification-20261030.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/resource-optimization-20261030.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/data-boundary-implementation-20261029.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/data-lifecycle-policy-20261029.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/production-baseline-20261029.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/shared-input-hardening-20261029.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/execution-status.md",
+      "link": "../../artifacts/webapp-navigation-20261030.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/mxn-business-dollar-retest-20261028.md",
+      "link": "../../artifacts/mxn-business-dollar-comparison-20261028.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/mxn-business-dollar-retest-20261028.md",
+      "link": "../../artifacts/mxn-business-dollar-a-body-20261028.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/mxn-business-dollar-retest-20261028.md",
+      "link": "../../artifacts/mxn-business-dollar-comparison-20261028.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-check-generation-20261027.md",
+      "link": "../../.local-reports/private/periodic-check-replay-20261027-S6KgZV/result.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-check-generation-20261027.md",
+      "link": "../../.local-reports/private/periodic-preparation-6tSLjl/prepared.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-report-samples-20261027.md",
+      "link": "../../artifacts/periodic-report-samples-20261027.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-report-samples-20261027.md",
+      "link": "../../.local-reports/private/periodic-samples-20261027-ZFgS7Q/verification.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-report-samples-20261027.md",
+      "link": "../../.local-reports/private/periodic-samples-20261027-ZFgS7Q/visual-check.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-20261027-a.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-20261027-a-desktop.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-20261027-a-mobile.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-result-20261027.md",
+      "link": "../../.local-reports/private/periodic-sol-trial-20261027/execution-receipt.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-result-20261027.md",
+      "link": "../../.local-reports/private/periodic-sol-trial-20261027/content-review.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-result-20261027.md",
+      "link": "../../.local-reports/private/periodic-sol-trial-20261027/render-verification.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-v1-v2-comparison-20261027.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-v2-20261027-a.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-v1-v2-comparison-20261027-body.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-v2-20261027-a-desktop.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../artifacts/clp-periodic-sol-v2-20261027-a-mobile.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../.local-reports/private/periodic-sol-v2-trial-20261027/execution-receipt.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../.local-reports/private/periodic-sol-v2-trial-20261027/content-review.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-sol-v2-result-20261027.md",
+      "link": "../../.local-reports/private/periodic-sol-v2-trial-20261027/render-verification.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-writing-rules-20261027.md",
+      "link": "../../.local-reports/private/periodic-editing-replay-20261027-JlPvqa/result.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-writing-rules-20261027.md",
+      "link": "../../.local-reports/private/periodic-editing-replay-20261027-JlPvqa/cases.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-writing-rules-20261027.md",
+      "link": "../../.local-reports/private/periodic-editing-replay-20261027-JlPvqa/writer-input.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/periodic-writing-rules-20261027.md",
+      "link": "../../.local-reports/private/periodic-editing-replay-20261027-JlPvqa/actual-manuscript-reevaluation.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/publication-cadence-four-currencies-2pct-20261027.md",
+      "link": "../../.local-reports/private/cadence-replay-20261027-SXHsGD/result.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/publication-cadence-replay-20261027.md",
+      "link": "../../.local-reports/private/cadence-replay-20261027-qRGP43/result.json",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/report-history-implementation-20261031.md",
+      "link": "../../artifacts/report-history-desktop-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/report-history-implementation-20261031.md",
+      "link": "../../artifacts/report-history-detail-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/report-history-implementation-20261031.md",
+      "link": "../../artifacts/report-history-mobile-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/report-history-implementation-20261031.md",
+      "link": "../../artifacts/report-withdrawal-test-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/report-history-implementation-20261031.md",
+      "link": "../../artifacts/report-history-cache-test-20261031.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/report-service-baseline-20261027.md",
+      "link": "../../artifacts/clp-three-model-comparison-20261027.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/runtime-connection-20261031.md",
+      "link": "../../artifacts/runtime-connection-20261031/index.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/six-currency-work-sequence-20261028.md",
+      "link": "../../artifacts/transition-preparation-20261030.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/six-currency-work-sequence-20261028.md",
+      "link": "../../artifacts/shared-input-hardening-20261029.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/six-currency-work-sequence-20261028.md",
+      "link": "../../artifacts/shared-input-final-audit-20261029.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/three-country-latest-report-result-20261028.md",
+      "link": "../../artifacts/three-country-reports-20261028.html",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/ui2-refinement-20261031.md",
+      "link": "../../artifacts/ui2-refined-comparison/dashboard-before-after.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/ui2-refinement-20261031.md",
+      "link": "../../artifacts/ui2-refined-comparison/report-before-after.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/ui2-refinement-20261031.md",
+      "link": "../../artifacts/ui2-refined-comparison/dashboard-mobile.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/ui2-refinement-20261031.md",
+      "link": "../../artifacts/ui2-refined-comparison/report-mobile.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/ui2-style-comparison-20261031.md",
+      "link": "../../artifacts/ui2-style-comparison/dashboard-three-styles.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/ui2-style-comparison-20261031.md",
+      "link": "../../artifacts/ui2-style-comparison/report-three-styles.png",
+      "reason": "missing_file"
+    },
+    {
+      "file": "docs/2.0/webapp-final-check-20261031.md",
+      "link": "../../artifacts/webapp-final-check-20261031/index.html",
+      "reason": "missing_file"
+    }
+  ]
+}
