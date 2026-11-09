@@ -254,3 +254,27 @@
  .app-shell .daily-results>.trend-related-report{gap:4px;padding:10px 12px}
  .app-shell .daily-results>.trend-related-report>.kpi-report-link{display:flex;flex-wrap:wrap;align-items:center;gap:5px 12px;min-height:36px}
 }
+
+/* The visible detail tools own refresh; empty/error views keep their recovery entry. */
+.app-shell .published-currency-reports:has(.currency-paper)>.report-navigation>.report-status-refresh{display:none}
+.app-shell .report-experience .paper-meta,.app-shell .report-experience .brief-stats small,.app-shell .report-experience .brief-stats>div>span,.app-shell .report-experience .chart-unit,.app-shell .report-experience .chart-foot,.app-shell .report-experience .small-note,.app-shell .report-experience .source-license,.app-shell .report-experience .claim-heading>span,.app-shell .report-experience .report-data-meta,.app-shell .report-experience .paper-footer{font-size:12px;line-height:1.6}
+.app-shell .published-currency-reports .detail-tools button,.app-shell .published-currency-reports .report-more-tools>summary{font-size:13px}
+.app-shell .monthly-empty{padding:16px 8px;color:var(--text-muted);font-size:13px}
+.app-shell .comparison-summary-first .moving-table-wrapper{overflow:auto;max-height:65vh}
+.app-shell .comparison-summary-first .moving-table-wrapper thead th{position:sticky;top:0;z-index:2;background:var(--surface-muted)}
+.app-shell .comparison-summary-first .moving-table-wrapper tbody th:first-child{position:sticky;left:0;z-index:1;background:var(--surface)}
+.app-shell .comparison-summary-first .moving-table-wrapper thead tr:first-child th:first-child{z-index:3;left:0;background:var(--surface-muted)}
+.comparison-daily-details{margin-top:12px;border-top:1px solid var(--border-soft)}
+.comparison-daily-details>summary{display:flex;align-items:center;gap:8px;min-height:44px;font-size:13px;font-weight:650;cursor:pointer}
+.comparison-daily-details>summary span{font-size:12px;font-weight:400;color:var(--text-muted)}
+.comparison-daily-details>summary::after{content:'＋';margin-left:auto}
+.comparison-daily-details[open]>summary::after{content:'−'}
+@media print{
+ .comparison-daily-details::details-content,.daily-table-details::details-content{content-visibility:visible!important;display:block!important}
+ .comparison-daily-details>*,.daily-table-details>*{display:block!important}
+ .app-shell .comparison-summary-first .moving-table-wrapper,.app-shell .daily-table-details .table-scroll{overflow:visible;max-height:none}
+ .app-shell .comparison-summary-first .dense-table{min-width:0;width:100%;font-size:7pt}
+ .app-shell .comparison-summary-first .dense-table th,.app-shell .comparison-summary-first .dense-table td{position:static!important;padding:3px}
+}
+
+.app-shell .moving-table-wrapper .row-percent th{background:#f8f9fb}

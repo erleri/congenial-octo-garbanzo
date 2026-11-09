@@ -110,7 +110,7 @@ function App() {
     const badge=reportBadge(item,reports.now,reports.verified)
     const hash=item?reportLink(currency):reportHistoryHash(currency as ReportCurrency)
     const status=item?`보고서 ${item.baseDate}`:archive?`최근 보관 ${archive.baseDate}`:reports.state==='failed'?'연결 확인 필요':reports.state==='loading'?'확인 중':'발행된 리포트가 없습니다'
-    const label=item?'해석 읽기':archive?'지난 리포트':reports.state==='failed'?'리포트 확인':'리포트 목록'
+    const label=item?'리포트 읽기':archive?'지난 리포트':reports.state==='failed'?'리포트 확인':'리포트 목록'
     return <a className="kpi-report-link" href={hash} onClick={e=>{e.preventDefault();if(navigation.screen==='dashboard')void recordUsage({event:'dashboard_report',screen:'reports',currency:currency as ReportCurrency});applyNavigation({...navigation,screen:'reports'},hash)}}>
       <strong>{currency} {label} →</strong>{badge&&<span className={`report-fresh-badge ${badge==='정정'?'correction':''}`}>{badge}</span>}
       <small>{status}{reports.state==='cache'?' · 캐시':''}</small>
@@ -151,7 +151,7 @@ function App() {
         <label><span className="filter-label">종료 연도</span><select aria-label="종료 연도" value={yearTo} onChange={e=>changeTrend({yearTo:Number(e.target.value)})}>{yearOptions.filter(y=>y>=yearFrom).map(y=><option key={y} value={y}>{y}</option>)}</select></label>
       </div>:<p className="table-help">이동·선행 평균과 실제·계획 편차를 조회합니다. 계획환율 수정·변경 이력은 <button className="inline-link" onClick={()=>openScreen('plan')}>관리자 → 계획환율</button>에서 확인합니다.</p>}
     </div>
-    {navigation.view==='daily'?<CurrencyDetail data={dataset} currencyFilter={navigation.currency} periodFrom={from} periodTo={to} rangeNotice={dailyRangeNotice} relatedReport={relatedReport}/>:navigation.view==='monthly'?<MonthlySummary data={dataset} currencyFilter={navigation.monthlyCurrency} yearFrom={yearFrom} yearTo={yearTo}/>:<div className="panel"><h2>평균·계획 대비 상세 비교</h2><p className="table-help">자료 기준일 {dataset.baseDate} · {businessPlanStatus.remoteLoadStatus==='loaded'?'저장된 계획환율':'계획환율 저장소 미확인 · 자동 평균/로컬 참고값'}</p><MovingComparisonTable data={dataset} businessPlan={businessPlan}/></div>}
+    {navigation.view==='daily'?<CurrencyDetail data={dataset} currencyFilter={navigation.currency} periodFrom={from} periodTo={to} rangeNotice={dailyRangeNotice} relatedReport={relatedReport}/>:navigation.view==='monthly'?<MonthlySummary data={dataset} currencyFilter={navigation.monthlyCurrency} yearFrom={yearFrom} yearTo={yearTo}/>:<div className="panel"><h2>평균·계획 대비 상세 비교</h2><p className="table-help">자료 기준일 {dataset.baseDate} · {businessPlanStatus.remoteLoadStatus==='loaded'?'저장된 계획환율':'계획환율 저장소 미확인 · 자동 평균/로컬 참고값'}</p><MovingComparisonTable data={dataset} businessPlan={businessPlan} presentation="summary-first"/></div>}
     {navigation.view==='monthly'&&relatedReport}
   </section>
   else content=<>

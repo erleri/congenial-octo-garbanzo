@@ -673,8 +673,8 @@ function Dashboard({ data, businessPlan, renderReportLink }: DashboardProps) {
         <div className="usd-krw-anchor-main">
           <span className="source-badge badge-api">기준 환율</span>
           <div>
-            <h2>USD/KRW Anchor</h2>
-            <p>원달러 기준 환율 · KRW 환산의 기준축</p>
+            <h2>USD/KRW</h2>
+            <p>원달러 기준 환율 · 원화 환산 기준</p>
           </div>
         </div>
         <div className="usd-krw-anchor-metrics">
