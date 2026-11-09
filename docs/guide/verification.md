@@ -20,7 +20,9 @@
 
 ## 구현과 설명의 양방향 대응
 
-11월10일 [저장·복원 추가 검증](frozen-input-storage.md#실제-자료와-합성-사례의-검증-결과)은 이번에 실행했습니다. 전체 회귀 1,411건, 격리 DB 26파일 485항목, 타입·린트·운영/리포트/로컬앱 빌드·공개 번들 검사를 통과했습니다. 실제 저장 자료 재생과 합성 장애·모의 모델을 구분하며 운영 배포·새 AI 원고 생성 성공을 뜻하지 않습니다. [정제 근거](evidence/frozen-storage-verification-20261110.json).
+11월10일 [저장·복원 추가 검증](frozen-input-storage.md#실제-자료와-합성-사례의-검증-결과)은 로컬 전체 회귀 1,411건, 격리 DB 26파일 485항목, 타입·린트·운영/리포트/로컬앱 빌드·공개 번들 검사를 통과했습니다. 무과금 전용 workflow 검사 1건을 추가한 최종 CI는 1,412건을 통과했습니다. [로컬 근거](evidence/frozen-storage-verification-20261110.json), [CI](https://github.com/erleri/congenial-octo-garbanzo/actions/runs/42648272511).
+
+이후 운영 DB·`681de0c` 배포와 [무과금 저장·복원 #1](https://github.com/erleri/congenial-octo-garbanzo/actions/runs/42649524739)을 완료했습니다. 실제 전체 입력 51.54MB → 9.13MB, 원본 해시 일치, 신규 모델 호출·예약 0입니다. [운영 근거](evidence/frozen-storage-production-20261110.json). 중단·변조·동시 실행의 상세 검사는 격리 로컬 결과이고, 운영의 유료 후속 처리·새 AI 원고 생성 성공은 아직 확인되지 않았습니다.
 
 | 기능·규칙 | 실제 구현 | 설명 | 검증 근거 |
 | --- | --- | --- | --- |

@@ -1,0 +1,238 @@
+{
+  "checkedAt": "2026-11-10T01:00:02+09:00",
+  "environment": "production / GitHub Actions ubuntu / Node 20.19.0",
+  "deployment": {
+    "commit": "681de0ccb91e8b38f8bddc3ecbc5670d3f98611a",
+    "pullRequest": 26,
+    "netlifyDeploy": "6af1ec027e2129078956fd20",
+    "publishedAt": "2026-11-09T15:52:10.344Z",
+    "migrationVersion": "20261109154806"
+  },
+  "ci": {
+    "run": 42648272511,
+    "tests": 1412,
+    "files": 201,
+    "databaseChecks": 485
+  },
+  "backup": {
+    "encrypted": true,
+    "restoredTables": 82,
+    "dataHashesMatched": true,
+    "policiesAndPrivilegesMatched": true
+  },
+  "preservation": {
+    "afterMigration": {
+      "tables": 44,
+      "matched": true,
+      "checkedAt": "2026-11-09T15:49:33.355Z"
+    },
+    "afterStorage": {
+      "tables": 39,
+      "matched": true,
+      "differences": [],
+      "checkedAt": "2026-11-09T16:00:02.644Z"
+    }
+  },
+  "verification": {
+    "run": 42649524739,
+    "status": "storage_verified",
+    "workflowSeconds": 153,
+    "storage": {
+      "rawBytes": 51541646,
+      "compressedBytes": 9129981,
+      "manifestBytes": 1254,
+      "objects": [
+        {
+          "role": "dataset",
+          "id": "619c7b3e93042d97cf341b9e164cfb7cfcc36ae1e7fa029b88c2ee72ce6319a6",
+          "codec": "gzip-json/1",
+          "rawBytes": 23933901,
+          "compressedBytes": 1674395,
+          "compressedHash": "fb3179c07b298f2535d4a92e45a605ee8a7dac2ff7b59b892709659e0a08ce72",
+          "chunkCount": 4
+        },
+        {
+          "role": "prepared",
+          "id": "12d819b49beb03c42d835d8f609229bdfd80e60be43483327b9a2c3a00178a0e",
+          "codec": "gzip-json/1",
+          "rawBytes": 27607745,
+          "compressedBytes": 7455586,
+          "compressedHash": "00f8a3b420890d2614e98d3443c4cb43848792b265209c526ed75d1b09506606",
+          "chunkCount": 15
+        }
+      ],
+      "limits": {
+        "chunk": 524288,
+        "manifest": 262144,
+        "raw": 134217728,
+        "compressed": 33554432
+      },
+      "status": "storage_preflight_passed",
+      "retention": {
+        "storedBytes": 0,
+        "deleteEnabled": false,
+        "incompleteObjects": 0,
+        "unreferencedBytes": 0,
+        "unreferencedObjects": 0
+      },
+      "newBytes": 9129981,
+      "reusedBytes": 0
+    },
+    "verifiedInputHash": "7d22ecdc024ded3769061a696f60850bf118c461cb5c6506061a9e6e52ed557c",
+    "modelCalls": 0,
+    "budgetReserved": false,
+    "locksAcquired": false,
+    "newPaidCostUsd": 0,
+    "newPaidReservationUsd": 0,
+    "objectsSealed": 2,
+    "chunks": 19,
+    "incompleteObjects": 0,
+    "unreferencedObjects": 2,
+    "physicalTableBytes": 9650176,
+    "physicalTableBytesBefore": null,
+    "isolatedStorageDurationMs": null,
+    "individualRpcDurationMs": null,
+    "peakMemoryBytes": null
+  },
+  "control": {
+    "enabled": false,
+    "reviewEnabled": true,
+    "revision": 4,
+    "monthlyUsd": 30,
+    "batchUsd": 7,
+    "requestUsd": 0.25,
+    "maxCalls": 60
+  },
+  "existingCosts": {
+    "confirmedActualUsd": 0.6350093,
+    "unknownReservedUsd": 0.34849,
+    "unknownJobs": 2,
+    "unprotectedUnknown": 0,
+    "activeJobs": 0
+  },
+  "nextExecutionPlan": {
+    "notExecuted": true,
+    "maximumUsd": 6.988400001,
+    "maxCalls": 52,
+    "rows": [
+      {
+        "currency": "BRL",
+        "status": "planned",
+        "holds": [],
+        "purpose": "unverified",
+        "articles": 3,
+        "maximumUsd": 1.1003625
+      },
+      {
+        "currency": "MXN",
+        "status": "planned",
+        "holds": [],
+        "purpose": "unverified",
+        "articles": 4,
+        "maximumUsd": 1.265495
+      },
+      {
+        "currency": "COP",
+        "status": "planned",
+        "holds": [],
+        "purpose": "unverified",
+        "articles": 3,
+        "maximumUsd": 1.0868525
+      },
+      {
+        "currency": "PEN",
+        "status": "planned",
+        "holds": [],
+        "purpose": "unverified",
+        "articles": 4,
+        "maximumUsd": 1.282195
+      },
+      {
+        "currency": "CLP",
+        "status": "planned",
+        "holds": [],
+        "purpose": "unverified",
+        "articles": 3,
+        "maximumUsd": 1.0923575
+      },
+      {
+        "currency": "ARS",
+        "status": "planned",
+        "holds": [],
+        "purpose": "unverified",
+        "articles": 3,
+        "maximumUsd": 1.161137501
+      }
+    ],
+    "meaning": "research candidates, not six approved reports; no threshold crossing and periodic date Nov16",
+    "decisions": [
+      {
+        "currency": "BRL",
+        "status": "research_candidate",
+        "cumulativePct": 1.2433327202501232,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      {
+        "currency": "MXN",
+        "status": "research_candidate",
+        "cumulativePct": -0.9458439224609871,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      {
+        "currency": "COP",
+        "status": "research_candidate",
+        "cumulativePct": 0.7995827425125057,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      {
+        "currency": "PEN",
+        "status": "research_candidate",
+        "cumulativePct": -0.6941385052528393,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      {
+        "currency": "CLP",
+        "status": "research_candidate",
+        "cumulativePct": -1.7156497200653154,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      {
+        "currency": "ARS",
+        "status": "research_candidate",
+        "cumulativePct": 0.9320958053436801,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      }
+    ]
+  },
+  "limitations": [
+    "No paid execution or manifest-to-batch linkage verified in production yet.",
+    "No production fault injection; interruption/corruption/permission/accounting cases verified locally.",
+    "Source gaps remain independent from storage: PEN access failures, MXN/CLP request limits and no matching candidates.",
+    "GitHub Actions runtime deprecation warning requires separate maintenance; application uses pinned Node20.19.0.",
+    "Free verification objects are unreferenced; no automatic deletion."
+  ]
+}
