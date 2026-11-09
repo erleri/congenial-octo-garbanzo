@@ -82,16 +82,17 @@
 .report-data-context>summary{cursor:pointer;padding:6px 2px;min-height:32px}
 .app-shell .trends-controls{padding:12px 16px;margin-bottom:10px}
 .app-shell .trend-view-switch{display:flex;gap:4px;flex-wrap:nowrap;margin:0 0 10px}
-.app-shell .trend-view-switch button{width:auto;flex:0 1 auto;min-height:40px;padding:7px 12px;font-size:13px;white-space:nowrap}
+.app-shell .trend-view-switch button{width:auto;flex:0 1 auto;min-height:36px;padding:5px 12px;font-size:13px;white-space:nowrap;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;color:var(--text-muted)}
+.app-shell .trend-view-switch button.selected{background:transparent;border-color:var(--accent);color:var(--accent);font-weight:750}
 .daily-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .trend-primary-row{display:flex;align-items:center;gap:12px;min-width:0}
 .daily-controls label,.monthly-controls label{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px}
 .daily-controls select,.monthly-controls select{min-height:40px;width:auto;min-width:0;padding:7px 9px;border:1px solid var(--border);background:var(--surface);font:inherit;font-size:14px}
 .selected-period{font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .custom-range{display:flex;gap:10px}
-.app-shell .period-presets{display:flex;gap:4px;margin:0;flex-wrap:nowrap}
-.app-shell .period-presets button{width:auto;min-height:40px;padding:6px 10px;font-size:12px;white-space:nowrap}
-.app-shell .period-presets button[aria-pressed=true]{background:var(--accent-soft);border-color:#91a8bb;color:var(--accent)}
+.app-shell .period-presets{display:inline-flex;gap:3px;margin:0;padding:3px;flex-wrap:nowrap;border-radius:7px;background:var(--surface-muted);width:max-content;max-width:100%}
+.app-shell .period-presets button{width:auto;min-height:32px;padding:4px 11px;font-size:12px;white-space:nowrap;border:1px solid transparent;background:transparent;color:var(--text-muted)}
+.app-shell .period-presets button[aria-pressed=true]{background:var(--surface);border-color:var(--border-soft);color:var(--accent);box-shadow:var(--shadow-subtle)}
 .app-shell .custom-range-toggle{display:none}
 .monthly-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .app-shell .daily-results{padding:0;background:transparent;border:0;box-shadow:none}
@@ -139,12 +140,12 @@
  .app-shell .data-info-content{top:112px;max-height:70vh}
  .app-shell .trends-controls{padding:8px 10px;margin:0 0 8px}
  .app-shell .trend-view-switch{margin-bottom:8px}
- .app-shell .trend-view-switch button{flex:1;min-height:44px;padding:6px 5px;font-size:12px}
+ .app-shell .trend-view-switch button{flex:1;min-height:36px;padding:5px;font-size:12px}
  .daily-controls{display:grid;gap:6px}
  .trend-primary-row{justify-content:space-between;gap:6px}
  .daily-controls select,.monthly-controls select{min-height:44px;font-size:16px;max-width:100%}
- .app-shell .period-presets{grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
- .app-shell .period-presets button{min-height:44px;padding:6px 3px;white-space:normal}
+ .app-shell .period-presets{grid-row:2;display:inline-flex;gap:3px}
+ .app-shell .period-presets button{min-height:34px;padding:4px 10px;white-space:nowrap}
  .app-shell .custom-range-toggle{display:block}
  .custom-range{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
  .custom-range.is-open{display:grid}
@@ -230,3 +231,26 @@
 .app-shell .published-currency-reports .report-history-list h2 a{display:block;min-height:44px;padding:3px 0}
 
 .app-shell .top-header>.admin-entry.selected{color:var(--accent);background:var(--accent-soft);border-color:var(--border-soft)}
+
+/* Daily detail stays secondary to the chart and the related report. */
+.app-shell .daily-results>.trend-related-report{margin-top:10px}
+.app-shell .daily-table-details{margin-top:10px;padding:0 12px;background:var(--surface);border:1px solid var(--border-soft);border-radius:var(--radius-md)}
+.daily-table-details>summary{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;list-style:none;font-size:13px;font-weight:650;padding:8px 0}
+.daily-table-details>summary::-webkit-details-marker{display:none}
+.daily-table-details>summary small{font-size:11px;font-weight:400;color:var(--text-muted);margin-left:6px}
+.daily-table-toggle{font-size:11px;white-space:nowrap;font-weight:500;color:var(--text-muted)}
+.daily-table-details .when-open{display:none}
+.daily-table-details[open] .when-open{display:inline}
+.daily-table-details[open] .when-closed{display:none}
+.daily-table-details[open]{padding-bottom:12px}
+.app-shell .daily-rate-table{table-layout:fixed}
+.app-shell .daily-rate-table th:first-child,.app-shell .daily-rate-table td:first-child{width:52px;min-width:52px;max-width:52px}
+.app-shell .daily-rate-table tbody th{font-weight:500}
+@media(max-width:760px){
+ .app-shell .daily-table-details{padding:0 10px}
+ .app-shell .daily-table-details[open]{padding-bottom:10px}
+ .daily-table-details>summary>span:first-child{display:grid;gap:2px}
+ .daily-table-details>summary small{margin-left:0}
+ .app-shell .daily-results>.trend-related-report{gap:4px;padding:10px 12px}
+ .app-shell .daily-results>.trend-related-report>.kpi-report-link{display:flex;flex-wrap:wrap;align-items:center;gap:5px 12px;min-height:36px}
+}
