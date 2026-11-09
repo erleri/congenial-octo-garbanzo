@@ -637,29 +637,7 @@ function Dashboard({ data, businessPlan, renderReportLink }: DashboardProps) {
   })
   const dailyChartNotes = buildDailyChartNotes(dailySeriesByCurrency)
 
-  return (
-    <div className="dashboard-container">
-      <h1 className="sr-only">대시보드</h1>
-      <p className="dashboard-print-date">기준일 {baseDateText} · 당월 누적 평균</p>
-      <nav className="currency-shortcuts" aria-label="통화 바로가기">{KPI_CURRENCIES.map(c=><a key={c} href={`#currency-${c}`} onClick={event=>{event.preventDefault();const card=document.getElementById(`currency-${c}`);card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true})}}>{c}</a>)}</nav>
-
-      <div className="usd-krw-anchor">
-        <div className="usd-krw-anchor-main">
-          <span className="source-badge badge-api">기준 환율</span>
-          <div>
-            <h2>USD/KRW Anchor</h2>
-            <p>원달러 기준 환율 · KRW 환산의 기준축</p>
-          </div>
-        </div>
-        <div className="usd-krw-anchor-metrics">
-          <div>
-            <span>기준일 환율</span>
-            <strong>{formatCellValue(usdKrwToday?.value ?? null, usdKrwToday?.status ?? 'empty', 'KRW')}</strong>
-          </div>
-          <div>
-            <span>당월 누적 평균</span>
-            <strong>{formatCellValue(usdKrwMtdAverage, usdKrwMtdAverage === null ? 'empty' : 'ok', 'KRW')}</strong>
-          </div>
+  const anchorSecondary=<>
           <div>
             <span>MoM</span>
             <strong className={usdKrwMom === null ? '' : usdKrwMom >= 0 ? 'up' : 'down'}>
@@ -683,8 +661,36 @@ function Dashboard({ data, businessPlan, renderReportLink }: DashboardProps) {
               <div className="gauge-marker" style={{ left: `${usdKrwPercent52}%` }} />
             </div>
           </div>
+  </>
+
+  return (
+    <div className="dashboard-container">
+      <h1 className="sr-only">대시보드</h1>
+      <p className="dashboard-print-date">기준일 {baseDateText} · 당월 누적 평균</p>
+      <nav className="currency-shortcuts" aria-label="통화 바로가기">{KPI_CURRENCIES.map(c=><a key={c} href={`#currency-${c}`} onClick={event=>{event.preventDefault();const card=document.getElementById(`currency-${c}`);card?.scrollIntoView({block:'start'});card?.focus({preventScroll:true})}}>{c}</a>)}</nav>
+
+      <div className="usd-krw-anchor">
+        <div className="usd-krw-anchor-main">
+          <span className="source-badge badge-api">기준 환율</span>
+          <div>
+            <h2>USD/KRW</h2>
+            <p>원달러 기준 환율 · 원화 환산 기준</p>
+          </div>
+        </div>
+        <div className="usd-krw-anchor-metrics">
+          <div>
+            <span>기준일 환율</span>
+            <strong>{formatCellValue(usdKrwToday?.value ?? null, usdKrwToday?.status ?? 'empty', 'KRW')}</strong>
+          </div>
+          <div>
+            <span>당월 누적 평균</span>
+            <strong>{formatCellValue(usdKrwMtdAverage, usdKrwMtdAverage === null ? 'empty' : 'ok', 'KRW')}</strong>
+          </div>
+          <div className="anchor-secondary-desktop">{anchorSecondary}</div>
         </div>
       </div>
+
+      <details className="anchor-secondary-mobile"><summary>원달러 MoM·52주 범위</summary><div className="usd-krw-anchor-metrics">{anchorSecondary}</div></details>
 
       <div className="today-focus-bar">
         <div className="today-focus-heading">

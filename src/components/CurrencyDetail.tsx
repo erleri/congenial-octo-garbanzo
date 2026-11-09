@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import {
   CartesianGrid,
   Line,
@@ -24,6 +24,7 @@ interface CurrencyDetailProps {
   periodFrom: string
   periodTo: string
   rangeNotice: string | null
+  relatedReport?: ReactNode
 }
 
 interface DetailDotProps {
@@ -116,6 +117,7 @@ function CurrencyDetail({
   periodFrom,
   periodTo,
   rangeNotice,
+  relatedReport,
 }: CurrencyDetailProps) {
   const currency = currencyFilter === 'ALL' ? 'BRL' : (currencyFilter as CurrencyCode)
 
@@ -249,14 +251,16 @@ function CurrencyDetail({
     const matrix: MatrixRow[] = rateType === 'LOCAL_PER_USD' ? localMatrix : []
 
     return (
-      <div className="table-scroll sticky-table-wrapper">
-        <table className="dense-table">
+      <div className="table-scroll sticky-table-wrapper" tabIndex={0} role="region" aria-label={`${currency} 일별 환율표 · ${periodFrom} — ${periodTo}`} >
+        <table className="dense-table daily-rate-table" style={{minWidth:52+monthColumns.length*116}}>
+          <caption className="sr-only">{currency}/USD · {periodFrom} — {periodTo} 일별 환율</caption>
+          <colgroup><col style={{width:52}}/>{monthColumns.map(({year,month})=><col key={`${year}-${month}`}/>)}</colgroup>
           <thead>
             <tr>
-              <th>일자</th>
+              <th scope="col">일자</th>
               {monthColumns.map(({ year, month }) => (
-                <th key={`${rateType}-${year}-${month}`}>
-                  {String(year).slice(2)}.{String(month).padStart(2, '0')}
+                <th scope="col" key={`${rateType}-${year}-${month}`}>
+                  {year}.{String(month).padStart(2, '0')}
                 </th>
               ))}
             </tr>
@@ -264,7 +268,7 @@ function CurrencyDetail({
           <tbody>
             {matrix.map((row) => (
               <tr key={`${rateType}-day-${row.day}`}>
-                <td>{row.day}</td>
+                <th scope="row">{row.day}</th>
                 {row.values.map((item, idx) => {
                   const classes = [item?.status === 'zero' ? 'cell-zero' : '']
 
@@ -290,7 +294,7 @@ function CurrencyDetail({
               </tr>
             ))}
             <tr>
-              <td>Avg.</td>
+              <th scope="row">월평균</th>
               {monthColumns.map(({ year, month }) => {
                 const avg = monthlyAvg(rateType, year, month)
                 return (
@@ -311,20 +315,13 @@ function CurrencyDetail({
   }
 
   return (
-    <div className="panel">
-      <div className="panel-header">
-        <div>
-          <h2>일별 추이</h2>
-          <p className="table-help">{currency} 기준 일별 환율과 기간 평균입니다.</p>
-        </div>
-      </div>
-
+    <div className="panel daily-results">
       {rangeNotice ? (
         <p className="inline-notice warning-notice">{rangeNotice}</p>
       ) : null}
 
       <div className="chart-card">
-        <h3>{periodFrom} ~ {periodTo} 일별 환율</h3>
+        <h3>{currency}/USD <span className="chart-heading-note">일별 환율 · 월평균 점선</span></h3>
         <ResponsiveContainer width="100%" height={320}>
           <LineChart data={dailySeries} margin={{ top: 8, right: 12, bottom: 2, left: 0 }}>
             <CartesianGrid strokeDasharray="2 4" vertical={false} stroke={DETAIL_GRID_STROKE} />
@@ -389,14 +386,15 @@ function CurrencyDetail({
         </ResponsiveContainer>
       </div>
 
-      <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>일별 환율표</h3>
+      {relatedReport}
+      <details key={`${currency}:${periodFrom}:${periodTo}`} className="table-card daily-table-details">
+        <summary><span>일별 환율표 <small>{periodFrom} — {periodTo}</small></span><span className="daily-table-toggle"><span className="when-closed">펼치기 ＋</span><span className="when-open">접기 −</span></span></summary>
         <p className="table-help">
           표시: <span className="imputed-badge">보정</span> = 전일 또는 결측값 보정
         </p>
-        <p className="mobile-table-hint">표를 좌우로 이동하면 전체 데이터를 확인할 수 있습니다.</p>
+        {monthColumns.length>2&&<p className="mobile-table-hint">표를 좌우로 이동하면 다른 달의 환율을 볼 수 있습니다.</p>}
         {renderMatrix('LOCAL_PER_USD')}
-      </div>
+      </details>
     </div>
   )
 }

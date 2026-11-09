@@ -1,0 +1,28 @@
+/* Shared by the app and the standalone A-layout preview. */
+.report-experience .report-mobile-navigation,.report-experience .report-back-short{display:none}
+.report-experience .report-more-tools{position:relative}
+.report-experience .report-more-tools>summary{display:none}
+.report-experience .report-more-tools>div{display:flex;gap:6px}
+@media(max-width:760px){
+ .report-experience .report-more-tools>summary{display:flex;min-height:44px;align-items:center;padding:7px 10px;border:1px solid var(--rule);border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
+ .report-experience .report-more-tools>div{display:none;position:absolute;right:0;top:100%;z-index:12;padding:8px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;box-shadow:0 3px 12px #18304712;min-width:180px}
+ .report-experience .report-more-tools[open]>div{display:grid}
+ .report-experience .report-more-tools button{min-height:44px;white-space:nowrap}
+}
+@media print{.report-experience .report-more-tools,.report-experience .report-mobile-navigation{display:none!important}}
+
+/* Reader metadata is secondary, but units, dates and direction remain legible. */
+.report-experience .report-observation-meta{font-size:12px;line-height:1.6;color:var(--muted);margin:8px 0 3px;overflow-wrap:anywhere}
+.report-experience .report-price-details{margin:0 0 10px;font-size:12px;color:var(--muted)}
+.report-experience .report-price-details>summary{display:flex;align-items:center;min-height:36px;cursor:pointer;gap:6px}
+.report-experience .report-price-details>summary::after{content:'＋'}
+.report-experience .report-price-details[open]>summary::after{content:'−'}
+.report-experience .report-price-details .report-data-meta{margin:4px 0;line-height:1.6;overflow-wrap:anywhere}
+.report-experience .paper-meta,.report-experience .brief-stats small,.report-experience .brief-stats>div>span,.report-experience .chart-unit,.report-experience .chart-foot,.report-experience .small-note,.report-experience .source-license,.report-experience .claim-heading>span,.report-experience .report-data-meta,.report-experience .paper-footer{font-size:12px;line-height:1.6;color:var(--muted)}
+.report-experience .detail-tools button,.report-experience .report-more-tools>summary,.report-experience .range-tabs button{font-size:13px}
+.report-experience .report-price-details>summary:focus-visible{outline:3px solid #215ec7;outline-offset:3px}
+@media print{
+ .report-experience .report-price-details{display:block!important}
+ .report-experience .report-price-details::details-content{content-visibility:visible!important;display:block!important}
+ .report-experience .report-price-details>*{display:block!important}
+}

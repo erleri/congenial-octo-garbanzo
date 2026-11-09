@@ -16,8 +16,16 @@ describe('shared FX navigation contract',()=>{
     }
   })
   it('rejects unsupported filter values and external return destinations',()=>{
-    expect(parseFxNavigation('#trends?currency=ARP&monthly=private&from=2026-99&to=wrong&yearFrom=secret&view=unknown')).toMatchObject({currency:'BRL',monthlyCurrency:'ALL',from:'',to:'',yearFrom:null,view:'daily'})
+    expect(parseFxNavigation('#trends?currency=ARP&monthly=private&from=2026-99&to=wrong&yearFrom=secret&view=unknown')).toMatchObject({currency:'BRL',monthlyCurrency:'BRL',from:'',to:'',yearFrom:null,view:'daily'})
     for(const target of [null,123,'https://example.com','#report/CLP',`#trends?${'x'.repeat(513)}`])expect(safeTrendReturn(target)).toBeNull()
     expect(safeTrendReturn('#trends?view=monthly&currency=CLP')).toBe('#trends?view=monthly&currency=CLP')
   })
+})
+
+it('shares a single-currency URL while respecting explicit dual selections and period memory',()=>{
+  expect(initialFxNavigation).toMatchObject({currency:'BRL',monthlyCurrency:'BRL'})
+  expect(parseFxNavigation('#trends?currency=MXN')).toMatchObject({currency:'MXN',monthlyCurrency:'MXN'})
+  const explicit=parseFxNavigation('#trends?view=monthly&currency=CLP&monthly=ALL&from=2026-09&to=2026-11&yearFrom=2025&yearTo=2026')
+  expect(parseFxNavigation(trendHash({...explicit,view:'daily'}))).toMatchObject({currency:'CLP',monthlyCurrency:'ALL'})
+  expect(selectTrendCurrency(explicit,'PEN')).toMatchObject({currency:'PEN',monthlyCurrency:'PEN',from:'2026-09',to:'2026-11',yearFrom:2025,yearTo:2026})
 })

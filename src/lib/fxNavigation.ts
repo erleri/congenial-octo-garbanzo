@@ -13,7 +13,7 @@ export interface FxNavigation {
   yearTo: number | null
 }
 export const initialFxNavigation: FxNavigation = {
-  screen:'dashboard',view:'daily',currency:'BRL',monthlyCurrency:'ALL',from:'',to:'',yearFrom:null,yearTo:null,
+  screen:'dashboard',view:'daily',currency:'BRL',monthlyCurrency:'BRL',from:'',to:'',yearFrom:null,yearTo:null,
 }
 function isCurrency(value: string | null): value is CurrencyCode { return CURRENCIES.includes(value as CurrencyCode) }
 function month(value: string | null) { return value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value) ? value : '' }
@@ -27,7 +27,7 @@ export function parseFxNavigation(hash: string, previous = initialFxNavigation):
       screen:'trends',
       view:p.get('view')==='monthly'?'monthly':p.get('view')==='comparison'?'comparison':'daily',
       currency:isCurrency(p.get('currency'))?p.get('currency') as CurrencyCode:previous.currency,
-      monthlyCurrency:p.get('monthly')==='ALL'?'ALL':isCurrency(p.get('monthly'))?p.get('monthly') as CurrencyCode:previous.monthlyCurrency,
+      monthlyCurrency:p.get('monthly')==='ALL'?'ALL':isCurrency(p.get('monthly'))?p.get('monthly') as CurrencyCode:isCurrency(p.get('currency'))?p.get('currency') as CurrencyCode:previous.monthlyCurrency,
       from:month(p.get('from')),to:month(p.get('to')),yearFrom:year(p.get('yearFrom')),yearTo:year(p.get('yearTo')),
     }
   }
