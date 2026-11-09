@@ -6,6 +6,22 @@
 
 [앱](app.md) → [설계도](architecture.md) → [공통 규칙](rules.md) → [운영](operations.md). [실제 상태](operational-status.md), [국가별 차이](countries.md), [검증](verification.md), [발표 근거](presentation-evidence.md), [관리자 알림](admin-review-notifications.md)을 연결합니다.
 
+## 11월10일 기존 문서 묶음의 갱신 범위
+
+현재 구현 기준은 운영 배포 `681de0c`입니다. 원본 압축·분리 보관, 작은 실행 명세서, 무과금 저장·복원 검사와 장애 표시를 아래 담당 문서에 반영했습니다. 운영 상태는 11월10일 01:06 KST 확인값이며 실시간 현황으로 간주하지 않습니다.
+
+| 문서 묶음 | 이번 반영 내용 |
+| --- | --- |
+| [README](../../README.md)·[운영 할 일](../../OPERATIONS_TODO.md) | 저장 문제 해결과 남은 실제 생성 확인을 구분 |
+| [앱 안내](app.md)·[관리자 알림](admin-review-notifications.md) | 저장 장애의 운영 확인·중복 알림·해결 조건과 원문 접근 제한 |
+| [설계도](architecture.md)·[도식 6종](diagrams/index.html) | 비공개 원본 저장 경계, 저장·복원과 생성의 분기, 장애 알림 연결 |
+| [공통 규칙](rules.md)·[저장 상세](frozen-input-storage.md) | 기존 발행·모델·예산 기준 유지, 새 형식과 이전 형식 호환·무결성·상한 |
+| [운영 안내](operations.md)·[상태 확인표](operational-status.md) | 무과금 확인과 실제 실행 구분, 배포·설정 복원·회계·복구 범위 |
+| [6통화 표](countries.md) | 국가별 정의는 유지하고 11월9일·10일 수집 관측을 분리 |
+| [검증 이력](verification.md)·[PPT 근거](presentation-evidence.md) | 실제 용량·해시 복원 증거와 새 AI 생성 미확인을 구분 |
+
+[갱신·보존 확인 기록](evidence/documentation-refresh-20261110.json), [도식 원본·렌더링 확인](evidence/diagram-verification-20261110.json), [국가별 수집 관측](evidence/source-observation-20261110.json)을 함께 연결합니다. 아래 전수 목록과 과거 시험·실패·비용 기록은 당시 사실을 보존합니다. 실행 코드가 읽는 정책 파일은 이번 문서 갱신으로 변경하지 않았습니다.
+
 ## 분류와 처리
 
 11월10일 추가 현재 안내: [입력 저장·복원](frozen-input-storage.md), [로컬 검증 근거](evidence/frozen-storage-verification-20261110.json), [운영 반영·무과금 확인 근거](evidence/frozen-storage-production-20261110.json). 기존 11월9일 전수 목록은 당시 기준점으로 보존합니다. 로컬 검증·운영 저장 성공·실제 유료 생성 미확인을 구분합니다.

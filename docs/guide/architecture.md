@@ -1,6 +1,6 @@
 # 설계도·데이터 흐름
 
-기준: 운영 배포 `fa9b58f` / 2026-11-09. 아래는 실제 책임과 경계를 설명하는 도식입니다. **설계된 경로와 최근 실행 성공은 다릅니다.** 최근 보류는 [운영 상태](operational-status.md)를 봅니다. 노드의 자동·AI·관리자 표기를 구분하며, 화살표는 권한·사용 범위·예산 검사를 생략하는 지름길이 아닙니다.
+기준: 운영 배포 `681de0c` / 2026-11-10. 아래 여섯 도식은 현재 구현의 책임과 경계를 설명합니다. **운영 저장·복원 통과와 실제 AI 생성 성공은 다릅니다.** 확인 범위는 [운영 상태](operational-status.md)를 봅니다. 노드의 자동·AI·관리자 표기를 구분하며, 화살표는 권한·사용 범위·예산 검사를 생략하는 지름길이 아닙니다.
 
 [여섯 도식 보기](diagrams/index.html)에서 확대해 볼 수 있습니다. 원본은 `.mmd`, 렌더링은 같은 이름의 `.svg`로 관리합니다. 원본 변경 시 두 결과를 함께 갱신합니다.
 ## 독자·관리자의 화면 이동
@@ -40,11 +40,14 @@ flowchart TD
   GIT[GitHub: 코드·공개 자료] --> NET[Netlify: 공개 웹앱 배포]
   GIT --> JOB[Actions: 자동 운영]
   API[환율 API·뉴스·공식 통계] --> JOB
-  JOB --> PRIVATE[Supabase 비공개: 입력·검토·비용·발송 이력]
+  JOB --> PRIVATE[Supabase 비공개: 실행 명세·검토·비용·발송 이력]
+  JOB -->|서버만 저장·복원| OBJECTS[Supabase 비공개: 무손실 압축 원본·조각]
+  OBJECTS -->|해시·완전성 확인| JOB
+  PRIVATE -.->|변경 불가 참조| OBJECTS
   JOB -->|허용한 자료만| MODEL[OpenRouter → 검증된 Azure: AI 처리]
   MODEL --> PRIVATE
   AUTH[Supabase Auth: 활성 관리자] --> DECIDE[관리자 결정]
-  PRIVATE --> DECIDE
+  PRIVATE -->|허용된 검토 정보만| DECIDE
   DECIDE -->|승인·공개 복사| PUB[공개 리포트·허용 조회 필드]
   PUB --> NET
   JOB --> SMTP[SMTP: 독자 메일·관리자 알림]
@@ -121,15 +124,21 @@ flowchart TD
 flowchart TD
   PLAN[자동: 국가별 질문·출처 선택] --> COLLECT[뉴스·공식 자료 수집]
   COLLECT -->|뉴스| SCOPE{자동: 이용 범위·기간·가격 적합?}
-  SCOPE -->|예| GATE[서버: 경로·용량·중복·예산 검사와 예약]
+  SCOPE -->|예| INPUT[자동: 환율·조사 준비 입력 고정]
   SCOPE -->|예외| SOURCE[관리자: 출처 범위 결정]
-  SOURCE -->|조건 충족 후| GATE
+  SOURCE -->|조건 충족 후| INPUT
   SOURCE -->|보류| HOLD[사유 기록·다른 적합 경로 유지]
+  INPUT --> STORE[서버: 무손실 압축·조각 저장·복원 해시 대조]
+  STORE -->|무과금 확인| VERIFIED[저장 검증 종료: 호출·예약·게시 없음]
+  STORE -->|실행| GATE[서버: 작은 명세서 연결·경로·중복·예산 검사와 예약]
+  STORE -->|실패| FAULT[기술 장애 기록·관리자 운영 확인·Actions 실패]
+  FAULT -->|기록도 실패| LOG[Actions에 기록 실패 표시]
   GATE -->|허용| EXTRACT[AI: 원문 추출 → 별도 대조]
   GATE -->|차단| HOLD
   EXTRACT --> CARDS[검토된 사실·귀속 견해 카드]
   COLLECT -->|공식 통계| OFFICIAL[자동: 지표 정의·기간·수정 확인]
   OFFICIAL --> BG[보조 배경: 당일 환율 원인과 분리]
+  BG --> INPUT
   CARDS --> WRITE[AI: 환율 중심 집필]
   BG --> WRITE
   WRITE --> REVIEW[자동 구조 검사 + AI 문장별 검토]
@@ -157,7 +166,8 @@ flowchart TD
   LIVE -->|변경·실패| HOLD[보류·실패·미확정 기록]
   SMTP --> MAIL[독자: 제목·발행 사유·리포트 읽기]
   MAIL --> APP[앱의 통화·날짜 판본]
-  NEW[새 관리자 검토 항목] --> DIGEST[자동: 하루 한 묶음·같은 버전 중복 제외]
+  INCIDENT[저장·복원 장애: 같은 원인 통합·정상 검사로 해결] --> NEW[새 관리자 검토 항목]
+  NEW --> DIGEST[자동: 하루 한 묶음·같은 버전 중복 제외]
   DIGEST --> NOTICE[관리자 메일: 대상 링크]
   NOTICE --> DOT[사용자 또는 Dot: 링크 확인]
   DOT --> AUTH{현재 로그인·권한·버전 일치?}
@@ -173,7 +183,7 @@ flowchart TD
 
 ## 실제 진입점과 책임
 
-2026-11-10 배포 `681de0c`의 [입력 저장·복원 흐름](frozen-input-storage.md#저장과-재개-흐름)은 큰 원본을 비공개 객체로 분리합니다. 위 여섯 도식은 `fa9b58f` 기준의 서비스 연결을 보존하며, 제작 흐름 중 입력 보관 부분은 이 추가 도식을 함께 읽습니다. AI·공개·비용 경계는 바뀌지 않습니다.
+위 도식에 분리 저장과 장애 알림 연결을 반영했습니다. 조각·해시·구형 `/1` 및 신형 `/2` 재개는 [저장·복원 상세 흐름](frozen-input-storage.md#저장과-재개-흐름)을 함께 봅니다. 원본 객체는 로그인 관리자도 직접 조회할 수 없으며 기존 검토 화면은 허용된 정보만 받습니다. AI·공개·비용 승인 경계는 바뀌지 않습니다.
 
 | 흐름 | 구현 진입점 | 권한·실패 경계 |
 | --- | --- | --- |
@@ -182,6 +192,8 @@ flowchart TD
 | DB 동기화 | [sync-fx-to-supabase](../../scripts/sync-fx-to-supabase.js) | 서비스 서버 경로, 공개 키와 분리 |
 | 발행 판단 | [publication-cadence](../../scripts/currency-report/publication-cadence.js) | 후보와 발행 승인 분리 |
 | 운영 조율 | [operating-entry](../../scripts/currency-report/operating-entry.js), [operating-cycle](../../scripts/currency-report/operating-cycle.js) | 설정·용량·예약·중복·국가별 상태 |
+| 입력 보관·재개 | [operating-storage](../../scripts/currency-report/operating-storage.js), [추가 DB 변경](../../supabase/migrations/20261109150211_currency_operating_frozen_objects.sql) | 원본 무손실·서버 전용·조각 완전성·`/1`/`/2` 호환 |
+| 무과금 저장 확인 | [전용 workflow](../../.github/workflows/report-storage-check.yml) | 모델 키·메일 인증정보 없음, 원본 저장은 수행 |
 | 자료·원문 | [runtime-supply](../../scripts/currency-report/runtime-supply.js), [original-news-pipeline](../../scripts/currency-report/original-news-pipeline.js) | 이용 범위·판본·원문 대조 |
 | 집필·검토 | [shared-writer](../../scripts/currency-report/shared-writer.js), [runtime-worker](../../scripts/currency-report/runtime-worker.js) | 모델 결과와 최종 게시 분리 |
 | 관리자 승인 | [CurrencyReportReview](../../src/components/CurrencyReportReview.tsx), [migration](../../supabase/migrations/) | 서버가 활성 권한·버전·공개 복사 검사 |

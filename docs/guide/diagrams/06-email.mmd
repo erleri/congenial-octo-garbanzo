@@ -6,7 +6,8 @@ flowchart TD
   LIVE -->|변경·실패| HOLD[보류·실패·미확정 기록]
   SMTP --> MAIL[독자: 제목·발행 사유·리포트 읽기]
   MAIL --> APP[앱의 통화·날짜 판본]
-  NEW[새 관리자 검토 항목] --> DIGEST[자동: 하루 한 묶음·같은 버전 중복 제외]
+  INCIDENT[저장·복원 장애: 같은 원인 통합·정상 검사로 해결] --> NEW[새 관리자 검토 항목]
+  NEW --> DIGEST[자동: 하루 한 묶음·같은 버전 중복 제외]
   DIGEST --> NOTICE[관리자 메일: 대상 링크]
   NOTICE --> DOT[사용자 또는 Dot: 링크 확인]
   DOT --> AUTH{현재 로그인·권한·버전 일치?}

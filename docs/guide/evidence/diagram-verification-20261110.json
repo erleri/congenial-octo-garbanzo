@@ -1,0 +1,62 @@
+{
+  "checkedOn": "2026-11-10",
+  "implementationCommit": "681de0ccb91e8b38f8bddc3ecbc5670d3f98611a",
+  "method": "Mermaid 11.12.0 rendered in local headless Chrome; all six PNG renders inspected individually for readable text, complete nodes and arrows; current inline sources match .mmd files.",
+  "scope": "Documentation rendering only; not runtime or actual-device testing.",
+  "diagrams": [
+    {
+      "source": "01-navigation.mmd",
+      "sourceSha256": "e530a2506d07acee8985c9d82b8c155ed2f1d2b5a9371c5eb223aa031563f33a",
+      "render": "01-navigation.svg",
+      "renderSha256": "1f20410c79b88b0fff6d50a99200baf24411ed0cf5a1cf865d13fa04496a22e7",
+      "renderer": "Mermaid 11.12.0",
+      "changed": true,
+      "visuallyInspected": true
+    },
+    {
+      "source": "02-services.mmd",
+      "sourceSha256": "9948ecdb6a25d628782fc394cf4b1b5df6657212aa36289859dd9a02a4e71b25",
+      "render": "02-services.svg",
+      "renderSha256": "2952cf68fea6b69c9b015674a0d272c84bde624de7ded523538a4adb3c865c01",
+      "renderer": "Mermaid 11.12.0",
+      "changed": true,
+      "visuallyInspected": true
+    },
+    {
+      "source": "03-rates.mmd",
+      "sourceSha256": "d6430720c8a09f6619a18eb1c21e03ad35e65d5495a1bfe801cd84814523c236",
+      "render": "03-rates.svg",
+      "renderSha256": "a479b6f015620a909ee84cb8c1652445bc7399e81473fd91984abb673550b6e4",
+      "renderer": "Mermaid 11.12.0",
+      "changed": true,
+      "visuallyInspected": true
+    },
+    {
+      "source": "04-cadence.mmd",
+      "sourceSha256": "a1acace4b0f63e8748069554a8fb7119475fe21feb4ba485f809ff9335c697cb",
+      "render": "04-cadence.svg",
+      "renderSha256": "b0fa1c139a4ae88cfabbfbea414e337193b27fca3234d48d316e3a496df66513",
+      "renderer": "Mermaid 11.12.0",
+      "changed": true,
+      "visuallyInspected": true
+    },
+    {
+      "source": "05-production.mmd",
+      "sourceSha256": "85808e895c703cb23471a4dbb1193e4c8bc42659e846bd55d7c99ed4574933b3",
+      "render": "05-production.svg",
+      "renderSha256": "5e53498261afd3f01aa9be3a80bcb340c92a1dc073d67330daab13f0ffb9e77a",
+      "renderer": "Mermaid 11.12.0",
+      "changed": true,
+      "visuallyInspected": true
+    },
+    {
+      "source": "06-email.mmd",
+      "sourceSha256": "25a532801e5016c06214204ab55715aeb70d0b491c942c253843c084704a09e9",
+      "render": "06-email.svg",
+      "renderSha256": "c99375911bd7be26cf904b2c332ea1b76a006f48d5336dc621e7ee9f6b14a079",
+      "renderer": "Mermaid 11.12.0",
+      "changed": true,
+      "visuallyInspected": true
+    }
+  ]
+}

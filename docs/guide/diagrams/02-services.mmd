@@ -2,11 +2,14 @@ flowchart TD
   GIT[GitHub: 코드·공개 자료] --> NET[Netlify: 공개 웹앱 배포]
   GIT --> JOB[Actions: 자동 운영]
   API[환율 API·뉴스·공식 통계] --> JOB
-  JOB --> PRIVATE[Supabase 비공개: 입력·검토·비용·발송 이력]
+  JOB --> PRIVATE[Supabase 비공개: 실행 명세·검토·비용·발송 이력]
+  JOB -->|서버만 저장·복원| OBJECTS[Supabase 비공개: 무손실 압축 원본·조각]
+  OBJECTS -->|해시·완전성 확인| JOB
+  PRIVATE -.->|변경 불가 참조| OBJECTS
   JOB -->|허용한 자료만| MODEL[OpenRouter → 검증된 Azure: AI 처리]
   MODEL --> PRIVATE
   AUTH[Supabase Auth: 활성 관리자] --> DECIDE[관리자 결정]
-  PRIVATE --> DECIDE
+  PRIVATE -->|허용된 검토 정보만| DECIDE
   DECIDE -->|승인·공개 복사| PUB[공개 리포트·허용 조회 필드]
   PUB --> NET
   JOB --> SMTP[SMTP: 독자 메일·관리자 알림]

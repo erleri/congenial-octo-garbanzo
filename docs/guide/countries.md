@@ -1,6 +1,6 @@
 # 6통화 출처·가격·달력·지표 비교
 
-기준 `fa9b58f` / 2026-11-09. 등록 자료를 공통 선택 함수로 읽은 [카탈로그 사본](evidence/source-catalog-20261109.json)과 [실행 관측](evidence/operational-snapshot-20261109.json)을 구분합니다. 이번 문서 작업에서는 새 기사를 수집하거나 이용 조건을 새로 승인하지 않았습니다.
+구현 기준 `681de0c` / 2026-11-10. 국가별 출처·가격·달력·지표 정의는 이번 저장 구조 변경으로 바뀌지 않았습니다. [11월9일 카탈로그](evidence/source-catalog-20261109.json), [당시 실행 관측](evidence/operational-snapshot-20261109.json), [11월10일 운영 무과금 수집 관측](evidence/source-observation-20261110.json)을 구분합니다. 이번 문서 갱신에서는 새 수집·이용 조건 승인·모델 호출을 하지 않았습니다.
 
 모든 통화의 대표 환율은 **대시보드 채택값**입니다. 아래 가격 정의는 보조 자료를 연결할 때의 차이이며 대표값의 공급자를 바꾸는 설정이 아닙니다. 회사 기준환율과의 동일성·현지 종가 여부는 확인되지 않은 가정을 사실로 바꾸지 않습니다. 누적2%·정기 점검·품질·예산·공개 기준은 [공통 규칙](rules.md)을 적용합니다.
 
@@ -17,6 +17,21 @@
 
 ## 등록과 실제 연결의 차이
 
+### 11월10일 무과금 저장 확인에서 관측한 결과
+
+전체 환율 이력과 아래 준비 입력은 같은 저장·복원 규칙으로 처리했습니다. 6통화 모두 조사 후보이며 누적 ±2%를 넘지 않았고 정기 점검 예정일은 11월16일입니다. **수집 후보 31건 → 모델 처리 준비 20건**은 다른 단계의 수치이며 검토 합격·발행 건수가 아닙니다.
+
+| 통화 | 수집 후보 | 처리 준비 기사 | 확인된 공백·조건 |
+| --- | ---: | ---: | --- |
+| BRL | 3 | 3 | InfoMoney 목록에서 대상 후보 없음, 다른 등록 경로 사용 |
+| MXN | 9 | 4 | 일부 경로·날짜는 공통 조회 횟수 한도로 미조회 |
+| COP | 4 | 3 | 이번 조회 실패 없음. 내용 검토는 아직 미실행 |
+| PEN | 4 | 4 | Gestión 유료벽·Andina robots 확인 실패, 일부 경로 미조회. 다른 확보 자료 사용 |
+| CLP | 6 | 3 | BioBio·Cooperativa 대상 후보 없음, 일부 기간 조회 한도 |
+| ARS | 5 | 3 | 이번 조회 실패 없음. 내용 검토는 아직 미실행 |
+
+일부 공백이 다른 출처·국가의 저장 검증을 막지는 않았습니다. 출처별 상세·실제 조사 기간은 [관측 근거](evidence/source-observation-20261110.json)에 보존했습니다. **아래 국가별 등록 URL과 실행 설명은 11월9일 보존 관측**이며, 위 새 수치와 합산하거나 현재 완전성으로 해석하지 않습니다.
+
 `existing_adapter`는 자동 탐색 경로가 있다는 뜻이며 최신 목록의 완전성·모든 기사의 무료 접근·AI 입력 허가·내용 검토 성공을 보장하지 않습니다. `excluded`는 현재 자동 탐색 제외입니다. Yahoo Finance는 6국 모두 제외 설정입니다. 과거 Yahoo 활용 논의·개별 읽기 성공을 현재 자동 수집으로 표시하지 않습니다. Câmara Rádio는 과거 프로그램 직접 수집 보조 경로이며 최신 시장 목록 대체로 쓰지 않습니다.
 
 칠레 `clp-existing-four-outlets`라는 옛 이름은 현재 네 매체가 모두 정상 수집된다는 뜻이 아닙니다. 실제 로컬 어댑터는 Emol Economía와 Reporte Minero를 등록하고, BioBio·Cooperativa는 별도 경로입니다. DF·Pulso의 제외/개별 판정과 이를 구분합니다. [실제 레지스트리](../../scripts/currency-report/local-source-discovery.js).
@@ -25,7 +40,7 @@
 
 ## 브라질 · BRL
 
-이번 실행 확보: brl-infomoney: 0건; brl-agenciabrasil: 2건; brl-cnn: 1건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
+11월9일 보존 관측: brl-infomoney: 0건; brl-agenciabrasil: 2건; brl-cnn: 1건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
 
 | 출처 ID | 등록 URL | 자동 탐색 설정 | 구분 |
 | --- | --- | --- | --- |
@@ -36,11 +51,11 @@
 | brl-cnn | [https://www.cnnbrasil.com.br/economia/money/mercado/](https://www.cnnbrasil.com.br/economia/money/mercado/) | existing_adapter | supplemental |
 | brl-camara-radio | [https://www.camara.leg.br/radio/742791-economia-direta](https://www.camara.leg.br/radio/742791-economia-direta) | existing_adapter | supplemental |
 
-제외 설정: brl-valor, brl-yahoo。출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
+제외 설정: brl-valor, brl-yahoo. 출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
 
 ## 멕시코 · MXN
 
-이번 실행 확보: mxn-eleconomista: 3건; mxn-elfinanciero: 2건; mxn-forbes: 2건; mxn-expansion: 2건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
+11월9일 보존 관측: mxn-eleconomista: 3건; mxn-elfinanciero: 2건; mxn-forbes: 2건; mxn-expansion: 2건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
 
 | 출처 ID | 등록 URL | 자동 탐색 설정 | 구분 |
 | --- | --- | --- | --- |
@@ -50,11 +65,11 @@
 | mxn-yahoo | [https://finance.yahoo.com/](https://finance.yahoo.com/) | excluded | syndicated |
 | mxn-forbes | [https://forbes.com.mx/mercados/](https://forbes.com.mx/mercados/) | existing_adapter | specialist |
 
-제외 설정: mxn-yahoo。출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
+제외 설정: mxn-yahoo. 출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
 
 ## 콜롬비아 · COP
 
-이번 실행 확보: cop-larepublica: 1건; cop-valora: 2건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
+11월9일 보존 관측: cop-larepublica: 1건; cop-valora: 2건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
 
 | 출처 ID | 등록 URL | 자동 탐색 설정 | 구분 |
 | --- | --- | --- | --- |
@@ -63,11 +78,11 @@
 | cop-yahoo | [https://finance.yahoo.com/](https://finance.yahoo.com/) | excluded | syndicated |
 | cop-valora | [https://www.valoraanalitik.com/](https://www.valoraanalitik.com/) | existing_adapter | specialist |
 
-제외 설정: cop-portafolio, cop-yahoo。출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
+제외 설정: cop-portafolio, cop-yahoo. 출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
 
 ## 페루 · PEN
 
-이번 실행 확보: pen-gestion: 0건; pen-revistaeconomia: 1건; pen-rpp: 1건; pen-elcomercio: 1건; pen-andina: 0건; pen-infobae: 0건. 발행 판단: `research_candidate`, 정기 점검 예정 2026-11-16. 조회 실패: [{"sourceId": "pen-gestion", "status": "access_failed", "category": "access_failure", "reason": "publisher_paywall", "requestedPeriods": ["2026-11-09", "2026-11-08", "2026-11-07", "2026-11-06", "2026-11-05", "2026-11-04", "2026-11-03", "2026-11-02"]}, {"sourceId": "pen-andina", "status": "access_failed", "category": "access_failure", "reason": "robots_unavailable", "requestedPeriods": ["2026-11-09", "2026-11-08", "2026-11-07", "2026-11-06", "2026-11-05", "2026-11-04", "2026-11-03", "2026-11-02"]}]. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
+11월9일 보존 관측: pen-gestion: 0건; pen-revistaeconomia: 1건; pen-rpp: 1건; pen-elcomercio: 1건; pen-andina: 0건; pen-infobae: 0건. 발행 판단: `research_candidate`, 정기 점검 예정 2026-11-16. 조회 실패: [{"sourceId": "pen-gestion", "status": "access_failed", "category": "access_failure", "reason": "publisher_paywall", "requestedPeriods": ["2026-11-09", "2026-11-08", "2026-11-07", "2026-11-06", "2026-11-05", "2026-11-04", "2026-11-03", "2026-11-02"]}, {"sourceId": "pen-andina", "status": "access_failed", "category": "access_failure", "reason": "robots_unavailable", "requestedPeriods": ["2026-11-09", "2026-11-08", "2026-11-07", "2026-11-06", "2026-11-05", "2026-11-04", "2026-11-03", "2026-11-02"]}]. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
 
 | 출처 ID | 등록 URL | 자동 탐색 설정 | 구분 |
 | --- | --- | --- | --- |
@@ -80,11 +95,11 @@
 | pen-infobae | [https://www.infobae.com/peru/](https://www.infobae.com/peru/) | existing_adapter | supplemental |
 | pen-larepublica | [https://larepublica.pe/economia](https://larepublica.pe/economia) | excluded | supplemental |
 
-제외 설정: pen-yahoo, pen-larepublica。출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
+제외 설정: pen-yahoo, pen-larepublica. 출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
 
 ## 칠레 · CLP
 
-이번 실행 확보: clp-existing-four-outlets: 6건; clp-biobio: 0건; clp-cooperativa: 0건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: official_pdf_numeric_parser_required.
+11월9일 보존 관측: clp-existing-four-outlets: 6건; clp-biobio: 0건; clp-cooperativa: 0건. 발행 판단: `no_active_trigger`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: official_pdf_numeric_parser_required.
 
 | 출처 ID | 등록 URL | 자동 탐색 설정 | 구분 |
 | --- | --- | --- | --- |
@@ -95,11 +110,11 @@
 | clp-biobio | [https://www.biobiochile.cl/lista/categorias/economia](https://www.biobiochile.cl/lista/categorias/economia) | existing_adapter | supplemental |
 | clp-cooperativa | [https://www.cooperativa.cl/noticias/site/tax/port/all/cooperativataxport_6___1.html](https://www.cooperativa.cl/noticias/site/tax/port/all/cooperativataxport_6___1.html) | existing_adapter | supplemental |
 
-제외 설정: clp-df, clp-pulso, clp-yahoo。출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
+제외 설정: clp-df, clp-pulso, clp-yahoo. 출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
 
 ## 아르헨티나 · ARS
 
-이번 실행 확보: ars-iprofesional: 3건; ars-infobae: 4건. 발행 판단: `research_candidate`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
+11월9일 보존 관측: ars-iprofesional: 3건; ars-infobae: 4건. 발행 판단: `research_candidate`, 정기 점검 예정 2026-11-16. 조회 실패: []. 공식 지표 사유: 추가 사유 없음(모든 지표 완료 의미 아님).
 
 | 출처 ID | 등록 URL | 자동 탐색 설정 | 구분 |
 | --- | --- | --- | --- |
@@ -109,7 +124,7 @@
 | ars-yahoo | [https://finance.yahoo.com/](https://finance.yahoo.com/) | excluded | syndicated |
 | ars-iprofesional | [https://www.iprofesional.com/finanzas](https://www.iprofesional.com/finanzas) | existing_adapter | specialist |
 
-제외 설정: ars-cronista, ars-ambito, ars-yahoo。출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
+제외 설정: ars-cronista, ars-ambito, ars-yahoo. 출처별 이용 조건·수집 범위는 실행 시 별도 검사하며 등록/수집만으로 승인하지 않습니다.
 
 ## 공통 국제 자료
 

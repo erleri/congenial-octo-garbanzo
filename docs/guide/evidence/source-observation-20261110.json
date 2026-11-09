@@ -1,0 +1,522 @@
+{
+  "checkedAt": "2026-11-10T00:57:58+09:00",
+  "run": 42649524739,
+  "commit": "681de0ccb91e8b38f8bddc3ecbc5670d3f98611a",
+  "collectionOnly": true,
+  "modelCalls": 0,
+  "contentApproved": false,
+  "rows": [
+    {
+      "currency": "BRL",
+      "candidates": 3,
+      "preparedArticles": 3,
+      "decision": {
+        "status": "research_candidate",
+        "cumulativePct": 1.2433327202501232,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      "sourceCoverage": [
+        {
+          "sourceId": "brl-infomoney",
+          "collectedOriginals": 0,
+          "status": "no_collected_original",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "brl-agenciabrasil",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "brl-cnn",
+          "collectedOriginals": 1,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        }
+      ],
+      "lookupFailures": [],
+      "collectionGaps": [
+        {
+          "sourceId": "brl-infomoney",
+          "status": "no_candidates_in_listing",
+          "category": "no_matching_candidate",
+          "reason": "listing_did_not_identify_matching_article",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        }
+      ],
+      "officialBackground": {
+        "status": "official_numeric_background_prepared",
+        "admittedStatistics": 1
+      }
+    },
+    {
+      "currency": "MXN",
+      "candidates": 9,
+      "preparedArticles": 4,
+      "decision": {
+        "status": "research_candidate",
+        "cumulativePct": -0.9458439224609871,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      "sourceCoverage": [
+        {
+          "sourceId": "mxn-eleconomista",
+          "collectedOriginals": 3,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "mxn-elfinanciero",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "mxn-forbes",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "mxn-expansion",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        }
+      ],
+      "lookupFailures": [],
+      "collectionGaps": [
+        {
+          "sourceId": "mxn-elfinanciero",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "mxn-forbes",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "mxn-eleconomista",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-05"
+          ]
+        }
+      ],
+      "officialBackground": {
+        "status": "official_numeric_background_prepared",
+        "admittedStatistics": 4
+      }
+    },
+    {
+      "currency": "COP",
+      "candidates": 4,
+      "preparedArticles": 3,
+      "decision": {
+        "status": "research_candidate",
+        "cumulativePct": 0.7995827425125057,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      "sourceCoverage": [
+        {
+          "sourceId": "cop-larepublica",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "cop-valora",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        }
+      ],
+      "lookupFailures": [],
+      "collectionGaps": [],
+      "officialBackground": {
+        "status": "official_numeric_background_prepared",
+        "admittedStatistics": 1
+      }
+    },
+    {
+      "currency": "PEN",
+      "candidates": 4,
+      "preparedArticles": 4,
+      "decision": {
+        "status": "research_candidate",
+        "cumulativePct": -0.6941385052528393,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      "sourceCoverage": [
+        {
+          "sourceId": "pen-gestion",
+          "collectedOriginals": 0,
+          "status": "no_collected_original",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "pen-revistaeconomia",
+          "collectedOriginals": 1,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "pen-rpp",
+          "collectedOriginals": 1,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "pen-elcomercio",
+          "collectedOriginals": 1,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "pen-andina",
+          "collectedOriginals": 0,
+          "status": "no_collected_original",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "pen-infobae",
+          "collectedOriginals": 1,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        }
+      ],
+      "lookupFailures": [
+        {
+          "sourceId": "pen-gestion",
+          "status": "access_failed",
+          "category": "access_failure",
+          "reason": "publisher_paywall",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-andina",
+          "status": "access_failed",
+          "category": "access_failure",
+          "reason": "robots_unavailable",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        }
+      ],
+      "collectionGaps": [
+        {
+          "sourceId": "pen-gestion",
+          "status": "access_failed",
+          "category": "access_failure",
+          "reason": "publisher_paywall",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-gestion",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-revistaeconomia",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-rpp",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-elcomercio",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-andina",
+          "status": "access_failed",
+          "category": "access_failure",
+          "reason": "robots_unavailable",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "pen-infobae",
+          "status": "not_attempted",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        }
+      ],
+      "officialBackground": {
+        "status": "official_numeric_background_prepared",
+        "admittedStatistics": 1
+      }
+    },
+    {
+      "currency": "CLP",
+      "candidates": 6,
+      "preparedArticles": 3,
+      "decision": {
+        "status": "research_candidate",
+        "cumulativePct": -1.7156497200653154,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      "sourceCoverage": [
+        {
+          "sourceId": "clp-existing-four-outlets",
+          "collectedOriginals": 6,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "clp-biobio",
+          "collectedOriginals": 0,
+          "status": "no_collected_original",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "clp-cooperativa",
+          "collectedOriginals": 0,
+          "status": "no_collected_original",
+          "contentReviewed": false
+        }
+      ],
+      "lookupFailures": [],
+      "collectionGaps": [
+        {
+          "sourceId": "clp-biobio",
+          "status": "no_candidates_in_listing",
+          "category": "no_matching_candidate",
+          "reason": "listing_did_not_identify_matching_article",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "clp-cooperativa",
+          "status": "no_candidates_in_listing",
+          "category": "no_matching_candidate",
+          "reason": "listing_did_not_identify_matching_article",
+          "requestedPeriods": [
+            "2026-11-09",
+            "2026-11-08",
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        },
+        {
+          "sourceId": "clp-existing-four-outlets",
+          "status": "no_candidates_in_listing",
+          "category": "no_matching_candidate",
+          "reason": "no_candidates_in_attempt",
+          "requestedPeriods": [
+            "2026-11-08"
+          ]
+        },
+        {
+          "sourceId": "clp-existing-four-outlets",
+          "status": "collected_pending_review",
+          "category": "request_budget",
+          "reason": "source_request_budget",
+          "requestedPeriods": [
+            "2026-11-07",
+            "2026-11-06",
+            "2026-11-05",
+            "2026-11-04",
+            "2026-11-03",
+            "2026-11-02"
+          ]
+        }
+      ],
+      "officialBackground": {
+        "status": "official_numeric_background_prepared",
+        "admittedStatistics": 1
+      }
+    },
+    {
+      "currency": "ARS",
+      "candidates": 5,
+      "preparedArticles": 3,
+      "decision": {
+        "status": "research_candidate",
+        "cumulativePct": 0.9320958053436801,
+        "thresholdPct": 2,
+        "periodicDueDate": "2026-11-16",
+        "dataHolds": [],
+        "comparisonHolds": [],
+        "comparisonDetails": []
+      },
+      "sourceCoverage": [
+        {
+          "sourceId": "ars-iprofesional",
+          "collectedOriginals": 3,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        },
+        {
+          "sourceId": "ars-infobae",
+          "collectedOriginals": 2,
+          "status": "collected_pending_review",
+          "contentReviewed": false
+        }
+      ],
+      "lookupFailures": [],
+      "collectionGaps": [],
+      "officialBackground": {
+        "status": "official_numeric_background_prepared",
+        "admittedStatistics": 1
+      }
+    }
+  ]
+}
