@@ -24,3 +24,10 @@
 .report-detail-links a { font-size:14px; }
 @media(max-width:520px) { .published-currency-reports .report-history-list li { grid-template-columns:1fr; gap:6px; padding:18px 0; } .published-currency-reports .report-history-list h2 { font-size:18px; } .report-neighbors button { flex:1; padding:10px; } }
 @media print { .report-navigation,.report-detail-links,.report-neighbors,.currency-tabs,.report-status-refresh,.report-history-filters,.report-more,.report-origin-return { display:none!important; } }
+
+.published-currency-reports .brief-list-card .brief-list-meta { margin-top:10px; font-size:12px; color:#526478; }
+.published-currency-reports .brief-list-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:4px; }
+.published-currency-reports .brief-list-actions a { display:inline-flex; align-items:center; min-height:44px; font-size:13px; line-height:1.4; text-decoration:none; text-underline-offset:3px; }
+.published-currency-reports .brief-list-actions .brief-list-read { color:#183853; font-weight:750; }
+.published-currency-reports .brief-list-actions .brief-list-history { color:#526478; margin-left:auto; }
+.published-currency-reports .brief-list-actions a:hover { text-decoration:underline; }

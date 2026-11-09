@@ -35,8 +35,11 @@ function LatestList({go,revision}:{go:Go;revision:number}) {
       const current=result.items.find(i=>i.currency===c),item=current??result.archives.find(i=>i.currency===c),failed=result.failed.includes(c)
       return <article className={`brief-list-card currency-${c.toLowerCase()}`} key={c}><span>{names[c]} · {c}</span>
         <h2>{item?.title??(failed?'조회 확인 필요':'현재 리포트 미발행')}</h2><p>{item?.summary??(failed?'연결을 확인하지 못했습니다.':'이 국가의 리포트 목록에서 발행된 자료를 확인할 수 있습니다.')}</p>
-        {item&&<><time>{item.baseDate}</time><p>{typeLabel(item)}</p><a href={reportLink(c,item.baseDate)} onClick={e=>{e.preventDefault();go(reportLink(c,item.baseDate))}}>{current?'최신 리포트 읽기':'보관 리포트 읽기'} →</a></>}
-        <p><a href={reportHistoryHash(c)} onClick={e=>{e.preventDefault();go(reportHistoryHash(c))}}>{names[c]} 리포트 목록 →</a></p>
+        {item&&<p className="brief-list-meta"><time>{item.baseDate}</time><span aria-hidden="true"> · </span>{typeLabel(item)}</p>}
+        <nav className="brief-list-actions" aria-label={`${names[c]} 리포트 이동`}>
+          {item&&<a className="brief-list-read" href={reportLink(c,item.baseDate)} onClick={e=>{e.preventDefault();go(reportLink(c,item.baseDate))}}>{current?'리포트 읽기':'보관 리포트 읽기'} →</a>}
+          <a className="brief-list-history" href={reportHistoryHash(c)} onClick={e=>{e.preventDefault();go(reportHistoryHash(c))}}>지난 리포트</a>
+        </nav>
       </article>
     })}</div></>}
   </>
