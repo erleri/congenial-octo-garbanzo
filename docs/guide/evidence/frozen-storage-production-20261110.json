@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-10T01:00:02+09:00",
+  "checkedAt": "2026-11-10T01:06:33+09:00",
   "environment": "production / GitHub Actions ubuntu / Node 20.19.0",
   "deployment": {
     "commit": "681de0ccb91e8b38f8bddc3ecbc5670d3f98611a",
@@ -95,9 +95,11 @@
     "peakMemoryBytes": null
   },
   "control": {
-    "enabled": false,
+    "enabled": true,
     "reviewEnabled": true,
-    "revision": 4,
+    "revision": 5,
+    "transition": "3 enabled → 4 temporarily held → 5 prior enabled setting restored; no manual paid dispatch",
+    "enabledDuringFreeVerification": false,
     "monthlyUsd": 30,
     "batchUsd": 7,
     "requestUsd": 0.25,
