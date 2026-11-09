@@ -35,14 +35,14 @@
 .app-shell .report-experience button{min-height:36px}.admin-legacy>summary{cursor:pointer;font-weight:600}.admin-ops-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}.admin-ops-grid>div{padding:15px;border:1px solid var(--border-soft);border-radius:8px;background:#f6f9fc}.admin-ops-grid strong{display:block;font-size:22px}.admin-ops-grid span{font-size:12px;color:var(--text-muted)}.admin-data-details{margin:20px 0}.admin-data-details>summary{cursor:pointer;padding:12px 0;font-weight:600}
 @media(max-width:760px){
  .app-shell{padding:12px 12px 25px}.app-shell .top-header{padding:14px;gap:10px}.app-shell .title-primary{font-size:20px}.app-shell .title-secondary{font-size:12px}
- .app-shell .header-actions{gap:8px;flex-wrap:wrap}.data-status{flex-basis:100%;font-size:11px;gap:7px}.data-info-content{position:fixed;top:130px;left:16px;width:calc(100vw - 32px);max-height:65vh;overflow:auto}
+ .app-shell .header-actions{gap:8px;flex-wrap:wrap}.data-status{font-size:11px;gap:7px}.data-info-content{position:fixed;top:130px;left:16px;width:calc(100vw - 32px);max-height:65vh;overflow:auto}
  .app-shell .screen-nav .tab{min-height:40px;padding:8px 10px}.app-shell .header-refresh-button,.app-shell .admin-entry{min-height:40px;padding:8px 11px}
  .admin-access-panel form{width:100%;margin-left:0}.admin-access-panel label{width:100%;min-width:0;white-space:nowrap}.admin-access-panel input{flex:1;min-width:0;width:auto}
  .currency-shortcuts{display:flex;gap:5px;flex-wrap:wrap;margin:0}.currency-shortcuts a{display:flex;align-items:center;justify-content:center;min-height:40px;flex:1;padding:5px;color:var(--text-main);background:white;border:1px solid var(--border-soft);border-radius:6px;font-size:12px;font-weight:650;text-decoration:none}
  .app-shell .usd-krw-anchor{padding:12px;gap:12px}.app-shell .usd-krw-anchor-main h2{font-size:14px}.app-shell .usd-krw-anchor-main p{font-size:11px}.app-shell .usd-krw-anchor-metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.app-shell .usd-krw-anchor-metrics>div{min-height:53px;padding:8px}.app-shell .usd-krw-anchor-metrics strong{font-size:16px}
  .app-shell .today-focus-bar{padding:10px;gap:8px}.app-shell .today-focus-heading{display:none}.app-shell .today-focus-items{display:flex;overflow:auto;gap:7px;padding:2px}.app-shell .today-focus-item{flex:0 0 150px;padding:7px 9px;min-height:0}.app-shell .today-focus-item span,.app-shell .today-focus-item em{font-size:11px}.app-shell .today-focus-item strong{font-size:14px}
  .app-shell .kpi-card{scroll-margin-top:12px;padding:14px;gap:7px}.app-shell .kpi-trend-link{display:inline-flex;align-items:center;min-height:40px}.app-shell .kpi-report-link{padding:9px 0;min-height:44px}
- .app-shell .period-presets button{min-height:40px}.app-shell .report-experience .detail-tools{flex-wrap:wrap;gap:8px}.app-shell .report-experience .detail-tools>div{display:flex;gap:6px}.app-shell .report-experience .detail-tools button{min-height:40px;padding:7px 10px}
+ .app-shell .period-presets button{min-height:40px}.app-shell .report-experience .detail-tools{flex-wrap:wrap;gap:8px}.app-shell .report-experience .detail-tools>div{display:flex;gap:6px}.app-shell .report-experience .detail-tools button{min-height:44px;padding:7px 10px}
  .app-shell .report-experience .brief-stats{gap:10px;padding:12px 9px;grid-template-columns:repeat(2,minmax(0,1fr))}.app-shell .report-experience .brief-stats>div{padding:0 6px;min-width:0}.app-shell .report-experience .paper-masthead{gap:8px;flex-wrap:wrap}.app-shell .report-experience .paper-hero h1{font-size:clamp(25px,7.5vw,35px)}
  .app-shell .report-experience .range-tabs button,.app-shell .report-experience .currency-tabs a{min-height:40px}.app-shell .report-experience .paper-footer{flex-wrap:wrap;gap:6px}.admin-ops-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .app-shell .top-header{position:relative;-webkit-backdrop-filter:none;backdrop-filter:none}.app-shell .title-wrap h1{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
@@ -59,14 +59,174 @@
 .app-shell .top-header .screen-nav { border-bottom:0; }
 .data-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:12px 0; padding:7px 10px; border:1px solid var(--border-soft); border-radius:8px; background:var(--surface); }
 .data-toolbar .data-status { flex:1; min-width:0; }
-.data-toolbar-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-shrink:0; margin-left:auto; }
-.data-toolbar-actions button { white-space:nowrap; }
 .dashboard-print-date { display:none; }
 @media(max-width:760px) {
- .data-toolbar { flex-wrap:wrap; gap:8px; }
- .data-toolbar .data-status { flex-basis:100%; }
- .data-toolbar-actions button { min-height:40px; }
+ .data-toolbar { gap:8px; }
  .app-shell .title-wrap { padding-right:0; }
  .app-shell .title-wrap h1 { flex-direction:row; }
 }
 @media print { .data-toolbar { display:none!important; } .dashboard-print-date { display:block; } }
+
+/* Responsive workspace: content priority is explicit, controls keep their own width. */
+.app-shell .top-header{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px}
+.app-shell .top-header>.admin-entry{grid-column:3;grid-row:1;width:auto;min-height:36px;padding:7px 10px}
+.app-shell .top-header>.screen-nav{grid-column:2;grid-row:1}
+.app-shell .data-toolbar{margin:8px 0;padding:0 8px;min-height:44px}
+.app-shell .data-toolbar .data-status{flex-basis:auto;gap:8px;flex-wrap:wrap}
+.app-shell .data-info>summary{display:flex;align-items:center;gap:7px;min-height:44px;padding:0;text-decoration:none;list-style:none}
+.data-info>summary::-webkit-details-marker{display:none}
+.data-info-icon{font-size:16px;color:var(--text-muted)}
+.app-shell .data-toolbar>.header-refresh-button{display:flex;align-items:center;justify-content:center;gap:6px;width:auto;min-width:44px;min-height:44px;padding:6px 8px;border:0;background:transparent;flex-shrink:0}
+.app-shell .data-toolbar>.header-refresh-button>span:first-child{font-size:22px;line-height:1}
+.report-data-context{font-size:12px;color:var(--text-muted);margin:4px 0}
+.report-data-context>summary{cursor:pointer;padding:6px 2px;min-height:32px}
+.app-shell .trends-controls{padding:12px 16px;margin-bottom:10px}
+.app-shell .trend-view-switch{display:flex;gap:4px;flex-wrap:nowrap;margin:0 0 10px}
+.app-shell .trend-view-switch button{width:auto;flex:0 1 auto;min-height:40px;padding:7px 12px;font-size:13px;white-space:nowrap}
+.daily-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.trend-primary-row{display:flex;align-items:center;gap:12px;min-width:0}
+.daily-controls label,.monthly-controls label{display:flex;align-items:center;gap:7px;min-width:0;font-size:12px}
+.daily-controls select,.monthly-controls select{min-height:40px;width:auto;min-width:0;padding:7px 9px;border:1px solid var(--border);background:var(--surface);font:inherit;font-size:14px}
+.selected-period{font-size:12px;color:var(--text-muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.custom-range{display:flex;gap:10px}
+.app-shell .period-presets{display:flex;gap:4px;margin:0;flex-wrap:nowrap}
+.app-shell .period-presets button{width:auto;min-height:40px;padding:6px 10px;font-size:12px;white-space:nowrap}
+.app-shell .period-presets button[aria-pressed=true]{background:var(--accent-soft);border-color:#91a8bb;color:var(--accent)}
+.app-shell .custom-range-toggle{display:none}
+.monthly-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.app-shell .daily-results{padding:0;background:transparent;border:0;box-shadow:none}
+.app-shell .daily-results .chart-card{padding:12px 12px 4px}
+.app-shell .daily-results .chart-card h3{margin:0 0 8px;font-size:15px}
+.chart-heading-note{font-size:12px;color:var(--text-muted);font-weight:400;margin-left:6px}
+.monthly-mobile-view{display:none}
+.monthly-desktop-view>.table-card+.table-card{margin-top:16px}
+.monthly-matrix th{white-space:nowrap}
+.app-shell .monthly-matrix th:first-child{position:sticky;left:0;background:var(--surface);z-index:2;text-align:left}
+.monthly-unit-switch{display:flex;gap:5px;margin-bottom:6px}
+.monthly-unit-switch button{min-height:44px;padding:6px 12px;border:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text-main)}
+.monthly-unit-switch button[aria-pressed=true]{background:var(--accent);color:white;border-color:var(--accent)}
+.monthly-row-table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.monthly-row-table th,.monthly-row-table td{padding:11px 12px;border-bottom:1px solid var(--border-soft);text-align:right;min-width:100px}
+.monthly-row-table thead th{background:var(--surface-muted);position:sticky;top:0;z-index:2}
+.monthly-row-table tr>:first-child{position:sticky;left:0;text-align:left;background:var(--surface);z-index:1;min-width:88px;box-shadow:1px 0 var(--border-soft)}
+.monthly-row-table thead tr>:first-child{z-index:3;background:var(--surface-muted)}
+.monthly-row-scroll{max-height:65vh}
+.report-country-select{display:none}
+.app-shell .published-currency-reports .report-list-heading{margin:16px 0}
+.app-shell .published-currency-reports .report-list-heading h1{font-size:25px;margin:0 0 6px}
+.app-shell .published-currency-reports .brief-list-card{padding:20px}
+.app-shell .published-currency-reports .brief-list-card>p:first-of-type,.app-shell .published-currency-reports .report-history-list li>div>p:last-child{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.app-shell .published-currency-reports .report-detail-links:empty{display:none}
+.app-shell .published-currency-reports .detail-tools{margin:8px 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.app-shell .published-currency-reports .paper-hero{padding-top:16px}
+.app-shell .published-currency-reports .paper-hero h1{margin-top:12px}
+.app-shell .admin-access-panel.is-signed-in{gap:10px;padding:10px 14px}
+.admin-access-panel.is-signed-in>div:first-child p{display:none}
+.admin-access-panel.is-signed-in h2{font-size:14px;margin:0}
+.admin-access-panel.is-signed-in .inline-controls{flex-direction:row;flex-wrap:wrap;min-width:0;overflow-wrap:anywhere}
+.admin-access-panel.is-signed-in>button{margin-left:auto;width:auto;min-height:44px}
+@media(max-width:760px){
+ .app-shell{padding:8px 10px 22px}
+ .app-shell .top-header{grid-template-columns:minmax(0,1fr) auto;padding:8px 10px;gap:2px 8px}
+ .app-shell .top-header>.admin-entry{grid-column:2;min-height:44px;font-size:12px;background:transparent;border-color:transparent}
+ .app-shell .top-header>.screen-nav{grid-column:1/-1;grid-row:2;width:100%;display:flex;gap:3px;justify-content:space-between;padding:0;margin:0}
+ .app-shell .screen-nav .tab{flex:1;min-height:44px;padding:6px 5px;font-size:13px;white-space:nowrap}
+ .app-shell .title-secondary{display:none}
+ .app-shell .data-toolbar{gap:5px;margin:6px 0}
+ .app-shell .data-toolbar .data-status{gap:4px}
+ .app-shell .data-average,.refresh-label{display:none}
+ .app-shell .data-info>summary{font-size:12px}
+ .app-shell .data-info-content{top:112px;max-height:70vh}
+ .app-shell .trends-controls{padding:8px 10px;margin:0 0 8px}
+ .app-shell .trend-view-switch{margin-bottom:8px}
+ .app-shell .trend-view-switch button{flex:1;min-height:44px;padding:6px 5px;font-size:12px}
+ .daily-controls{display:grid;gap:6px}
+ .trend-primary-row{justify-content:space-between;gap:6px}
+ .daily-controls select,.monthly-controls select{min-height:44px;font-size:16px;max-width:100%}
+ .app-shell .period-presets{grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+ .app-shell .period-presets button{min-height:44px;padding:6px 3px;white-space:normal}
+ .app-shell .custom-range-toggle{display:block}
+ .custom-range{display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .custom-range.is-open{display:grid}
+ .custom-range label{display:grid;gap:4px}
+ .monthly-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .monthly-controls label{display:grid;gap:3px}
+ .monthly-controls select{width:100%;padding:7px 4px}
+ .app-shell .daily-results .chart-card{padding:10px 4px 0}
+ .app-shell .daily-results .chart-card h3{margin:0 7px 8px}
+ .chart-heading-note{font-size:11px}
+ .monthly-desktop-view{display:none}
+ .monthly-mobile-view{display:block}
+ .app-shell .monthly-results{padding:8px}
+ .app-shell .monthly-results .mobile-table-hint{margin:0 0 8px;font-size:11px}
+ .app-shell .published-currency-reports{padding:8px 0}
+ .app-shell .published-currency-reports .report-navigation{grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;margin:0 0 8px}
+ .app-shell .published-currency-reports .currency-tabs{display:none}
+ .report-country-select{display:block;min-width:0}
+ .report-country-select select{width:100%;min-height:44px;padding:7px 10px;border:1px solid var(--border);background:var(--surface);color:var(--text-main);font:inherit;font-size:16px}
+ .app-shell .published-currency-reports .report-status-refresh{min-height:44px;width:44px;padding:10px}
+ .app-shell .published-currency-reports .report-status-refresh span{display:none}
+ .app-shell .published-currency-reports .report-list-heading{margin:10px 0 14px}
+ .app-shell .published-currency-reports .report-list-heading h1{font-size:22px}
+ .app-shell .published-currency-reports .report-list-heading p{font-size:12px;margin-top:4px}
+ .app-shell .published-currency-reports .brief-list-card{padding:14px}
+ .app-shell .published-currency-reports .brief-list-card h2{font-size:19px;margin:8px 0}
+ .app-shell .published-currency-reports .report-history-list{margin:10px 0}
+ .app-shell .published-currency-reports .report-history-list li{padding:14px 0}
+ .app-shell .report-history-filters{gap:8px;margin:10px 0}
+ .app-shell .report-history-filters label{gap:5px;font-size:12px}
+ .app-shell .report-history-filters select{min-height:44px;font-size:16px;padding:6px}
+ .app-shell .published-currency-reports .detail-tools{flex-wrap:nowrap;margin:0 0 8px}
+ .app-shell .published-currency-reports .detail-tools>button{min-height:44px;min-width:0;font-size:12px;padding:7px 9px}
+ .app-shell .published-currency-reports .currency-paper{padding:13px}
+ .app-shell .published-currency-reports .paper-masthead{padding-bottom:8px}
+ .app-shell .published-currency-reports .paper-hero{padding:10px 0 14px}
+ .app-shell .published-currency-reports .country-name{font-size:12px;margin-bottom:6px}
+ .app-shell .published-currency-reports .paper-hero h1{font-size:26px!important;letter-spacing:-.6px;margin:8px 0 10px}
+ .app-shell .published-currency-reports .paper-deck{margin:0;line-height:1.7}
+ .app-shell .published-currency-reports .report-detail-links{margin:0;font-size:12px;justify-content:flex-end}
+ .app-shell .published-currency-reports .report-detail-links a{min-height:44px;display:flex;align-items:center}
+ .app-shell .admin-section-nav{display:flex;gap:6px}
+ .app-shell .admin-section-nav button{flex:1;min-height:44px;width:auto;padding:6px;font-size:12px}
+ .app-shell .admin-access-panel.is-signed-in{display:flex;gap:8px}
+ .admin-access-panel.is-signed-in .inline-controls{flex:1;font-size:12px;gap:6px}
+}
+@media print{
+ .report-data-context,.report-more-tools,.monthly-mobile-view{display:none!important}
+ .monthly-desktop-view{display:block!important}
+ .monthly-matrix{min-width:0!important;font-size:7pt}
+ .app-shell .monthly-matrix th,.app-shell .monthly-matrix td{padding:3px;position:static}
+}
+
+.app-shell .usd-krw-anchor-metrics>.anchor-secondary-desktop{display:contents}
+.anchor-secondary-desktop>div{border:1px solid var(--border-soft);border-radius:6px;background:var(--surface);padding:9px 10px;min-width:0}
+.anchor-secondary-mobile{display:none}
+@media(max-width:760px){
+ .app-shell .usd-krw-anchor-metrics>.anchor-secondary-desktop{display:none}
+ .anchor-secondary-mobile{display:block;margin:-2px 0 8px;font-size:12px;color:var(--text-muted)}
+ .anchor-secondary-mobile>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;padding:0 4px}
+ .anchor-secondary-mobile>summary::after{content:'＋';margin-left:8px}
+ .anchor-secondary-mobile[open]>summary::after{content:'−'}
+ .anchor-secondary-mobile>.usd-krw-anchor-metrics{margin-top:4px}
+}
+@media print{.anchor-secondary-mobile{display:none!important}.app-shell .usd-krw-anchor-metrics>.anchor-secondary-desktop{display:contents!important}}
+
+.app-shell .screen-nav{overflow:visible}
+
+@media(max-width:760px){
+ .app-shell .published-currency-reports:has(.has-mobile-navigation)>.report-navigation{display:none}
+ .app-shell .published-currency-reports .detail-tools.has-mobile-navigation{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:6px}
+ .report-mobile-navigation{display:block!important;min-width:0}
+ .report-mobile-navigation .report-country-select{width:100%}
+ .report-mobile-navigation select{font-size:14px}
+ .has-mobile-navigation .report-back-full{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+ .app-shell .has-mobile-navigation .report-back-short{display:inline}
+ .app-shell .published-currency-reports>.local-notice{padding:6px 8px;font-size:11px;margin-bottom:8px}
+ .app-shell .published-currency-reports .paper-masthead{padding-bottom:4px}
+ .report-data-context>summary{min-height:28px;padding:4px 2px}
+}
+@media print{.report-mobile-navigation{display:none!important}}
+
+.app-shell .published-currency-reports .report-history-list h2 a{display:block;min-height:44px;padding:3px 0}
+
+.app-shell .top-header>.admin-entry.selected{color:var(--accent);background:var(--accent-soft);border-color:var(--border-soft)}

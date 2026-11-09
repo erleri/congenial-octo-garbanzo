@@ -1665,9 +1665,7 @@ main {
   .global-filters select,
   .inline-controls input,
   .inline-controls select,
-  .inline-controls button,
-  .quiet-button,
-  .header-refresh-button {
+  .inline-controls button {
     width: 100%;
   }
 

@@ -4,8 +4,8 @@ import type { AdminAccess } from '../hooks/useAdminAccess'
 export default function AdminAccessPanel({ access }: { access: AdminAccess }) {
   const [email, setEmail] = useState(''), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false)
   const signedIn = !!access.email
-  return <section className="panel admin-access-panel" aria-label="공통 관리자 로그인">
-    <div><h2>관리자 로그인</h2><p className="table-help">한 번 로그인하면 리포트와 계획환율을 함께 관리합니다.</p></div>
+  return <section className={`panel admin-access-panel ${signedIn?'is-signed-in':''}`} aria-label="공통 관리자 로그인">
+    <div><h2>{signedIn?'관리자':'관리자 로그인'}</h2><p className="table-help">한 번 로그인하면 리포트와 계획환율을 함께 관리합니다.</p></div>
     {signedIn ? <div className="inline-controls"><span>{access.email}</span><span className="scope-badge">{access.canManage ? '관리자' : access.phase === 'checking' || access.phase === 'paused' ? '권한 확인 중' : '권한 확인 필요'}</span></div> : null}
     {!signedIn && access.configured ? <form className="inline-controls" onSubmit={async event => {
       event.preventDefault(); setBusy(true); setNotice('')

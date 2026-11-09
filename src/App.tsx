@@ -1,5 +1,6 @@
-import { Suspense, lazy, useCallback, useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataStatus from './components/DataStatus'
+import Disclosure from './components/Disclosure'
 import AdminAccessPanel from './components/AdminAccessPanel'
 import {parseReviewRequest} from './lib/review-request.js'
 import { fxReportConfig } from './generated/fxReportConfig'
@@ -36,6 +37,8 @@ function App() {
   const [navigation,setNavigation]=useState(()=>parseFxNavigation(parseReviewRequest(window.location.search)?'#admin':window.location.hash))
   const [locationHash,setLocationHash]=useState(window.location.hash)
   const [selectionNotice,setSelectionNotice]=useState('')
+  const [customRange,setCustomRange]=useState(false)
+  const rangeButton=useRef<HTMLButtonElement>(null)
   const reports=useDashboardReports(HAS_REPORTS,navigation.screen)
   usePageContext(navigation,locationHash)
   useEffect(()=>{const event=pageUsage(navigation);if(event)void recordUsage(event)},[navigation])
@@ -130,19 +133,23 @@ function App() {
   </>
   else if(screen==='trends')content=<section className="trends-workspace" aria-label="환율 추이">
     {selectionNotice&&<p className="inline-notice warning-notice" role="status">{selectionNotice}</p>}
-    <div className="panel trends-controls"><div className="panel-header-inline"><div><h2>환율 추이</h2><p className="table-help">일별 움직임과 월별 이력을 같은 화면에서 확인합니다.</p></div>
-      <div className="trend-view-switch" role="group" aria-label="조회 종류">{([['daily','일별 추이'],['monthly','월별 이력'],['comparison','상세 비교']] as [TrendView,string][]).map(([view,label])=><button key={view} className={`quiet-button ${navigation.view===view?'selected':''}`} aria-pressed={navigation.view===view} onClick={()=>changeTrend({view})}>{label}</button>)}</div></div>
-      {navigation.view==='daily'?<div className="global-filters">
-        <label><span className="filter-label">통화</span><select aria-label="통화" value={navigation.currency} onChange={e=>changeCurrency(e.target.value as CurrencyCode)}>{CURRENCIES.map(c=><option key={c} value={c}>{c}</option>)}</select></label>
-        <label><span className="filter-label">시작 월</span><select aria-label="시작 월" value={from} onChange={e=>changeTrend({from:e.target.value,to:e.target.value>to?e.target.value:to})}>{periodOptions.map(p=><option key={p} value={p}>{p}</option>)}</select></label>
-        <label><span className="filter-label">종료 월</span><select aria-label="종료 월" value={to} onChange={e=>changeTrend({to:e.target.value})}>{periodOptions.filter(p=>p>=from).map(p=><option key={p} value={p}>{p}</option>)}</select></label>
-      </div>:navigation.view==='monthly'?<><div className="global-filters">
+    <div className="panel trends-controls">
+      <h2 className="sr-only">환율 추이</h2>
+      <div className="trend-view-switch" role="group" aria-label="조회 종류">{([['daily','일별 추이'],['monthly','월별 이력'],['comparison','상세 비교']] as [TrendView,string][]).map(([view,label])=><button key={view} className={`quiet-button ${navigation.view===view?'selected':''}`} aria-pressed={navigation.view===view} onClick={()=>changeTrend({view})}>{label}</button>)}</div>
+      {navigation.view==='daily'?<div className="daily-controls" onKeyDown={e=>{if(e.key==='Escape'&&customRange){setCustomRange(false);rangeButton.current?.focus()}}}>
+        <div className="trend-primary-row"><label><span className="filter-label">통화</span><select aria-label="통화" value={navigation.currency} onChange={e=>changeCurrency(e.target.value as CurrencyCode)}>{CURRENCIES.map(c=><option key={c} value={c}>{c}</option>)}</select></label><span className="selected-period" aria-label="선택 기간">{from} — {to}</span></div>
+        <div id="custom-trend-range" className={`custom-range ${customRange?'is-open':''}`}>
+          <label><span className="filter-label">시작 월</span><select aria-label="시작 월" value={from} onChange={e=>changeTrend({from:e.target.value,to:e.target.value>to?e.target.value:to})}>{periodOptions.map(p=><option key={p} value={p}>{p}</option>)}</select></label>
+          <label><span className="filter-label">종료 월</span><select aria-label="종료 월" value={to} onChange={e=>changeTrend({to:e.target.value})}>{periodOptions.filter(p=>p>=from).map(p=><option key={p} value={p}>{p}</option>)}</select></label>
+        </div>
+        <div className="period-presets" aria-label="최근 기간">{[1,3,12].map(months=>{const range=periodOptions.length?recentMonthRange(periodOptions.at(-1)!,months,periodOptions[0]):null;return <button key={months} className="quiet-button" disabled={!range} aria-pressed={!!range&&from===range.from&&to===range.to} onClick={()=>{if(range)changeTrend(range);setCustomRange(false)}}>{months===12?'1년':`${months}개월`}</button>})}<button ref={rangeButton} className="quiet-button custom-range-toggle" aria-expanded={customRange} aria-controls="custom-trend-range" onClick={()=>setCustomRange(v=>!v)}>직접 설정</button></div>
+      </div>:navigation.view==='monthly'?<div className="monthly-controls">
+        <label><span className="filter-label">통화</span><select aria-label="통화 필터" value={navigation.monthlyCurrency} onChange={e=>changeCurrency(e.target.value as CurrencyFilter)}><option value="ALL">전체 통화</option>{CURRENCIES.map(c=><option key={c} value={c}>{c}</option>)}</select></label>
         <label><span className="filter-label">시작 연도</span><select aria-label="시작 연도" value={yearFrom} onChange={e=>changeTrend({yearFrom:Number(e.target.value),yearTo:Math.max(yearTo,Number(e.target.value))})}>{yearOptions.map(y=><option key={y} value={y}>{y}</option>)}</select></label>
         <label><span className="filter-label">종료 연도</span><select aria-label="종료 연도" value={yearTo} onChange={e=>changeTrend({yearTo:Number(e.target.value)})}>{yearOptions.filter(y=>y>=yearFrom).map(y=><option key={y} value={y}>{y}</option>)}</select></label>
-      </div><p className="table-help">월별 표는 연도 단위로 표시하며, 일별 조회 월 범위는 따로 유지합니다. 전체 통화에서 일별로 돌아가면 {navigation.currency}를 표시합니다.</p></>:<p className="table-help">이동·선행 평균과 실제·계획 편차를 조회합니다. 계획환율 수정·변경 이력은 <button className="inline-link" onClick={()=>openScreen('plan')}>관리자 → 계획환율</button>에서 확인합니다.</p>}
-      {navigation.view==='daily'&&periodOptions.length>0&&<div className="period-presets" aria-label="최근 기간">{[1,3,12].map(months=><button key={months} className="quiet-button" onClick={()=>changeTrend(recentMonthRange(periodOptions.at(-1)!,months,periodOptions[0]))}>{months===12?'최근 1년':`최근 ${months}개월`}</button>)}</div>}
+      </div>:<p className="table-help">이동·선행 평균과 실제·계획 편차를 조회합니다. 계획환율 수정·변경 이력은 <button className="inline-link" onClick={()=>openScreen('plan')}>관리자 → 계획환율</button>에서 확인합니다.</p>}
     </div>
-    {navigation.view==='daily'?<CurrencyDetail data={dataset} currencyFilter={navigation.currency} periodFrom={from} periodTo={to} rangeNotice={dailyRangeNotice}/>:navigation.view==='monthly'?<MonthlySummary data={dataset} currencyFilter={navigation.monthlyCurrency} yearFrom={yearFrom} yearTo={yearTo} onCurrencyChange={changeCurrency}/>:<div className="panel"><h2>평균·계획 대비 상세 비교</h2><p className="table-help">자료 기준일 {dataset.baseDate} · {businessPlanStatus.remoteLoadStatus==='loaded'?'저장된 계획환율':'계획환율 저장소 미확인 · 자동 평균/로컬 참고값'}</p><MovingComparisonTable data={dataset} businessPlan={businessPlan}/></div>}
+    {navigation.view==='daily'?<CurrencyDetail data={dataset} currencyFilter={navigation.currency} periodFrom={from} periodTo={to} rangeNotice={dailyRangeNotice}/>:navigation.view==='monthly'?<MonthlySummary data={dataset} currencyFilter={navigation.monthlyCurrency} yearFrom={yearFrom} yearTo={yearTo}/>:<div className="panel"><h2>평균·계획 대비 상세 비교</h2><p className="table-help">자료 기준일 {dataset.baseDate} · {businessPlanStatus.remoteLoadStatus==='loaded'?'저장된 계획환율':'계획환율 저장소 미확인 · 자동 평균/로컬 참고값'}</p><MovingComparisonTable data={dataset} businessPlan={businessPlan}/></div>}
     {navigation.view!=='comparison'&&<div className="trend-related-report"><span>관련 리포트</span>{navigation.view==='monthly'&&navigation.monthlyCurrency==='ALL'?<button className="inline-link" onClick={()=>openScreen('reports')} disabled={!HAS_REPORTS}>전체 환율 리포트 보기</button>:reportEntry(navigation.view==='monthly'&&navigation.monthlyCurrency!=='ALL'?navigation.monthlyCurrency:navigation.currency)??<span className="table-help">이 통화는 현재 리포트 대상이 아닙니다.</span>}<small>보고서 기준일은 환율 조회 기간과 다를 수 있습니다.</small></div>}
   </section>
   else content=<>
@@ -153,14 +160,12 @@ function App() {
   return <div className="app-shell">
     <a className="skip-link" href="#main-content" onClick={e=>{e.preventDefault();document.getElementById('main-content')?.focus()}}>본문으로 건너뛰기</a>
     <header className="top-header"><div className="title-wrap"><h1><a className="title-primary brand-home" href="#dashboard" aria-label="LATAM FX 대시보드로" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();openScreen('dashboard')}}>LATAM FX</a><span className="title-secondary">환율 대시보드</span></h1></div>
+      <button className={`quiet-button admin-entry ${screen==='admin'||screen==='plan'?'selected':''}`} onClick={()=>openScreen('admin')}>관리자</button>
       <nav className="screen-nav" aria-label="화면 선택">{([['dashboard','대시보드'],['trends','환율 추이'],...(HAS_REPORTS?[['reports','환율 리포트']]:[])] as [FxScreen,string][]).map(([key,label])=><button type="button" key={key} className={screen===key?'tab active':'tab'} aria-current={screen===key?'page':undefined} onClick={()=>openScreen(key)}>{label}</button>)}</nav>
     </header>
-      <div className="data-toolbar" aria-label="자료 기준 및 관리"><DataStatus data={dataset} source={datasetSource} busy={loading||dailyRangeLoading} error={error} showAverage={screen==='dashboard'}/>
-        <div className="data-toolbar-actions">
-        <button className="header-refresh-button" onClick={()=>void refreshData()} disabled={loading}>{loading?'갱신 중':'데이터 갱신'}</button>
-        <button className={`quiet-button admin-entry ${screen==='admin'||screen==='plan'?'selected':''}`} onClick={()=>openScreen('admin')}>관리자</button>
-        </div>
-      </div>
+      {screen==='reports'?<Disclosure className="report-data-context" summary="대시보드 자료 기준"><div className="data-toolbar"><DataStatus data={dataset} source={datasetSource} busy={loading} error={error}/></div></Disclosure>:<div className="data-toolbar" aria-label="자료 기준 및 관리"><DataStatus data={dataset} source={datasetSource} busy={loading||dailyRangeLoading} error={error} showAverage={screen==='dashboard'}/>
+        <button className="header-refresh-button" aria-label={loading?'데이터 갱신 중':'데이터 갱신'} title="환율 데이터 갱신" onClick={()=>void refreshData()} disabled={loading}><span aria-hidden="true">↻</span><span className="refresh-label">{loading?'갱신 중':'데이터 갱신'}</span></button>
+      </div>}
     <main id="main-content" tabIndex={-1}>{(screen==='admin'||screen==='plan')&&<AdminAccessPanel access={adminAccess}/>}<Suspense fallback={<div className="panel empty loading-panel"><h2>화면을 불러오는 중입니다.</h2></div>}>{content}</Suspense></main>
   </div>
 }

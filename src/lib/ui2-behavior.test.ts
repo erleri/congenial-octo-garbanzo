@@ -16,6 +16,18 @@ describe('UI 2.0 trust and navigation rules',()=>{
     expect(datasetStatus({...data,baseDate:'2099-01-01'}).state).toBe('unknown')
     expect(datasetStatus(null).state).toBe('unknown')
   })
+  it('accepts early same-day data without changing the release calendar or certifying its price basis',()=>{
+    const data={baseDate:'2026-11-09',dailyRates:[]} as unknown as ExchangeRateDataset
+    const calendar={timeZone:'UTC',closedDates:[],releaseHour:18,maxBusinessDays:2}
+    for(const instant of ['2026-11-09T00:00:00Z','2026-11-09T12:07:00Z','2026-11-09T18:01:00Z']){
+      expect(datasetStatus(data,Date.parse(instant),calendar).state).toBe('unverified')
+    }
+    expect(datasetStatus({...data,baseDate:'2026-11-10'},Date.parse('2026-11-09T23:59:00Z'),calendar).state).toBe('unknown')
+    expect(datasetStatus({...data,baseDate:'invalid'},Date.parse('2026-11-09T12:00:00Z'),calendar).state).toBe('unknown')
+    expect(datasetStatus({...data,baseDate:'2026-11-06'},Date.parse('2026-11-09T12:00:00Z'),calendar).state).toBe('unverified')
+    expect(datasetStatus({...data,baseDate:'2026-11-02'},Date.parse('2026-11-09T12:00:00Z'),calendar).state).toBe('late')
+    expect(calendar.releaseHour).toBe(18)
+  })
   it('preserves currency and report context in titles and clamps quick periods at the available start',()=>{
     const hash='#report/CLP/history'
     expect(pageTitle(parseFxNavigation(hash),hash)).toBe('CLP 리포트 목록 · LATAM FX')

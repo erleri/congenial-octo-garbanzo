@@ -1,0 +1,12 @@
+/* Shared by the app and the standalone A-layout preview. */
+.report-experience .report-mobile-navigation,.report-experience .report-back-short{display:none}
+.report-experience .report-more-tools{position:relative}
+.report-experience .report-more-tools>summary{display:none}
+.report-experience .report-more-tools>div{display:flex;gap:6px}
+@media(max-width:760px){
+ .report-experience .report-more-tools>summary{display:flex;min-height:44px;align-items:center;padding:7px 10px;border:1px solid var(--rule);border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap}
+ .report-experience .report-more-tools>div{display:none;position:absolute;right:0;top:100%;z-index:12;padding:8px;background:var(--paper);border:1px solid var(--rule);border-radius:8px;box-shadow:0 3px 12px #18304712;min-width:180px}
+ .report-experience .report-more-tools[open]>div{display:grid}
+ .report-experience .report-more-tools button{min-height:44px;white-space:nowrap}
+}
+@media print{.report-experience .report-more-tools,.report-experience .report-mobile-navigation{display:none!important}}

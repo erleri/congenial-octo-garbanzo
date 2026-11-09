@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { publicReportHistory } from '../lib/reports/history-provider'
 import { localReportMode } from '../lib/reports/client'
 import type { CachedReportResult } from '../lib/reports/history-provider'
@@ -99,7 +99,7 @@ function HistoryList({hash,q,go,revision}:{hash:string;q:ReportHistoryQuery;go:G
     {loaded&&items.length>0&&!next&&!error&&<p className="report-list-end">선택한 기간의 마지막 리포트입니다.</p>}
   </>
 }
-function Detail({currency,date,id,go,revision,onRetry}:{currency:ReportCurrency;date?:string;id?:string;go:Go;revision:number;onRetry:()=>void}) {
+function Detail({currency,date,id,go,revision,onRetry,mobileNavigation}:{currency:ReportCurrency;date?:string;id?:string;go:Go;revision:number;onRetry:()=>void;mobileNavigation:ReactNode}) {
   const context=historyRoute(String(history.state?.reportHistory??'')),q=context?.currency===currency?context:undefined
   const historyHash=q?reportHistoryHash(currency,q,!!q.includeTest):reportHistoryHash(currency)
   const [result,setResult]=useState<CachedReportResult<ReportResolution>>(),[error,setError]=useState(''),[empty,setEmpty]=useState(false)
@@ -131,7 +131,7 @@ function Detail({currency,date,id,go,revision,onRetry}:{currency:ReportCurrency;
     arm();document.addEventListener('visibilitychange',arm)
     return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',arm)}
   },[state])
-  return <><nav className="report-detail-links" aria-label="보고서 이동">{state?.state!=='active'&&<a href={historyHash} onClick={e=>{e.preventDefault();go(historyHash)}}>← {names[currency]} 리포트 목록</a>}<a href={reportLink(currency)} onClick={e=>{e.preventDefault();go(reportLink(currency))}}>최신 리포트 읽기</a></nav>
+  return <><nav className="report-detail-links" aria-label="보고서 이동">{state?.state!=='active'&&<a href={historyHash} onClick={e=>{e.preventDefault();go(historyHash)}}>← {names[currency]} 리포트 목록</a>}{(state?.state!=='active'||neighbors?.data.newer)&&<a href={reportLink(currency)} onClick={e=>{e.preventDefault();go(reportLink(currency))}}>최신 리포트 읽기</a>}</nav>
     {error?<ErrorNotice onRetry={onRetry}>{error}</ErrorNotice>:null}
     {empty?<div className="report-empty"><h1>현재 리포트 미발행</h1><p>발행된 자료와 과거 사례는 이 국가의 리포트 목록에서 확인할 수 있습니다.</p><button onClick={()=>go(historyHash)}>{names[currency]} 리포트 목록 보기</button></div>:null}
     {!state&&!empty&&!error?<p role="status">보고서를 불러오는 중입니다.</p>:null}
@@ -140,7 +140,7 @@ function Detail({currency,date,id,go,revision,onRetry}:{currency:ReportCurrency;
       {state.replacement?<button onClick={()=>go(reportLink(state.replacement!.currency,state.replacement!.baseDate),historyHash)}>유효 수정본 보기</button>:<p>{state.state==='not_found'?'주소의 통화·날짜·보고서 ID를 확인해 주세요.':'현재 유효한 수정본은 없습니다.'}</p>}</div>:null}
     {state?.state==='active'&&state.report?<>
       {state.revisionKind&&<p className="local-notice">{state.revisionKind==='correction'?'정정된 리포트입니다.':'새 판본으로 교체된 리포트입니다.'} 당시 기준일과 자료를 유지합니다.</p>}
-      <CurrencyReportDetail key={state.id} report={state.report} onBack={()=>go(historyHash)} backLabel={`← ${names[currency]} 리포트 목록`}/>
+      <CurrencyReportDetail key={state.id} report={state.report} onBack={()=>go(historyHash)} backLabel={`← ${names[currency]} 리포트 목록`} mobileNavigation={mobileNavigation} onRefresh={onRetry}/>
       <nav className="report-neighbors" aria-label="같은 통화의 이전 다음 리포트">{(['older','newer'] as const).map(direction=>{const item=neighbors?.data[direction];return <button key={direction} disabled={!item} onClick={()=>item&&go(reportLink(currency,item.baseDate),historyHash)}>{direction==='older'?'← 이전 · 더 오래된':'다음 · 더 최근인 →'} {item?.baseDate??'없음'}</button>})}</nav>
       {neighborError?<p role="status">이전·다음 탐색을 확인하지 못했습니다. 본문 조회는 정상입니다.</p>:q&&(q.year||q.month)&&<p className="report-list-end">현재 기간 안에서 이동합니다. 기간 밖의 글은 전체 이력에서 확인할 수 있습니다.</p>}
     </>:null}
@@ -162,14 +162,16 @@ export default function PublishedCurrencyReports({hash}:{hash:string}) {
   const invalidRun=runs.length>1||runs.length===1&&!PUBLIC_REPORT_ID.test(runs[0])||runs.length>0&&(!route?.currency||!!hist)
   const invalidScope=!localReportMode()&&hist?.includeTest
   const currency=hist?.currency??route?.currency
+  const countrySelector=<label className="report-country-select"><span className="sr-only">국가별 리포트 목록</span><select aria-label="국가별 리포트 목록" value={currency??'ALL'} onChange={e=>go(e.target.value==='ALL'?'#report':reportHistoryHash(e.target.value as ReportCurrency))}><option value="ALL">전체 국가</option>{REPORT_CURRENCIES.map(c=><option key={c} value={c}>{names[c]} · {c}</option>)}</select></label>
   return <section className="report-experience design-a published-currency-reports">{localReportMode()&&<p className="local-notice">로컬 승인·조회 검증 · 운영 게시 없음</p>}
     <div className="report-navigation">
+      {countrySelector}
       <nav className="currency-tabs" aria-label="국가별 리포트 목록"><a href="#report" aria-current={!currency&&route?'page':undefined} onClick={e=>{e.preventDefault();go('#report')}}>전체 국가</a>{REPORT_CURRENCIES.map(c=><a key={c} href={reportHistoryHash(c)} aria-current={currency===c?'page':undefined} onClick={e=>{e.preventDefault();go(reportHistoryHash(c))}}>{names[c]} <b>{c}</b></a>)}</nav>
       <button type="button" className="report-status-refresh" aria-label="리포트 새로고침" title="리포트 목록과 공개 상태를 다시 불러옵니다." onClick={()=>setRevision(n=>n+1)}>
         <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16.2 7A6.5 6.5 0 1 0 16 13.5"/><path d="M16.2 2.8V7H12"/></svg>
         <span>새로고침</span>
       </button>
     </div>
-    {invalidRun||invalidScope||!route&&!hist?<div className="report-empty"><h1>리포트 주소를 확인해 주세요.</h1><button onClick={()=>go('#report')}>전체 국가로</button></div>:hist?<HistoryList key={hash} hash={hash} q={hist} go={go} revision={revision}/>:route?.currency?<Detail key={hash+':'+runs.join()} currency={route.currency} date={route.date} id={runs[0]} go={go} revision={revision} onRetry={()=>setRevision(n=>n+1)}/>:<LatestList go={go} revision={revision}/>}
+    {invalidRun||invalidScope||!route&&!hist?<div className="report-empty"><h1>리포트 주소를 확인해 주세요.</h1><button onClick={()=>go('#report')}>전체 국가로</button></div>:hist?<HistoryList key={hash} hash={hash} q={hist} go={go} revision={revision}/>:route?.currency?<Detail key={hash+':'+runs.join()} currency={route.currency} date={route.date} id={runs[0]} go={go} revision={revision} onRetry={()=>setRevision(n=>n+1)} mobileNavigation={countrySelector}/>:<LatestList go={go} revision={revision}/>}
   </section>
 }

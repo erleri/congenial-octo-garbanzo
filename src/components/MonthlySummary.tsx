@@ -1,170 +1,33 @@
+import { useMemo, useState } from 'react'
 import { formatCellValue } from '../lib/formatters'
-import type {
-  CurrencyFilter,
-  ExchangeRateDataset,
-  MonthlyRate,
-} from '../types/exchangeRate'
+import type { CurrencyFilter, ExchangeRateDataset } from '../types/exchangeRate'
 import { CURRENCIES, MONTHS, YEARS } from '../types/exchangeRate'
 
-interface MonthlySummaryProps {
-  data: ExchangeRateDataset
-  currencyFilter: CurrencyFilter
-  yearFrom: number
-  yearTo: number
-  onCurrencyChange: (currency: CurrencyFilter) => void
-}
-
-function pickRows(
-  monthlyRates: MonthlyRate[],
-  rateType: 'LOCAL_PER_USD' | 'KRW',
-  currencyFilter: CurrencyFilter,
-): MonthlyRate[] {
-  return monthlyRates.filter((row) => {
-    if (row.rateType !== rateType) {
-      return false
+interface MonthlySummaryProps {data:ExchangeRateDataset;currencyFilter:CurrencyFilter;yearFrom:number;yearTo:number}
+export default function MonthlySummary({data,currencyFilter,yearFrom,yearTo}:MonthlySummaryProps) {
+  const [unit,setUnit]=useState<'LOCAL_PER_USD'|'KRW'>('LOCAL_PER_USD')
+  const currencies=currencyFilter==='ALL'?CURRENCIES:[currencyFilter]
+  const periods=YEARS.filter(y=>y>=Math.min(yearFrom,yearTo)&&y<=Math.max(yearFrom,yearTo)).flatMap(year=>MONTHS.map(month=>({year,month,label:`${year}.${String(month).padStart(2,'0')}`})))
+  // Preserve the previous first-match behavior, including duplicate historical rows.
+  const values=useMemo(()=>{
+    const index=new Map<string,ExchangeRateDataset['monthlyRates'][number]>()
+    for(const row of data.monthlyRates){
+      const key=`${row.rateType}:${row.currency}:${row.year}:${row.month}`
+      if(!index.has(key))index.set(key,row)
     }
-
-    if (currencyFilter === 'ALL') {
-      return true
-    }
-
-    return row.currency === currencyFilter
-  })
-}
-
-function renderMatrix(
-  rows: MonthlyRate[],
-  rateType: 'LOCAL_PER_USD' | 'KRW',
-  currencyFilter: CurrencyFilter,
-  yearFrom: number,
-  yearTo: number,
-) {
-  const activeCurrencies =
-    currencyFilter === 'ALL' ? CURRENCIES : [currencyFilter]
-  const fromYear = Math.min(yearFrom, yearTo)
-  const toYear = Math.max(yearFrom, yearTo)
-
-  const yearGroups = YEARS
-    .map((year) => ({
-      year,
-      months: year >= fromYear && year <= toYear ? MONTHS : [],
-    }))
-    .filter((group) => group.months.length > 0)
-
-  return (
-    <>
-      <p className="mobile-table-hint">
-        표를 좌우로 이동하면 전체 데이터를 확인할 수 있습니다.
-      </p>
-      <div className="table-scroll">
-        <table className="dense-table">
-          <thead>
-            <tr>
-              <th rowSpan={2}>통화</th>
-              {yearGroups.map((group) => (
-                <th key={`year-${group.year}`} colSpan={group.months.length}>
-                  {group.year}
-                </th>
-              ))}
-            </tr>
-            <tr>
-              {yearGroups.flatMap((group) =>
-                group.months.map((month) => (
-                  <th key={`${group.year}-${month}`}>{month}월</th>
-                )),
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {activeCurrencies.map((currency) => (
-              <tr key={`${rateType}-${currency}`}>
-                <td>{currency}</td>
-                {yearGroups.flatMap((group) =>
-                  group.months.map((month) => {
-                    const row = rows.find(
-                      (item) =>
-                        item.currency === currency &&
-                        item.year === group.year &&
-                        item.month === month,
-                    )
-
-                    const className = row?.status === 'zero' ? 'cell-zero' : ''
-
-                    return (
-                      <td
-                        key={`${currency}-${group.year}-${month}`}
-                        className={className}
-                      >
-                        {formatCellValue(
-                          row?.value ?? null,
-                          row?.status ?? 'empty',
-                          rateType === 'KRW' ? 'KRW' : currency,
-                        )}
-                      </td>
-                    )
-                  }),
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </>
-  )
-}
-
-function MonthlySummary({
-  data,
-  currencyFilter,
-  yearFrom,
-  yearTo,
-  onCurrencyChange,
-}: MonthlySummaryProps) {
-  const localRows = pickRows(data.monthlyRates, 'LOCAL_PER_USD', currencyFilter)
-  const krwRows = pickRows(data.monthlyRates, 'KRW', currencyFilter)
-
-  return (
-    <div className="panel">
-      <div className="panel-header-inline">
-        <div>
-          <h2>월별 이력</h2>
-          <p className="table-help">
-            선택한 기간과 통화의 월평균 환율을 확인합니다.
-          </p>
-        </div>
-        <select
-          value={currencyFilter}
-          onChange={(event) =>
-            onCurrencyChange(event.target.value as CurrencyFilter)
-          }
-          aria-label="통화 필터"
-        >
-          <option value="ALL">전체 통화</option>
-          {CURRENCIES.map((item) => (
-            <option key={item} value={item}>
-              {item}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="table-card">
-        <h3>Local per USD</h3>
-        {renderMatrix(
-          localRows,
-          'LOCAL_PER_USD',
-          currencyFilter,
-          yearFrom,
-          yearTo,
-        )}
-      </div>
-
-      <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>KRW 환산</h3>
-        {renderMatrix(krwRows, 'KRW', currencyFilter, yearFrom, yearTo)}
-      </div>
+    return index
+  },[data.monthlyRates])
+  const cell=(rateType:'LOCAL_PER_USD'|'KRW',currency:typeof CURRENCIES[number],year:number,month:number)=>{
+    const row=values.get(`${rateType}:${currency}:${year}:${month}`)
+    return <td key={`${currency}:${year}:${month}`} className={row?.status==='zero'?'cell-zero':''}>{formatCellValue(row?.value??null,row?.status??'empty',rateType==='KRW'?'KRW':currency)}</td>
+  }
+  return <section className="panel monthly-results" aria-label="월별 평균 환율">
+    <h2 className="sr-only">월평균 환율</h2>
+    <div className="monthly-mobile-view">
+      <div className="monthly-unit-switch" role="group" aria-label="월평균 환율 단위">{(['LOCAL_PER_USD','KRW'] as const).map(type=><button type="button" key={type} aria-pressed={unit===type} onClick={()=>setUnit(type)}>{type==='LOCAL_PER_USD'?'Local per USD':'KRW 환산'}</button>)}</div>
+      {currencyFilter==='ALL'&&<p className="mobile-table-hint">연월을 기준으로 통화 열을 좌우로 이동하세요.</p>}
+      <div className="table-scroll monthly-row-scroll" tabIndex={0} role="region" aria-label={`월평균 연월표 · ${unit==='KRW'?'KRW 환산':'Local per USD'}`}><table className="monthly-row-table"><thead><tr><th scope="col">연월</th>{currencies.map(c=><th scope="col" key={c}>{unit==='KRW'?`${c}/KRW`:`${c}/USD`}</th>)}</tr></thead><tbody>{periods.map(p=><tr key={p.label}><th scope="row">{p.label}</th>{currencies.map(c=>cell(unit,c,p.year,p.month))}</tr>)}</tbody></table></div>
     </div>
-  )
+    <div className="monthly-desktop-view">{(['LOCAL_PER_USD','KRW'] as const).map(type=><div className="table-card" key={type}><h3>{type==='LOCAL_PER_USD'?'Local per USD':'KRW 환산'}</h3><div className="table-scroll" tabIndex={0} role="region" aria-label={`월평균 비교표 · ${type==='KRW'?'KRW 환산':'Local per USD'}`}><table className="dense-table monthly-matrix"><thead><tr><th scope="col">통화</th>{periods.map(p=><th scope="col" key={p.label}>{p.label}</th>)}</tr></thead><tbody>{currencies.map(c=><tr key={c}><th scope="row">{c}</th>{periods.map(p=>cell(type,c,p.year,p.month))}</tr>)}</tbody></table></div></div>)}</div>
+  </section>
 }
-
-export default MonthlySummary

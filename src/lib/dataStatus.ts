@@ -3,7 +3,6 @@ import {DEFAULT_FRESHNESS_CALENDAR,elapsedBusinessDays,freshnessReferenceDate} f
 export {DEFAULT_FRESHNESS_CALENDAR,elapsedBusinessDays} from './reference-freshness.js'
 export type {FreshnessCalendar} from './reference-freshness.js'
 
-const DAY = 86_400_000
 const currencies = ['BRL','MXN','CLP','COP','PEN','ARS'] as const
 const providers: Record<FxPriceSource['provider'], string> = {
   frankfurter_v1:'Frankfurter', exchange_rate_api:'ExchangeRate-API', open_er_api:'Open ER',
@@ -20,8 +19,11 @@ export function datasetStatus(data: ExchangeRateDataset | null, now=Date.now(), 
       providerUpdatedAt:source?.providerUpdatedAt??null,price:source?.priceKind==='conversion_reference'?'환산 기준':source?.priceKind==='provider_daily_close'?'공급자 일별 종가':'가격 정의 미확인',
       observed:!!row&&row.value!==null&&row.source!=='IMPUTED',verified:!!source&&source.priceKind!=='unverified'}
   })
-  const age=elapsedBusinessDays(data.baseDate,date,calendar.closedDates)
-  const future=Date.parse(data.baseDate+'T00:00:00Z')>now+DAY
+  // A scheduled release is a minimum expected date, not a ceiling on valid data.
+  // Early same-day data must not become unknown merely because releaseHour is pending.
+  const today=freshnessReferenceDate(now,{...calendar,releaseHour:0})
+  const future=data.baseDate>today
+  const age=elapsedBusinessDays(data.baseDate,data.baseDate>date&&!future?data.baseDate:date,calendar.closedDates)
   const state=future||age===null?'unknown':age>calendar.maxBusinessDays?'late':'unverified'
   return {state,label:state==='late'?'갱신 확인 필요':state==='unknown'?'기준일 확인 필요':'기준시각 미확인',quotes}
 }

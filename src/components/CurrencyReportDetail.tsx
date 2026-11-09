@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
+import Disclosure from './Disclosure'
+import './report-detail-tools.css'
 import type { CurrencyReport, ReportClaim } from '../types/currencyReport'
 import { isHistoricalComparison } from '../lib/reports/provenance'
 import { reportMetadata, evidenceMetadata } from '../lib/reports/metadata'
@@ -39,14 +41,14 @@ function Chart({ report }: { report: CurrencyReport }) {
     </svg><div className="chart-foot">보고서 관측일 {report.observedDate} · {sparse ? '일부 날짜의 관측값만 표시하며 점 사이의 경로는 추정하지 않습니다.' : '보고서에 저장된 관측값 · 가로축은 실제 날짜 간격입니다.'}</div>
   </section>
 }
-export default function CurrencyReportDetail({ report, onBack, backLabel = '← 대시보드로' }: { report: CurrencyReport; onBack: () => void; backLabel?: string }) {
+export default function CurrencyReportDetail({ report, onBack, backLabel = '← 대시보드로', mobileNavigation, onRefresh }: { report: CurrencyReport; onBack: () => void; backLabel?: string; mobileNavigation?:ReactNode; onRefresh?:()=>void }) {
   const [copyState, setCopyState] = useState('링크 복사')
   const country = COUNTRY[report.currency]
   const metadata = reportMetadata(report)
   const attributions = sourceAttribution(report)
   const limitations = [...new Set([...report.content.limitations, ...report.limitations])]
   const referenceLabel = report.testOnly ? '합성 DB 연결 시험 · AI 미사용' : report.status === 'approved' ? (report.authorship === 'ai_with_manual_edit' ? 'AI 원고 · 수동 편집 · 승인 보고서' : 'AI 작성 · 승인 보고서') : report.comparison?.editorialRevision ? '수동 편집 사본 · AI 재생성 없음' : report.comparison?.citationRevision ? 'AI 원고 · 출처 연결 보완 · 재생성 없음' : report.comparison?.referenceOnly ? '편집 기준 예시 · OpenRouter 재호출 없음' : report.comparison?.rulesReviewOnly ? 'AI 작성 · 공통 규칙 내용 검토 미완료' : null
-  return <>{report.status === 'rejected' ? <div className="local-notice" role="alert"><strong>내용 평가 미통과 · 비교용이며 채택·게시하지 않았습니다.</strong>{report.comparison?.reviewNotes?.length ? <ul>{report.comparison.reviewNotes.map(note => <li key={note}>{note}</li>)}</ul> : <p>근거가 뒷받침하지 않는 설명이 포함되어 있습니다.</p>}</div> : null}<div className="detail-tools"><button onClick={onBack}>{backLabel}</button><div><button onClick={async () => { try { await navigator.clipboard.writeText(location.href); setCopyState('복사됨') } catch { setCopyState('주소창에서 복사해 주세요') } }}>{copyState}</button><button onClick={() => window.print()}>인쇄 ↗</button></div></div>
+  return <>{report.status === 'rejected' ? <div className="local-notice" role="alert"><strong>내용 평가 미통과 · 비교용이며 채택·게시하지 않았습니다.</strong>{report.comparison?.reviewNotes?.length ? <ul>{report.comparison.reviewNotes.map(note => <li key={note}>{note}</li>)}</ul> : <p>근거가 뒷받침하지 않는 설명이 포함되어 있습니다.</p>}</div> : null}<div className={`detail-tools ${mobileNavigation?'has-mobile-navigation':''}`}><button onClick={onBack}><span className="report-back-full">{backLabel}</span><span className="report-back-short" aria-hidden="true">← 목록</span></button>{mobileNavigation&&<div className="report-mobile-navigation">{mobileNavigation}</div>}<Disclosure desktopOpen className="report-more-tools" summary="더보기" label="보고서 도구 더보기"><div><button onClick={async () => { try { await navigator.clipboard.writeText(location.href); setCopyState('복사됨') } catch { setCopyState('주소창에서 복사해 주세요') } }}>{copyState}</button><button onClick={() => window.print()}>인쇄 ↗</button>{onRefresh&&<button onClick={onRefresh}>게시 상태 새로고침</button>}</div></Disclosure></div>
     <article className={`currency-paper currency-${report.currency.toLowerCase()}`}>
       <div className="paper-masthead"><span>LATAM FX <b>/ CURRENCY BRIEF</b></span><span>{country.en} — {report.baseDate.replaceAll('-', '.')}</span></div>
       <header className="paper-hero"><div className="country-name"><span className="country-mark">{country.index}</span><span>{country.name} · {country.unit}</span><span className="currency-code">{report.currency}</span></div><h1>{report.content.title}</h1><p className="paper-deck">{factText(report.content.summary, report)}</p><div className="paper-meta"><span>{referenceLabel ?? (report.status === 'rejected' ? 'AI 작성 · 미채택 비교본' : report.generationMode === 'editorial_fixture' ? '공개 자료 기반 편집 시안 · AI 미사용' : 'AI 작성 · 검토 초안')}</span><span>보고서 기준 {report.baseDate}</span>{isHistoricalComparison(report) ? <span>과거 사례 사후 검토 · 현재 시장 보고서 아님</span> : null}</div>{report.comparison?.historicalReview === false ? <p className="small-note">{reportPriceSourceLabel(report) ? <>리포트용 검증 가격 자료 수집 {metadata.fetchedAt ?? '시각 미제공'} ·</> : <>운영 환율 수집 {report.comparison.datasetFetchedAt ?? '시각 미제공'} · 이후 장중 뉴스는 별도 시점의 설명입니다.</>} 생성 {report.comparison.model} · 비용 {report.comparison.costUsd === null ? '미확인' : `$${report.comparison.costUsd.toFixed(6)}`}</p> : null}</header>

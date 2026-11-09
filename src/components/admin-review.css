@@ -78,3 +78,17 @@
  .db-review .admin-data-details { padding-left:12px; padding-right:12px; }
  .review-page-heading { align-items:flex-start; }
 }
+
+.review-published{margin:16px 0;border:1px solid var(--border-soft);border-radius:8px;padding:0 12px}
+.review-published>summary{min-height:44px;display:flex;align-items:center}
+.db-review .review-empty{padding:12px;background:var(--surface-muted);border-radius:6px}
+@media(max-width:760px){.review-body dl{grid-template-columns:1fr}.review-card-actions button{min-height:44px}.review-card-heading{gap:6px}.db-review .review-toolbar input:not([type=checkbox]){font-size:16px}.review-page-heading{margin-bottom:12px}}
+
+.review-operations{margin:12px 0;border:1px solid var(--border-soft);border-radius:8px;padding:0 12px}.review-operations>summary{min-height:44px;display:flex;align-items:center}.db-review .review-section-heading h2 small{font-size:12px;color:var(--text-muted);font-weight:500;margin-left:8px}
+
+.review-inbox-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.db-review .review-inbox-heading h2{font-size:14px}
+.db-review .admin-review-inbox{padding:10px 12px}
+.db-review .admin-review-inbox p{margin:6px 0 0;font-size:12px;line-height:1.6}
+.db-review .review-section-heading{margin:16px 0 8px}
+.db-review>.local-notice{padding:6px 8px;margin-bottom:10px;font-size:11px}

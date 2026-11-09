@@ -311,20 +311,13 @@ function CurrencyDetail({
   }
 
   return (
-    <div className="panel">
-      <div className="panel-header">
-        <div>
-          <h2>일별 추이</h2>
-          <p className="table-help">{currency} 기준 일별 환율과 기간 평균입니다.</p>
-        </div>
-      </div>
-
+    <div className="panel daily-results">
       {rangeNotice ? (
         <p className="inline-notice warning-notice">{rangeNotice}</p>
       ) : null}
 
       <div className="chart-card">
-        <h3>{periodFrom} ~ {periodTo} 일별 환율</h3>
+        <h3>{currency}/USD <span className="chart-heading-note">일별 환율 · 월평균 점선</span></h3>
         <ResponsiveContainer width="100%" height={320}>
           <LineChart data={dailySeries} margin={{ top: 8, right: 12, bottom: 2, left: 0 }}>
             <CartesianGrid strokeDasharray="2 4" vertical={false} stroke={DETAIL_GRID_STROKE} />
@@ -390,7 +383,7 @@ function CurrencyDetail({
       </div>
 
       <div className="table-card" style={{ marginTop: 12 }}>
-        <h3>일별 환율표</h3>
+        <h3>일별 환율표 <span className="chart-heading-note">{periodFrom} — {periodTo}</span></h3>
         <p className="table-help">
           표시: <span className="imputed-badge">보정</span> = 전일 또는 결측값 보정
         </p>
