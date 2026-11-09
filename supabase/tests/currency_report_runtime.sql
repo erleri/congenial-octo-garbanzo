@@ -1,6 +1,10 @@
 begin;
 set local search_path=public,extensions,pg_catalog;
 select no_plan();
+-- Existing confirmed/escrowed spend is preserved; only synthetic headroom is
+-- added inside this rollback transaction, as in the operating-cycle tests.
+select set_config('runtime.test.prior_nano',(select coalesce(sum(case when cost_state='confirmed' then actual_nano else reserved_nano end),0)::text from app_private.currency_report_runtime_jobs
+ where created_at>=date_trunc('month',clock_timestamp() at time zone 'UTC') at time zone 'UTC' or app_private.runtime_cost_escrowed(id)),true);
 select ok(not has_table_privilege('anon','app_private.currency_report_runtime_inputs','SELECT'),'anonymous readers cannot read prepared inputs');
 select ok(not has_table_privilege('authenticated','app_private.currency_report_runtime_jobs','SELECT'),'ordinary sessions cannot read private responses');
 select ok(not has_function_privilege('authenticated','public.reserve_currency_report_runtime(text,text,date,text,text,jsonb,bigint,bigint,uuid)','EXECUTE'),'administrators cannot reserve model spending through the public API');
@@ -19,7 +23,7 @@ select is(public.reserve_currency_report_runtime(repeat('a',64),'BRL','2094-01-0
  '{"writer":"sol"}',200000000,(public.currency_report_runtime_control()->>'revision')::bigint)->>'reason',
  'runtime_disabled_or_changed','enabled flag alone does not grant an unapproved budget');
 reset role;
-update app_private.currency_report_runtime_control set monthly_limit_nano=250000000;
+update app_private.currency_report_runtime_control set writer='sol',monthly_limit_nano=250000000+current_setting('runtime.test.prior_nano')::bigint;
 set local role service_role;
 select is(public.reserve_currency_report_runtime(repeat('a',64),'BRL','2094-01-01','writer',repeat('b',64),
  '{"writer":"sol"}',200000000,null)->>'reason','runtime_disabled_or_changed','missing revision cannot bypass the configuration check');

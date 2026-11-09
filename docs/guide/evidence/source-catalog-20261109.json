@@ -1,0 +1,1351 @@
+{
+  "version": "research-source-selection/1",
+  "executionPolicy": "automatic_collection_only/1",
+  "sources": [
+    {
+      "id": "brl-policy",
+      "currency": "BRL",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "0814a35c19370f4368221a9606cdd39bf3df8b4176d1dc65dd6ce8cecfa379ac",
+      "role": "policy_context",
+      "kind": "official_or_indicator",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/10?formato=json",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "brl-retail",
+      "currency": "BRL",
+      "questionIds": [
+        "demand"
+      ],
+      "recordHash": "45bb60e736645782a7c87ffaf8aef9a8bd69533e87d6efb4603e362d013c6105",
+      "role": "retail_volume",
+      "kind": "official_or_indicator",
+      "url": "https://servicodados.ibge.gov.br/api/docs/agregados?versao=3",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "brl-calendar",
+      "currency": "BRL",
+      "questionIds": [
+        "watch"
+      ],
+      "recordHash": "ae74c78d0649be23bab733dac0856336e46832a43d8a8818c8c5013af8dd90e5",
+      "role": "calendar",
+      "kind": "official_or_indicator",
+      "url": "https://servicodados.ibge.gov.br/api/docs/calendario?versao=3",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "mxn-policy",
+      "currency": "MXN",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "c658f3cc9457ad43cb1556aa641c9ed0e23d37bb427684ba14ddb508a7b277f1",
+      "role": "policy_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.banxico.org.mx/SieAPIRest/service/v1/",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "mxn-consumer",
+      "currency": "MXN",
+      "questionIds": [
+        "demand",
+        "policy"
+      ],
+      "recordHash": "4de9b401f87cbde742d73947ebc2efa3aafbebef52ab17e1beef2a3c1d9bf1fc",
+      "role": "consumer_statistics",
+      "kind": "official_or_indicator",
+      "url": "https://www.inegi.org.mx/servicios/api_indicadores.html",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "mxn-calendar",
+      "currency": "MXN",
+      "questionIds": [
+        "watch"
+      ],
+      "recordHash": "5246be0ad739a20e9cb6878a11027a8825acfb25e71455314716eee1f52c2c5d",
+      "role": "calendar",
+      "kind": "official_or_indicator",
+      "url": "https://www.inegi.org.mx/contenidos/saladeprensa/doc/cal_2026.pdf",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "cop-retail",
+      "currency": "COP",
+      "questionIds": [
+        "demand"
+      ],
+      "recordHash": "8d6b53b6acfd750c38fb4c872de03659b4181c798fb3295ad010887cf4f23470",
+      "role": "retail_statistics",
+      "kind": "official_or_indicator",
+      "url": "https://www.dane.gov.co/index.php/estadisticas-por-tema/comercio-interno/encuesta-mensual-de-comercio-emc",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "cop-credit",
+      "currency": "COP",
+      "questionIds": [
+        "financing"
+      ],
+      "recordHash": "01a2aa61543409c895be480dd132d7b7334f01ea3331bc15dc7ad3942296357c",
+      "role": "consumer_finance",
+      "kind": "official_or_indicator",
+      "url": "https://www.superfinanciera.gov.co/publicaciones/60955/informes-y-cifrascifrasestablecimientos-de-creditoinformacion-periodicamensualtasa-de-interes-y-desembolsos-por-modalidad-de-credito-60955/",
+      "localRecord": null,
+      "status": "official_page_and_metadata_read"
+    },
+    {
+      "id": "cop-policy",
+      "currency": "COP",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "b14f1d81346ba28dc76daff0e3d3a41df6b013c41957616ca273cf93c4e78cf4",
+      "role": "policy_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.banrep.gov.co/",
+      "localRecord": null,
+      "status": "official_portal_route_only"
+    },
+    {
+      "id": "pen-policy",
+      "currency": "PEN",
+      "questionIds": [
+        "policy"
+      ],
+      "recordHash": "fd6ac8695edb114d102c93ba651e520dfa5f3796557ce4fb2593b5a6477d6457",
+      "role": "policy_context",
+      "kind": "official_or_indicator",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/mensuales/tasas-de-interes",
+      "localRecord": null,
+      "status": "official_catalog_read"
+    },
+    {
+      "id": "pen-financing",
+      "currency": "PEN",
+      "questionIds": [
+        "financing"
+      ],
+      "recordHash": "03b409e824e6de94c55898d9cd88717954d7bea977d541c580824fd62c5aa76b",
+      "role": "consumer_finance",
+      "kind": "official_or_indicator",
+      "url": "https://estadisticas.bcrp.gob.pe/estadisticas/series/mensuales/tasas-de-interes",
+      "localRecord": null,
+      "status": "valid_json_sample"
+    },
+    {
+      "id": "pen-activity",
+      "currency": "PEN",
+      "questionIds": [
+        "demand"
+      ],
+      "recordHash": "fefcd8297b34222b87a9119598e5d944729934007da4e663f3fccaf136833741",
+      "role": "economic_activity_background",
+      "kind": "official_or_indicator",
+      "url": "https://www.inei.gob.pe/media/MenuRecursivo/boletines/boletin-produccion-nacional-set2026.pdf",
+      "localRecord": null,
+      "status": "historical_pdf_body_read"
+    },
+    {
+      "id": "clp-policy",
+      "currency": "CLP",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "3f2d848fcf8a13e93664ec07d966c32fcd30073027e2b92cd2ee9ccf866c03ae",
+      "role": "policy_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.bcentral.cl/",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "clp-consumer",
+      "currency": "CLP",
+      "questionIds": [
+        "demand"
+      ],
+      "recordHash": "e08542ad67f97c9cba7b27faaa59533edb7e0a053b1de93aa76690a37c5a3947",
+      "role": "retail_statistics",
+      "kind": "official_or_indicator",
+      "url": "https://www.ine.gob.cl/estadisticas-por-tema/comercio-y-servicios/actividad-mensual-del-comercio",
+      "localRecord": null,
+      "status": "existing_local_collector_reused"
+    },
+    {
+      "id": "clp-pay",
+      "currency": "CLP",
+      "questionIds": [
+        "demand"
+      ],
+      "recordHash": "d26e1779265c31b4dfcbb48b14adbfd5e74d0497dffa3b9508b6b28fe0706003",
+      "role": "real_pay",
+      "kind": "official_or_indicator",
+      "url": "https://www.ine.gob.cl/estadisticas-por-tema/mercado-laboral/remuneraciones-y-costos-laborales",
+      "localRecord": null,
+      "status": "existing_local_collector_reused"
+    },
+    {
+      "id": "ars-policy",
+      "currency": "ARS",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "0b9705994874f6a2f1f35e971132153931804a04005ae893dd3c185730da6b23",
+      "role": "policy_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.bcra.gob.ar/",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "ars-retail-appliances",
+      "currency": "ARS",
+      "questionIds": [
+        "demand"
+      ],
+      "recordHash": "77d126f88255ec80cdc69517be926b78366c3406d8e834a77dc769859c62ad7c",
+      "role": "retail_and_appliance_survey",
+      "kind": "official_or_indicator",
+      "url": "https://www.indec.gob.ar/indec/web/Nivel3-Tema-3-1",
+      "localRecord": null,
+      "status": "catalog_and_calendar_verified_body_collection_pending"
+    },
+    {
+      "id": "ars-calendar",
+      "currency": "ARS",
+      "questionIds": [
+        "watch"
+      ],
+      "recordHash": "45bc6f9312554342cb37cff8657b194e09ca8f335ed40dce3b583447754d4e4d",
+      "role": "calendar",
+      "kind": "official_or_indicator",
+      "url": "https://www.indec.gob.ar/ftp/cuadros/publicaciones/calendario_2sem2026.pdf",
+      "localRecord": null,
+      "status": "calendar_pdf_read"
+    },
+    {
+      "id": "common-us-policy",
+      "currency": "COMMON",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "fd2d909da333a216ffabd4f26b3553096f583f366c68e2500c15c8d4da8a26a8",
+      "role": "us_policy",
+      "kind": "official_or_indicator",
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "common-us-prices",
+      "currency": "COMMON",
+      "questionIds": [
+        "policy",
+        "watch"
+      ],
+      "recordHash": "7b9d1312be0c716c92a0db07b09f90bfbd39bb5718259dc9dacdc692affecac7",
+      "role": "us_releases",
+      "kind": "official_or_indicator",
+      "url": "https://www.bls.gov/schedule/news_release/",
+      "localRecord": null,
+      "status": "existing_record_reused"
+    },
+    {
+      "id": "common-dollar",
+      "currency": "COMMON",
+      "questionIds": [
+        "cause"
+      ],
+      "recordHash": "4f28c7f1bb8cbfbf34f957ee50a73ee057c61d47c9720a0bc62c3f743c86b1c2",
+      "role": "market_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.federalreserve.gov/releases/h10/summary/default.htm",
+      "localRecord": null,
+      "status": "official_page_read"
+    },
+    {
+      "id": "common-us-yields",
+      "currency": "COMMON",
+      "questionIds": [
+        "cause"
+      ],
+      "recordHash": "0adef9ee996aab8df6b0313d3de9b3a3b00a8e5617d32bf1b8e044fd8257f924",
+      "role": "market_context",
+      "kind": "official_or_indicator",
+      "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2026&type=daily_treasury_yield_curve",
+      "localRecord": null,
+      "status": "official_table_and_download_links_read"
+    },
+    {
+      "id": "common-copper",
+      "currency": "COMMON",
+      "questionIds": [
+        "cause"
+      ],
+      "recordHash": "832f9f96d40a41354ca399efa91d971d99b57de46aeebf5b0429695ea89e7e6f",
+      "role": "commodity_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.cochilco.cl/web/",
+      "localRecord": null,
+      "status": "weekly_report_body_read"
+    },
+    {
+      "id": "common-oil",
+      "currency": "COMMON",
+      "questionIds": [
+        "cause"
+      ],
+      "recordHash": "4c3b90fc6352fd6eef10c39ca84d36e8141f5e7e846f6a8ed9fc7fb1549fe516",
+      "role": "commodity_context",
+      "kind": "official_or_indicator",
+      "url": "https://www.eia.gov/petroleum/prices/table.php?show_by=12_series&period=D&table_key=PET_PRI_SPT_S1_D",
+      "localRecord": null,
+      "status": "data_table_not_extracted"
+    },
+    {
+      "id": "brl-infomoney",
+      "currency": "BRL",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "432465af57179d74f7892535c3cb88ffa68a897c4e6e44e10cd7700b07b60eee",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.infomoney.com.br/mercados/",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "infomoney.com.br"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "brl-agenciabrasil",
+      "currency": "BRL",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "34bd5800684c65657be35ef7c6b014d2df58b38ae0431a5922545ab3e7114544",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://agenciabrasil.ebc.com.br/economia",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "agenciabrasil.ebc.com.br"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "mxn-eleconomista",
+      "currency": "MXN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "407aadf618b6313660a2d09ca6ceaf78e631d11b7e7c6ab8c8f1d8ef5174c81a",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.eleconomista.com.mx/seccion/mercados",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "eleconomista.com.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano",
+          "Mexican peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "mxn-expansion",
+      "currency": "MXN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "015fc1092ba68063cb8e53874098ec8626d3dab73639227bbb75eb946f3cc20f",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://expansion.mx/mercados",
+      "localRecord": null,
+      "status": "listing_only",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "expansion.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano",
+          "Mexican peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "cop-larepublica",
+      "currency": "COP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "c430e082051645bb4b513da037b7e155f5d8aab1e9e43788bad79d2e8d0f5d04",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.larepublica.co/finanzas",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "larepublica.co"
+        ],
+        "terms": [
+          "dólar peso colombiano",
+          "Colombian peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "cop-portafolio",
+      "currency": "COP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "b6cc30cbe98db55dbc4fc4d3066ad0679e6b3ea95ea7286f0af21661741f09c9",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.portafolio.co/economia/finanzas",
+      "localRecord": null,
+      "status": "listing_only",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "portafolio.co"
+        ],
+        "terms": [
+          "dólar peso colombiano",
+          "Colombian peso"
+        ],
+        "reason": "기존 본문 추출 또는 접근 조건이 해결되지 않았다. 공개 본문과 이용 범위를  자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "pen-revistaeconomia",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "0cb7d5d85fed301f6d628e34250e9de9180f01915e4db70740825a8e25a272fb",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.revistaeconomia.com/mercado/",
+      "localRecord": null,
+      "status": "saved_body_and_robots_reviewed_20261029",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.revistaeconomia.com"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "sol dólar"
+        ],
+        "reason": "공개 robots와 고유 기사 본문 경계를 확인한 로컬 연결. 요지의 사실·귀속·시점·용도 검토는 기존 공통 경로를 사용한다."
+      }
+    },
+    {
+      "id": "pen-gestion",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "374c36b468b98e24be2851849a8d631eebe2fcf6e19b47a1c029c5c6d1ad5400",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://gestion.pe/noticias/tipo-de-cambio/",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "gestion.pe"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "Peruvian sol"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "pen-rpp",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "bfa44a8c05ba3405d4b8f06de1f28c3c844bec5f3801c499fdba4104e10a4639",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://rpp.pe/economia",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "rpp.pe"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "Peruvian sol"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "ars-infobae",
+      "currency": "ARS",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "1582ccde7ecfb5a6423759c5a446196bc80dbba654d9cd5ccc360a6408ddf004",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.infobae.com/economia/",
+      "localRecord": null,
+      "status": "body_read",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "infobae.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "기존 로컬 수집 경로를 재사용한다. 확보 여부와 기사 내용·이용 범위·모델 입력 승인은 별도 검토한다."
+      }
+    },
+    {
+      "id": "ars-cronista",
+      "currency": "ARS",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "19150e4332f39d6b96f60dff61a56bd4f90954cf63e4845324e0ecfa9ca1fdc0",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.cronista.com/finanzas-mercados/",
+      "localRecord": null,
+      "status": "paywall",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "cronista.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "기존 본문 추출 또는 접근 조건이 해결되지 않았다. 공개 본문과 이용 범위를  자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "clp-existing-four-outlets",
+      "currency": "CLP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "959af7ac14b2ecaff545c47c2b51e0ba1dbc98ba8a62affc44a8d496070422fb",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": null,
+      "localRecord": "docs/2.0/clp-news-notes-20260910.json",
+      "status": "existing_record",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "emol.com",
+          "reporteminero.cl"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "기존 저장 네 매체 기록은 보존한다. 실행 수집 범위는 기존 Emol/Reporte Minero 수집기이며 DF/Pulso/Yahoo를 자동 수집하지 않는다."
+      }
+    },
+    {
+      "id": "brl-valor",
+      "currency": "BRL",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "51d95590cd20464d1923b3c32c8a4e4ce69bd218d34888b8f60bf2a762f4a75a",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://valor.globo.com/",
+      "localRecord": null,
+      "status": "discovery_route_reviewed_body_not_collected",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "valor.globo.com"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "경제 일간지. 자동 접근 차단과 본문 공개 범위를  구독벽이나 robots 차단은 우회하지 않는다. 자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "mxn-elfinanciero",
+      "currency": "MXN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "3cfa688199216800967a06dce58819c0f0ac48592db1a2379a80a898304dedca",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.elfinanciero.com.mx/mercados/",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.elfinanciero.com.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "ars-ambito",
+      "currency": "ARS",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "01812285c969b022d4688c9429319b25aa0ce3b86d805b5e8ef8f6757e669158",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.ambito.com/",
+      "localRecord": null,
+      "status": "discovery_route_reviewed_body_not_collected",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "ambito.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "금융 전문 매체. 아르헨티나 도매·소매·MEP·CCL·blue를 구분해 공개 본문을 확인한다. 전용 자동 수집은 미연결이다. 자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "clp-df",
+      "currency": "CLP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "b9a406d4751639898f02c0392314af00b7173e07ed22d83762d95ece3dd7dc8e",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.df.cl/",
+      "localRecord": null,
+      "status": "discovery_route_reviewed_body_not_collected",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "df.cl"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "경제 전문지. 공개된 기사만 확인하며 제목·검색 요약·구독 안내를 원문 근거로 승인하지 않는다. 자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "clp-pulso",
+      "currency": "CLP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "e963a07d20ae8ff75b8798b718657858557443d97cc04d525766d7dde4cf3a29",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.latercera.com/",
+      "localRecord": null,
+      "status": "discovery_route_reviewed_body_not_collected",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "excluded",
+        "domains": [
+          "latercera.com"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "La Tercera의 Pulso 경제 보도를 검색한다. 기존 목록 오류로  자동 수집 조건·연결 미완료로 제외한다. 수동 확인을 요구하지 않는다."
+      }
+    },
+    {
+      "id": "brl-yahoo",
+      "currency": "BRL",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "60004453196c7145edc41c92fbea9a7a65be48366b8084616aeb03c6ac1468a7",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://finance.yahoo.com/",
+      "localRecord": null,
+      "status": "search_found_direct_reads_rate_limited",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar real brasileiro",
+          "Brazilian real"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "mxn-yahoo",
+      "currency": "MXN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "a185ced6e8fa96233313dd8c41d0f3c4580eb8f76cdb2f967ece4a96fbd3ceec",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://finance.yahoo.com/",
+      "localRecord": null,
+      "status": "search_found_direct_reads_rate_limited",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar peso mexicano",
+          "Mexican peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "cop-yahoo",
+      "currency": "COP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "bd4fd379ac89e60d4847164b3466f9ffc4add78d4c61f2baa67e2eb1a3629f5c",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://finance.yahoo.com/",
+      "localRecord": null,
+      "status": "search_found_direct_reads_rate_limited",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar peso colombiano",
+          "Colombian peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "pen-yahoo",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "c16f3c938228bfc94741d1dc9d2329585fc04c0abdd6b8ca363df2ac500f11fc",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://finance.yahoo.com/",
+      "localRecord": null,
+      "status": "search_found_direct_reads_rate_limited",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "tipo de cambio sol peruano",
+          "Peruvian sol"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "clp-yahoo",
+      "currency": "CLP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "a5aeb384cf4af6d7129ab8be0a6088068c745cdfa098d1dd779ca664f8fad848",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://finance.yahoo.com/",
+      "localRecord": null,
+      "status": "search_found_direct_reads_rate_limited",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar peso chileno",
+          "Chilean peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "ars-yahoo",
+      "currency": "ARS",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "203415d47751bc48785fedc6bba04806357ba862dfd7139e44472c1a951fe7c4",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://finance.yahoo.com/",
+      "localRecord": null,
+      "status": "search_found_direct_reads_rate_limited",
+      "discovery": {
+        "tier": "syndicated",
+        "mode": "excluded",
+        "domains": [
+          "finance.yahoo.com",
+          "es.finance.yahoo.com",
+          "ca.finance.yahoo.com"
+        ],
+        "terms": [
+          "dólar mayorista Argentina",
+          "Argentine peso"
+        ],
+        "reason": "직접 읽기 429 및 자동 수집 이용 조건 미해결. 자동 수집에서 제외하며 사람의 수동 확인을 기다리지 않는다."
+      }
+    },
+    {
+      "id": "brl-cnn",
+      "currency": "BRL",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "e7ef61c4db0c06abad8d81bd838bb91e11e7fcf36337e4fd42d5e04127377f52",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.cnnbrasil.com.br/economia/money/mercado/",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.cnnbrasil.com.br"
+        ],
+        "terms": [
+          "dólar real brasileiro"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "mxn-forbes",
+      "currency": "MXN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "36bcb369e8fd4c6ac5faebc5ae00818e0c4e324bc50001ff077075d3252789b5",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://forbes.com.mx/mercados/",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "forbes.com.mx"
+        ],
+        "terms": [
+          "dólar peso mexicano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "cop-valora",
+      "currency": "COP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "f406842058ac4e553ce36066d332ed294f28ebf297fdbca79142925cc5f85cd3",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.valoraanalitik.com/",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.valoraanalitik.com"
+        ],
+        "terms": [
+          "dólar peso colombiano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "clp-biobio",
+      "currency": "CLP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "263f0164230a2719fe82fab5ff113017e8438d951cd41a9aa08748aecfee23f7",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.biobiochile.cl/lista/categorias/economia",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.biobiochile.cl"
+        ],
+        "terms": [
+          "dólar peso chileno"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "clp-cooperativa",
+      "currency": "CLP",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "ab51173ce9300066f072a50eb7b2bc2cf614d639879c5a103ab1ff757e53dc6a",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.cooperativa.cl/noticias/site/tax/port/all/cooperativataxport_6___1.html",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.cooperativa.cl"
+        ],
+        "terms": [
+          "dólar peso chileno"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "ars-iprofesional",
+      "currency": "ARS",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "555988bb85c34ba19fd11245fab9e0f8744d5ce6a08f4bcbae422aee843f2e26",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.iprofesional.com/finanzas",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "specialist",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.iprofesional.com"
+        ],
+        "terms": [
+          "dólar mayorista"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-elcomercio",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "d187bd6a16ef04b1743eb825a69639dcbef36dec6adb77a7c40481ff8f9cc42a",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://elcomercio.pe/economia/mercados/",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "elcomercio.pe"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-andina",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "b1d2bc916b12431bad21aeab6d8809d0f170ba2b2929b643773e6151adb769b9",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://andina.pe/agencia/seccion-economia-2.aspx",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "andina.pe"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-infobae",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "b1fece2e69cd42b377b8fd621e86d15ae55d9759380ef351d13b1efb5a90ac7e",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.infobae.com/peru/",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.infobae.com"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "로컬 공개 자료 조사 어댑터를 연결했다. 실행 시 robots·유료벽을 확인하며 원문은 비공개 검토용으로만 저장한다. 외부 모델·공개 사용은 별도 보류한다."
+      }
+    },
+    {
+      "id": "pen-larepublica",
+      "currency": "PEN",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "eb3bd9490ad2f5d53a4ff4c7eadf4eb3c606ea535a1c8295708133a3780f2df3",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://larepublica.pe/economia",
+      "localRecord": null,
+      "status": "local_http_sample_checked_20261028",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "excluded",
+        "domains": [
+          "larepublica.pe"
+        ],
+        "terms": [
+          "dólar sol peruano"
+        ],
+        "reason": "반복 수집의 저장·전송 이용 범위가 미확정이다. 사용자 수동 작업을 생성하지 않고 자동 수집에서 제외한다."
+      }
+    },
+    {
+      "id": "brl-camara-radio",
+      "currency": "BRL",
+      "questionIds": [
+        "cause",
+        "policy"
+      ],
+      "recordHash": "093b676aff31cf4a968eb03641e6710495b1c871efdae42a9532b8a63daa8565",
+      "role": "dated_market_reporting",
+      "kind": "news",
+      "url": "https://www.camara.leg.br/radio/742791-economia-direta",
+      "localRecord": null,
+      "status": "body_read_current_page_not_archived",
+      "discovery": {
+        "tier": "supplemental",
+        "mode": "existing_adapter",
+        "domains": [
+          "www.camara.leg.br"
+        ],
+        "terms": [
+          "dólar",
+          "câmbio",
+          "Economia Direta"
+        ],
+        "reason": "확인한 과거 프로그램 URL의 직접 수집 시험용 보조 경로. 자동 최신 목록은 아직 검증하지 않았고 최신 시장 보도를 대체하지 않는다."
+      }
+    }
+  ],
+  "countries": [
+    {
+      "currency": "BRL",
+      "newsRefs": [
+        "brl-valor",
+        "brl-infomoney",
+        "brl-agenciabrasil",
+        "brl-cnn",
+        "brl-yahoo"
+      ],
+      "officialRefs": [
+        "brl-policy",
+        "brl-retail",
+        "brl-calendar"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-oil"
+      ]
+    },
+    {
+      "currency": "MXN",
+      "newsRefs": [
+        "mxn-eleconomista",
+        "mxn-elfinanciero",
+        "mxn-expansion",
+        "mxn-forbes",
+        "mxn-yahoo"
+      ],
+      "officialRefs": [
+        "mxn-policy",
+        "mxn-consumer",
+        "mxn-calendar"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-oil"
+      ]
+    },
+    {
+      "currency": "COP",
+      "newsRefs": [
+        "cop-larepublica",
+        "cop-portafolio",
+        "cop-valora",
+        "cop-yahoo"
+      ],
+      "officialRefs": [
+        "cop-policy",
+        "cop-retail",
+        "cop-credit"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-oil"
+      ]
+    },
+    {
+      "currency": "PEN",
+      "newsRefs": [
+        "pen-revistaeconomia",
+        "pen-gestion",
+        "pen-rpp",
+        "pen-elcomercio",
+        "pen-andina",
+        "pen-infobae",
+        "pen-larepublica",
+        "pen-yahoo"
+      ],
+      "officialRefs": [
+        "pen-policy",
+        "pen-financing",
+        "pen-activity"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-copper"
+      ]
+    },
+    {
+      "currency": "CLP",
+      "newsRefs": [
+        "clp-df",
+        "clp-pulso",
+        "clp-existing-four-outlets",
+        "clp-biobio",
+        "clp-cooperativa",
+        "clp-yahoo"
+      ],
+      "officialRefs": [
+        "clp-policy",
+        "clp-consumer",
+        "clp-pay"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields",
+        "common-copper"
+      ]
+    },
+    {
+      "currency": "ARS",
+      "newsRefs": [
+        "ars-cronista",
+        "ars-ambito",
+        "ars-infobae",
+        "ars-iprofesional",
+        "ars-yahoo"
+      ],
+      "officialRefs": [
+        "ars-policy",
+        "ars-retail-appliances",
+        "ars-calendar"
+      ],
+      "commonRefs": [
+        "common-us-policy",
+        "common-us-prices",
+        "common-dollar",
+        "common-us-yields"
+      ]
+    }
+  ],
+  "policyHash": "f0a26f9f337a780ded855b57f6d4cb702f175a7d2eccfd74367073843d9b3c44",
+  "catalogId": "ecfb21471bc098e61c6c1a3cb5d6a44e13b8be1f613a8f02d8633804a7acf253"
+}

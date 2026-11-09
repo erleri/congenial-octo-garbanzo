@@ -9,7 +9,7 @@ select set_config('continuation.policy',jsonb_build_object(
  'recurringBudgetAuthorization','not_authorized','trialBudgetAuthorization','approved_by_operator','budgetScope','one_time_trial_only',
  'datasetBinding',repeat('d',64),'authorizationReference','synthetic-zero-dispatch-rollback-only',
  'configuredAt',clock_timestamp(),'expiresAt',clock_timestamp()+interval '1 hour',
- 'accountingPriorSpendUsd',(select coalesce(sum(actual_nano),0)/1e9 from app_private.currency_report_runtime_jobs where cost_state='confirmed' and created_at>=date_trunc('month',clock_timestamp())),
+ 'accountingPriorSpendUsd',(select coalesce(sum(case when cost_state='confirmed' and created_at>=date_trunc('month',clock_timestamp()) then actual_nano when app_private.runtime_cost_escrowed(id) then reserved_nano else 0 end),0)/1e9 from app_private.currency_report_runtime_jobs),
  'destination',jsonb_build_object('endpoint','https://openrouter.ai/api/v1/chat/completions','model','openai/gpt-6.1-sol','provider','azure','zdr',true,'dataCollection','deny','retries',0,'fallback',false,'rawPublicDisplay',false),
  'limits',jsonb_build_object('batchUsd',.2,'monthlyUsd',0,'perCallUsd',.1,'maxCalls',12))::text,true);
 set local role service_role;

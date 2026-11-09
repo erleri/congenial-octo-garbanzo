@@ -1,0 +1,19 @@
+flowchart TD
+  DATA[자동: 환율·차트 준비] --> CUTOFF[메일 마감 시점의 승인 리포트 선택]
+  CUTOFF --> LEDGER[수신자별 발송 원장·중복 검사]
+  LEDGER --> LIVE{전송 직전 공개·철회 재확인}
+  LIVE -->|유효| SMTP[SMTP 접수 → 결과 기록]
+  LIVE -->|변경·실패| HOLD[보류·실패·미확정 기록]
+  SMTP --> MAIL[독자: 제목·발행 사유·리포트 읽기]
+  MAIL --> APP[앱의 통화·날짜 판본]
+  NEW[새 관리자 검토 항목] --> DIGEST[자동: 하루 한 묶음·같은 버전 중복 제외]
+  DIGEST --> NOTICE[관리자 메일: 대상 링크]
+  NOTICE --> DOT[사용자 또는 Dot: 링크 확인]
+  DOT --> AUTH{현재 로그인·권한·버전 일치?}
+  AUTH -->|예| HUMAN[관리자 최종 결정·기록 재확인]
+  AUTH -->|아니오| STOP[로그인 또는 변경 상태 안내]
+  SMTP -->|응답 유실| UNKNOWN[자동 재발송 금지·원장 확인]
+  classDef normal fill:#edf4f8,stroke:#25465d,color:#162f43;
+  classDef decision fill:#fff4d6,stroke:#8a6416,color:#42330e;
+  classDef human fill:#e5f3ee,stroke:#19745f,color:#104b3e;
+  classDef hold fill:#fceceb,stroke:#a64e45,color:#71302a;

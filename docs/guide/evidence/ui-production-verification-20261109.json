@@ -1,0 +1,74 @@
+{
+  "pr": "https://github.com/erleri/congenial-octo-garbanzo/pull/25",
+  "commit": "fa9b58f7bc8c112879db037f181a7eca8c4c4e28",
+  "deployId": "6af1d0e87c67f14a05dcb421",
+  "publishedAt": "2026-11-09T13:56:15.816Z",
+  "ci": {
+    "verify": "success",
+    "database": "success"
+  },
+  "tests": 1397,
+  "builds": [
+    "production",
+    "report",
+    "local-app"
+  ],
+  "routes": [
+    {
+      "route": "#dashboard",
+      "overflow": false,
+      "title": "환율 대시보드 · LATAM FX",
+      "width": 390
+    },
+    {
+      "route": "#trends?view=daily&currency=BRL",
+      "overflow": false,
+      "title": "일별 추이 · BRL · LATAM FX",
+      "width": 390
+    },
+    {
+      "route": "#trends?view=monthly&currency=BRL",
+      "overflow": false,
+      "title": "월별 이력 · BRL · LATAM FX",
+      "width": 390
+    },
+    {
+      "route": "#report",
+      "overflow": false,
+      "title": "환율 리포트 · LATAM FX",
+      "width": 390
+    },
+    {
+      "route": "#dashboard",
+      "overflow": false,
+      "title": "환율 대시보드 · LATAM FX",
+      "width": 1440
+    },
+    {
+      "route": "#trends?view=daily&currency=BRL",
+      "overflow": false,
+      "title": "일별 추이 · BRL · LATAM FX",
+      "width": 1440
+    },
+    {
+      "route": "#trends?view=monthly&currency=BRL",
+      "overflow": false,
+      "title": "월별 이력 · BRL · LATAM FX",
+      "width": 1440
+    },
+    {
+      "route": "#report",
+      "overflow": false,
+      "title": "환율 리포트 · LATAM FX",
+      "width": 1440
+    }
+  ],
+  "reportLinkNavigation": "passed",
+  "historyLinkNavigation": "passed",
+  "limitations": [
+    "Actual iPhone Safari not tested",
+    "Native A4 preview not verified",
+    "200% text zoom not verified"
+  ],
+  "scope": "UI only; existing rates/reports/database/mail/generation settings preserved"
+}

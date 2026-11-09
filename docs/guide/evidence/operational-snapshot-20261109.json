@@ -1,0 +1,575 @@
+{
+  "checkedAt": "2026-11-09T14:07:43.560692Z",
+  "baseline": "fa9b58f7bc8c112879db037f181a7eca8c4c4e28",
+  "localHead": "4b4507f6c8d575527d80ded21fbb3ba9839deb5d",
+  "deploy": {
+    "id": "6af1d0e87c67f14a05dcb421",
+    "publishedAt": "2026-11-09T13:56:15.816Z"
+  },
+  "variables": {
+    "FX_REPORT_ENABLED": "true",
+    "FX_REPORT_EXECUTION_MODE": "execute",
+    "FX_REPORT_GENERATOR": "currency",
+    "FX_REPORT_OPERATIONAL_HOLD": "false",
+    "FX_REPORT_PUBLISH_MODE": "review",
+    "FX_EMAIL_REPORT_MODE": "approved",
+    "FX_EMAIL_HOLD": "false",
+    "FX_EMAIL_SEND_APPROVED": "true",
+    "FX_ADMIN_REVIEW_EMAIL_ENABLED": "true",
+    "FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED": "true"
+  },
+  "database": {
+    "enabled": true,
+    "reviewEnabled": true,
+    "writer": "sol-us",
+    "controlRevision": 3,
+    "policyRevision": 1,
+    "policyState": "operator_configured",
+    "limits": {
+      "monthlyUsd": 30,
+      "batchUsd": 7,
+      "perCallUsd": 0.25,
+      "maxCalls": 60,
+      "maxReports": 6
+    },
+    "operatingBatchRows": 0,
+    "publishedReports": {
+      "count": 6,
+      "baseDate": "2026-11-02",
+      "currencies": [
+        "ARS",
+        "BRL",
+        "CLP",
+        "COP",
+        "MXN",
+        "PEN"
+      ]
+    }
+  },
+  "latestScheduledRun": {
+    "id": 42573958438,
+    "occurredBeforeBaselineDeploy": true,
+    "overall": "success",
+    "dataAndEmailJob": "success",
+    "currencyJob": "failure",
+    "adminNoticeJob": "success",
+    "result": {
+      "status": "operating_payload_capacity_hold",
+      "modelCalls": 0,
+      "maximumUsd": 3.093675001,
+      "maxCalls": 24,
+      "rows": [
+        {
+          "currency": "BRL",
+          "status": "no_report_due",
+          "holds": [],
+          "purpose": "unverified",
+          "articles": 0,
+          "maximumUsd": 0
+        },
+        {
+          "currency": "MXN",
+          "status": "no_report_due",
+          "holds": [],
+          "purpose": "unverified",
+          "articles": 0,
+          "maximumUsd": 0
+        },
+        {
+          "currency": "COP",
+          "status": "no_report_due",
+          "holds": [],
+          "purpose": "unverified",
+          "articles": 0,
+          "maximumUsd": 0
+        },
+        {
+          "currency": "PEN",
+          "status": "planned",
+          "holds": [],
+          "purpose": "unverified",
+          "articles": 3,
+          "maximumUsd": 1.0806475
+        },
+        {
+          "currency": "CLP",
+          "status": "no_report_due",
+          "holds": [],
+          "purpose": "unverified",
+          "articles": 0,
+          "maximumUsd": 0
+        },
+        {
+          "currency": "ARS",
+          "status": "planned",
+          "holds": [],
+          "purpose": "unverified",
+          "articles": 7,
+          "maximumUsd": 2.013027501
+        }
+      ],
+      "operatingOutcome": {
+        "kind": "action_required",
+        "exitCode": 2,
+        "partialSourceFailure": true,
+        "publicationApproved": false
+      },
+      "countries": [
+        {
+          "currency": "BRL",
+          "candidates": 3,
+          "decision": {
+            "status": "no_active_trigger",
+            "cumulativePct": 1.2433327202501232,
+            "thresholdPct": 2,
+            "periodicDueDate": "2026-11-16",
+            "dataHolds": [],
+            "comparisonHolds": [],
+            "comparisonDetails": []
+          },
+          "sourceCoverage": [
+            {
+              "sourceId": "brl-infomoney",
+              "collectedOriginals": 0,
+              "status": "no_collected_original",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "brl-agenciabrasil",
+              "collectedOriginals": 2,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "brl-cnn",
+              "collectedOriginals": 1,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            }
+          ],
+          "lookupFailures": [],
+          "officialCoverage": {
+            "version": "official-background-coverage/1",
+            "currency": "BRL",
+            "questions": [
+              {
+                "id": "retail_conditions",
+                "label": "조사 대상 소매·구매 활동",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "PMC11708"
+                ]
+              },
+              {
+                "id": "purchasing_power",
+                "label": "물가·실질소득의 구매 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              },
+              {
+                "id": "financing_conditions",
+                "label": "정의된 상품·정책의 금융 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              }
+            ],
+            "minimumRule": "official_numeric_context_requires_one_verified_topic;other_reviewed_background_remains_valid;market_explanations_require_separate_market_evidence",
+            "numericContextAvailable": true,
+            "completeConsumerPicture": false,
+            "directFxCauseAllowed": false,
+            "contentReview": "pending",
+            "publicationApproved": false
+          },
+          "officialReasons": []
+        },
+        {
+          "currency": "MXN",
+          "candidates": 9,
+          "decision": {
+            "status": "no_active_trigger",
+            "cumulativePct": -0.9458439224609871,
+            "thresholdPct": 2,
+            "periodicDueDate": "2026-11-16",
+            "dataHolds": [],
+            "comparisonHolds": [],
+            "comparisonDetails": []
+          },
+          "sourceCoverage": [
+            {
+              "sourceId": "mxn-eleconomista",
+              "collectedOriginals": 3,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "mxn-elfinanciero",
+              "collectedOriginals": 2,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "mxn-forbes",
+              "collectedOriginals": 2,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "mxn-expansion",
+              "collectedOriginals": 2,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            }
+          ],
+          "lookupFailures": [],
+          "officialCoverage": {
+            "version": "official-background-coverage/1",
+            "currency": "MXN",
+            "questions": [
+              {
+                "id": "retail_conditions",
+                "label": "조사 대상 소매·구매 활동",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "718506",
+                  "718506"
+                ]
+              },
+              {
+                "id": "purchasing_power",
+                "label": "물가·실질소득의 구매 여건",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "910399",
+                  "910406"
+                ]
+              },
+              {
+                "id": "financing_conditions",
+                "label": "정의된 상품·정책의 금융 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              }
+            ],
+            "minimumRule": "official_numeric_context_requires_one_verified_topic;other_reviewed_background_remains_valid;market_explanations_require_separate_market_evidence",
+            "numericContextAvailable": true,
+            "completeConsumerPicture": false,
+            "directFxCauseAllowed": false,
+            "contentReview": "pending",
+            "publicationApproved": false
+          },
+          "officialReasons": []
+        },
+        {
+          "currency": "COP",
+          "candidates": 3,
+          "decision": {
+            "status": "no_active_trigger",
+            "cumulativePct": 0.7995827425125057,
+            "thresholdPct": 2,
+            "periodicDueDate": "2026-11-16",
+            "dataHolds": [],
+            "comparisonHolds": [],
+            "comparisonDetails": []
+          },
+          "sourceCoverage": [
+            {
+              "sourceId": "cop-larepublica",
+              "collectedOriginals": 1,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "cop-valora",
+              "collectedOriginals": 2,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            }
+          ],
+          "lookupFailures": [],
+          "officialCoverage": {
+            "version": "official-background-coverage/1",
+            "currency": "COP",
+            "questions": [
+              {
+                "id": "retail_conditions",
+                "label": "조사 대상 소매·구매 활동",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "EMC_TOTAL"
+                ]
+              },
+              {
+                "id": "purchasing_power",
+                "label": "물가·실질소득의 구매 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              },
+              {
+                "id": "financing_conditions",
+                "label": "정의된 상품·정책의 금융 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              }
+            ],
+            "minimumRule": "official_numeric_context_requires_one_verified_topic;other_reviewed_background_remains_valid;market_explanations_require_separate_market_evidence",
+            "numericContextAvailable": true,
+            "completeConsumerPicture": false,
+            "directFxCauseAllowed": false,
+            "contentReview": "pending",
+            "publicationApproved": false
+          },
+          "officialReasons": []
+        },
+        {
+          "currency": "PEN",
+          "candidates": 3,
+          "decision": {
+            "status": "research_candidate",
+            "cumulativePct": -0.6941385052528393,
+            "thresholdPct": 2,
+            "periodicDueDate": "2026-11-16",
+            "dataHolds": [],
+            "comparisonHolds": [],
+            "comparisonDetails": []
+          },
+          "sourceCoverage": [
+            {
+              "sourceId": "pen-gestion",
+              "collectedOriginals": 0,
+              "status": "no_collected_original",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "pen-revistaeconomia",
+              "collectedOriginals": 1,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "pen-rpp",
+              "collectedOriginals": 1,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "pen-elcomercio",
+              "collectedOriginals": 1,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "pen-andina",
+              "collectedOriginals": 0,
+              "status": "no_collected_original",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "pen-infobae",
+              "collectedOriginals": 0,
+              "status": "no_collected_original",
+              "contentReviewed": false
+            }
+          ],
+          "lookupFailures": [
+            {
+              "sourceId": "pen-gestion",
+              "status": "access_failed",
+              "category": "access_failure",
+              "reason": "publisher_paywall",
+              "requestedPeriods": [
+                "2026-11-09",
+                "2026-11-08",
+                "2026-11-07",
+                "2026-11-06",
+                "2026-11-05",
+                "2026-11-04",
+                "2026-11-03",
+                "2026-11-02"
+              ]
+            },
+            {
+              "sourceId": "pen-andina",
+              "status": "access_failed",
+              "category": "access_failure",
+              "reason": "robots_unavailable",
+              "requestedPeriods": [
+                "2026-11-09",
+                "2026-11-08",
+                "2026-11-07",
+                "2026-11-06",
+                "2026-11-05",
+                "2026-11-04",
+                "2026-11-03",
+                "2026-11-02"
+              ]
+            }
+          ],
+          "officialCoverage": {
+            "version": "official-background-coverage/1",
+            "currency": "PEN",
+            "questions": [
+              {
+                "id": "retail_conditions",
+                "label": "조사 대상 소매·구매 활동",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              },
+              {
+                "id": "purchasing_power",
+                "label": "물가·실질소득의 구매 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              },
+              {
+                "id": "financing_conditions",
+                "label": "정의된 상품·정책의 금융 여건",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "PN07845NM"
+                ]
+              }
+            ],
+            "minimumRule": "official_numeric_context_requires_one_verified_topic;other_reviewed_background_remains_valid;market_explanations_require_separate_market_evidence",
+            "numericContextAvailable": true,
+            "completeConsumerPicture": false,
+            "directFxCauseAllowed": false,
+            "contentReview": "pending",
+            "publicationApproved": false
+          },
+          "officialReasons": []
+        },
+        {
+          "currency": "CLP",
+          "candidates": 6,
+          "decision": {
+            "status": "no_active_trigger",
+            "cumulativePct": -1.7156497200653154,
+            "thresholdPct": 2,
+            "periodicDueDate": "2026-11-16",
+            "dataHolds": [],
+            "comparisonHolds": [],
+            "comparisonDetails": []
+          },
+          "sourceCoverage": [
+            {
+              "sourceId": "clp-existing-four-outlets",
+              "collectedOriginals": 6,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "clp-biobio",
+              "collectedOriginals": 0,
+              "status": "no_collected_original",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "clp-cooperativa",
+              "collectedOriginals": 0,
+              "status": "no_collected_original",
+              "contentReviewed": false
+            }
+          ],
+          "lookupFailures": [],
+          "officialCoverage": {
+            "version": "official-background-coverage/1",
+            "currency": "CLP",
+            "questions": [
+              {
+                "id": "retail_conditions",
+                "label": "조사 대상 소매·구매 활동",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "CL_IACM"
+                ]
+              },
+              {
+                "id": "purchasing_power",
+                "label": "물가·실질소득의 구매 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              },
+              {
+                "id": "financing_conditions",
+                "label": "정의된 상품·정책의 금융 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              }
+            ],
+            "minimumRule": "official_numeric_context_requires_one_verified_topic;other_reviewed_background_remains_valid;market_explanations_require_separate_market_evidence",
+            "numericContextAvailable": true,
+            "completeConsumerPicture": false,
+            "directFxCauseAllowed": false,
+            "contentReview": "pending",
+            "publicationApproved": false
+          },
+          "officialReasons": [
+            "official_pdf_numeric_parser_required"
+          ]
+        },
+        {
+          "currency": "ARS",
+          "candidates": 7,
+          "decision": {
+            "status": "research_candidate",
+            "cumulativePct": 0.9320958053436801,
+            "thresholdPct": 2,
+            "periodicDueDate": "2026-11-16",
+            "dataHolds": [],
+            "comparisonHolds": [],
+            "comparisonDetails": []
+          },
+          "sourceCoverage": [
+            {
+              "sourceId": "ars-iprofesional",
+              "collectedOriginals": 3,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            },
+            {
+              "sourceId": "ars-infobae",
+              "collectedOriginals": 4,
+              "status": "collected_pending_review",
+              "contentReviewed": false
+            }
+          ],
+          "lookupFailures": [],
+          "officialCoverage": {
+            "version": "official-background-coverage/1",
+            "currency": "ARS",
+            "questions": [
+              {
+                "id": "retail_conditions",
+                "label": "조사 대상 소매·구매 활동",
+                "status": "registered_numeric_context_available",
+                "seriesIds": [
+                  "INDEC_SUPER"
+                ]
+              },
+              {
+                "id": "purchasing_power",
+                "label": "물가·실질소득의 구매 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              },
+              {
+                "id": "financing_conditions",
+                "label": "정의된 상품·정책의 금융 여건",
+                "status": "not_verified_in_this_input",
+                "seriesIds": []
+              }
+            ],
+            "minimumRule": "official_numeric_context_requires_one_verified_topic;other_reviewed_background_remains_valid;market_explanations_require_separate_market_evidence",
+            "numericContextAvailable": true,
+            "completeConsumerPicture": false,
+            "directFxCauseAllowed": false,
+            "contentReview": "pending",
+            "publicationApproved": false
+          },
+          "officialReasons": []
+        }
+      ]
+    }
+  },
+  "scope": "Read-only; no mail, model, database mutation or workflow execution. Mail job success does not establish delivery."
+}

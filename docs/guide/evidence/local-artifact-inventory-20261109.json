@@ -1,0 +1,359 @@
+[
+  {
+    "path": "artifacts/daily-ui-followup-20261109/390-collapsed.png",
+    "bytes": 29015,
+    "sha256": "25d787504c1debe05a8cc74d8ea9a2870ebb233b3cfd3f1be26a84d8586cc279",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/daily-ui-followup-20261109/390-expanded.png",
+    "bytes": 28159,
+    "sha256": "19711c0acc66b39553b1cea9847567a31e035a03cfbd6e9489862d12e2bd1509",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/daily-ui-followup-20261109/measurements.json",
+    "bytes": 1251,
+    "sha256": "f0b5a187200f70c1c04e835863343dc1d4d4c7bd0b6e475017c7e4b6b0fd1d44",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/daily-ui-followup-20261109/verification.json",
+    "bytes": 311,
+    "sha256": "6708028419e059ff803c87e256aafc94d6e048a77c2395d2dead54ef49b42e9b",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/1440-comparison.png",
+    "bytes": 101282,
+    "sha256": "ef826669cabf1659b5c92a52403b05bcea9fdba43dcf81b31c8defa925bcb03a",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/1440-daily.png",
+    "bytes": 60655,
+    "sha256": "5d69dfdc746b3c02ab2c4687db82438ddcc4088b3945a32e8a8cf723f3836880",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/1440-dashboard.png",
+    "bytes": 138352,
+    "sha256": "6242fece5e38ed89c55caa54a8c844ee878d07205826bdc74c682005e4a83f8e",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/1440-detail.png",
+    "bytes": 94991,
+    "sha256": "5c618d8addea162a21ef28e723088d3de3f9d6bcf1a9c432753f38d9e92fffe3",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/1440-monthly.png",
+    "bytes": 90089,
+    "sha256": "08286b53150d19183cfb95c6c5684377c17205502a699da6357f18074401858c",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/1440-reports.png",
+    "bytes": 117606,
+    "sha256": "d961d63343d58f887559c06c27c190ac9c5e1b609b22908e008de797c296ff98",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/390-comparison.png",
+    "bytes": 40521,
+    "sha256": "3b2864a2e039e31be568c534c61f7a7a380f63e77fc9fd2d7bdb9832b853cb85",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/390-daily.png",
+    "bytes": 27746,
+    "sha256": "315d5556948ae49b9431445048ade1993fe53d377513b8a2d2276bbd45b4375e",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/390-dashboard.png",
+    "bytes": 35319,
+    "sha256": "ae829a3655e6cf3a9e1451f7fe833959072628a13a0e70113cabb0d339699a9c",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/390-detail.png",
+    "bytes": 42716,
+    "sha256": "40740f59b6b693911ad935f99faa5d88b5b4a7dc82ea61eda27c3da85906a493",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/390-monthly.png",
+    "bytes": 32811,
+    "sha256": "0f57e32036e6f4f26a9d6ab8cb4092fa7d237cca5206865d1a338a8b77b52b55",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/390-reports.png",
+    "bytes": 38625,
+    "sha256": "b0289d33138aba26d4af1cc7e7f03639ac15bdb0afeeaff370f8d1ab070c24ec",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/index.html",
+    "bytes": 3363,
+    "sha256": "bc96ceaacee3c2054df71cfedeff0ebc875be29cdf15adfc8036876d27be9b42",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/measurements.json",
+    "bytes": 3266,
+    "sha256": "65061de1da2ca21222861c3578649c64a79c6a6759eb367d37a3fa49827c1f81",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/production-report-cards-390.png",
+    "bytes": 41505,
+    "sha256": "0ca6ee61f8ddda61ceff9735bd3801cf81f04e0b939344af390f63a124574a66",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/production-verification.json",
+    "bytes": 1852,
+    "sha256": "b0de109c15ca6c5ba26ddab45bdb1bd8fcf014edd8b360b44c2d7f7b06d09961",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/report-card-links-390.png",
+    "bytes": 40715,
+    "sha256": "412d8c70cfcfed7c420cfe3187b0f98b3159cd91d4fb2eb9b5846ffce615b0a6",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/readability-ui-20261109/verification.json",
+    "bytes": 1641,
+    "sha256": "8b2328342bfc3696c30c3c5975b87c1d829f94be03e80654fec9a30583ef295f",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/desktop-daily.png",
+    "bytes": 68103,
+    "sha256": "5f6cc87dbd6733e6b5bb898417ac2e1f5a10aea986f6a6d422e3ec7a42614445",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/desktop-dashboard.png",
+    "bytes": 126492,
+    "sha256": "52928e9a8ff2ed4e31fb689efd9761a344e26f6d13ab6a965e1a2af22930876f",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/desktop-monthly.png",
+    "bytes": 141962,
+    "sha256": "2976bc6d76845d3512d686309aeacefc01dfc7eb5ce5e6267b29414a0e9729fb",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/desktop-report-detail.png",
+    "bytes": 81852,
+    "sha256": "9363abd5f430435382af3ac339b21186825dd5e42e9796d66503090b3462271d",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/desktop-reports.png",
+    "bytes": 113736,
+    "sha256": "f79160519fc0e678316b20bcfa3264e2bb8e686ae41ef14a96002d7199c26d19",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/index.html",
+    "bytes": 27742,
+    "sha256": "5637bfd846db546fc71e3297b316901006d92f234ed049b6e5f722dcd8ffd172",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/measurements.json",
+    "bytes": 22829,
+    "sha256": "64c3687dbbe945fd4cbf85ef8d96819318996f1c221551ea0d6611d60f732b80",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/mobile-daily.png",
+    "bytes": 31846,
+    "sha256": "0e1232a3c38c37c36f9f987e0ae037ee51273d0a3f85454af891e9d7de581d9a",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/mobile-dashboard.png",
+    "bytes": 37563,
+    "sha256": "1ab68ec357b04a3038a9286599f6be1efd5a9a15ce24a7d9acd42da1cde8f352",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/mobile-monthly.png",
+    "bytes": 36510,
+    "sha256": "880f2746d329f0a9f57ace92c884f0a556cc0267a47ea2238123b340187d19f1",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/mobile-report-detail.png",
+    "bytes": 35673,
+    "sha256": "1eaf6a8a6140e3c4818da11d82c3e29e9fab77d6263026b64f27c656106fa18e",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/mobile-report-history.png",
+    "bytes": 35194,
+    "sha256": "cad54c8e95d36136f963660b5d928664cc76eccb72db285a1ce4339416759501",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-audit-20261109/mobile-reports.png",
+    "bytes": 38233,
+    "sha256": "2bc53be5d0bb7e74237cdb078453e7bb588e4a492cf35d5a0685dedf2456cb3a",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/1440-admin.png",
+    "bytes": 72484,
+    "sha256": "c68997bb540186d0b3555a6b11fff413b154c38a606b3e355baf8f5ab2881274",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/1440-daily.png",
+    "bytes": 63615,
+    "sha256": "957df31a5a157a3379da60453d10b022719678ac3ba41e7205d14a7a02ed6521",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/1440-dashboard.png",
+    "bytes": 118634,
+    "sha256": "15fe98e280fffc180f7987e5df422efafbededd34e8dfc7a51e4e57431d0705c",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/1440-monthly.png",
+    "bytes": 90914,
+    "sha256": "62ab878a02ff6b9103fc4d4b5d1f8dd3a4b1f157f56efa0432640d3d7283f57f",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/1440-report.png",
+    "bytes": 81190,
+    "sha256": "6ea9a18aae7d1b698ffb1238fb17d1fbd4a0fa4cc4eed7b7db977720107a3fdf",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/1440-reports.png",
+    "bytes": 103668,
+    "sha256": "bfe99656043af2a3acf054840eb066d980bdc6bbe6d2d8ac3ca64226336cf884",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-admin.png",
+    "bytes": 33981,
+    "sha256": "fec12417670d1e6cb775ba4cfc05f79bf10ced459b9b675813217e45cff92178",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-daily.png",
+    "bytes": 30830,
+    "sha256": "8634900515805a98372173c803b4fe840dcbcc9d8a86451886caabb229f22003",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-dashboard.png",
+    "bytes": 35887,
+    "sha256": "a56682bf8d5229b763e67ef0b2a31372284fa7d8deb1929ff43e647caf1ef2a6",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-monthly-all.png",
+    "bytes": 40632,
+    "sha256": "eacebf2cdeaf3530fbb1bc7efb32b98b4be57caee9587789ccbc2295dcad1f3a",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-monthly.png",
+    "bytes": 34289,
+    "sha256": "4588ee583b19769a43caeb0b2489a65f68d10ca1ddf3fd26e55237d2304379b3",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-report.png",
+    "bytes": 43819,
+    "sha256": "7e4a3a3956ab4110fe17d3f1e3f2255c2b63fe830af0a58a2e77de610ed596f6",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/390-reports.png",
+    "bytes": 39611,
+    "sha256": "0396ad9068c74be99d14b1ac757a9598d8ff4de1bdb553382c652d2e6bb8b814",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/index.html",
+    "bytes": 9342,
+    "sha256": "b57df9cc450e034b7e2bf2adb38ebb9152aa0fd205e45ffb5eaa99d688ad8124",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/measurements.json",
+    "bytes": 14837,
+    "sha256": "dcb574c793d10ae063b12afb38c3ba11540ff7793693d5b3309f0a5b07edfbf2",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  },
+  {
+    "path": "artifacts/responsive-ui-implementation-20261109/verification.json",
+    "bytes": 678,
+    "sha256": "7d702db082b73d71022fb241ead234a58c5e70946a17aabe0b909dab2e8bcda8",
+    "role": "로컬 화면·검증 산출물; 운영 빌드 제외",
+    "action": "원본 보존; 발표용 공개 화면만 별도 복사"
+  }
+]

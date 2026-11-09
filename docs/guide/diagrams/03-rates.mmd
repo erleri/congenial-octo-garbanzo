@@ -1,0 +1,19 @@
+flowchart TD
+  API[자동: 기존 환율 API 조회] --> CHECK{날짜·통화·값·출처 확인}
+  CHECK -->|유효| ADOPT[날짜별 채택값·가격 정의 보존]
+  CHECK -->|휴일·결측| HOLIDAY[기존 전일값 보정 정책과 상태 표시]
+  HOLIDAY --> ADOPT
+  ADOPT --> DIFF{같은 기준의 기존 값과 충돌?}
+  DIFF -->|예| PROPOSE[수정 제안·진단 기록: 자동 덮어쓰기 안 함]
+  DIFF -->|아니오| FREEZE[같은 판본의 데이터 고정]
+  PROPOSE --> KEEP[기존 채택값 유지]
+  KEEP --> FREEZE
+  FREEZE --> SYNC[자동: Supabase 동기화·공개 자료 커밋]
+  SYNC --> APP[대시보드·추이 조회]
+  FREEZE --> REPORT[리포트 대표 숫자·발행 비교]
+  CHECK -->|자료 실패| ERR[실패 기록: 변화 없음으로 처리하지 않음]
+  ERR --> OLD[마지막 정상 자료·상태 안내]
+  classDef normal fill:#edf4f8,stroke:#25465d,color:#162f43;
+  classDef decision fill:#fff4d6,stroke:#8a6416,color:#42330e;
+  classDef human fill:#e5f3ee,stroke:#19745f,color:#104b3e;
+  classDef hold fill:#fceceb,stroke:#a64e45,color:#71302a;

@@ -52,6 +52,12 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
  }
  return {
   environment:mode,
+  storageInspect:ids=>rpc('currency_report_storage_inspect',{p_ids:ids}),
+  storagePrepare:metadata=>rpc('prepare_currency_report_storage_object',{p_meta:metadata}),
+  storageChunk:(id,index,data)=>rpc('put_currency_report_storage_chunk',{p_id:id,p_index:index,p_data:data}),
+  storageSeal:id=>rpc('seal_currency_report_storage_object',{p_id:id}),
+  storageReadChunk:(id,index)=>rpc('read_currency_report_storage_chunk',{p_id:id,p_index:index}),
+  storageIncident:r=>rpc('record_currency_report_storage_incident',{p_stage:r.stage,p_reason:r.reason??'verified',p_healthy:r.healthy,p_stats:r.stats??{}}),
   control:()=>rpc('currency_report_runtime_control'),
   operatingPolicy:async()=>{
    const value=await rpc('currency_report_operating_policy')

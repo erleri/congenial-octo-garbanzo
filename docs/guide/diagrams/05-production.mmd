@@ -1,0 +1,23 @@
+flowchart TD
+  PLAN[자동: 국가별 질문·출처 선택] --> COLLECT[뉴스·공식 자료 수집]
+  COLLECT -->|뉴스| SCOPE{자동: 이용 범위·기간·가격 적합?}
+  SCOPE -->|예| GATE[서버: 경로·용량·중복·예산 검사와 예약]
+  SCOPE -->|예외| SOURCE[관리자: 출처 범위 결정]
+  SOURCE -->|조건 충족 후| GATE
+  SOURCE -->|보류| HOLD[사유 기록·다른 적합 경로 유지]
+  GATE -->|허용| EXTRACT[AI: 원문 추출 → 별도 대조]
+  GATE -->|차단| HOLD
+  EXTRACT --> CARDS[검토된 사실·귀속 견해 카드]
+  COLLECT -->|공식 통계| OFFICIAL[자동: 지표 정의·기간·수정 확인]
+  OFFICIAL --> BG[보조 배경: 당일 환율 원인과 분리]
+  CARDS --> WRITE[AI: 환율 중심 집필]
+  BG --> WRITE
+  WRITE --> REVIEW[자동 구조 검사 + AI 문장별 검토]
+  REVIEW -->|미달| HOLD
+  REVIEW -->|검토 결과 저장| ADMIN[관리자: 근거·원고·버전 확인]
+  ADMIN -->|승인| PUBLIC[서버: 승인·공개 복사 함께 저장]
+  ADMIN -->|반려·정정| HISTORY[이력 보존·공개 문장 자동 수정 안 함]
+  classDef normal fill:#edf4f8,stroke:#25465d,color:#162f43;
+  classDef decision fill:#fff4d6,stroke:#8a6416,color:#42330e;
+  classDef human fill:#e5f3ee,stroke:#19745f,color:#104b3e;
+  classDef hold fill:#fceceb,stroke:#a64e45,color:#71302a;

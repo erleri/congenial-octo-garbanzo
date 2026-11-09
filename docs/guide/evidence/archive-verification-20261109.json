@@ -1,0 +1,56 @@
+[
+  {
+    "path": "OPERATIONS_TODO.md",
+    "archive": "docs/history/documentation-before-20261109/OPERATIONS_TODO.md",
+    "sha256": "c312425a33db18a58a4cbedac169c5f18595a7374ceff4cf2e6c03da44ccf07b",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "PROJECT_OVERVIEW.md",
+    "archive": "docs/history/documentation-before-20261109/PROJECT_OVERVIEW.md",
+    "sha256": "0be6236f3c1a43c3ee0602cffc64dac3fe739a7a9e9b0657f32de8df7a53da9f",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "README.md",
+    "archive": "docs/history/documentation-before-20261109/README.md",
+    "sha256": "c879ea5ee8e5364636ae36719e50cdbfa902c258df4a355582af3f14dc010304",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "docs/guide/admin-review-notifications.md",
+    "archive": "docs/history/documentation-before-20261109/docs/guide/admin-review-notifications.md",
+    "sha256": "e8ddc08cee856f55f60f7dcbae9e1ba59abcd2d83e10a715d247f40afd503480",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "docs/guide/app.md",
+    "archive": "docs/history/documentation-before-20261109/docs/guide/app.md",
+    "sha256": "3ffcecea92f92c3fe00f68ce3a0828941b5abc1e08d2e3eeabcca6f120da0736",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "docs/guide/architecture.md",
+    "archive": "docs/history/documentation-before-20261109/docs/guide/architecture.md",
+    "sha256": "37124106e4789412adfbdfa90d022f013f57cc2401f5afe43f393314647b1ec9",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "docs/guide/catalog.md",
+    "archive": "docs/history/documentation-before-20261109/docs/guide/catalog.md",
+    "sha256": "fc9d2cdf5af9822088bff5ed8059ecf77d09e64846771abae44812fe41a8ed79",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "docs/guide/operations.md",
+    "archive": "docs/history/documentation-before-20261109/docs/guide/operations.md",
+    "sha256": "e7495b888418cb83a49af7b1991fedafc4c71afad67ab3a2680ecad8c11611c0",
+    "restoreByteMatch": true
+  },
+  {
+    "path": "docs/guide/rules.md",
+    "archive": "docs/history/documentation-before-20261109/docs/guide/rules.md",
+    "sha256": "ee1ea537f9afef8972aa591b95c26353f01c8dcb1573046320f2e42697f69552",
+    "restoreByteMatch": true
+  }
+]

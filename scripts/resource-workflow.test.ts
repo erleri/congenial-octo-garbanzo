@@ -6,6 +6,15 @@ import {dailyRunScope} from './daily-run-scope.js'
 type Step={name?:string;run?:string;if?:string;uses?:string;with?:Record<string,string>;env?:Record<string,string>}
 type Job={needs?:string;outputs?:Record<string,string>;if?:string;steps:Step[];permissions?:Record<string,string>;env?:Record<string,string>;'continue-on-error'?:boolean|string;'timeout-minutes'?:number|string;strategy?:{'max-parallel':number;'fail-fast':boolean;matrix:{currency:string[]}}}
 const workflow=yaml.load(fs.readFileSync('.github/workflows/generate-data.yml','utf8')) as {jobs:Record<string,Job>;on:{workflow_dispatch:{inputs:{run_scope:{default:string;options:string[]}}};schedule:unknown[]}}
+it('provides a manual main-only storage check without model or mail credentials',()=>{
+ const source=fs.readFileSync('.github/workflows/report-storage-check.yml','utf8')
+ const check=yaml.load(source) as {on:Record<string,unknown>;permissions:Record<string,string>;jobs:Record<string,Job>}
+ expect(Object.keys(check.on)).toEqual(['workflow_dispatch'])
+ expect(check.permissions).toEqual({contents:'read'})
+ expect(check.jobs.storage.if).toBe("github.ref == 'refs/heads/main'")
+ expect(check.jobs.storage.steps.at(-1)?.run).toBe('npm run report:operate -- --action verify-storage')
+ expect(source).not.toMatch(/OPENROUTER_API_KEY|SMTP_PASSWORD|--action execute|git push/)
+})
 const context=(scope='daily',mode='plan')=>({
  vars:{FX_REPORT_GENERATOR:'currency',FX_REPORT_ENABLED:'true',FX_REPORT_OPERATIONAL_HOLD:'false',FX_REPORT_PUBLISH_MODE:'review',FX_REPORT_EXECUTION_MODE:mode},
  needs:{'generate-data-and-send-email':{result:'success',outputs:{run_scope:scope,dataset_ref:'committed-sha'}}},
@@ -58,7 +67,7 @@ it('makes the six-currency worker an exclusive, opt-in, serial consumer of the c
  expect(evaluate(current.if,failedDefault)).toBe(true)
  expect(current.env?.FX_REPORT_DATA_REFRESH).toContain("outputs.dataset_ref != ''")
  expect(current.needs).toBe('generate-data-and-send-email')
- expect(current.permissions).toEqual({contents:'read'});expect(evaluate(current['continue-on-error'],context())).toBe(true)
+ expect(current.permissions).toEqual({contents:'read'});expect(evaluate(current['continue-on-error'],context())).toBe(false)
  expect(current.strategy).toBeUndefined()
  expect(evaluate(current['timeout-minutes'],context())).toBe(150)
  expect(current.steps.find(s=>s.uses?.startsWith('actions/checkout'))?.with?.ref).toContain('outputs.dataset_ref')

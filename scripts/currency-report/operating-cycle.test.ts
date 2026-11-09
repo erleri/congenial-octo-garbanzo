@@ -101,12 +101,13 @@ it('keeps restored research dates instead of replacing them with a narrower cach
  expect(sameBody.collection.reviewRevalidations).toEqual([])
 })
 
-it('holds oversized proof bundles before a paid reservation without truncating source evidence',async()=>{
+it('stores formerly oversized proof bundles losslessly without duplicating their JSON in the batch row',async()=>{
  const f=await operatingFixture(),acquire=f.acquire,proof='synthetic-not-a-document-'.repeat(700000)
  f.acquire=async args=>({...await acquire(args),...(args.snapshot.currency==='MXN'?{officialBackground:{captureProofs:{documents:[{rawBase64:proof}]}}}:{} )})
  const r=await runOperatingCycle({...f,execute:true})
- expect(r.status).toBe('operating_payload_capacity_hold');expect(operatingResultState(r).kind).toBe('action_required')
- expect(f.state.batch).toBeNull();expect(f.state.posts).toHaveLength(0);expect(f.store.jobs).toHaveLength(0)
+ expect(r.status).toBe('completed_with_country_results')
+ expect(f.state.batch.payload.version).toBe('operating-frozen-input/2')
+ expect(Buffer.byteLength(JSON.stringify(f.state.batch.payload))).toBeLessThan(262144)
 })
 
 it('keeps proposals and zero/changed budgets non-executable without inventing recurring consent',async()=>{

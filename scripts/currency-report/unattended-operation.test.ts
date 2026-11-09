@@ -59,7 +59,9 @@ it('keeps shared permission and schema errors as global no-dispatch failures',as
  const f=await operatingFixture()
  await runOperatingCycle({...f,execute:true,preflightSource:async()=>{throw Error('synthetic_endpoint_outage')}})
  const prior=structuredClone(f.state.batch),key='e'.repeat(64)
- const payload=JSON.parse(prior.payload.serializedOperatingPayload);payload.resumeIdentity=key
+ const {restoreFrozenInput}=await import('./operating-storage.js')
+ const {restoreOperatingPayload}=await import('./runtime-store.js')
+ const payload=await restoreFrozenInput(prior.payload,f.store,restoreOperatingPayload);payload.resumeIdentity=key
  prior.batch_key=key;prior.payload={...payload,serializedOperatingPayload:JSON.stringify(payload)}
  f.state.batches.set(key,prior)
  let reads=0,claims=0
