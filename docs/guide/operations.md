@@ -27,6 +27,7 @@
 | `report:operate -- --action plan` | 무료 수집·입력/예산 준비 | 외부 조회와 상태 저장 가능; 완전 오프라인 아님 |
 | `report:operate -- --action execute` | 조건 충족 시 원문 처리·집필·검토 | 유료 호출·DB 기록 가능 |
 | `report:operate -- --action verify-storage` | 11월10일 로컬 추가: 입력 객체 저장·조회·무손실 복원 | 실행 잠금·유료 예약·모델 호출 없음. DB 쓰기가 있으므로 승인된 환경에서만 실행 |
+| Actions `report-storage-check.yml` 수동 실행 | main에서 무료 자료 수집 후 위 저장·복원 검사 | 모델 키·메일 자격증명을 전달하지 않음. 운영 반영 후 사용 |
 | Actions `run_scope=data-check` | 기존 API 갱신·복구·동기화·자료 커밋·무료 상태 확인 | 메일/유료 생성 없음, 운영 자료 변경은 있음 |
 | Actions `run_scope=daily` | 일일 운영 순서 | 실제 메일·설정에 따른 유료 실행 가능 |
 | `npm run build` | 운영 웹앱 산출물 | 모델 생성 실행 아님 |

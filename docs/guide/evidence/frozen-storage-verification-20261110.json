@@ -184,9 +184,11 @@
     "maxCalls": 60,
     "maxReports": 6,
     "batches": 0,
-    "unresolvedOrInflightCalls": 0,
     "publishedReports": 6,
-    "newStorageSchema": false
+    "newStorageSchema": false,
+    "inflightOrUncoveredUnknownCalls": 0,
+    "escrowedUnknownCalls": 2,
+    "escrowedUnknownUsd": 0.34849
   },
   "limitations": [
     "Not exact failed November9 frozen payload",

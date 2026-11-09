@@ -1,0 +1,35 @@
+name: Verify report input storage without model calls
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: report-storage-verification
+  cancel-in-progress: false
+jobs:
+  storage:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      INEGI_INDICATORS_TOKEN: ${{ secrets.INEGI_INDICATORS_TOKEN }}
+      FX_REPORT_GENERATOR: currency
+      FX_REPORT_PUBLISH_MODE: review
+      FX_REPORT_PDF_PYTHON: python
+      FX_EMAIL_DATA_SOURCE: json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check -r scripts/currency-report/requirements-official.txt
+      - run: npm ci
+      # No model key, mail credentials, paid reservation or generation action.
+      - name: Collect and verify exact input storage without generation
+        run: npm run report:operate -- --action verify-storage
