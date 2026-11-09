@@ -83,7 +83,9 @@ it('resumes a paused frozen batch after midnight without changing its cutoff or 
   calendarByCurrency:automaticReferenceCalendars(f.dataset,'2026-11-02T04:00:00Z'),
   acquire:async args=>({...await f.acquire(args),completedAt:args.asOf})})
  expect(r.status).toBe('completed_with_country_results');expect(f.state.posts).toHaveLength(24)
- expect(f.state.batch.payload.prepared.asOf).toBe(f.asOf)
+ const {restoreFrozenInput}=await import('./operating-storage.js')
+ const {restoreOperatingPayload}=await import('./runtime-store.js')
+ expect((await restoreFrozenInput(f.state.batch.payload,f.store,restoreOperatingPayload)).prepared.asOf).toBe(f.asOf)
 })
 
 it('treats an evidence update under a fixed reference price as context, with a separate timing review obligation',()=>{

@@ -8,6 +8,7 @@ import {bindSelectedOriginalReview} from './selected-source-collection.js'
 import {operatingPolicyDraft} from './operating-policy.js'
 import {NEWS_REVIEW_POLICY} from './news-model-review.js'
 import {prepareRuntimeReview} from './runtime.js'
+import {memoryOperatingStorage} from './operating-storage-fixture.js'
 
 export async function operatingFixture({nonce=null,newsDate='2026-10-27'}={}){
  const read=f=>JSON.parse(fs.readFileSync('docs/2.0/'+f,'utf8'))
@@ -20,7 +21,7 @@ export async function operatingFixture({nonce=null,newsDate='2026-10-27'}={}){
  policy.limits.monthlyUsd=7;delete policy.binding;policy.binding=fingerprint(policy)
  const state={batch:null,batches:new Map(),cases:new Map(),inputs:new Map(),inputHistory:[],sourceCache:[],corrections:new Map(),policy,posts:[]}
  const base=memoryRuntimeStore();base.config.monthly_limit_nano=7e9
- const store={...base,environment:'local',history:async()=>[],
+ const store={...base,...memoryOperatingStorage(),environment:'local',history:async()=>[],
   recordCorrections:async r=>{let inserted=0;for(const c of r.candidates)if(!state.corrections.has(c.key)){state.corrections.set(c.key,structuredClone(c));inserted++}return {inserted,duplicates:r.candidates.length-inserted}},
   operatingPolicy:async()=>({revision:1,policy:state.policy}),operatingBatch:async key=>structuredClone(state.batches.get(key)??null),
   pendingBatches:async()=>[...state.batches.values()].filter(b=>['paused','cost_unresolved','running'].includes(b.state)).map(b=>structuredClone(b)),

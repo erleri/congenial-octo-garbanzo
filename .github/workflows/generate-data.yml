@@ -352,7 +352,9 @@ jobs:
     # Up to 60 x 120s model requests, collection/setup, and safe checkpointing.
     # The coordinator stops starting requests before its own 138-minute limit.
     timeout-minutes: ${{ needs.generate-data-and-send-email.outputs.run_scope == 'data-check' && 20 || 150 }}
-    continue-on-error: ${{ needs.generate-data-and-send-email.outputs.run_scope != 'data-check' }}
+    # A report failure must remain visible on the run. FX/mail finished in their
+    # separate job; administrator notices below use always() and still execute.
+    continue-on-error: false
     permissions:
       contents: read
     env:

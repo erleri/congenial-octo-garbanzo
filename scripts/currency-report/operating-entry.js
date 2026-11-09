@@ -33,7 +33,7 @@ export function automaticReferenceCalendars(dataset,asOf) {
 }
 export async function operatingEntry({action='inspect',input,requireReady=false,env=process.env,workspace=process.cwd(),store,
  asOf=new Date().toISOString(),fetchImpl=fetch,transport,acquire}={}) {
- if(!['inspect','draft-policy','draft-trial','draft-recurring','configure-policy','plan','execute'].includes(action))throw Error('operating_action_required')
+ if(!['inspect','draft-policy','draft-trial','draft-recurring','configure-policy','plan','verify-storage','execute'].includes(action))throw Error('operating_action_required')
  if(requireReady&&action!=='plan')throw Error('reference_readiness_is_plan_only')
  const root=await fs.realpath(workspace),privateRoot=path.join(root,'.local-reports/private')
  const readPrivate=async file=>{
@@ -136,7 +136,7 @@ export async function operatingEntry({action='inspect',input,requireReady=false,
  }
  const result=await runOperatingCycle({dataset,asOf:operatingAsOf,store,sourcePlan,sourceRegister,registry,processingRules,env,
   calendarByCurrency:calendars,
-  mode:workflow?'live':manifest?.mode??'saved',capturesByCurrency,execute:action==='execute',
+  mode:workflow?'live':manifest?.mode??'saved',capturesByCurrency,execute:action==='execute',verifyStorage:action==='verify-storage',
   acquire:acquire??(args=>acquireRuntimeResearch({...args,fetchImpl,officialInputLoader})),...adapters})
  return requireReady?{...result,referenceReadiness:referenceReadiness(result)}:result
 }
@@ -146,8 +146,12 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
   const outcome=operatingResultState(result)
   console.log(JSON.stringify({...result,operatingOutcome:outcome}))
   if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,
-   `\n### Currency report execution\n\nResult: ${outcome.kind}. Model calls: ${Number.isInteger(result.modelCalls)?result.modelCalls:'unconfirmed'}. Publication: administrator review required.\n`)
+   `\n### Currency report execution\n\n${outcome.kind==='action_required'||outcome.kind==='failure'?'기술 장애':outcome.kind==='review_wait'?'관리자 검토 대기':outcome.kind==='waiting'?'자료 보류':result.status==='no_report_due'?'대상 없음':'준비 완료'} (${result.status}). Model calls: ${Number.isInteger(result.modelCalls)?result.modelCalls:'unconfirmed'}. Publication: administrator review required.\n`
+   +(result.storage?`\nStorage: ${result.storage.rawBytes} raw bytes → ${result.storage.compressedBytes} gzip bytes. Manifest: ${result.storage.manifestBytes} bytes. New: ${result.storage.newBytes}; reusable: ${result.storage.reusedBytes}.\n`:'')
+   +(result.incident?.recordFailure?'\nIncident record failed. Check report job logs; do not treat the workflow as healthy.\n':''))
   process.exitCode=outcome.exitCode
  })
-  .catch(()=>{console.error('operating_hold: inspect private records and admin status; no retry/fallback');process.exitCode=1})
+  .catch(async()=>{console.error('operating_hold: inspect private records and admin status; no retry/fallback');
+   if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,'\n### Currency report: 기술 장애\n\nThe report worker could not finish or confirm its incident record. FX/mail are separate jobs; report success is not confirmed.\n').catch(()=>{})
+   process.exitCode=1})
 }

@@ -1,0 +1,197 @@
+{
+  "checkedAt": "2026-11-09T15:32:38.160Z",
+  "environment": "isolated local / Node 20.19.0",
+  "deployment": "not applied",
+  "providerCalls": 0,
+  "newPaidReservations": 0,
+  "productionChanges": 0,
+  "actualStoredReplay": {
+    "fxBaseDate": "2026-11-09",
+    "preparedBaseDate": "2026-11-02T12:23:01.063Z",
+    "description": "Saved six-country material plus full Nov9 FX; not fresh source eligibility or AI quality",
+    "oldDuplicateBytes": 67340673,
+    "rawBytes": 31277528,
+    "compressedBytes": 4994955,
+    "manifestBytes": 1252,
+    "objects": [
+      {
+        "role": "dataset",
+        "id": "619c7b3e93042d97cf341b9e164cfb7cfcc36ae1e7fa029b88c2ee72ce6319a6",
+        "codec": "gzip-json/1",
+        "rawBytes": 23933901,
+        "compressedBytes": 1674395,
+        "compressedHash": "006a53af4382291ecf4489d9f102934cd84a362aa719c04e6c763eb1672a833a",
+        "chunkCount": 4
+      },
+      {
+        "role": "prepared",
+        "id": "d82b4af9613789fb9f027e089b025e372763aac54a7638b83c429d719434cf79",
+        "codec": "gzip-json/1",
+        "rawBytes": 7343627,
+        "compressedBytes": 3320560,
+        "compressedHash": "69355897685ac3db51429f4a09b068c7fe5aa72cb5da810817828ea176940bfb",
+        "chunkCount": 7
+      }
+    ],
+    "limits": {
+      "chunk": 524288,
+      "manifest": 262144,
+      "raw": 134217728,
+      "compressed": 33554432
+    },
+    "newBytes": 0,
+    "reusedBytes": 4994955,
+    "roundTripMs": 1970.1346,
+    "payloadHash": "b2f0b6ada961ba1b1d5a266b55c239c19df27c18a89ff23160408490e5f7aec3"
+  },
+  "syntheticGrowth": {
+    "rawBytes": 54895226,
+    "compressedBytes": 6439928,
+    "manifestBytes": 1252,
+    "objects": [
+      {
+        "role": "dataset",
+        "id": "a23209179453c3d5537538202025d7e3ab207f02c30122b5c07d8763d8de2dbf",
+        "codec": "gzip-json/1",
+        "rawBytes": 45551571,
+        "compressedBytes": 3111953,
+        "compressedHash": "4c010ff59e318face9d1d7c1463e4023b91d289e9817106309228048d4170fd0",
+        "chunkCount": 6
+      },
+      {
+        "role": "prepared",
+        "id": "087d7766fd91063b9494796113044104f7caeb45a97c7d5f52eedd3dbfafea3c",
+        "codec": "gzip-json/1",
+        "rawBytes": 9343655,
+        "compressedBytes": 3327975,
+        "compressedHash": "5757fbaf3b6b0bbda9d575d1a51c79f01a60b54a9ee3dcfc73156aea0c4ad21b",
+        "chunkCount": 7
+      }
+    ],
+    "limits": {
+      "chunk": 524288,
+      "manifest": 262144,
+      "raw": 134217728,
+      "compressed": 33554432
+    }
+  },
+  "commonPipeline": {
+    "status": "storage_verified",
+    "currencies": [
+      "BRL",
+      "MXN",
+      "COP",
+      "PEN",
+      "CLP",
+      "ARS"
+    ],
+    "storage": {
+      "rawBytes": 35646129,
+      "compressedBytes": 5142769,
+      "manifestBytes": 1287,
+      "objects": [
+        {
+          "role": "dataset",
+          "id": "619c7b3e93042d97cf341b9e164cfb7cfcc36ae1e7fa029b88c2ee72ce6319a6",
+          "codec": "gzip-json/1",
+          "rawBytes": 23933901,
+          "compressedBytes": 1674395,
+          "compressedHash": "006a53af4382291ecf4489d9f102934cd84a362aa719c04e6c763eb1672a833a",
+          "chunkCount": 4
+        },
+        {
+          "role": "prepared",
+          "id": "b340b790b0a3eda1d1b08fade58b4170aca88623bd5c17933d0938c047b19460",
+          "codec": "gzip-json/1",
+          "rawBytes": 11712228,
+          "compressedBytes": 3468374,
+          "compressedHash": "5c2b9a58c685572645268ee5a0e8c9e97a6518f7fa41d179cd30a49df0a60676",
+          "chunkCount": 7
+        }
+      ],
+      "limits": {
+        "chunk": 524288,
+        "manifest": 262144,
+        "raw": 134217728,
+        "compressed": 33554432
+      },
+      "status": "storage_preflight_passed",
+      "retention": {
+        "storedBytes": 17614810,
+        "deleteEnabled": false,
+        "incompleteObjects": 0,
+        "unreferencedBytes": 17614810,
+        "unreferencedObjects": 8
+      },
+      "newBytes": 0,
+      "reusedBytes": 5142769
+    },
+    "history": "synthetic empty publication history; saved Nov2 news/official material and Nov9 FX",
+    "modelCalls": 0
+  },
+  "permissions": {
+    "deniedChecks": 18,
+    "roles": [
+      "anon",
+      "reader",
+      "admin"
+    ]
+  },
+  "integrity": {
+    "legacyHashPreserved": true,
+    "originalCostPreserved": true,
+    "incidentDedupAndResolve": true
+  },
+  "performance": {
+    "reusedObjectRoundTripMs": 1970.1346,
+    "maxIndividualRpcMs": 25.766700000000128,
+    "peakRssBytes": 871960576,
+    "note": "local multi-case process; not production latency or first insert benchmark"
+  },
+  "localStorageFootprint": {
+    "objects": 8,
+    "compressedPayloadBytes": 17614810,
+    "physicalBytes": 18489344,
+    "note": "cumulative real and synthetic cases; no automatic deletion"
+  },
+  "unit": {
+    "total": 1411,
+    "passed": 1411,
+    "failed": 0,
+    "success": true
+  },
+  "database": {
+    "migrationApplied": true,
+    "files": 26,
+    "checks": 485,
+    "allPassed": true,
+    "originalRowsCopied": false
+  },
+  "builds": {
+    "production": "passed",
+    "report": "passed",
+    "localApp": "passed",
+    "publicBundleBoundary": "passed"
+  },
+  "productionReadOnly": {
+    "at": "2026-11-09T15:15:32.53385Z",
+    "enabled": true,
+    "reviewEnabled": true,
+    "writer": "sol-us",
+    "monthlyLimitUsd": 30,
+    "batchLimitUsd": 7,
+    "perCallLimitUsd": 0.25,
+    "maxCalls": 60,
+    "maxReports": 6,
+    "batches": 0,
+    "unresolvedOrInflightCalls": 0,
+    "publishedReports": 6,
+    "newStorageSchema": false
+  },
+  "limitations": [
+    "Not exact failed November9 frozen payload",
+    "No new AI draft quality validation",
+    "No production migration, storage roundtrip or paid continuation yet",
+    "Physical bytes include cumulative local fault fixtures"
+  ]
+}

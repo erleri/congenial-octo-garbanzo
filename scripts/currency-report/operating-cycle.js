@@ -17,11 +17,19 @@ import {classifyCountryRefresh,frozenSourceReviewHolds} from './operating-refres
 import {operatingCheckpoint} from './operating-checkpoint.js'
 import {retainRegisteredResearch} from './retained-research.js'
 import {currentSourceAdmissionHold} from './source-admission-catalog.js'
+import {encodeOperatingInput,inspectOperatingStorage,storeOperatingInput,restoreFrozenInput} from './operating-storage.js'
 export {operatingMaterialHash} from './operating-source-cache.js'
 
 const safeReason=error=>/^[a-z0-9_]+$/.test(error?.message??'')?error.message:'operating_execution_hold'
 const stopsCycle=result=>result.modelCalls===null||['cost_reconciliation_required','operating_batch_busy',
- 'operating_lease_expired','operating_execution_hold'].includes(result.status)
+ 'operating_lease_expired','operating_execution_hold','operating_storage_failure'].includes(result.status)
+async function storageState(store,stage,error,stats,record){
+ if(!record)return {recorded:false}
+ try{
+  await store.storageIncident({stage,reason:error?safeReason(error):'verified',healthy:!error,stats})
+  return {recorded:true}
+ }catch{return {recorded:false,recordFailure:'operating_incident_record_failed'}}
+}
 const executionRows=result=>{
  const seen=new Set()
  while(result&&!result.rows&&!seen.has(result)){seen.add(result);result=result.previousResult}
@@ -34,7 +42,7 @@ export function operatingReferenceIdentity(dataset,countries,asOf) {
 }
 // A new fetch timestamp is not new material. Edition/content/period changes are.
 export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,sourcePlan,sourceRegister,registry,processingRules,
- env={},mode='saved',capturesByCurrency={},acquire,execute=false,preflightSource,preflightWriter,send,reconcile,dispatchHolds=[],
+ env={},mode='saved',capturesByCurrency={},acquire,execute=false,verifyStorage=false,preflightSource,preflightWriter,send,reconcile,dispatchHolds=[],
  clock=()=>Date.now(),deadlineMs=Date.now()+138*60*1000,owner=randomUUID(),testOnly=false}={}) {
  const configured=await store.operatingPolicy()
  if(!configured)return {status:'operating_configuration_missing',modelCalls:0,publicationApproved:false}
@@ -70,12 +78,16 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  const queue=[],seen=new Set(),recoveredCountries=new Set()
  for(const candidate of [...pending,...(current&&current.state!=='completed'?[current]:[])]){
   if(seen.has(candidate.batch_key))continue
-  const frozen=restoreOperatingPayload(candidate.payload)
+  let frozen
+  try{frozen=await restoreFrozenInput(candidate.payload,store,restoreOperatingPayload)}catch(error){
+   return {status:'operating_storage_failure',stage:'restore',reason:safeReason(error),modelCalls:0,publicationApproved:false,
+    incident:await storageState(store,'restore',error,null,execute||verifyStorage)}
+  }
   if(Boolean(frozen.testOnly)!==Boolean(testOnly)||frozen.policyBinding!==policy.binding)continue
   if(frozen.resumeIdentity!==candidate.batch_key||fingerprint(frozen.dataset)!==frozen.datasetBinding)throw Error('operating_frozen_batch_changed')
   for(const row of frozen.prepared.rows)if(row.status!=='planned'
    &&prepared.rows.some(fresh=>fresh.currency===row.currency&&fresh.status==='planned'))recoveredCountries.add(row.currency)
-  seen.add(candidate.batch_key);queue.push(candidate)
+  seen.add(candidate.batch_key);queue.push({...candidate,restoredInput:frozen})
  }
  // A single invocation keeps one shared spending/call ceiling across original
  // accounting envelopes. DB monthly, per-envelope and one-time gates still apply.
@@ -96,7 +108,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
   try{return await send(args)}catch(error){spending.unknown=true;throw error}
  }:send
  const common={dataset,asOf,freshKey,refreshed:prepared,policy,configured,configurationHolds,correctionHolds,recovery,
-  store:budgetedStore,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,preflightSource,preflightWriter,
+  store:budgetedStore,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,verifyStorage,preflightSource,preflightWriter,
   send:guardedSend,reconcile,dispatchHolds,clock,deadlineMs,owner,testOnly}
  const results=[],owned=new Map(),freshCandidates=new Set(recoveredCountries)
  for(const previous of queue){
@@ -131,7 +143,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
 }
 
 async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,configured,configurationHolds,correctionHolds,recovery,
- store,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,preflightSource,preflightWriter,send,reconcile,
+ store,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,verifyStorage,preflightSource,preflightWriter,send,reconcile,
  dispatchHolds,clock,deadlineMs,owner,testOnly,key,previous,owned}) {
  let prepared=refreshed,executionDataset=dataset
  const deferredFreshMaterial=!!previous&&key!==freshKey
@@ -141,7 +153,7 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   if(previous.state==='cost_unresolved'){
    if(recovery?.status!=='clear')return {status:'cost_reconciliation_required',recovery,collectionResults:prepared.collectionResults,modelCalls:0,publicationApproved:false}
   }
-  const saved=restoreOperatingPayload(previous.payload)
+  const saved=previous.restoredInput??await restoreFrozenInput(previous.payload,store,restoreOperatingPayload)
   if(saved.policyBinding!==policy.binding||saved.resumeIdentity!==key||!saved.dataset||fingerprint(saved.dataset)!==saved.datasetBinding)
    throw Error('operating_frozen_batch_changed')
   executionDataset=saved.dataset
@@ -169,21 +181,50 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   collectionResults:refreshed.collectionResults,maximumUsd:prepared.maximumUsd,maxCalls:prepared.maxCalls,modelCalls:0,publicationApproved:false}
  if(recovery?.status==='action_required')return {...summary,status:'cost_reconciliation_required',recovery}
  if(prepared.rows.every(r=>r.status==='no_report_due'))return {...summary,status:'no_report_due',maximumUsd:0,maxCalls:0}
+ const payload={version:'operating-frozen-input/1',datasetBinding:fingerprint(executionDataset),policyBinding:policy.binding,prepared,
+  dataset:executionDataset,resumeIdentity:key,...(testOnly?{testOnly:true}:{} )}
+ let encoded,storage
+ try{
+  encoded=encodeOperatingInput(payload)
+  storage=await inspectOperatingStorage(encoded,store)
+  }catch(error){const stats=encoded?.stats??error.storageStats??null
+   return {...summary,status:'operating_storage_failure',stage:'preflight',reason:safeReason(error),storage:stats,
+    incident:await storageState(store,'preflight',error,stats,execute||verifyStorage)}}
+ summary.storage=storage
+ if(verifyStorage){
+  try{
+   await storeOperatingInput(encoded,store)
+   const incidents=await Promise.all(['preflight','write','restore'].map(stage=>storageState(store,stage,null,storage,true)))
+   return {...summary,status:incidents.every(i=>i.recorded)?'storage_verified':'operating_storage_failure',
+    verifiedInputHash:encoded.manifest.payloadHash,incidents,modelCalls:0,locksAcquired:false,budgetReserved:false}
+  }catch(error){return {...summary,status:'operating_storage_failure',stage:'write',reason:safeReason(error),
+   incident:await storageState(store,'write',error,storage,true)}}
+ }
  if(!execute||holds.length)return summary
  if(runtimeMode(env)!=='currency')return {...summary,status:'runtime_disabled'}
  if(testOnly&&store.environment!=='local')throw Error('isolated_operating_fixture_required')
  if(typeof send!=='function'||typeof preflightSource!=='function'||typeof preflightWriter!=='function')throw Error('explicit_operating_adapters_required')
  const approval={...prepared.authorizationCandidate,authorized:true}
- const payload={version:'operating-frozen-input/1',datasetBinding:fingerprint(executionDataset),policyBinding:policy.binding,prepared,
-  dataset:structuredClone(executionDataset),resumeIdentity:key,...(testOnly?{testOnly:true}:{} )}
- // The store preserves original JSON alongside JSONB. Leave headroom beneath
- // its existing 32 MB limit; stop before dispatch rather than truncate proof.
- const serialized=JSON.stringify(payload)
- if(Buffer.byteLength(serialized,'utf8')+Buffer.byteLength(JSON.stringify(serialized),'utf8')+64>30_000_000)
-  return {...summary,status:'operating_payload_capacity_hold',modelCalls:0}
- const batch=await store.claimBatch({key,owner,revision:configured.revision,payload,
-  budgetNano:Math.round(policy.limits.batchUsd*1e9),maxCalls:policy.limits.maxCalls})
+ let storedPayload
+ try{
+  if(previous){storedPayload=restoreOperatingPayload(previous.payload)}
+  else {await storeOperatingInput(encoded,store);storedPayload=encoded.manifest}
+  const incidents=await Promise.all(['preflight','write','restore'].map(stage=>storageState(store,stage,null,storage,true)))
+  if(incidents.some(i=>!i.recorded))return {...summary,status:'operating_storage_failure',reason:'operating_incident_record_failed'}
+ }catch(error){return {...summary,status:'operating_storage_failure',stage:'write',reason:safeReason(error),
+  incident:await storageState(store,'write',error,storage,true)}}
+ let batch
+ try{batch=await store.claimBatch({key,owner,revision:configured.revision,payload:storedPayload,
+  budgetNano:Math.round(policy.limits.batchUsd*1e9),maxCalls:policy.limits.maxCalls})}
+ catch(error){return {...summary,status:'operating_storage_failure',stage:'link',reason:safeReason(error),
+  incident:await storageState(store,'link',error,storage,true)}}
  if(!batch.claimed)return {...summary,status:batch.reason}
+ const linked=await storageState(store,'link',null,storage,true)
+ if(!linked.recorded){
+  const result={...summary,status:'operating_storage_failure',reason:'operating_incident_record_failed'}
+  await store.batchCheckpoint({key,owner,state:'paused',result:operatingCheckpoint(result,key)})
+  return result
+ }
  let currentCase=null,currentCountry=null,deadlineHeld=false
  const callsBefore=spending.calls,costBefore=spending.confirmedNano
  const heartbeat=async result=>store.batchCheckpoint({key,owner,state:'running',result:operatingCheckpoint(result,key)})

@@ -9,7 +9,7 @@ export function ReviewRequestNotice({target,state,item}:{target:ReviewTarget|nul
   if(!target)return null
   return <aside className="review-request-notice" role="status" aria-label="메일에서 요청한 검토">
     <strong>메일에서 요청한 검토</strong>
-    {state==='current'&&item?<><p>{labels[item.kind]} · {item.currency??'공통'}{item.base_date?` · ${item.base_date}`:''}</p><p>{item.title}</p><p>{item.reason}</p><p className="table-help">현재 대상과 메일의 버전이 일치합니다. 아래 근거와 본문을 확인한 뒤 결정해 주세요.</p><button className="inline-link" onClick={()=>{const node=document.getElementById(`review-target-${item.target_id}`);node?.scrollIntoView({block:'start'});node?.focus()}}>해당 검토로 이동</button></>:
+    {state==='current'&&item?<><p>{labels[item.kind]} · {item.currency??'공통'}{item.base_date?` · ${item.base_date}`:''}</p><p>{item.title}</p><p>{item.reason}</p>{item.kind==='incident'?<div id={`review-target-${item.target_id}`} tabIndex={-1}><p>{item.summary}</p><p className="table-help">운영 확인 항목입니다. 원인 조치 후 정상 검사로 해결을 확인하며, 이 화면에서 원고를 승인하거나 오류를 숨기지 않습니다.</p></div>:<><p className="table-help">현재 대상과 메일의 버전이 일치합니다. 아래 근거와 본문을 확인한 뒤 결정해 주세요.</p><button className="inline-link" onClick={()=>{const node=document.getElementById(`review-target-${item.target_id}`);node?.scrollIntoView({block:'start'});node?.focus()}}>해당 검토로 이동</button></>}</>:
       <p>{state==='changed'?'메일 발송 후 대상이 변경됐습니다. 아래 검토함에서 현재 버전을 다시 여세요.':state==='resolved_or_unavailable'?'이미 처리됐거나 현재 검토 대상이 아닙니다.':state==='unavailable'?'검토 대상 연결을 확인하지 못했습니다. 현재 상태를 다시 확인해 주세요.':'검토 대상과 버전을 확인하는 중입니다.'}</p>}
   </aside>
 }

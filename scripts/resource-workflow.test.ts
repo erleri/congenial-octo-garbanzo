@@ -58,7 +58,7 @@ it('makes the six-currency worker an exclusive, opt-in, serial consumer of the c
  expect(evaluate(current.if,failedDefault)).toBe(true)
  expect(current.env?.FX_REPORT_DATA_REFRESH).toContain("outputs.dataset_ref != ''")
  expect(current.needs).toBe('generate-data-and-send-email')
- expect(current.permissions).toEqual({contents:'read'});expect(evaluate(current['continue-on-error'],context())).toBe(true)
+ expect(current.permissions).toEqual({contents:'read'});expect(evaluate(current['continue-on-error'],context())).toBe(false)
  expect(current.strategy).toBeUndefined()
  expect(evaluate(current['timeout-minutes'],context())).toBe(150)
  expect(current.steps.find(s=>s.uses?.startsWith('actions/checkout'))?.with?.ref).toContain('outputs.dataset_ref')

@@ -9,3 +9,10 @@ it('shows current and stale mail targets without an embedded approval action',()
  expect(stale).toContain('현재 버전을 다시');expect(stale).not.toContain('해당 검토로 이동')
  expect(current).not.toContain('>승인<');expect(stale).not.toContain('>승인<')
 })
+it('shows operational failures at the linked target without a false approval or dismissal action',()=>{
+ const incident={...item,kind:'incident' as const,title:'입력 저장 확인',reason:'write · storage_failed',summary:'저장 장애로 새 생성 보류'}
+ const html=renderToStaticMarkup(<ReviewRequestNotice target={incident} state="current" item={incident}/>)
+ expect(html).toContain('review-target-'+incident.target_id)
+ expect(html).toContain('정상 검사로 해결');expect(html).toContain(incident.reason)
+ expect(html).not.toContain('해당 검토로 이동');expect(html).not.toContain('>승인<')
+})

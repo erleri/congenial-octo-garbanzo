@@ -49,6 +49,8 @@
 
 ## 실행 코드가 읽는 문서
 
+입력 보관의 11월10일 로컬 추가 기준은 [저장·복원](frozen-input-storage.md#인터페이스와-보호-한도)에 모았습니다. 원문 무손실 압축·분리 저장이며 위 환율·발행·모델·비용 규칙을 수정하지 않습니다. 운영 적용은 별도 단계입니다.
+
 [출처 계획](../2.0/six-currency-explanation-sources-20261027.json), [등록부](../2.0/six-currency-source-register-20261027.json), [원문 정책](../2.0/original-news-source-policy-20261028.json), [처리 규칙](../2.0/material-processing-rules.json)은 날짜가 오래돼도 실행 입력입니다. 일부 안의 `runtimeIntegrated:false`·`local_research_only`는 작성 당시 설명이며 현재 연결 상태는 코드 호출로 판정합니다. 이번 문서 정비에서는 이를 수정하지 않았습니다. 내용 변경이 필요하면 운영 입력 변경 작업으로 분리합니다.
 
 과거 공통 규칙·편집 기준·모델 비교는 [색인](catalog.md)의 과거 기록입니다. 과거 실패와 비용을 현재 성공으로 재작성하지 않습니다.
