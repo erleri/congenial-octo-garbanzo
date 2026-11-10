@@ -25,10 +25,10 @@ export {operatingMaterialHash} from './operating-source-cache.js'
 const safeReason=error=>/^[a-z0-9_]+$/.test(error?.message??'')?error.message:'operating_execution_hold'
 const stopsCycle=result=>result.modelCalls===null||['cost_reconciliation_required','operating_batch_busy',
  'operating_lease_expired','operating_execution_hold','operating_storage_failure','source_endpoint_preflight_hold'].includes(result.status)
-async function storageState(store,stage,error,stats,record){
+async function storageState(store,stage,error,stats,record,verifiedReason='verified'){
  if(!record)return {recorded:false}
  try{
-  await store.storageIncident({stage,reason:error?safeReason(error):'verified',healthy:!error,stats})
+  await store.storageIncident({stage,reason:error?safeReason(error):verifiedReason,healthy:!error,stats})
   return {recorded:true}
  }catch{return {recorded:false,recordFailure:'operating_incident_record_failed'}}
 }
@@ -75,14 +75,24 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  // still opt-in execution under the configured policy, never part of plan.
  const recovery=execute&&!configurationHolds.length&&!dispatchHolds.length?await recoverOperatingCalls({store,reconcile}):null
  if(store.runtimeDocumentCapability){
-  try{if((await store.runtimeDocumentCapability())?.version!=='runtime-document/2')throw Error('runtime_document_capability_missing')}
+  try{
+   if((await store.runtimeDocumentCapability())?.version!=='runtime-document/2')throw Error('runtime_document_capability_missing')
+   if(execute||verifyStorage){
+    const recorded=await storageState(store,'runtime',null,null,true,'verified_capability')
+    if(!recorded.recorded)throw Error('operating_incident_record_failed')
+   }
+  }
   catch(error){return {status:'operating_storage_failure',reason:safeReason(error),modelCalls:0,publicationApproved:false,
    incident:await storageState(store,'runtime',error,null,execute||verifyStorage)}}
  }
  // Shared recovery is part of the authorized worker. It never edits requests,
  // material, responses or costs and leaves a durable audit before re-queuing.
  if(execute&&!configurationHolds.length&&!dispatchHolds.length&&store.recoverTechnicalHolds){
-  try{await store.recoverTechnicalHolds(configured.revision)}catch(error){
+  try{
+   await store.recoverTechnicalHolds(configured.revision)
+   const recorded=await storageState(store,'runtime',null,null,true,'verified_recovery')
+   if(!recorded.recorded)throw Error('operating_incident_record_failed')
+  }catch(error){
    return {status:'operating_storage_failure',stage:'runtime_recovery',reason:safeReason(error),modelCalls:0,publicationApproved:false,
     incident:await storageState(store,'runtime',error,null,true)}
   }
@@ -366,8 +376,8 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
    const recorded=await storageState(store,'runtime',Error(`${code}_${row.currency.toLowerCase()}`),null,true)
    if(!recorded.recorded)throw Error('operating_incident_record_failed')
   }
-  if(!runtimeFaults.length&&result.rows.some(row=>row.purpose)){
-   const recorded=await storageState(store,'runtime',null,null,true)
+  for(const row of result.rows.filter(row=>row.status==='pending_admin_review')){
+   const recorded=await storageState(store,'runtime',null,null,true,`verified_${row.currency.toLowerCase()}`)
    if(!recorded.recorded)throw Error('operating_incident_record_failed')
   }
   // One successful request cannot resolve another failed stage in the same run.

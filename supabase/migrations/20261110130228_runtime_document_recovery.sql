@@ -199,7 +199,11 @@ declare key text;clean jsonb;
 begin
  if p_stage is null or p_stage not in ('preflight','write','restore','link','endpoint','runtime') or p_healthy is null then raise exception 'storage incident stage required';end if;
  if p_healthy then
-  update app_private.currency_report_storage_incidents set active=false,resolved_at=now(),last_seen=now(),revision=revision+1 where active and stage=p_stage;
+  update app_private.currency_report_storage_incidents set active=false,resolved_at=now(),last_seen=now(),revision=revision+1
+   where active and stage=p_stage and (p_stage<>'runtime'
+    or p_reason ~ '^verified_(brl|mxn|cop|pen|clp|ars)$' and right(reason,4)='_'||right(p_reason,3)
+    or p_reason='verified_capability' and reason in ('runtime_document_capability_missing','runtime_store_currency_report_runtime_document_capability_failed')
+    or p_reason='verified_recovery' and reason in ('runtime_recovery_unavailable','runtime_store_recover_currency_report_operating_technical_holds_failed'));
   return true;
  end if;
  if p_reason is null or p_reason!~'^[a-z0-9_]{1,160}$' then raise exception 'sanitized storage reason required';end if;

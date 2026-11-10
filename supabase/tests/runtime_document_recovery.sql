@@ -55,8 +55,10 @@ select set_config('runtime_document.incident_revision',(select revision::text fr
 select public.record_currency_report_storage_incident('runtime','runtime_document_raw_limit_cop',false,'{}');
 select is((select revision::text from app_private.currency_report_storage_incidents where stage='runtime' and reason='runtime_document_raw_limit_cop'),current_setting('runtime_document.incident_revision'),'persistent fault does not create a new notification version');
 select ok(exists(select 1 from app_private.currency_report_review_items() where title='리포트 집필 입력·재개 기술 장애'),'runtime fault is visible in administrator inbox');
-select public.record_currency_report_storage_incident('runtime','verified',true,'{}');
-select ok(not exists(select 1 from app_private.currency_report_storage_incidents where stage='runtime' and active),'verified success resolves the incident');
+select public.record_currency_report_storage_incident('runtime','runtime_document_raw_limit_brl',false,'{}');
+select public.record_currency_report_storage_incident('runtime','verified_cop',true,'{}');
+select ok(not exists(select 1 from app_private.currency_report_storage_incidents where stage='runtime' and reason='runtime_document_raw_limit_cop' and active),'verified country success resolves its incident');
+select ok(exists(select 1 from app_private.currency_report_storage_incidents where stage='runtime' and reason='runtime_document_raw_limit_brl' and active),'another country success cannot hide an unresolved runtime fault');
 select is(app_private.runtime_context_packet('{"packet":{"currency":"CLP"}}'),' {"currency":"CLP"}'::jsonb,'legacy inline packet still resolves');
 select * from finish();
 rollback;
