@@ -9,10 +9,13 @@
   ],
   "ci": {"runId": 42833348955, "codeFiles": 204, "codeTests": 1438, "dbFiles": 29, "dbAssertions": 547, "passed": true},
   "controls": {"enabled": true, "reviewEnabled": true, "writer": "sol-us", "revision": 11, "monthlyUsd": 30, "batchUsd": 7, "requestUsd": 0.25},
+  "checkedAt": "2026-11-10T21:54:56.270825Z",
+  "remainingExecutionAllowance": 1,
   "productionExecutions": [
     {"round": 1, "runId": 42828070743, "modelCalls": 11, "confirmedUsd": 0.2478475, "newUnknownCost": false, "outcome": "CLP reviewed; unused-candidate scope defect found"},
     {"round": 2, "runId": 42835434602, "modelCalls": 0, "confirmedUsd": 0, "newUnknownCost": false, "outcome": "automatic COP recovery; changed material deferred to next common cycle"},
-    {"round": 3, "runId": 42837269942, "modelCalls": 29, "confirmedUsd": 0.56236775, "newUnknownReservationUsd": 0.0949025, "outcome": "BRL/MXN reviewed; COP quality hold; PEN evidence hold; ARS upstream 429 and unconfirmed expense"}
+    {"round": 3, "runId": 42837269942, "modelCalls": 29, "confirmedUsd": 0.56236775, "newUnknownReservationUsd": 0.0949025, "outcome": "BRL/MXN reviewed; COP quality hold; PEN evidence hold; ARS upstream 429 and unconfirmed expense"},
+    {"round": 4, "runId": 42908993399, "modelCalls": 0, "confirmedUsd": 0, "newUnknownCost": false, "recovery": "cost_still_unconfirmed", "outcome": "common recovery queried existing ARS expense; action_required; no model resubmission"}
   ],
   "countryResults": [
     {"currency": "CLP", "baseDate": "2026-11-10", "state": "pending_admin_review", "contentReview": "passed", "modelQualityAverage": 4.4},
@@ -27,13 +30,14 @@
   "administratorNotices": [
     {"runId": 42828070743, "status": "accepted", "itemCount": 1, "transportCalls": 1},
     {"runId": 42835434602, "status": "already_recorded", "itemCount": 0, "transportCalls": 0},
-    {"runId": 42837269942, "status": "accepted", "itemCount": 4, "transportCalls": 1}
+    {"runId": 42837269942, "status": "accepted", "itemCount": 4, "transportCalls": 1},
+    {"runId": 42908993399, "status": "already_recorded", "itemCount": 0, "transportCalls": 0}
   ],
   "limits": [
     "Model review scores describe these manuscripts, not general model quality or business performance.",
     "No publication, reader-email resend, manual manuscript edit or manual case reset occurred.",
     "SMTP acceptance is distinct from actual receipt and reading.",
-    "ARS cost remains unconfirmed; zero expense is not assumed. Further common recovery execution is pending operational approval review.",
+    "ARS cost remains unconfirmed after fourth production common recovery. Original reservation retained; fifth execution unused.",
     "Earlier trial expenses and older unconfirmed reservations are preserved separately."
   ]
 }
