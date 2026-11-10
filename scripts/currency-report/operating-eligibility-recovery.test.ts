@@ -34,6 +34,60 @@ const withdraw=(f,currency)=>{
  const next=revision(prior,r=>{r.review.validity={...r.review.validity,state:'withdrawn',supersedes:[prior.key]}})
  f.state.sourceCache.push(next);return {prior,next}
 }
+
+it('does not let a never-accepted candidate reject other frozen evidence before staging, while retaining dependency revocation',async()=>{
+ for(const currency of REPORT_CURRENCIES){
+  const f=await operatingFixture();await run(f)
+  const prior=f.state.sourceCache.find(r=>r.currency===currency),collection=structuredClone(f.collections[currency])
+  const original=structuredClone(prior.original);original.url+='-candidate';delete original.id;delete original.sourceId
+  const bound=bindSelectedOriginalReview({record:original,request:{sourceId:prior.original.sourceId,period:'2026-10-27'},
+   adapter:'reviewed_news_notes',requestIds:['synthetic-rejected-candidate'],currency,asOf:f.asOf,targets:prior.card.targets})
+  collection.originals.push(bound.original);collection.reviewQueue.push(bound.review)
+  const candidate={...structuredClone(prior),sourceKey:operatingSourceKey(bound.original,prior.rulesBinding),original:bound.original,card:bound.review,
+   review:{cardBinding:bound.review.binding,heldStatus:'original_pipeline_failed',holds:['event_date_unverified'],
+    dateRuleVersion:NEWS_EVENT_DATE_VERSION,pipelineVersion:ORIGINAL_NEWS_PIPELINE_VERSION,
+    validity:{version:SOURCE_REVIEW_VALIDITY_VERSION,pipelineVersion:ORIGINAL_NEWS_PIPELINE_VERSION,state:'held',supersedes:[]}}}
+  const rejected=revision(candidate,()=>{}),cache=[prior,rejected],country={collection}
+  expect(frozenSourceReviewHolds(country,cache,prior.rulesBinding)).toEqual([])
+  expect(frozenSourceReviewHolds(country,cache,prior.rulesBinding,{materialEditions:[{url:prior.original.url}]})).toEqual([])
+  // If an exact staged input actually used it, the hold must remain blocking.
+  expect(frozenSourceReviewHolds(country,cache,prior.rulesBinding,{materialEditions:[{url:bound.original.url}]})).toEqual(['original_pipeline_failed'])
+  const revoked=revision(prior,r=>{r.review.heldStatus='original_support_hold';r.review.holds=['original_claim_support_not_confirmed'];r.review.dateRuleVersion=NEWS_EVENT_DATE_VERSION;
+   r.review.validity={...r.review.validity,state:'held',supersedes:[prior.key]}})
+  expect(frozenSourceReviewHolds(country,[...cache,revoked],prior.rulesBinding)).toEqual(['original_support_hold'])
+  expect(frozenSourceReviewHolds({...country,savedSourceReviews:[prior.review]},[revoked,rejected],prior.rulesBinding)).toEqual(['original_support_hold'])
+ }
+})
+
+it('resumes the whole coordinator after pre-staging storage repair using valid alternatives in every currency',async()=>{
+ for(const currency of REPORT_CURRENCIES){
+  const f=await operatingFixture(),collection=f.collections[currency],source=collection.originals[0],original=structuredClone(source)
+  original.url+='-rejected';delete original.id;delete original.sourceId
+  const bound=bindSelectedOriginalReview({record:original,request:{sourceId:source.sourceId,period:'2026-10-27'},
+   adapter:'reviewed_news_notes',requestIds:['synthetic-rejected'],currency,asOf:f.asOf,targets:collection.reviewQueue[0].targets})
+  collection.originals.push(bound.original);collection.reviewQueue.push(bound.review)
+  const candidate={currency,rulesBinding:f.state.policy.processingRulesBinding,
+   sourceKey:operatingSourceKey(bound.original,f.state.policy.processingRulesBinding),original:bound.original,card:bound.review,
+   review:{cardBinding:bound.review.binding,heldStatus:'original_pipeline_failed',holds:['event_date_unverified'],
+    dateRuleVersion:NEWS_EVENT_DATE_VERSION,pipelineVersion:ORIGINAL_NEWS_PIPELINE_VERSION,
+    validity:{version:SOURCE_REVIEW_VALIDITY_VERSION,pipelineVersion:ORIGINAL_NEWS_PIPELINE_VERSION,state:'held',supersedes:[]}}}
+  const rejected=revision(candidate,()=>{});f.state.sourceCache.push(rejected)
+  const stage=f.store.stage
+  f.store.stage=async task=>{if(task.currency===currency)throw Error('unsafe_or_oversized_runtime_payload');return stage(task)}
+  const first=await run(f)
+  expect(first.rows.find(r=>r.currency===currency)).toMatchObject({status:'country_execution_hold',reason:'unsafe_or_oversized_runtime_payload'})
+  expect(f.state.inputs.has(currency)).toBe(false)
+  const before=f.state.posts.length,sourceHash=fingerprint(rejected)
+  f.store.stage=stage
+  const second=await run(f)
+  expect(second.rows.find(r=>r.currency===currency).status).toBe('pending_admin_review')
+  expect(f.state.posts.length-before).toBe(2) // writer and independent review, no source repayment
+  expect(f.store.drafts).toHaveLength(6)
+  expect(fingerprint(f.state.sourceCache.find(r=>r.key===rejected.key))).toBe(sourceHash)
+  expect(f.state.inputs.get(currency).materialEditions.some(e=>e.url===bound.original.url)).toBe(false)
+  const posts=f.state.posts.length;await run(f);expect(f.state.posts.length).toBe(posts)
+ }
+},30000)
 // Exercise the real restoration/error adapter with synthetic RPC responses.
 const readAdapter=(response)=>createRuntimeStore({url:'http://127.0.0.1:56321',key:'synthetic-not-a-key',mode:'local',
  client:{rpc:(name)=>({abortSignal:async()=>response(name)})}})

@@ -4,10 +4,14 @@ import {effectiveSourceGroups} from './source-review-validity.js'
 export const RESEARCH_CONTINUATION_VERSION='research-continuation/3'
 const codes=item=>[item?.status,item?.reason,...(item?.holds??[])].filter(v=>typeof v==='string')
 const match=(items,re)=>items.some(v=>re.test(v))
+const discoveryStates=new Set(['partial_pending_review','originals_pending_review','collected_pending_review',
+ 'no_candidates_in_listing','listing_did_not_identify_matching_article','no_candidates_in_attempt','no_candidates_in_index'])
 export function sourceContinuation(item) {
  const reasons=codes(item)
  let category='technical',action='await_pipeline_repair',resumeWhen='code_or_configuration_changed',resumeExact=false
- if(match(reasons,/frozen_country_(?:reference|material)_superseded/)){
+ if(reasons.length&&reasons.every(code=>discoveryStates.has(code))){
+  category='discovery';action='review_available_sources';resumeWhen='next_cycle_with_available_material'
+ }else if(match(reasons,/frozen_country_(?:reference|material)_superseded/)){
   category='superseded';action='prepare_current_input';resumeWhen='next_cycle_with_current_input_and_original_budget_gates'
  }else if(match(reasons,/cost_unresolved|cost_reconciliation|existing_source_call_not_reusable|unresolved_or_inflight/)){
   category='accounting';action='stop_paid_work';resumeWhen='confirmed_accounting_recovery'
