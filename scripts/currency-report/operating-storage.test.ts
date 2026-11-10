@@ -133,3 +133,42 @@ it('does not clear a recurring comparison outage just because extraction preflig
  await runOperatingCycle({...f,execute:true})
  expect(f.store.incidents.filter(i=>i.stage==='endpoint').at(-1).healthy).toBe(true)
 })
+it('checks runtime archive capability before any paid work and never repairs state during a free plan',async()=>{
+ const f=await operatingFixture(),repair=vi.fn(async()=>({recovered:0}))
+ f.store.recoverTechnicalHolds=repair
+ f.store.runtimeDocumentCapability=async()=>({version:'runtime-document/2'})
+ await runOperatingCycle({...f,execute:false})
+ expect(repair).not.toHaveBeenCalled();expect(f.store.jobs).toHaveLength(0)
+ f.store.runtimeDocumentCapability=async()=>({version:'unsupported'})
+ const held=await runOperatingCycle({...f,execute:true})
+ expect(held).toMatchObject({status:'operating_storage_failure',reason:'runtime_document_capability_missing',modelCalls:0})
+ expect(repair).not.toHaveBeenCalled();expect(f.store.jobs).toHaveLength(0)
+ expect(f.store.incidents.at(-1)).toMatchObject({stage:'runtime',healthy:false})
+})
+it('reports recovery storage failure before claiming an envelope or paying for source review',async()=>{
+ const f=await operatingFixture()
+ f.store.recoverTechnicalHolds=async()=>{throw Error('runtime_recovery_unavailable')}
+ const held=await runOperatingCycle({...f,execute:true})
+ expect(held).toMatchObject({status:'operating_storage_failure',stage:'runtime_recovery',reason:'runtime_recovery_unavailable',modelCalls:0})
+ expect(f.state.batch).toBeNull();expect(f.store.jobs).toHaveLength(0)
+ expect(f.store.incidents.at(-1)).toMatchObject({stage:'runtime',healthy:false})
+})
+it('plans the original repairable completed envelope read-only instead of budgeting different fresh input',async()=>{
+ const f=await operatingFixture()
+ const first=await runOperatingCycle({...f,execute:true,preflightSource:async request=>{
+  if(f.state.batch&&request.stage==='compare')throw Error('synthetic_old_endpoint_outage')
+  return f.preflightSource()
+ }})
+ f.state.batch.state='completed'
+ for(const c of f.state.cases.values())if(c.state==='paused')c.state='held'
+ const original=JSON.stringify([...f.state.cases.values()]),posts=f.state.posts.length
+ f.store.inspectTechnicalHolds=vi.fn(async()=>[structuredClone(f.state.batch)])
+ f.store.recoverTechnicalHolds=vi.fn(async()=>{throw Error('free_plan_must_not_recover')})
+ const plan=await runOperatingCycle({...f,execute:false,asOf:'2026-11-02T03:00:00Z'})
+ expect(plan.batchKey).toBe(first.batchKey)
+ expect(plan.modelCalls).toBe(0);expect(plan.maximumUsd).toBeLessThanOrEqual(7)
+ expect(f.store.inspectTechnicalHolds).toHaveBeenCalledWith(1)
+ expect(f.store.recoverTechnicalHolds).not.toHaveBeenCalled()
+ expect(f.state.posts.length).toBe(posts);expect(JSON.stringify([...f.state.cases.values()])).toBe(original)
+ expect(f.state.batch.state).toBe('completed')
+})

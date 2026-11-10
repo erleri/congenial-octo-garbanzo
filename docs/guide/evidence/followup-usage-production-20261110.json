@@ -1,0 +1,158 @@
+{
+  "version": "followup-usage-production/1",
+  "checkedAt": "2026-11-10T21:25:00+09:00",
+  "implementationCommit": "fe86f6572141629f558df49d66feb9005ff4bb1f",
+  "pullRequest": "https://github.com/erleri/congenial-octo-garbanzo/pull/27",
+  "ci": {
+    "run": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/42809899543",
+    "codeTests": 1427,
+    "databaseTests": 508,
+    "status": "passed",
+    "meaning": "Code and isolated database checks; not manuscript quality samples."
+  },
+  "backup": {
+    "archiveBytes": 36981680,
+    "archiveSha256": "2adc1c2f8fde308aba3d0592b766f727bdf7577bd77014ab9f0ea5ff1a255a5b",
+    "tablesVerified": 86,
+    "policiesVerified": 16,
+    "contentAndPrivilegesMatched": true,
+    "isolatedRestoreConnectionsClosed": true
+  },
+  "migration": {
+    "source": "20261110110228_usage_v2_report_followup.sql",
+    "productionVersion": "20261110115157",
+    "status": "applied"
+  },
+  "deploy": {
+    "id": "6af30736649f5aa795da776b",
+    "status": "published",
+    "commit": "fe86f6572141629f558df49d66feb9005ff4bb1f",
+    "webUsageFlag": true,
+    "flagScope": "production only",
+    "publicAsset": "/assets/index-08SlhOCx.js"
+  },
+  "usage": {
+    "enabled": true,
+    "version": 2,
+    "timezone": "Asia/Seoul",
+    "activatedAt": "2026-11-10T12:00:10.031274Z",
+    "anonymousCounterTransaction": "accepted then rolled back; no test count retained",
+    "anonymousSummaryRead": false,
+    "signedInCounterWrite": false,
+    "productionRowsAtCheck": 0,
+    "authenticatedBrowser": "active administrator verified; 30-day and 7-day views accessible",
+    "realReaderActivity": "not yet observed"
+  },
+  "preflight": {
+    "run": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/42811868565",
+    "passedSourcePlans": 20,
+    "sourcePlans": 20,
+    "maximumUsd": 6.996155001,
+    "maxCalls": 52,
+    "modelCalls": 0,
+    "holds": [
+      "runtime_not_enabled"
+    ],
+    "holdMeaning": "Temporary rollout pause; restored after preflight.",
+    "rawBytes": 50770620,
+    "compressedBytes": 8976778,
+    "manifestBytes": 1254,
+    "newStorageBytes": 0,
+    "reusedStorageBytes": 8976778
+  },
+  "runtimeControl": {
+    "enabled": true,
+    "reviewEnabled": true,
+    "revision": 7,
+    "monthlyUsd": 30,
+    "batchUsd": 7,
+    "requestUsd": 0.25
+  },
+  "followup": {
+    "run": "https://github.com/erleri/congenial-octo-garbanzo/actions/runs/42812606530",
+    "status": "completed_with_holds",
+    "newCostUsd": 0.0725526,
+    "newManuscripts": 0,
+    "publicationApproved": false,
+    "readerEmailResend": false,
+    "modelCalls": 5,
+    "newUnknownCost": false,
+    "adminNotice": {
+      "status": "no_new_items",
+      "transportCalls": 0
+    },
+    "countries": [
+      {
+        "currency": "BRL",
+        "status": "unchanged_case_already_processed",
+        "actualCalls": 0,
+        "priorState": "held",
+        "priorCause": "source_endpoint_preflight_hold"
+      },
+      {
+        "currency": "MXN",
+        "status": "unchanged_case_already_processed",
+        "actualCalls": 0,
+        "priorState": "held",
+        "priorCause": "source_endpoint_preflight_hold"
+      },
+      {
+        "currency": "PEN",
+        "status": "unchanged_case_already_processed",
+        "actualCalls": 0,
+        "priorState": "held",
+        "priorCause": "source_endpoint_preflight_hold"
+      },
+      {
+        "currency": "CLP",
+        "status": "unchanged_case_already_processed",
+        "actualCalls": 0,
+        "priorState": "held",
+        "priorCause": "source_endpoint_preflight_hold"
+      },
+      {
+        "currency": "ARS",
+        "status": "unchanged_case_already_processed",
+        "actualCalls": 0,
+        "priorState": "held",
+        "priorCause": "source_endpoint_preflight_hold"
+      },
+      {
+        "currency": "COP",
+        "status": "writer_preparation_hold",
+        "reason": "unsafe_or_oversized_runtime_payload",
+        "actualCalls": 5,
+        "purpose": "original_source_extraction_and_comparison_only"
+      }
+    ]
+  },
+  "priorAccounting": {
+    "confirmedUsd": 0.6350093,
+    "unknownCalls": 2,
+    "unknownReservedUsd": 0.34849
+  },
+  "publicReports": 6,
+  "advisors": {
+    "privateRlsNoPolicy": "33 informational: server-only private tables",
+    "anonymousDefiner": "Limited v1/v2 counters; no anonymous aggregate read",
+    "authenticatedDefiner": "v2 summary checks active administrator within function",
+    "existingAuthWarning": "Leaked-password protection remains disabled; unchanged in this rollout"
+  },
+  "remainingDefects": [
+    {
+      "code": "legacy_technical_hold_not_reclaimed",
+      "evidence": "Five existing cases contain source_endpoint_preflight_hold with zero runtime jobs but remain held. claim_case excludes these held states.",
+      "scope": "resume state; not proof of no usable news"
+    },
+    {
+      "code": "writer_runtime_payload_capacity",
+      "evidence": "Offline replay of saved COP reviews reproduces writer_preparation_hold. Writer packet series alone is 774980 UTF-8 bytes; plan is 831442 bytes before task snapshot and context copies. The model request body in the diagnostic plan is 34008 bytes.",
+      "scope": "downstream task/context storage remains uncompressed; operating-frozen-input/2 fixes only batch storage"
+    },
+    {
+      "code": "capacity_classified_as_source_access",
+      "evidence": "unsafe_or_oversized_runtime_payload matches broad unsafe access pattern; result kind waiting and admin-notice no_new_items.",
+      "scope": "technical incident classification and alerting remain incomplete"
+    }
+  ]
+}
