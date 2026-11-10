@@ -11,6 +11,10 @@ export function sourceContinuation(item) {
   category='superseded';action='prepare_current_input';resumeWhen='next_cycle_with_current_input_and_original_budget_gates'
  }else if(match(reasons,/cost_unresolved|cost_reconciliation|existing_source_call_not_reusable|unresolved_or_inflight/)){
   category='accounting';action='stop_paid_work';resumeWhen='confirmed_accounting_recovery'
+ }else if(match(reasons,/unsafe_or_oversized_runtime_payload|runtime_document_|unsafe_supply_payload/)){
+  category='technical';action='await_pipeline_repair';resumeWhen='verified_runtime_storage_repair';resumeExact=true
+ }else if(match(reasons,/source_endpoint_(?:preflight_hold|metadata_unavailable|route_unavailable|unsupported_parameters|processing_conditions|price_or_input_limit|request_configuration)/)){
+  category='temporary';action='resume_saved_stages';resumeWhen='endpoint_control_or_execution_window_recovered';resumeExact=true
  }else if(match(reasons,/published_history_unavailable|correction_storage_failed|correction_history_unavailable|supply_status_storage_failed/)){
   category='temporary';action='wait_for_country_storage';resumeWhen='next_cycle_rechecks_country_history_and_storage'
  }else if(match(reasons,/source_budget_deferred|source_dispatch_deferred/)){
@@ -65,7 +69,8 @@ export function countryContinuation(row) {
  const sourceIssues=(row.sourceIssues??[]).filter(i=>!['reviewed_note_ready_for_material_validation',
   'exact_saved_review_reused_not_new_verification','duplicate_original'].includes(i.status))
  const diagnostics=sourceIssues.map(issue=>({status:issue.status,reason:issue.reason??null,holds:issue.holds??[],...sourceContinuation(issue)}))
- if(row.status==='source_dispatch_deferred')return {version:RESEARCH_CONTINUATION_VERSION,category:'budget',
+ const blockingCodes=[...sourceIssues,{status:row.status,reason:row.reason,holds:row.sourceHolds??row.holds??[]}].flatMap(codes)
+ if(row.status==='source_dispatch_deferred'&&!blockingCodes.some(code=>/source_endpoint_|runtime_document_|unsafe_or_oversized_runtime_payload|cost_unresolved|cost_reconciliation/.test(code)))return {version:RESEARCH_CONTINUATION_VERSION,category:'budget',
   action:'continue_next_budgeted_cycle',resumeExact:false,resumeWhen:'next_cycle_reuses_reviews_and_allocates_remaining_sources',
   paidCallAuthorized:false,automaticRetry:false,issues:diagnostics}
  if(row.status==='country_owned_by_prior_batch')return {version:RESEARCH_CONTINUATION_VERSION,category:'ownership',
@@ -82,7 +87,7 @@ export function countryContinuation(row) {
  const issues=[...sourceIssues,
   {status:row.status,reason:row.reason,holds:row.sourceHolds??row.holds??[]}]
  const decisions=issues.map(sourceContinuation)
- const selected=decisions.find(d=>d.category==='accounting')??decisions.find((d,i)=>codes(issues[i]).some(code=>code.startsWith('source_endpoint_')))??decisions.find(d=>d.category==='technical')??decisions.find(d=>d.resumeExact)
+ const selected=decisions.find(d=>d.category==='accounting')??decisions.find((d,i)=>codes(issues[i]).some(code=>/^(source_endpoint_|runtime_document_|unsafe_or_oversized_runtime_payload)/.test(code)))??decisions.find(d=>d.category==='technical')??decisions.find(d=>d.resumeExact)
   ??decisions.find(d=>d.category==='access'||d.category==='capture'||d.category==='capacity')
   ??decisions.find(d=>d.category==='content'||d.category==='output'||d.category==='period'||d.category==='superseded')??decisions[0]
  const holds=row.sourceHolds??row.holds??[]

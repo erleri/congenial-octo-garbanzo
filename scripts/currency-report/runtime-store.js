@@ -2,6 +2,7 @@
 import {createClient} from '@supabase/supabase-js'
 import {assertLocalApi} from './local-db.js'
 import {fingerprint} from './research-harness.js'
+import {requiresRuntimeArchive,encodeRuntimeDocument,persistRuntimeDocument,restoreRuntimeDocument} from './runtime-document.js'
 
 const canonical=value=>JSON.stringify(sort(value))
 function sort(value){return Array.isArray(value)?value.map(sort):value&&typeof value==='object'?Object.fromEntries(Object.keys(value).sort().map(k=>[k,sort(value[k])])):value}
@@ -50,8 +51,21 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
   if(error)throw new RuntimeStoreError(name,error,status)
   return data
  }
+ const archive={
+  storagePrepare:metadata=>rpc('prepare_currency_report_storage_object',{p_meta:metadata}),
+  storageChunk:(id,index,data)=>rpc('put_currency_report_storage_chunk',{p_id:id,p_index:index,p_data:data}),
+  storageSeal:id=>rpc('seal_currency_report_storage_object',{p_id:id}),
+  storageReadChunk:(id,index)=>rpc('read_currency_report_storage_chunk',{p_id:id,p_index:index}),
+  registerRuntimeDocument:(projection,packetText)=>rpc('register_currency_report_runtime_document',{p_projection:projection,p_packet_text:packetText})
+ }
+ const pack=async(value,kind,field)=>requiresRuntimeArchive(value)
+  ?persistRuntimeDocument(encodeRuntimeDocument(value,kind),archive):preserveOrder(value,field)
+ const unpack=async(value,field)=>value?.runtimeDocument
+  ?restoreRuntimeDocument(value,(m,i)=>archive.storageReadChunk(m.id,i).then(b=>Buffer.from(b,'base64'))):ordered(value,field)
  return {
   environment:mode,
+  runtimeDocumentCapability:()=>rpc('currency_report_runtime_document_capability'),
+  recoverTechnicalHolds:revision=>rpc('recover_currency_report_operating_technical_holds',{p_revision:revision}),
   storageInspect:ids=>rpc('currency_report_storage_inspect',{p_ids:ids}),
   storagePrepare:metadata=>rpc('prepare_currency_report_storage_object',{p_meta:metadata}),
   storageChunk:(id,index,data)=>rpc('put_currency_report_storage_chunk',{p_id:id,p_index:index,p_data:data}),
@@ -96,15 +110,16 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
   finishCase:r=>rpc('finish_currency_report_operating_case',{p_batch_key:r.batchKey,p_owner:r.owner,p_case_key:r.key,p_state:r.state,p_result:r.result}),
   job:async key=>{
    const j=await rpc('load_currency_report_runtime_job',{p_task_key:key})
-   return j?{...j,context:ordered(j.context,'serializedRuntimeContext'),
+   return j?{...j,context:await unpack(j.context,'serializedRuntimeContext'),
     response:j.response?ordered(j.response,'serializedRuntimeResponse'):null}:null
   },
-  stage:task=>rpc('stage_currency_report_runtime_input',{p_task:preserveOrder(task,'serializedRuntimeInput')}),
-  input:async(currency,snapshotId)=>{const value=await rpc('load_currency_report_runtime_input',{p_currency:currency,p_snapshot_id:snapshotId});return value?ordered(value,'serializedRuntimeInput'):null},
-  history:currency=>rpc('currency_report_runtime_history',{p_currency:currency}),
+  stage:async task=>rpc('stage_currency_report_runtime_input',{p_task:await pack(task,'task','serializedRuntimeInput')}),
+  input:async(currency,snapshotId)=>{const value=await rpc('load_currency_report_runtime_input',{p_currency:currency,p_snapshot_id:snapshotId});return value?unpack(value,'serializedRuntimeInput'):null},
+  history:async currency=>Promise.all((await rpc('currency_report_runtime_history',{p_currency:currency})).map(async row=>({...row,
+   ...(row.runtimeContext?.runtimeDocument?{runtimeContext:preserveOrder(await unpack(row.runtimeContext,'serializedRuntimeContext'),'serializedRuntimeContext')}:{})}))),
   check:r=>rpc('record_currency_report_runtime_check',{p_check_key:r.key,p_currency:r.currency,p_checked_at:r.checkedAt,p_result:r.result}),
-  reserve:r=>rpc('reserve_currency_report_runtime',{p_task_key:r.taskKey,p_currency:r.currency,p_date:r.baseDate,p_stage:r.stage,
-   p_request_hash:r.requestHash,p_context:preserveOrder(r.context,'serializedRuntimeContext'),p_reserved_nano:r.reservedNano,p_revision:r.revision,p_parent_id:r.parentId}),
+  reserve:async r=>rpc('reserve_currency_report_runtime',{p_task_key:r.taskKey,p_currency:r.currency,p_date:r.baseDate,p_stage:r.stage,
+   p_request_hash:r.requestHash,p_context:await pack(r.context,'context','serializedRuntimeContext'),p_reserved_nano:r.reservedNano,p_revision:r.revision,p_parent_id:r.parentId}),
   begin:(id,hash)=>rpc('begin_currency_report_runtime',{p_id:id,p_request_hash:hash}),
   checkpoint:(id,checkpoint)=>rpc('checkpoint_currency_report_runtime',{p_id:id,p_checkpoint:checkpoint}),
   receive:(id,response,actual)=>rpc('receive_currency_report_runtime',{p_id:id,p_response:preserveOrder(response,'serializedRuntimeResponse'),p_actual_nano:actual}),

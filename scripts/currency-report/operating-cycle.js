@@ -74,6 +74,19 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  // Accounting recovery is independent from a usable new article/price. It is
  // still opt-in execution under the configured policy, never part of plan.
  const recovery=execute&&!configurationHolds.length&&!dispatchHolds.length?await recoverOperatingCalls({store,reconcile}):null
+ if(store.runtimeDocumentCapability){
+  try{if((await store.runtimeDocumentCapability())?.version!=='runtime-document/2')throw Error('runtime_document_capability_missing')}
+  catch(error){return {status:'operating_storage_failure',reason:safeReason(error),modelCalls:0,publicationApproved:false,
+   incident:await storageState(store,'runtime',error,null,execute||verifyStorage)}}
+ }
+ // Shared recovery is part of the authorized worker. It never edits requests,
+ // material, responses or costs and leaves a durable audit before re-queuing.
+ if(execute&&!configurationHolds.length&&!dispatchHolds.length&&store.recoverTechnicalHolds){
+  try{await store.recoverTechnicalHolds(configured.revision)}catch(error){
+   return {status:'operating_storage_failure',stage:'runtime_recovery',reason:safeReason(error),modelCalls:0,publicationApproved:false,
+    incident:await storageState(store,'runtime',error,null,true)}
+  }
+ }
  const current=await store.operatingBatch(freshKey)
  const pending=store.pendingBatches?await store.pendingBatches(configured.revision):[]
  if(pending.length>16)return {status:'operating_queue_capacity_hold',modelCalls:0,publicationApproved:false,collectionResults:prepared.collectionResults}
@@ -344,6 +357,17 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
     }
     await heartbeat({status:stage,currency,resultStatus:value.status??null,runId:value.runId??null})
    }})
+  const runtimeFaults=result.rows.filter(row=>[row.reason,...(row.sourceHolds??[]),...(row.holds??[])]
+   .some(code=>/runtime_document_|unsafe_or_oversized_runtime_payload|unsafe_supply_payload/.test(code??'')))
+  for(const row of runtimeFaults){
+   const code=[row.reason,...(row.sourceHolds??[]),...(row.holds??[])].find(code=>/runtime_document_|unsafe_or_oversized_runtime_payload|unsafe_supply_payload/.test(code??''))
+   const recorded=await storageState(store,'runtime',Error(`${code}_${row.currency.toLowerCase()}`),null,true)
+   if(!recorded.recorded)throw Error('operating_incident_record_failed')
+  }
+  if(!runtimeFaults.length&&result.rows.some(row=>row.purpose)){
+   const recorded=await storageState(store,'runtime',null,null,true)
+   if(!recorded.recorded)throw Error('operating_incident_record_failed')
+  }
   // One successful request cannot resolve another failed stage in the same run.
   if(endpointChecked&&!endpointFailed){
    const recorded=await storageState(store,'endpoint',null,null,true)

@@ -133,3 +133,23 @@ it('does not clear a recurring comparison outage just because extraction preflig
  await runOperatingCycle({...f,execute:true})
  expect(f.store.incidents.filter(i=>i.stage==='endpoint').at(-1).healthy).toBe(true)
 })
+it('checks runtime archive capability before any paid work and never repairs state during a free plan',async()=>{
+ const f=await operatingFixture(),repair=vi.fn(async()=>({recovered:0}))
+ f.store.recoverTechnicalHolds=repair
+ f.store.runtimeDocumentCapability=async()=>({version:'runtime-document/2'})
+ await runOperatingCycle({...f,execute:false})
+ expect(repair).not.toHaveBeenCalled();expect(f.store.jobs).toHaveLength(0)
+ f.store.runtimeDocumentCapability=async()=>({version:'unsupported'})
+ const held=await runOperatingCycle({...f,execute:true})
+ expect(held).toMatchObject({status:'operating_storage_failure',reason:'runtime_document_capability_missing',modelCalls:0})
+ expect(repair).not.toHaveBeenCalled();expect(f.store.jobs).toHaveLength(0)
+ expect(f.store.incidents.at(-1)).toMatchObject({stage:'runtime',healthy:false})
+})
+it('reports recovery storage failure before claiming an envelope or paying for source review',async()=>{
+ const f=await operatingFixture()
+ f.store.recoverTechnicalHolds=async()=>{throw Error('runtime_recovery_unavailable')}
+ const held=await runOperatingCycle({...f,execute:true})
+ expect(held).toMatchObject({status:'operating_storage_failure',stage:'runtime_recovery',reason:'runtime_recovery_unavailable',modelCalls:0})
+ expect(f.state.batch).toBeNull();expect(f.store.jobs).toHaveLength(0)
+ expect(f.store.incidents.at(-1)).toMatchObject({stage:'runtime',healthy:false})
+})

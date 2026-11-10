@@ -6,6 +6,7 @@ import {COMPACT_REVIEW_VERSION,compactReviewContract,decodeCompactReview} from '
 import {withoutOptionalBackground} from './runtime-material-selection.js'
 import {selectRuntimeAttempt} from './runtime-retry.js'
 import {publicSourceDelivery} from './public-source-delivery.js'
+import {assertRuntimeDocumentCapacity} from './runtime-document.js'
 import {RUNTIME_ASSEMBLY_VERSION,DEFAULT_RUNTIME_REVIEWER} from './runtime-assembly.js'
 import {applySharedClaimTyping} from './shared-claim-typing.js'
 import {randomUUID} from 'node:crypto'
@@ -103,10 +104,10 @@ export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calend
  task.legacyTaskKey=task.taskKey
  task.inputEdition=inputEdition(task)
  task.taskKey=fingerprint({version:'runtime-request-identity/2',caseTask:task.legacyTaskKey,inputEdition:task.inputEdition})
- return safe(sealed(task))
+ return assertRuntimeDocumentCapacity(sealed(task),'task')
 }
 export function assertRuntimeTask(task,{dataset,asOf,publications}) {
- assertSealed(safe(task))
+ assertSealed(assertRuntimeDocumentCapacity(task,'task'))
  if(task.inputEdition&&(task.inputEdition!==inputEdition(task)||task.taskKey!==fingerprint({version:'runtime-request-identity/2',caseTask:task.legacyTaskKey,inputEdition:task.inputEdition})))
   throw Error('runtime_input_edition_changed')
  if(task.version!==RUNTIME_VERSION||task.status!=='prepared'||!REPORT_CURRENCIES.includes(task.currency)
@@ -243,7 +244,7 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   if(verified.model!==selected.body.model||verified.route!==(selected.profile??selected.writerProfile).route||verified.zdr!==true||verified.dataCollection!=='deny')throw Error('runtime_endpoint_required')
   const reservation=await store.reserve({taskKey,currency:task.currency,baseDate:task.baseDate,stage,
    parentId,requestHash:hash,reservedNano:runtimeNano(selected.maximumUsd),revision:config.revision,
-   context:safe({writer:task.writer,ruleVersion:SHARED_REPORT_RULE_VERSION,packet:task.plan.packet,task,request:selected.body,...attempt.retry,...(testOnly?{testOnly:true}:{})})})
+   context:assertRuntimeDocumentCapacity({writer:task.writer,ruleVersion:SHARED_REPORT_RULE_VERSION,packet:task.plan.packet,task,request:selected.body,...attempt.retry,...(testOnly?{testOnly:true}:{})},'context')})
   if(!reservation.reserved)return {status:reservation.reason}
   if(runtimeMode(env)!=='currency'||!await store.begin(reservation.id,hash))return {status:'runtime_stopped_before_call'}
   let response,lastId=null
