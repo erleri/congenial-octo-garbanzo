@@ -35,3 +35,14 @@ it('preserves an unknown source expense and does not retry after transport failu
  await expect(t.extract(plan.extraction,plan)).rejects.toThrow('source_runtime_stopped')
  expect(send).toHaveBeenCalledTimes(1)
 })
+it('reuses both confirmed source stages during a metadata outage without reserving or sending',async()=>{
+ const f=await originalPipelineFixture(),plan=prepareOriginalNewsCase(f),store=memoryRuntimeStore()
+ const approval={version:'runtime-source-approval/1',planBindings:[plan.binding],maxCalls:2,budgetUsd:1};let n=0
+ const first=runtimeSourceTransport({store,env:runtimeTestEnv,approval,preflight:async()=>metadata,
+  send:async({body})=>({valid:true,actualModel:body.model,costUsd:.01,responseId:'cached-'+(++n),payload:{choices:[{message:{content:JSON.stringify(n===1?f.candidate:f.comparison)}}]}})})
+ const extracted=await first.extract(plan.extraction,plan);const comparison=prepareOriginalComparison(plan,extracted.output);await first.compare(comparison,plan)
+ const preflight=vi.fn(async()=>{throw Error('offline')}),send=vi.fn(),resumed=runtimeSourceTransport({store,env:runtimeTestEnv,approval,preflight,send})
+ expect(await resumed.extract(plan.extraction,plan)).toMatchObject({reused:true,generationCalls:0,costUsd:0})
+ expect(await resumed.compare(comparison,plan)).toMatchObject({reused:true,generationCalls:0,costUsd:0})
+ expect(preflight).not.toHaveBeenCalled();expect(send).not.toHaveBeenCalled();expect(store.jobs).toHaveLength(2)
+})

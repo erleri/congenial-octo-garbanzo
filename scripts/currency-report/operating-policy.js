@@ -22,7 +22,7 @@ export function recurringOperatingPolicy({config,authorizationReference,configur
  const policy=operatingPolicyDraft(config)
  Object.assign(policy,{state:'operator_configured',writer,authorizationReference,configuredAt,
   externalTransmissionAuthorization:'approved_by_operator',recurringBudgetAuthorization:'approved_by_operator'})
- policy.destination={...policy.destination,writerProvider:writerProfile(writer).route}
+ policy.destination={...policy.destination,provider:writerProfile(writer).route,writerProvider:writerProfile(writer).route,reviewProvider:writerProfile(writer).route}
  policy.limits={...policy.limits,batchUsd,monthlyUsd,perCallUsd,maxCalls}
  delete policy.binding;policy.binding=fingerprint(policy)
  return assertOperatingPolicy(policy)

@@ -1,0 +1,81 @@
+name: Report-only follow-up
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'plan is free; execute requires existing server controls and budget'
+        type: choice
+        options: [plan, execute]
+        default: plan
+permissions:
+  contents: read
+# Same lock as the regular FX/mail workflow; never run two paid workers together.
+concurrency:
+  group: daily-dashboard-email
+  cancel-in-progress: false
+jobs:
+  report:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      FX_EMAIL_DATA_SOURCE: json
+      FX_REPORT_GENERATOR: currency
+      FX_REPORT_ENABLED: ${{ vars.FX_REPORT_ENABLED }}
+      FX_REPORT_OPERATIONAL_HOLD: ${{ vars.FX_REPORT_OPERATIONAL_HOLD }}
+      FX_REPORT_PUBLISH_MODE: review
+      FX_REPORT_DATA_REFRESH: committed
+      FX_REPORT_PDF_PYTHON: python
+      INEGI_INDICATORS_TOKEN: ${{ secrets.INEGI_INDICATORS_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: python -m pip install --disable-pip-version-check -r scripts/currency-report/requirements-official.txt
+      - name: Free preparation against the committed reference
+        if: inputs.action == 'plan'
+        run: npm run report:operate -- --action plan
+      - name: Process only authorized report work
+        if: inputs.action == 'execute' && vars.FX_REPORT_EXECUTION_MODE == 'execute'
+        run: npm run report:operate -- --action execute
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      - name: Reject disabled execution
+        if: inputs.action == 'execute' && vars.FX_REPORT_EXECUTION_MODE != 'execute'
+        run: echo 'Report execution mode is not enabled'; exit 1
+  admin-notice:
+    needs: report
+    if: >-
+      ${{ always() && !cancelled() && github.ref == 'refs/heads/main'
+          && inputs.action == 'execute' && vars.FX_ADMIN_REVIEW_EMAIL_ENABLED == 'true'
+          && vars.FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.19.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - name: Existing deduplicated administrator notice
+        run: node scripts/send-admin-review-email.mjs --send
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FX_ADMIN_REVIEW_EMAIL_TO: ${{ secrets.FX_ADMIN_REVIEW_EMAIL_TO }}
+          FX_ADMIN_REVIEW_EMAIL_ENABLED: ${{ vars.FX_ADMIN_REVIEW_EMAIL_ENABLED }}
+          FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED: ${{ vars.FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}

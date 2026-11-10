@@ -4,7 +4,7 @@ import { renderEmailReportDigest } from './email-report-digest.js'
 
 export const MAJOR_CURRENCIES = ['BRL', 'MXN', 'CLP', 'COP', 'ARS', 'PEN']
 
-const DASHBOARD_URL = 'https://latamforex.netlify.app/'
+const DASHBOARD_URL = 'https://latamforex.netlify.app/?entry=email'
 const CARD_COLORS = {
   BRL: '#2f6f5e',
   MXN: '#4f6f38',

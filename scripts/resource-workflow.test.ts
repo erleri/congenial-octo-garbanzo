@@ -122,3 +122,15 @@ it('requires a successful committed FX refresh for manual readiness while preser
  expect(evaluate(main.steps.find(s=>s.name==='Send dashboard email')!.if,normal)).toBe(true)
  expect(main.steps.findIndex(s=>s.name==='Validate requested run scope')).toBeLessThan(main.steps.findIndex(s=>s.name==='Validate required exchange API secrets'))
 })
+it('uses a report-only main workflow with a free default and the existing lock, without reader mail',()=>{
+ const text=fs.readFileSync('.github/workflows/report-followup.yml','utf8')
+ const w=yaml.load(text) as {on:{workflow_dispatch:{inputs:{action:{default:string}}}};concurrency:{group:string};permissions:Record<string,string>;jobs:Record<string,Job>}
+ expect(w.on.workflow_dispatch.inputs.action.default).toBe('plan');expect(w.permissions).toEqual({contents:'read'})
+ expect(w.concurrency.group).toBe('daily-dashboard-email');expect(w.jobs.report.if).toBe("github.ref == 'refs/heads/main'")
+ const paid=w.jobs.report.steps.find(s=>s.run==='npm run report:operate -- --action execute')!
+ expect(paid.if).toContain("vars.FX_REPORT_EXECUTION_MODE == 'execute'")
+ expect(w.jobs.report.env?.FX_REPORT_PUBLISH_MODE).toBe('review')
+ expect(w.jobs.report.steps.some(s=>s.env?.SMTP_PASSWORD)).toBe(false)
+ expect(text).not.toMatch(/send-daily|generate:data|mailing_list|git push/)
+ expect(w.jobs['admin-notice'].if).toContain("inputs.action == 'execute'")
+})

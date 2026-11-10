@@ -26,7 +26,7 @@ export function operatingResultState(result) {
  const collections=result.collectionResults??results.flatMap(r=>r.collectionResults??[])
  const statuses=[...results.flatMap(r=>[r.status,...(r.holds??[])]),...rows.map(r=>r.status),...collections.map(r=>r.status)]
  const recorded=results.filter(r=>r.version==='operating-checkpoint/1').map(r=>r.checkpointOutcome)
- const attention=recorded.some(r=>r?.kind==='action_required')||statuses.some(s=>/operating_storage_failure|cost_(?:unresolved|reconciliation|exceeded|or_execution_recovery)|unresolved_or_inflight|execution_hold|lease_expired|batch_busy|payload_capacity_hold|queue_capacity_hold|correction_recording_required/.test(s??''))
+ const attention=recorded.some(r=>r?.kind==='action_required')||statuses.some(s=>/source_endpoint_|operating_storage_failure|cost_(?:unresolved|reconciliation|exceeded|or_execution_recovery)|unresolved_or_inflight|execution_hold|lease_expired|batch_busy|payload_capacity_hold|queue_capacity_hold|correction_recording_required/.test(s??''))
   ||rows.some(r=>[r.continuation,...(r.continuation?.issues??[])].some(i=>['await_pipeline_repair','stop_paid_work'].includes(i?.action)))
  const failed=result.referenceReadiness?.ready===false||recorded.some(r=>r?.kind==='failure')||statuses.some(s=>/collection_or_history_failed|country_execution_hold|operating_model_key_missing|collection_failed/.test(s??''))
   ||collections.some(r=>r.acquisitionError||r.referenceStatus==='upstream_fx_refresh_not_confirmed'||r.candidates===0&&r.lookupFailures?.length)

@@ -17,7 +17,8 @@ it('plans through the workflow entry using the shared FX loader without a local 
  expect(result.modelCalls).toBe(0)
  expect(result.referenceReadiness).toMatchObject({ready:true,failures:[],contentQualityEvaluated:false})
  expect(f.state.posts).toEqual([])
- expect(fetchImpl).not.toHaveBeenCalled()
+ expect(fetchImpl).toHaveBeenCalled();expect(result).toMatchObject({status:'source_endpoint_preflight_hold',modelCalls:0})
+ expect(fetchImpl.mock.calls.every(([,options])=>!options?.method||options.method==='GET')).toBe(true)
  expect(acquire.mock.calls.every(([args])=>args.mode==='live')).toBe(true)
 })
 
@@ -29,7 +30,7 @@ it('fails readiness for a missing country, a reference comparison hold or a non-
  const f=await operatingFixture()
  vi.mocked(loadOperationalFxDataset).mockResolvedValueOnce(f.dataset)
  const result=await operatingEntry({action:'plan',workspace:process.cwd(),store:f.store,asOf:f.asOf,acquire:f.acquire,
-  env:{GITHUB_ACTIONS:'true',FX_REPORT_DATA_REFRESH:'committed'}})
+  fetchImpl:async(url)=>{const d=await f.preflightSource();return {ok:true,status:200,json:async()=>url.endsWith('/zdr')?d.zdr:d.catalog}},env:{GITHUB_ACTIONS:'true',FX_REPORT_DATA_REFRESH:'committed'}})
  const missing={...result,collectionResults:result.collectionResults.slice(1)}
  expect(referenceReadiness(missing)).toMatchObject({ready:false})
  const held=structuredClone(result);held.collectionResults[0].publicationDecision.comparisonHolds.push('anchor_value_revised')

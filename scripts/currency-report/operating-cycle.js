@@ -1,6 +1,8 @@
 // Server coordinator. No credentials/network/activation at import. Execution
 // requires service-owned policy and costs; publishing remains administrator-only.
 import {randomUUID} from 'node:crypto'
+import {inspectOriginalPlanEndpoint,inspectNewsModelEndpoint} from './news-model-review.js'
+import {endpointDiagnostic} from './endpoint-metadata.js'
 import {fingerprint} from './research-harness.js'
 import {assertOperatingPolicy,operatingConfigurationHolds} from './operating-policy.js'
 import {planAutomaticSupply} from './automatic-supply-plan.js'
@@ -22,7 +24,7 @@ export {operatingMaterialHash} from './operating-source-cache.js'
 
 const safeReason=error=>/^[a-z0-9_]+$/.test(error?.message??'')?error.message:'operating_execution_hold'
 const stopsCycle=result=>result.modelCalls===null||['cost_reconciliation_required','operating_batch_busy',
- 'operating_lease_expired','operating_execution_hold','operating_storage_failure'].includes(result.status)
+ 'operating_lease_expired','operating_execution_hold','operating_storage_failure','source_endpoint_preflight_hold'].includes(result.status)
 async function storageState(store,stage,error,stats,record){
  if(!record)return {recorded:false}
  try{
@@ -191,6 +193,27 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
    return {...summary,status:'operating_storage_failure',stage:'preflight',reason:safeReason(error),storage:stats,
     incident:await storageState(store,'preflight',error,stats,execute||verifyStorage)}}
  summary.storage=storage
+ // Inspect the immutable source requests, before claims/reservations. A failed
+ // common endpoint is a technical hold, not six independent evidence failures.
+ // A resumed envelope must first consult durable stage receipts. Its transport
+ // rechecks only unsent stages; an outage must not block reuse of paid results.
+ if(!verifyStorage&&!(execute&&previous)&&typeof preflightSource==='function'){
+  const checks=[]
+  for(const plan of prepared.sourcePlans??[]){
+   let metadata
+   try{
+    metadata=await preflightSource(plan.extraction)
+    inspectOriginalPlanEndpoint(plan,metadata.catalog,metadata.zdr)
+    checks.push({status:'passed',stage:'extract',requestHash:plan.extraction.requestHash,
+     checkedAt:metadata.checkedAt??new Date(clock()).toISOString(),metadataHash:metadata.metadataHash??fingerprint(metadata)})
+   }catch(error){
+    return {...summary,status:'source_endpoint_preflight_hold',holds:['model_processing_technical_hold'],
+     endpointChecks:[...checks,{status:'held',...endpointDiagnostic(error,plan.extraction,metadata,clock)}],modelCalls:0,
+     incident:await storageState(store,'endpoint',Error(error.endpointCategory?`source_endpoint_${error.endpointCategory}`:'source_endpoint_metadata_unavailable'),endpointDiagnostic(error,plan.extraction,metadata,clock),execute)}
+   }
+  }
+  summary.endpointChecks=checks
+ }
  if(verifyStorage){
   try{
    await storeOperatingInput(encoded,store)
@@ -237,9 +260,21 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   return store.reserve({...request,context:{...request.context,operatingBatchKey:key,operatingOwner:owner,operatingCaseKey:currentCase,
    ...(testOnly?{testOnly:true}:{} )}})
  }}
+ let endpointChecked=false,endpointFailed=false
+ const checkedSource=async request=>{
+  let metadata
+  try{metadata=await preflightSource(request);inspectNewsModelEndpoint(request,metadata.catalog,metadata.zdr);endpointChecked=true}
+  catch(error){
+   endpointFailed=true
+   const recorded=await storageState(store,'endpoint',Error(error.endpointCategory?`source_endpoint_${error.endpointCategory}`:'source_endpoint_metadata_unavailable'),endpointDiagnostic(error,request,metadata,clock),true)
+   if(!recorded.recorded)throw Error('operating_incident_record_failed')
+   throw error
+  }
+  return metadata
+ }
  try{
-  const result=await runOperationalReportBatch({dataset:executionDataset,countries:prepared.privateCountries,asOf:prepared.asOf,store:scoped,env,approval,writer:policy.writer,
-   sourcePlan,sourceRegister,registry,processingRules,preflightSource,preflightWriter,send,reconcile,testOnly,sourceAdmissionState:prepared.sourceAdmissionState,
+  const result=await runOperationalReportBatch({dataset:executionDataset,countries:prepared.privateCountries,asOf:prepared.asOf,store:scoped,env,approval,writer:policy.writer,reviewer:policy.destination.reviewProvider==='azure'?'sol':'sol-us',
+   sourcePlan,sourceRegister,registry,processingRules,preflightSource:checkedSource,preflightWriter,send,reconcile,testOnly,sourceAdmissionState:prepared.sourceAdmissionState,
    excludedCountries:[...owned].filter(([,batchKey])=>batchKey!==key).map(([currency])=>currency),
    beforeCountry:async country=>{
     if(owned.has(country.currency)&&owned.get(country.currency)!==key)return {claimed:false,reason:'country_owned_by_prior_batch'}
@@ -309,6 +344,11 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
     }
     await heartbeat({status:stage,currency,resultStatus:value.status??null,runId:value.runId??null})
    }})
+  // One successful request cannot resolve another failed stage in the same run.
+  if(endpointChecked&&!endpointFailed){
+   const recorded=await storageState(store,'endpoint',null,null,true)
+   if(!recorded.recorded)throw Error('operating_incident_record_failed')
+  }
   // A temporary pre-dispatch wait preserves the exact batch/case for resume.
   const state=result.unknownCost?'cost_unresolved':deadlineHeld||result.rows.some(r=>r.continuation?.resumeExact)?'paused':'completed'
   const outcome={...result,collectionResults:refreshed.collectionResults}

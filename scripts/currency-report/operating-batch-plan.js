@@ -20,7 +20,7 @@ export const OPERATING_DESTINATION=Object.freeze({endpoint:'https://openrouter.a
  model:'openai/gpt-6.1-sol',provider:'azure',writerProvider:'azure',reviewProvider:'azure/us',zdr:true,dataCollection:'deny',rawPurpose:'original_extraction_and_comparison_only',
  writerInput:'reviewed_independent_notes_only',rawPublicDisplay:false,retries:0,fallback:false})
 export const matchesOperatingDestination=value=>value&&Object.keys(value).every(key=>Object.hasOwn(OPERATING_DESTINATION,key))
- &&Object.entries(OPERATING_DESTINATION).every(([key,expected])=>key==='writerProvider'?['azure','azure/us'].includes(value[key]??'azure'):value[key]===expected)
+ &&Object.entries(OPERATING_DESTINATION).every(([key,expected])=>['provider','writerProvider','reviewProvider'].includes(key)?['azure','azure/us'].includes(value[key]??'azure'):value[key]===expected)
 // The extended ceiling is available only to an explicitly bound one-time
 // trial. Factory defaults and recurring service limits remain unchanged.
 export const operatingLimitCeilings=policy=>policy?.state==='trial_configured'
@@ -112,7 +112,7 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
    }catch{
     row.holds.push('saved_source_review_invalid');break
    }
-   const plan=prepareOriginalNewsCase({collection,card,sourceUse})
+   const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter:policy.destination.provider==='azure/us'?'sol-us':'sol'})
    if(plan.holds.length){row.sources.push({cardBinding:card.binding,status:'source_preparation_hold',holds:plan.holds});continue}
    plans.push(plan);row.sourceMaxNano+=Math.ceil(plan.maximumUsd*1e9);row.maxCalls+=2
    row.sources.push({cardBinding:card.binding,status:'request_prepared_not_dispatched',planBinding:plan.binding,
@@ -124,7 +124,7 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
   if(row.status!=='planned'){row.maxCalls=0;row.sourceMaxNano=0}
   row.maximumUsd=row.status==='planned'?(row.sourceMaxNano+2*writerProfile('sol').perCallUsd*1e9)/1e9:0
   privateCountries.push({...structuredClone(country),collection,
-   preparation:{status:row.status,holds:[...row.holds]}})
+   preparation:{status:row.status,holds:[...row.holds],...(policy.destination.provider==='azure/us'?{sourceWriter:'sol-us'}:{})}})
   rows.push(row)
  }
  const writerCallAllowance=2*rows.filter(r=>r.status==='planned').length

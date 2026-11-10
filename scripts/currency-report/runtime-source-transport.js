@@ -3,7 +3,8 @@
 // these expenses distinct. Source jobs can never create a report candidate.
 import {fingerprint} from './research-harness.js'
 import {prepareOriginalComparison} from './original-news-pipeline.js'
-import {inspectNewsModelEndpoint,NEWS_REVIEW_POLICY} from './news-model-review.js'
+import {inspectNewsModelEndpoint} from './news-model-review.js'
+import {endpointDiagnostic} from './endpoint-metadata.js'
 import {runtimeNano,runtimeMode} from './runtime.js'
 import {selectRuntimeAttempt} from './runtime-retry.js'
 
@@ -43,17 +44,18 @@ export function runtimeSourceTransport({store,env,approval,preflight,send,reconc
   if(calls>=approval.maxCalls||committed+request.maximumUsd>approval.budgetUsd)before('source_budget_not_approved')
   const config=await store.control()
   if(!config.enabled||!config.review_enabled||!['sol','sol-us'].includes(config.writer))before('source_runtime_disabled')
+  let metadata
   try{
-   const metadata=await preflight(request)
+   metadata=await preflight(request)
    inspectNewsModelEndpoint(request,metadata.catalog,metadata.zdr)
-  }catch{before('source_endpoint_preflight_hold')}
+  }catch(error){const failure=Error(error.endpointCategory?`source_endpoint_${error.endpointCategory}`:'source_endpoint_metadata_unavailable');failure.beforeDispatch=true;failure.diagnostic=endpointDiagnostic(error,request,metadata);throw failure}
   const reservation=await store.reserve({taskKey,
    currency:plan.currency,baseDate:plan.job.time.asOf.slice(0,10),stage:request.stage==='extract'?'writer':'reviewer',
    parentId:parent?.id??null,requestHash:request.requestHash,reservedNano:runtimeNano(request.maximumUsd),revision:config.revision,
    // Do not store the original request text in the runtime DB.
    context:{writer:config.writer,purpose:'original_source_review',sourceStage:request.stage,planBinding:plan.binding,
     originalId:plan.originalId,originalBinding:plan.originalBinding,requestHash:request.requestHash,
-    model:NEWS_REVIEW_POLICY.model,provider:NEWS_REVIEW_POLICY.route,...retry}})
+    model:request.body.model,provider:request.body.provider.only[0],...retry}})
   if(!reservation.reserved)before(reservation.reason)
   if(!await store.begin(reservation.id,request.requestHash))before('source_runtime_stopped_before_post')
   calls++

@@ -126,3 +126,8 @@ it('checks the stop switch again after reservation and leaves an interrupted res
  await expect(runCurrencyRuntime({...f,env:runtimeTestEnv,store:broken,...t,send})).rejects.toThrow('database response lost')
  expect(send).toHaveBeenCalledTimes(1);expect(broken.jobs[0]).toMatchObject({state:'calling',costState:'unknown'})
 })
+it('binds the explicitly approved reviewer while keeping legacy defaults unchanged',()=>{
+ const f=runtimeFixture(),legacy=prepareRuntimeTask(f),selected=prepareRuntimeTask({...f,reviewer:'sol'})
+ expect(legacy.reviewer).toBe('sol-us');expect(selected.reviewer).toBe('sol')
+ expect(selected.taskKey).not.toBe(legacy.taskKey);expect(selected.plan.body).toEqual(legacy.plan.body)
+})

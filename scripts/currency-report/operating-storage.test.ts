@@ -101,7 +101,7 @@ it('detects a corrupted database readback before any execution claim or model re
 })
 it('resumes an existing /1 paused run without converting its payload or changing its case budget',async()=>{
  const f=await operatingFixture()
- await runOperatingCycle({...f,execute:true,preflightSource:async()=>{throw Error('synthetic_endpoint_outage')}})
+ await runOperatingCycle({...f,execute:true,preflightSource:async()=>{if(f.state.batch)throw Error('synthetic_endpoint_outage');return f.preflightSource()}})
  const legacy=await restoreFrozenInput(f.state.batch.payload,f.store,restoreOperatingPayload)
  f.state.batch.payload={...legacy,serializedOperatingPayload:JSON.stringify(legacy)}
  const before=JSON.stringify(f.state.batch.payload),result=await runOperatingCycle({...f,execute:true})
@@ -119,4 +119,17 @@ it('passes identical mock model request bodies and publication inputs before and
  expect(requests[0].length).toBeGreaterThan(0)
  expect(requests[1]).toEqual(requests[0])
  expect(second.state.inputHistory.map(t=>t.binding)).toEqual(first.state.inputHistory.map(t=>t.binding))
+})
+it('does not clear a recurring comparison outage just because extraction preflight succeeds',async()=>{
+ const f=await operatingFixture()
+ const preflightSource=async request=>{
+  if(f.state.batch&&request?.stage==='compare')throw Error('synthetic_compare_metadata_outage')
+  return f.preflightSource()
+ }
+ for(let i=0;i<2;i++)await runOperatingCycle({...f,execute:true,preflightSource})
+ const incidents=f.store.incidents.filter(i=>i.stage==='endpoint')
+ expect(incidents.length).toBeGreaterThan(0)
+ expect(incidents.every(i=>!i.healthy)).toBe(true)
+ await runOperatingCycle({...f,execute:true})
+ expect(f.store.incidents.filter(i=>i.stage==='endpoint').at(-1).healthy).toBe(true)
 })

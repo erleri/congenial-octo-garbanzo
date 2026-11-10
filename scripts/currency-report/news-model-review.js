@@ -6,6 +6,7 @@ import {projectReviewedNewsNotes,NEWS_NOTES_INSTRUCTIONS} from './reviewed-news-
 import {projectEvidenceScopes} from './evidence-scope.js'
 import {inspectSourceUses} from './source-use.js'
 import {projectSourceAttributions} from './source-attributions.js'
+import {endpointError} from './endpoint-metadata.js'
 import {writerProfile} from './writer-policy.js'
 import {requestTokenBound} from './request-budget.js'
 import {callOpenRouterStream,reconcileGenerationCost} from './openrouter-stream.js'
@@ -25,6 +26,12 @@ export const NEWS_REVIEW_POLICY=Object.freeze({model:profile.model,route:profile
 export const ORIGINAL_REVIEW_PURPOSE='complete_original_analysis'
 export const ORIGINAL_REVIEW_POLICY=Object.freeze({...NEWS_REVIEW_POLICY,maxPipelineUsd:.25,
  maxInputTokens:Math.floor((.25-2*NEWS_REVIEW_POLICY.maxOutputTokens*profile.completion/1e6)*1e6/profile.inputReservation)})
+export function originalReviewPolicy(writer='sol') {
+ const p=writerProfile(writer)
+ if(!['sol','sol-us'].includes(writer))throw endpointError('request_configuration')
+ return {...ORIGINAL_REVIEW_POLICY,model:p.model,route:p.route,outputField:p.outputField,prompt:p.prompt,completion:p.completion,inputReservation:p.inputReservation,
+  maxInputTokens:Math.floor((.25-2*4096*p.completion/1e6)*1e6/p.inputReservation)}
+}
 const roles=['market_explanation','price_only','global_context','consumer_background','policy_context','unrelated']
 const priceKinds=['market_close','intraday','official_fix','official_reference','wholesale','retail','mep','ccl','blue','mixed','not_stated','not_applicable']
 const str=(values)=>({type:'string',...(values?{enum:values}:{})})
@@ -94,7 +101,7 @@ export function prepareNewsNotesModelReview({packet,sourceUse,asOf}) {
 }
 
 export function inspectNewsModelEndpoint(plan,catalog,zdr) {
- const p=plan.purpose===ORIGINAL_REVIEW_PURPOSE?ORIGINAL_REVIEW_POLICY:NEWS_REVIEW_POLICY
+ const p=plan.purpose===ORIGINAL_REVIEW_PURPOSE?originalReviewPolicy(plan.sourceWriter??'sol'):NEWS_REVIEW_POLICY
  const e=catalog?.data?.endpoints?.find(e=>e.tag===p.route)
  const body=plan.body,input=requestTokenBound(body)
  const price=(v,max)=>v!=null&&Number.isFinite(Number(v))&&Number(v)>=0&&Number(v)<=max/1e6
@@ -102,16 +109,29 @@ export function inspectNewsModelEndpoint(plan,catalog,zdr) {
    ||JSON.stringify(body.provider)!==JSON.stringify({only:[p.route],require_parameters:true,zdr:true,data_collection:'deny',allow_fallbacks:false,
      max_price:{prompt:p.prompt,completion:p.completion}})||body.reasoning?.effort!=='medium'||body.stream!==true
    ||body.tools||body.plugins||body.temperature!==undefined
-   ||!e||e.model_id!==p.model||e.status!==0||!zdr?.data?.some(x=>x.model_id===p.model&&x.tag===p.route)
-   ||!['reasoning','response_format','structured_outputs',p.outputField].every(x=>e.supported_parameters?.includes(x))
+   )throw endpointError('request_configuration')
+ if(!e||e.model_id!==p.model||e.status!==0)throw endpointError('route_unavailable')
+ if(!zdr?.data?.some(x=>x.model_id===p.model&&x.tag===p.route))throw endpointError('processing_conditions')
+ if(!['reasoning','response_format','structured_outputs',p.outputField].every(x=>e.supported_parameters?.includes(x))
    ||Object.keys(body).some(k=>!['model','messages','provider','stream'].includes(k)&&!e.supported_parameters?.includes(k))
-   ||input>p.maxInputTokens||e.context_length<input+p.maxOutputTokens||e.max_completion_tokens<p.maxOutputTokens
+   )throw endpointError('unsupported_parameters')
+ if(input>p.maxInputTokens||e.context_length<input+p.maxOutputTokens||e.max_completion_tokens<p.maxOutputTokens
    ||!price(e.pricing?.prompt,p.prompt)||!price(e.pricing?.completion,p.completion)
    ||!price(e.pricing?.internal_reasoning??e.pricing?.completion,p.completion)
    ||['input_cache_read','input_cache_write','input_cache_write_1h'].some(k=>e.pricing[k]!==undefined&&!price(e.pricing[k],p.inputReservation))
    ||Number(e.pricing?.request??0)!==0||e.pricing?.overrides?.some(x=>x.min_prompt_tokens<=input))
-   throw new Error('news_review_endpoint_privacy_support_or_price_hold')
+   throw endpointError('price_or_input_limit')
  return {model:p.model,route:p.route,zdr:true,dataCollection:'deny',pricing:e.pricing}
+}
+
+export function inspectOriginalPlanEndpoint(plan,catalog,zdr) {
+ const result=inspectNewsModelEndpoint(plan.extraction,catalog,zdr)
+ const p=originalReviewPolicy(plan.sourceWriter??'sol'),endpoint=catalog.data.endpoints.find(e=>e.tag===p.route)
+ if(!Number.isSafeInteger(plan.budget?.comparisonInputBound)||plan.budget.comparisonInputBound>p.maxInputTokens
+  ||endpoint.context_length<plan.budget.comparisonInputBound+p.maxOutputTokens||plan.maximumUsd>p.maxPipelineUsd){
+  const error=endpointError('price_or_input_limit');error.endpointStage='compare';throw error
+ }
+ return result
 }
 
 export function inspectNewsNotesModelResponse(plan,output) {

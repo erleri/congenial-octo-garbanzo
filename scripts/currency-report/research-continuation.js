@@ -15,7 +15,7 @@ export function sourceContinuation(item) {
   category='temporary';action='wait_for_country_storage';resumeWhen='next_cycle_rechecks_country_history_and_storage'
  }else if(match(reasons,/source_budget_deferred|source_dispatch_deferred/)){
   category='budget';action='continue_next_budgeted_cycle';resumeWhen='next_cycle_reuses_reviews_and_allocates_remaining_sources'
- }else if(match(reasons,/country_runtime_read_wait|country_store_wait|frozen_(?:source|reference)_refresh_wait|execution_time_budget_wait|source_endpoint_preflight_hold|runtime_endpoint_preflight_wait|runtime_finalization_wait|runtime_store_.*_failed|runtime_stopped_before_call|runtime_disabled|source_runtime_stopped_before_post/)){
+ }else if(match(reasons,/country_runtime_read_wait|country_store_wait|frozen_(?:source|reference)_refresh_wait|execution_time_budget_wait|source_endpoint_(?:preflight_hold|metadata_unavailable|route_unavailable|unsupported_parameters|processing_conditions|price_or_input_limit|request_configuration)|runtime_endpoint_preflight_wait|runtime_finalization_wait|runtime_store_.*_failed|runtime_stopped_before_call|runtime_disabled|source_runtime_stopped_before_post/)){
   category='temporary';action='resume_saved_stages';resumeWhen='endpoint_control_or_execution_window_recovered';resumeExact=true
  }else if(match(reasons,/source_budget_not_approved|source_review_budget_required|source_review_wait|batch_budget_hold|monthly_budget|budget_exhausted|batch_stopped_before_dispatch|operating_batch_budget_hold/)){
   category='budget';action='wait_for_budget';resumeWhen='authorized_budget_available';resumeExact=true
@@ -82,7 +82,7 @@ export function countryContinuation(row) {
  const issues=[...sourceIssues,
   {status:row.status,reason:row.reason,holds:row.sourceHolds??row.holds??[]}]
  const decisions=issues.map(sourceContinuation)
- const selected=decisions.find(d=>d.category==='accounting')??decisions.find(d=>d.category==='technical')??decisions.find(d=>d.resumeExact)
+ const selected=decisions.find(d=>d.category==='accounting')??decisions.find((d,i)=>codes(issues[i]).some(code=>code.startsWith('source_endpoint_')))??decisions.find(d=>d.category==='technical')??decisions.find(d=>d.resumeExact)
   ??decisions.find(d=>d.category==='access'||d.category==='capture'||d.category==='capacity')
   ??decisions.find(d=>d.category==='content'||d.category==='output'||d.category==='period'||d.category==='superseded')??decisions[0]
  const holds=row.sourceHolds??row.holds??[]

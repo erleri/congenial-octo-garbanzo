@@ -37,14 +37,14 @@ export const emailMessageId = key => {
 }
 export function publicEmailReportLink(currency,date,id) {
   if(!EMAIL_CURRENCIES.includes(currency)||!validEmailDate(date)||!publicId.test(id)) throw Error('invalid_email_report_link')
-  return `https://latamforex.netlify.app/?run=${encodeURIComponent(id)}#report/${currency}/${date}`
+  return `https://latamforex.netlify.app/?entry=email&run=${encodeURIComponent(id)}#report/${currency}/${date}`
 }
 export function captureDashboardEmailFrame({dataset,businessPlan=null,asOf=new Date().toISOString(),workflowRunId=null}) {
   if(!validEmailDate(dataset?.baseDate)||dataset.baseDate>emailEditionDate(asOf)) throw Error('invalid_email_dataset_date')
   const {subject,html}=composeEmailBody({dataset,businessPlan,reportDigest:[],digestPlaceholder:true})
   const details=getCurrencyDetails(dataset,businessPlan)
   const anchor=getUsdKrwAnchor(dataset)
-  const plainText=[`LATAM FX Daily Brief · 환율 기준일 ${dataset.baseDate}`,'https://latamforex.netlify.app/',
+  const plainText=[`LATAM FX Daily Brief · 환율 기준일 ${dataset.baseDate}`,'https://latamforex.netlify.app/?entry=email',
     `USD/KRW: ${formatRate(anchor.rate)}`,...details.map(d=>`${d.currency}/USD 기준환율 ${formatRate(d.rate)} · 월평균 ${formatRate(d.mtdAverage)}`)].join('\n')
   return {version:'dashboard-email-frame/1',channel:EMAIL_CHANNEL,editionDate:emailEditionDate(asOf),
     cutoff:asOf,dataDate:dataset.baseDate,datasetHash:emailHash(JSON.stringify(dataset)),subject,html,plainText,

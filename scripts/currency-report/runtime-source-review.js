@@ -10,7 +10,7 @@ import {savedSourceReview} from './operating-source-cache.js'
 import {sourceContinuation} from './research-continuation.js'
 import {inspectNewsPreselection} from './news-preselection.js'
 
-export async function reviewRuntimeSources({collection,asOf,registry,processingRules,saved=[],extract,compare,admitNotes,onlySaved=false,dispatchCardBindings}) {
+export async function reviewRuntimeSources({collection,asOf,registry,processingRules,saved=[],extract,compare,admitNotes,onlySaved=false,dispatchCardBindings,sourceWriter='sol'}) {
  if(dispatchCardBindings!==undefined&&(!Array.isArray(dispatchCardBindings)
   ||new Set(dispatchCardBindings).size!==dispatchCardBindings.length
   ||dispatchCardBindings.some(b=>!collection.reviewQueue.some(c=>c.binding===b))))throw Error('bound_source_dispatch_required')
@@ -54,7 +54,7 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
    if(materialDecision?.reason==='unsafe_original_material'){
     items.push({cardBinding:card.binding,status:'source_review_hold',holds:['unsafe_original_material']});continue
    }
-   const plan=prepareOriginalNewsCase({collection,card,sourceUse})
+   const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter})
    if(plan.holds.length){
     const decision=sourceUse.policyDecisions.find(d=>d.originalId===original.id)
     const budgetHold=plan.holds.some(h=>['complete_original_exceeds_budget','comparison_worst_case_exceeds_budget','source_two_stage_budget_exceeded'].includes(h))
@@ -91,11 +91,11 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
     if(newPaidCostUsd!==null)newPaidCostUsd+=r.costUsd
     return r
    }
-   const reviewed=await runOriginalNewsCase({collection,card,sourceUse,extract:invoke(extract),compare:invoke(compare),checkedOn:asOf.slice(0,10)})
+   const reviewed=await runOriginalNewsCase({collection,card,sourceUse,sourceWriter,extract:invoke(extract),compare:invoke(compare),checkedOn:asOf.slice(0,10)})
    if(newPaidCostUsd===null){items.push({cardBinding:card.binding,status:'source_cost_unresolved'});break}
    if(reviewed.status!=='source_card_prepared'){
     items.push({cardBinding:card.binding,status:reviewed.status,reason:reviewed.reason??null,
-     limitations:reviewed.limitations??[],modelCalls:thisCalls,costUsd:thisCost});continue
+     ...(reviewed.diagnostic?{diagnostic:reviewed.diagnostic}:{}),limitations:reviewed.limitations??[],modelCalls:thisCalls,costUsd:thisCost});continue
    }
    // A note's publication/model-use permission is not inferred from permission
    // to analyze the original. This adapter must return a bound material input.

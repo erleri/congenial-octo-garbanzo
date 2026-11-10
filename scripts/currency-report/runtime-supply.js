@@ -205,7 +205,7 @@ export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sou
 // return receipts + material inputs. Missing access/use/reviewer => hold, never
 // user-assigned manual selection. Cached judgments retain their original scope.
 export async function supplyRuntimeInput({dataset,currency,asOf,calendar,commentaryTarget,publications=[],
- handoff,claimTypingReview,sourcePlan,sourceRegister,acquire,review,store,writer='sol',periodicInput,
+ handoff,claimTypingReview,sourcePlan,sourceRegister,acquire,review,store,writer='sol',reviewer,periodicInput,
  eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,connect=prepareCountryNewsPool,processingRules}) {
  if(!REPORT_CURRENCIES.includes(currency))throw Error('registered_supply_currency_required')
  const snapshot=buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calendar})
@@ -302,7 +302,7 @@ export async function supplyRuntimeInput({dataset,currency,asOf,calendar,comment
  result.pendingArticles=pool.summary.pendingArticles
  result.cachedClaimsReused=Object.values(current.materialConnection.sections).flat().length
  let task
- try{task=prepareRuntimeTask({dataset,currency,asOf,calendar,publications,handoff:current,writer,periodicInput,
+ try{task=prepareRuntimeTask({dataset,currency,asOf,calendar,publications,handoff:current,writer,reviewer,periodicInput,
   eventCandidateIds,correctionReportIds,previousChecks,openCase})}
  catch(error){result.status='writer_preparation_hold';result.holds=[reason(error)];return finish()}
  if(task.status!=='prepared'){

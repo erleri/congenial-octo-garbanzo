@@ -112,9 +112,9 @@ it('checks live endpoint capability, price and ZDR for the exact provider before
    context_length:100000,max_completion_tokens:8192,pricing:{prompt:'0.000002',completion:'0.000010'}}
  const catalog={data:{endpoints:[e]}},zdr={data:[{model_id:p.model,tag:p.route}]}
  expect(inspectNewsModelEndpoint(plan,catalog,zdr).route).toBe('azure')
- expect(()=>inspectNewsModelEndpoint(plan,catalog,{data:[]})).toThrow('privacy_support_or_price')
+ expect(()=>inspectNewsModelEndpoint(plan,catalog,{data:[]})).toThrow('source_endpoint_')
  e.pricing.completion='0.000011'
- expect(()=>inspectNewsModelEndpoint(plan,catalog,zdr)).toThrow('privacy_support_or_price')
+ expect(()=>inspectNewsModelEndpoint(plan,catalog,zdr)).toThrow('source_endpoint_')
 })
 
 it('retains unknown cost reservations and blocks subsequent work rather than retrying',async()=>{

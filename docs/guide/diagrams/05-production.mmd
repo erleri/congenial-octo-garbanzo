@@ -1,15 +1,21 @@
 flowchart TD
   PLAN[자동: 국가별 질문·출처 선택] --> COLLECT[뉴스·공식 자료 수집]
   COLLECT -->|뉴스| SCOPE{자동: 이용 범위·기간·가격 적합?}
-  SCOPE -->|예| GATE[서버: 경로·용량·중복·예산 검사와 예약]
+  SCOPE -->|예| INPUT[자동: 환율·조사 준비 입력 고정]
   SCOPE -->|예외| SOURCE[관리자: 출처 범위 결정]
-  SOURCE -->|조건 충족 후| GATE
+  SOURCE -->|조건 충족 후| INPUT
   SOURCE -->|보류| HOLD[사유 기록·다른 적합 경로 유지]
+  INPUT --> STORE[서버: 무손실 압축·조각 저장·복원 해시 대조]
+  STORE -->|무과금 확인| VERIFIED[저장 검증 종료: 호출·예약·게시 없음]
+  STORE -->|실행| GATE[서버: 작은 명세서 연결·경로·중복·예산 검사와 예약]
+  STORE -->|실패| FAULT[기술 장애 기록·관리자 운영 확인·Actions 실패]
+  FAULT -->|기록도 실패| LOG[Actions에 기록 실패 표시]
   GATE -->|허용| EXTRACT[AI: 원문 추출 → 별도 대조]
   GATE -->|차단| HOLD
   EXTRACT --> CARDS[검토된 사실·귀속 견해 카드]
   COLLECT -->|공식 통계| OFFICIAL[자동: 지표 정의·기간·수정 확인]
   OFFICIAL --> BG[보조 배경: 당일 환율 원인과 분리]
+  BG --> INPUT
   CARDS --> WRITE[AI: 환율 중심 집필]
   BG --> WRITE
   WRITE --> REVIEW[자동 구조 검사 + AI 문장별 검토]

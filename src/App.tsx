@@ -15,7 +15,7 @@ import { reportBadge } from './lib/reportFreshness'
 import { reportHistoryHash } from './lib/reportHistory'
 import { recentMonthRange } from './lib/pageContext'
 import { usePageContext } from './hooks/usePageContext'
-import { pageUsage, recordUsage } from './lib/usage'
+import { recordPageUsage, recordUsage } from './lib/usage'
 import { CURRENCIES, type CurrencyCode, type CurrencyFilter } from './types/exchangeRate'
 import './App.css'
 import './ui2.css'
@@ -41,10 +41,10 @@ function App() {
   const rangeButton=useRef<HTMLButtonElement>(null)
   const reports=useDashboardReports(HAS_REPORTS,navigation.screen)
   usePageContext(navigation,locationHash)
-  useEffect(()=>{const event=pageUsage(navigation);if(event)void recordUsage(event)},[navigation])
   const {dataset,datasetSource,loading,error,excelPriority,fillMissing,dailyRangeLoading,dailyRangeNotice,
     filters,refreshData,ensureDailyRange,uploadAndMergeExcel,businessPlan,updateBusinessPlan,businessPlanStatus,adminAccess,
     businessPlanHistory,businessPlanHistoryStatus,loadMoreBusinessPlanHistory,requestBusinessPlanAccess,signOutBusinessPlanAccess}=useExchangeData()
+  useEffect(()=>{void recordPageUsage(navigation)},[navigation,locationHash,adminAccess])
   const screen=navigation.screen
   // Fetch charts alongside FX data on the dashboard; report readers skip them.
   useEffect(()=>{if(screen==='dashboard')void loadDashboard()},[screen])

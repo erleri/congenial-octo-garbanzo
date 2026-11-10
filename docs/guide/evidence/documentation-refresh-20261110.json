@@ -1,0 +1,1612 @@
+{
+  "version": "documentation-refresh/1",
+  "date": "2026-11-10",
+  "implementationCommit": "681de0ccb91e8b38f8bddc3ecbc5670d3f98611a",
+  "startingLocalCommit": "92a6969b4fe74747f4677e6180271634e3939d8a",
+  "operatingObservationAt": "2026-11-10T01:06:00+09:00",
+  "scope": "Existing documentation package refreshed; no runtime code, runtime policy input, production setting, DB, model call, mail or deployment change in this documentation task.",
+  "currentGuideReview": [
+    "README.md",
+    "PROJECT_OVERVIEW.md",
+    "OPERATIONS_TODO.md",
+    "docs/guide/app.md",
+    "docs/guide/architecture.md",
+    "docs/guide/rules.md",
+    "docs/guide/operations.md",
+    "docs/guide/operational-status.md",
+    "docs/guide/countries.md",
+    "docs/guide/admin-review-notifications.md",
+    "docs/guide/frozen-input-storage.md",
+    "docs/guide/verification.md",
+    "docs/guide/presentation-evidence.md",
+    "docs/guide/catalog.md"
+  ],
+  "changedOrAdded": [
+    "OPERATIONS_TODO.md",
+    "docs/guide/admin-review-notifications.md",
+    "docs/guide/app.md",
+    "docs/guide/architecture.md",
+    "docs/guide/catalog.md",
+    "docs/guide/countries.md",
+    "docs/guide/diagrams/01-navigation.svg",
+    "docs/guide/diagrams/02-services.mmd",
+    "docs/guide/diagrams/02-services.svg",
+    "docs/guide/diagrams/03-rates.svg",
+    "docs/guide/diagrams/04-cadence.svg",
+    "docs/guide/diagrams/05-production.mmd",
+    "docs/guide/diagrams/05-production.svg",
+    "docs/guide/diagrams/06-email.mmd",
+    "docs/guide/diagrams/06-email.svg",
+    "docs/guide/diagrams/index.html",
+    "docs/guide/evidence/diagram-verification-20261110.json",
+    "docs/guide/evidence/documentation-refresh-20261110.json",
+    "docs/guide/evidence/source-observation-20261110.json",
+    "docs/guide/operations.md",
+    "docs/guide/presentation-evidence.md",
+    "docs/guide/rules.md",
+    "docs/guide/verification.md"
+  ],
+  "protectedDocuments": {
+    "count": 256,
+    "hashNormalization": "UTF-8 text with CRLF normalized to LF; compared to starting local commit.",
+    "entries": [
+      {
+        "path": "LatamFX_AX_5min_script.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5ace18a913100c63ebe3b01f4a7051d388d8be466dfda64dd8516ee7f6806daf",
+        "unchanged": true
+      },
+      {
+        "path": "docs/1x-prs.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "937bad8c0488777c01de395aa896aa02feffd2aac9ea758c66b4a255b0508773",
+        "unchanged": true
+      },
+      {
+        "path": "docs/1x-rollout.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ebcf581f016982f2ed887c907414736952196bbaef1d3ec3b134e592bf5ab4c2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/actual-response-common-repair-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "fa541d5755f5b206764592d8bba90a2f8e01b18cd80067db5dbd397d510a42e4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/admin-auth-unification-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "25a1f8640bc45c2e0b9b8799c9ed1425c630e19c6d246fda6d35b0a494d6ac7c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/app-flow-verification-20261030.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "de8c34e85aa93821ef4959cdce9a819f683b704c36705dd26762236fa4b98299",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/app-flow-verification-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a376f8b70fe5f9814be99e3dad5c3652350464f32f20240b6eabe700a3ae2426",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/app-map-handoff-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "cd6d72a4c4f3b1ab9721109b756e3a329129ffa2493866550db3a57a17f09262",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/app-report-integration-20261013.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "60d13ebe4874a758ceec367a343f2d958d02d2e9ad0ef1c49e8584fa3ae54a40",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/automation-completion-fixes-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2dec8d390ee4f3fcf5ab7a04edab5162b986ee1863611eb412b972e101d70b3f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/automation-continuation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c0cc1d728b80d57aebf436b392aa3b3e3d5d27699f3a0c6195e04496acf4bb57",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/automation-independent-audit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "02239d0d172bb3285547b2974f2f845e42104e3687fb67987785752b3a3addf0",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/automation-independent-reaudit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "be690785058aa9a3d6c2489267b9ce4631431775a24fa85ae665632c60d49653",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/bcch-api-token-verification-20261026.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ce251a40cfecd7c579bc5e323031a8d83ce27ab4ed720898cc119292c4de4756",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/bcch-public-reuse-review-20261017.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "e05236a662dce318a1fca123bd9fa0dd40cd88f9e27ff97c9e4168f2030050d9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/bcch-report-input-verification-20261026.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "621d855410067e6d55e7c680c76849de7f519df780d5a82b7e6571b0b1ce9662",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/brazil-harness-comparison-results.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "995730eed8e0d35160d9f60ef3fd49272722dbd0e25ad90ddc8a751ba00dc823",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/brl-saved-source-handoff-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "f59f1c8bb662d75c439f8482e76c62dd85568019014c3f2883ea27c97bf7d1f7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/business-writing-connection-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c85ae2bc11dd9caa58328303c8c9d80495cdd177fb50739fed5f6d009c8d0b03",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/chile-monthly-collector-review-20261015.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3714d4ea8142637db92a022a2954b47d29aa232123099e801da8243a2e5e8a79",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/chile-monthly-evidence-review-20261015.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ff19a178d4a478d9f9fc2b2770715330cbccd4a4b64498baec2e3ed7da7c35a9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/chile-monthly-refresh-verification-20261016.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2a8a7d92b1726e99e56670056b271aa8e0f61e00587cee79a9ed6bce3ae7bbdf",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/chile-monthly-reuse-review-20261015.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d848fd87bfa4c64f519d86206e739170e90b8e189f417ff6cf21c667b0222d29",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/chile-statistic-registry-review-20261014.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "03856be85f3d18babb2cda7b3c9bcd01e2c497fe3be1071640dd6e64ffa85ac2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-20261005-evidence-review.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "775f4ad0e866458fa62e63b33f7fa0486d37ed33bd4d9d4a1d523991e95f27bf",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-current-market-review-20261016.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "78d6d9eef2ef4c331cc7360da69806268c6331ef4f6956e7422fa46b5fca9696",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-editorial-trial-results.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "edf55d934d9dbd5905724468ddcac048c1cb323649e0127eb596345bfed1cb7a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-final-input-review.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "429602c130513050c2b1b4f362d23dd4f46864672dfcc058cb38fb8f134dd353",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-final-trial-result.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "63fa6719a5fe70149c7575f78205e1675e2a50af24484521f945d910d9bcf1cd",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-free-news-case-20260910-review-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5749fb12bb8dddb66d9e65ff756e05f0cc922894765a05a3754c89f400df10c9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-gemini-stream-report-result.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "99272d14a7f62d2181e12d5744016e7ba882adc29d5aeeb1de275e68650fb416",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-gemini38-trial-result.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3a0157ed9b0b07689f55dee89848e93b186ae5a784b0f3d61489161419b2e5b2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-latest-report-preparation-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d8fb035734920ec4c861edad9b9d54217a6eb23537869229cbe32d1589f9e8ca",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-news-notes-20260910.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "7cad6b88fe76b19065fa03976615731ba5acabbc09fcf436ea1deb2b7d1e431a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-news-notes-correction-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5c0fa4e7be44c848437ced76dfc1f8059609f434ce060c7efc77583b5187d9c1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-news-notes-trial-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "fb0f75539e3a53c12a0dd4485824a17e05404a9b5b9d90bb094e3cbcdc064d0e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-official-price-verification-20261017.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "eba446ae09c73795fcddd35271b6945729668f123b9360a6536d144ac4fb23ab",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-price-basis-input-20261017.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "eb339195ed254b0a6a36a97e224f98a20fc735e38af291061ef600b4a3e9585d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-price-basis-verification-20261017.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a49884110dc9f92bd793f16e3118fe4eda7e3b50af3ac65c7b5f2eb7d4237f15",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-publisher-admission-verification-20261026.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "96b42deb1f08eba195359dfae7f410d2b077a616ea72f89599072ed284fe079b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-publisher-input-final-review-20261026.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "af7f36af07064eb62ca8d678b4ebc67bb954f787ae89b9ce867c4ed35d5926b8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-publisher-input-final-review-20261026.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "59ed79e713ff29b18dd0061cbebc4d52a5a93e5b023011293bc9986b161915c8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-publisher-research-verification-20261026.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "1562937e72ee3f762d27ac2a59f5a7327e450aabf3093d2cc813a508360f706f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/clp-source-pool-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9d461e912a02a8f75776c0f30f4187ceec17b75d74ddede5a6b4eccd95f8b2b7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/common-process-rerun-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9d7dc857a684228928aa511eb89ffe9a9d35b84418f76fc3c0011a2d7f274a0a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/common-report-rules-history-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "6ce6a6ce83e5564a186da9a66fc190a81df5cb7bc713e3f87a39f70ffab5f25c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/common-runtime-closeout-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "6b5e1896eb745cf82058b7a8266a41f7f07cf63ff6f8f06cf58104e2b83f4255",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/common-source-selection-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "0f4a7da53f34739ca7efa5e53215da11bf977eb07392fcfd32b56fb0195a6c74",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/common-writer-closeout-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3c2962d06de37db636f363f51a656015c67050f01aa76db103e4aa113ca452d8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/consumer-generation-trial-20261015.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "e89a9d0be9d839fe048f24fc03fe840e334ec7104ee4640517826828cee45dd5",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/consumer-input-comparison-20261016.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "29b83d71ab3e6da272dfdf331cf2fa52314a5d0d1e8b56faa2e0ba95613acf24",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/consumer-input-review-20261015.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "cbc666bf79319a1af2a9862db47651a77cac05b14a1238789aa7eed37a8614e8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/consumer-reader-input-review-20261016.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "951678748df0e5abec3f6c0c6bf0c981a5fcadc1510c50f675291850a2d6c2bb",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/cop-ars-reported-prices-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "4f23ddb4dc5910b7f9eeb74aad915ac84c270feb7c15660409034e93ac2bd134",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/cop-pen-ars-gap-judgment-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c2c0ae1a505aee0cea39ac467ab7a6ef11a80220125da1b260ce31181fab2747",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/country-queue-recovery-fixes-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "89ba33bccf5fa354c2384a2992cd6e7f8afca337eabc4fedb32d459c9977bfa6",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/current-validity-preparation-recovery-fixes-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "817d6bff3202fc9b9c70e1f9b385c7e95f462884967a61e7b9158102cdf9a57f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/dashboard-layout-comparison-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "f08d4f8db8c3ff6f1e4665f831a5cb41968df029763fb3655be7163ad4c01d4f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/dashboard-trends-implementation-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "4abd1cdd250f9b8ddecb568bce46269508af84d21b4dfb05de21c59fc5eff38b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/dashboard-trends-work-plan-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3e27194c07d8befb99f93764adad59a6fc999b0c99a95dfafb320bce78d7c2c1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/data-boundary-implementation-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "eb370f12d678774df78a094c469821f1cb1c8d0c37d1c18fa8c46d83a4a07a2a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/data-lifecycle-policy-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5bd45b9530009cc4c1f25ea29e30f368603700634354bd43036f1c0f807adee1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/design-handoff.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "cc57be3d068ee571a93e725ba2705dc844ca21edb5b130f1861743c78d19d49d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-comparison-preparation-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "7112812ed18f719f3646a691828427b26b15fbca4e4cf9467427a6bef8ca49a9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-editorial-comparison-20261012.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "aa19e44eca01a5d9b3abfd5686eba182d03b66efb6a978e6eb123716c08ef466",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-editorial-input-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "09fa7a7e6f91f7f81705ef40ad8fe7d1e32e6a7cfbfcbfa48797d598d588cc72",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-evidence-card-proposal.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "bf038e6f64171533aaa5f1e1522c2bd4b6996b237fbc4ef03d56b40c25c55691",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-retest-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "7734a0c1fd231ece6094be3038df4a474fb018935d6a9a15aa84f45243e4919c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-scope-implementation-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "10afafa84e0d320d7c3091a9261dc4326ebac27c6ffa863519f8e15cdbd758d7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-scope-review-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a7c9771829da3e76f2532d25aced4d3f989e77851a7ffebea4e73eca6076f1c4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-scoped-trial-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "7dc425657aea42f3ae6346e4bc9dc9f405d361b758d3c52e82f363d0e794d227",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/economic-trial-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "901c2869cbafa06ffe919815620f01194f2eaa8ff7ad78f09df14d612430d821",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/editorial-standard-history-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "39b8c521555bc597cef6335a0c1f31a9073b3a56015d28850bc6608824fc27c8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/email-integration-20261103.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "af9ef6eaf03d4056713e89892b0b667136c59f3901a22988ea3bf82ee65ad924",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/email-integration-status-20261103.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "962ae432a78a3004c12656e5046d2c03044990eaa52e1521cb8425637b003c3b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/evidence-quality.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2307a33e0b3a509ef18df0c6e537f70d1ab130551f94e569c59e3f340a4d89da",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/execution-status.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "307049dd6d3e01841c2ae480554f1f8b08318f008000760c8bc23cfe1b0d2124",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/figjam-app-map-review-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d157364ccd4c2a8729f0a609292e683d0c59991edc32a4c9b7d8abee512b985a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/final-independent-audit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "dfb1b1137b0d8e14cf6ec2be2ead8b0f4f0443429c4157a4fc73389da30f8500",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/final-validity-independent-audit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "199d13d35e3beac6fb7cc6a2cc51023959c15d2e0b0352a6be50b41c70f1a360",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/five-country-news-pool-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9751ab2d6f57370b5262f5ffeeaf716712b702d9f0072df6e9244cbe2bb553eb",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/four-country-evidence-gap-audit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9050099b4ce27a7ca06261d3925c9e7f3bb12748544e9deadb9d445664b50737",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/four-country-price-case-followup-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "37302fc711f93fe5dd24eb46c07af15220ada718c4f0d9a0b451b368f22634d2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/four-currency-price-link-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d13157e7ee6633e18105fbdc4881a810e249e0ded844e8c10b1335af9eaf610d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/free-news-expansion-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "79237103ffe58be055995f723532d310f773dfa994e6746984be7bf5b6e15576",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/fx-cause-workflow-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ad154315120c32f35387d8c160dbd85cf904f02db51cefd09ffb2893431b4dee",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/fx-cause-workflow-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a5fc7bb631d8dedb989d2d4822d1f92ad87fe1d39d07cf1e99f4d66e2607642f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/fx-first-generation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "8dec16f9585a0e301be15c460ad1f265b92dba80a8f880454697133a4c7105bb",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/gemini-connection-diagnostics.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "067798ef918385c6e04d74fff4ddba1845e0e3b29e0bc7ccdb97f795493f49d3",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/gemini-connection-probe-result.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3661df810ac62182b0b06396aad6b784f0388ca38692bed2ed6db9a6f2898f7a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/generation-decision-plan.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "0c661f857578ba2c2621c540aff41b8c2064ce1ee8845c3bb9d5f07a0f2566f8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/generation-review-structure.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "6e90a418c447a7859aa5b7a756699f12ccc7f6c4dd03aaf1d8a1bd57f300a56d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/generation-wire-and-card-policy-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5e4101187c37c452ecd33180655828ab87ad01983d604b9b02ffadd713842fee",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/github-bp-report-harness.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "79f84549e2311552dba14faf13ff1cf1b77f78a359f221a1f34275a45a89d529",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/harness-comparison-results.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3e2775585443da835c7c926e8363ab330548f7495908e0769fb1246f319664d1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/indicator-price-plan.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "933c57d3223dc789efc0d92daa256b6428fc45b8b0638bd7153a203358e0d149",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/initial-scope-independent-review-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "df4ad12640c36ea4f063c22e4fccc47f9704e2cf688c3a0e48ff06536cb4d5da",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/input-edition-independent-audit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "56a3d1c052a6a7f10e4302d962079b6ef996e277ac297cc3cd97bb1adaea8ea4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/input-edition-recovery-fixes-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "505d532be132350d79b2f06bb318b65b05155aaaff946ba08acf86589663252a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/local-editorial-approval-20261013.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "86c8f0ca6d21fc7c7adc4ce9b2d802ba1ae41c1ff1c20ab96d9aa1dfb26fcbc0",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/local-experience.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "4651e565bdfd350082c8269ff31930585068338dc380de6cdbdf24825e179924",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/local-integration-checkpoint-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a1f41a4e3444bfe5ae254b1b103a1461e856eed54b59b8a2424ed0b89428f300",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/local-release-verification-20261016.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9aa07072cdde871888e1a2372a9e3ba7c7e3aa98541e8a1c239906fd8d32abe6",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/material-processing-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "96f265322a1cf5222e21fba0cd4bf4ab055af559e3f1de0683d20eb6a004e03b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/material-processing-complete-reading-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "916ddc496318a187ac8026367f4e5a3d4872073c32aac62dc29386def9808923",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/material-processing-rules-v1.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "215e40970cdcaf22e56989d45e4f315e54b9368ada456d0c5b03696dc67cb829",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/material-processing-rules-v2.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ca7821e9edbbf00969abf50187f6eff1a63952817ed645ca6f2c60a37d7ba3b8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/material-processing-rules.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "71bb58746ca23cd30ae50f0bcbae3b9012f121e695c4877caa3ba26ad0b25bef",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/material-selection-implementation-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9240efec52768158458185ed9edecc9058d9e3a9f096cd0be43fc97526df82b5",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/mexico-api-verification-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "71d93240bf8845b39d5356f9240cb5cbde4856fdcc9c8af6b7d352e7d4a2baf9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/mxn-business-dollar-retest-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2986fc4375ab569eb5adef1274a8b6fe7123da6bc9ec51d82dc49284da4972d4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/mxn-input-final-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "67cf8189e930eeaf1baf3a9a463b78b160e3fdd789c13cb88a3bc3a0a4b7e886",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/mxn-market-policy-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a87a808e199649fe0fe5b3cf7419dcfa61ecba496b04adc0e314a505ce931283",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/mxn-writing-integration-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "1b18c8ccdf4fabf8775ca55e0c0f66b6865d6c0c2004f104c7c229814927445c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/narrative-placement-and-link-review-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3950948f86d4ec2194225eebca6c88361f17f2fe2c29415000f7fe43da5478d1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/news-model-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ebad6a91779dd5a4d41b19bb2e45293434d09c609f3c6385f424a37e31b48b05",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/news-notes-input-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "60a6ea3dbd83c7271f26125cbea692edf3feb40bd05926cd6a776684f3d9fe4a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/news-notes-verification-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "300d4f9582d18308642e8732ea2626167a9c3b3ac4b0d4ed160c02ff1870f18c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/news-review-connection-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "92b3b16cddb577ce66d6e95be6dedc7fa550b91d2098310bfa0e2c1321392eac",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/news-routing-integration-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "b08d66165f8b1269845458b6b11e45bc84247629d92bef110a716e5473fbb8c1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/news-selection-period-repair-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "6a91605ec91a837e9dd4366501e72f5ff37167cd9d7c61b0325dba39dd6b3c32",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/next-trial-preparation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "acd1245cf975b8424bc5f40dc82ecb4561d3bd22fd1edd00a966ff4e41022b1b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/official-background-connection-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "69c28d71078eee41b6fdeaf43cd2a99d098841795daf521d83c744a6b14e3d2e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/official-five-country-connection-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "8ae209cd2562bd41cce5066c113c749e5e061176ecfac0e62e91d5470af3a6d5",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operating-automation-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "775aab5d8fd3b9d878f4eefb5373268cc04047a6ecf4ca58d986fa26117f1cd9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operating-completion-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "43a4bd9e78365c056c75995c80ae7d37040f7b6f8ef813d05bff4214e9a2641a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operating-final-check-20261103.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "08529e88695fef9f323663bb4d618e3aadf3361412fe9eaf042f1e4cbec32488",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operating-final-check-20261103.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "96c9b46d9133448b412b9058d303b9ee15a1cd798e8be98cc59c68ada934c0ce",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operating-readiness-20261103.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "18108e3811690600ae2f17ab27cb321503cf86afe39e0b02eaeec752491d293f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operating-readiness-20261103.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c96193987f92c9362dc5a1c919dc87dbf95fa9c41d302e69e1badbdbf8dd1168",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/operations-todo-history-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "018408165e0c7a097e62dccbfb76c9b1a499d1c6a1e4ec64279b46d3ab5dd07a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/original-news-pipeline-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ba4ec23abb194ae7a828bb6a278e4dce3bbcfd9b285dae4f30266c2e68249d0e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/original-news-source-policy-20261028.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "f6d69b7ed44d159d8aa07be88cf06b086b368ed5927fe4355146eb646e3433ff",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/original-scope-and-df-decision-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "194ce1fd5a52863e671f6be9960b73d3ef8cd4b50cdef2ee86af828b322a1b59",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/original-source-trial-preparation-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "00e419c6df4cd1f884fcd977e38e926f04f67f8fb7cafc9e0dfa7f42d2f831e4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/owned-content-trial-results.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "74d34f52958cf506a9ea26aa4c108a32c2a1ea90bcc751b51f5cc36384c5bc44",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pen-ars-cop-basis-verification-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "616c36382753bfd8a4b83476e0d48c87cabeb471c47b94ed0f73b30a7bc1f11a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pen-ars-cop-basis-verification-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "bd47f64deeef4ec6ed51c9602e11cf1eff2a38f09ef507b5c02ad2d66108b00b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pen-brl-evidence-followup-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "e1880b276bbb71d6754c5f3b753801fa9ed80a2160c0a589182863d6e0627626",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-check-generation-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9abaae6bd82d355df2e04bd6208d876daf5620f6bfdb45ecefb2e58ab08a907b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-report-content-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "e034bc732cd8458a45331692939dce88ffc5da061cf066de182b3c980c5f4839",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-report-samples-20261027.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "50e024c52b5b99cf00952e431a7a0068d374af94a11a833d8ae832014bd30c66",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-report-samples-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "785273a5c8f0adbbb0a3349fdb5d27d27747bdf4b3c457295d649126e69229f2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-sol-preparation-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "da7f21e3afb9d04ac72c4a7678808f9131ce7df481ea15cd203e8448f81a9ef9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-sol-result-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5bb1ffc8adc01ffaa4759c385b865e435c6874cdffaac0055ba9f4f9b9eb9194",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-sol-v2-preparation-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2abd95b1843874ec36a1862b49a200d13900946f6d3a6d7d6861a395039aac81",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-sol-v2-result-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "95634024983305f8e4f39e55f2df55749146495b8ae1e7e11794801deb8acc54",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/periodic-writing-rules-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "f69cd4d6fa4da89f1f46203f7c83bff0ce9b1a7abd73282a3f2ac2a26ff70b51",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pre-generation-stages-1-2-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "089286342027c2eb079b3ad0af52c7a9927ef11927084c8f9e4f7280ea9dcb77",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pre-generation-stages-1-2-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "13efcfb5a0d5bc791ce0ff32e4658ca14ecf79256dd337abc55a6f97b3d5363b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pre-ui-policy-review-20261030.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "f63d400dd992206caf37ddd27bf2991536e7b803ff261bf212358ce1fb4204f3",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/pre-ui-policy-review-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "424ca92a23450e4f015369a4fb085f2951a38716cdc09f38b5f37dd4cc6b1abb",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/price-provenance-hardening-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "1a0507fdf8bd74c4acb81aaa2ffdeca6deeac8220476d1601dfe86f055a65407",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/production-baseline-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "98aa35cfa0ddc3ad9f5bcdc1faa09d7b3af9ebe2633d181fb1ac52e52c1c2f56",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/production-data-operations-plan-20261029.html",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3947b46e652a3a2bc79703ec78bc30536c03924ef54259ad760aa1e226b790b8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/project-overview-history-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d1b84feb7a201e6a9fe0da7921edeb931891946a0a7bc9ef0ea4353cb58fd86a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/provider-close-definition-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "886cde95ff675e8c73114d4135f7e4fedca90447aabbf7c8239f6fe5ed87f6b7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publication-cadence-design-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2b201a07e05fcd62d309fbbee220c2436071faae4d186063a54501c9cb7f0367",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publication-cadence-four-currencies-2pct-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "564e91aaedd065e041c763418b90ca722f0df9d69c1e5fc1c3f7892e067d1dcc",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publication-cadence-replay-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "256f65787789449c55d4bc040d13b1d0316052f3034b873b5c256ebbe71d73e0",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publication-policy-history-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a28902fd97b1b720dd258d2f5442ac563dbc2130cf553bda33b18de6f7ad66bb",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publisher-admission-standard.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ded2ee7380e667992fcd66da4cdc54e55ccd81920e37606bd4feee6952bab0f0",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publisher-input-revision-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "977b71c02ebfeea9aed816f488113e7f6735c0e7992f3567a7da619f36706236",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/publisher-input-revision-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "079b3d6a4d036e2271095a38c097b01397c9a28f9617f93f8467135b32f05259",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/question-led-evidence-discovery-design.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2fa94fd1d9d03e19e30bf2c6f5589dbba8865a8fbb387e3ba7168579f94aad95",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/reader-presentation-20261016.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "323a4a31a0d849c926062b9cf2deaace94f713cd055586113c72afcc49020f62",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/readme-history-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "bf04d44b50d0fa95e8efaac1c9430bf8ab28f79104054c14ce0f0b3c4db24c37",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/recovery-runbook.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "8748a4664e5cf4c48957c6c38602ce27fd24646dc98d1e541710eed1ef4e88d9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/recovery-verification-20261030.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "7bb4ec11765d5e42947a88a9344594854a9bf13efc081feba22978700fd56495",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/reference-material-reconnection-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ab4ce3803558e0e8c7fb5a837c168b31c44e632b4ad878af1702f3405c34447c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/reference-rate-policy-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "04c1479b7f50af86084c09dd4272e21d33f450785a652f0d5dad301cc71d736b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/reference-review-application-20261029.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "80b23775a359c768e1e2b288d83d617e096c7cc8021675ba1f54eac8694aecee",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/registered-discovery-followup-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "32da084db2b10c9cc717b5b29c324e898efb25741f9ea43a60ee60d591088fa3",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/release-backlog.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9219dbfc6c33fbeca4a6f83a1686772cfae30b4d03e17e06ad583b0caa8584b7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/release-gates-20261103.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c0a9bb699c4e368e499fd9fdf588011099240f71810dd6b2eb43f2683547ea20",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-correction-connection-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a5fff6bdc445c5bcb7c087dd6a80002acfb820bfc2193a56dbecb5ab4d3b00d6",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-creation-flow-20261016.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "0cac4bdaa7bc4ce99f2ab11078f516a1f2246a70412b86821080960dea82efec",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-history-implementation-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a4ec0d7b631b92fcdac80e43d4b8a20379556b70f63b8ed5d08fef66a24b4f42",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-history-review-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "b77eb0ed848ea335b17124f44ce14ef857f569365969a98c17e7c7a70c2a1970",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-history-work-plan-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "e39f44dbc2fabae1f53da0e84965dab300ef32ecb56963482ddc73ae2783b2e4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-independent-audit-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "96ccc419c7f0c90f8a1fd1ed1637748ea5f463dacc07b801c940751bbaa3239a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-navigation-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9333ae33814056926a591f366b619e8928d14002572b90013d962bd31626fc45",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-operations-stage123-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d19738d8e55d34d8db140a3d92e22a5490e59de7f9aa70e92395c8c1a1e5a7f9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-production-design-20261016.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "7c752f020c46e10e42349c8146453ac486f7b2e7fd24fe9781b751ac0e3e54c4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-service-baseline-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d875bbcc37ce687529ea5ad404dc5756b01ab763e9fa42776977517907e093d0",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-service-flows-20261027.html",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ccd4b1b773895d66c8ee8891d230c2fcbc8906d71568e44a95e56ebbcd50fda8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-source-routes-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a50b3570fb5c696aacd471ac618741fccf672d29cf6703cc5ace4f6dd71f0da3",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/report-state-actions-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "95fe3f2e43d0f09407edb5c3a00ed61606b41b96e2c19969931fe2b7ce183e06",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/research-api-access-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ede49b9b676a208e54da59cd693af10ed23831e57af39b375739c1f0052e2bc2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/research-collection-verification-20261016.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "06020aea8d8dfc5fee3b397ad176738c617e59f468bb5609db19870523f29f20",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/research-material-handoff-20261027.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "11d05d2008bce93df5478296de672e6fe5e4f8be024019f1de51451f6c6c81c7",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/research-material-handoff-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "f57abaab18b3ac9d0c2d62ea896c8c29cbd2eb4ea6e0aa7d47ae815e11aeac8f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/resource-optimization-20261030.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "b648401bd8c504624bab60786f0fec5796895e8179661eb6eb9b25029c74bafd",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/review-error-and-style-policy.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "89be2aa2344746398cfcac4f38eebe2cbe30418ae319fc4a92cbd995005f0aba",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/rollout-preparation-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "55c7e3fbd7b51c6d4ceb34a4862e16f9d304cbe0a1a0a36b6fdfde38eb7bb36d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/runtime-connection-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "6e5f172cf06f8002133f069cb9c90f28885f35f7ecf29adb9837e8dae2c3d9d2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/runtime-supply-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "89af0bb42e8b8ad4811648dcb848a54f54ee885b8fa77057af21813871df0c8e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/saved-manuscript-evaluation.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "1230523c772d13b25a510cd96c85fda478b6c330e4159d784525862b158b7f2b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/scope-body-common-repair-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "cee768c16c09804a5e6415f1a2065881acb0377a0f17b1a4fc505d16390e44c5",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/scope-body-release-audit-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "16dac3b442b7e6113fd86143e44bf9d024d824ce42f55d97629d95a9259ccf6c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/selected-source-collection-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "11964b30cc3e6a04ab886547f1dcc139e9bc5b4661d129ec2156dcfa8e0e8f30",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/shared-dashboard-report-standard-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "5fc2678bfe1797a537c29cd286e2fe11d1ea6b8f52fa56dd2bb1a340c525f385",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/shared-input-final-audit-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "0fb361c0cdca3eeaf873f1202a737c93817cb166ef97d70d1a49923f49a2d1bf",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/shared-input-hardening-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "62a67ac0cc6c4bb8f935658091a7d330f811d4d29a9a7a92e654216004686483",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/shared-reference-content-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "45f8b5565244777c84135f206a30fa0379c65d84dafe7aae0221c136f84cb72b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/shared-writer-connection-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "859251aca1d7efc5e2d329b9df168fb4fb436b0f473e6e5ebb6e9e4a7b202335",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-common-trial-results-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "42793e25ee9a0478e718bd508bace05ece4c6ba3daf097d4f679c1f9da237ed3",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-country-closeout-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "b27bd79134fd669af0b6334cf6d4c87efea5569b70f892f0d4cb0c1bdfeea34b",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-country-news-outlets-yahoo-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "4dfc148b8fc9ab9322baf9364dd206e62eb19bf0c0e7ceea2a19c11bd0192ae9",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-country-source-selection-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "157e3bdbbae3b525fae69c75e4a733f8f9875435d10529e908fd445e3f170c2a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-cause-use-review-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "0235ffd6c3d8cb0e5e921eed03e57c2490a6bf261154a2a1ce8a27f4228742e8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-eligibility-decision-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d40fdb7fe70003540f3a525a017dfeda4f181b0ade51f291a869a5606879fa49",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-explanation-sources-20261027.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "2cf9e5844ebb5ea92b42c296b32fb45447a6e50a08bfddc0948cdb8c7fcc8ff2",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-input-closeout-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "804091b1bcff03ec889fe997b3e8b6f93a5b12d758b51565a39ad98960ca508e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-preparation-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "698e39255ae6a5bb01ca66091252f7657409542a677f44ff350a5901864dd429",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-readiness-20261027.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "eed3decdd0c6806bf8f671f6b2e0c4327075588580addc958b8523820f420dc4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-review-readiness-20261029.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "94010b251a34d05242c4cae62afde88b7e96b6b3b58c05091ec0351b894ae083",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-source-register-20261027.json",
+        "role": "코드가 실제 읽거나 참조하는 정책·설정·검증 자료",
+        "normalizedSha256": "681e693fef84e6983b44247329a844e77d2a1761cb144452edfb965507cef639",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-trial-stage6-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "8092829736128968fe2be7aaf79751a9b83c47a5d8cda74ebfc6a80980d77322",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-trial-stage6-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2c89981d3869e166c273c7a78ce3d664d409027e2c308111d258d2a862886f73",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-currency-work-sequence-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "37ac0234ca3277cad1f3ece2839558d2af24c18334fa7fc925c2e0a5ff391437",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-current-execution-preparation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "4bc850aff24c18ffa9682349f353e438a4683e13aff900c4ac4cfc314d886586",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-current-execution-results-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a13707463d447536a804636d3d08471868c49563cda7d70b975075793289bf63",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-latest-trial-preparation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "055c758420649bc49374f24eb4515e4e7194ee748293c8b99e88d0dfb301d207",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-latest-trial-results-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2f57597ab6f26b122139be03f183614fbbdf9c0c314467143c112bf1fb0fee9f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-operational-batch-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "ab11af8090cd94a274fa88abb27f600afff58bdb3bebdbcf1eea9fb78077d4c4",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-refreshed-preparation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "d69bad37ef2a76ca3b32a3c54b98afa86e14f19c9adb9d58b18377d2d5408118",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-report-completion-goal.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c53543bba173b7643c356031adcc17ac774676046b6aa10c1650c60b72e03bdc",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/six-trial-final-preparation-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "a6a92b28d3c3adaf4842b0a7fbdc955df47830d451c6b1938fd5ab0679fc1e86",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/source-applicability-review-20261011.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "06dfdaafb88b787f7164bce995f2033c7ca207de661b3c32299f41a2e4e9cb0f",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/source-applicability-review-20261011.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "afbb78f66ca272c2ca12dee84c3f9b1b3555f3502afdad028f87a331d3947d85",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/source-feasibility.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "9278c8d0295931f88d5ddfa2524a75371a9260a05b740bd0fdb130ea0a422485",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/source-readiness-closeout-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "99796aa72b08eb5b6b41c4040fb83c733060e02e6b39744f2f86e32e41ed35ce",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/source-scope-recovery-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "6d4f2a04a134157a56ddd254f6e5386d8353680850c804280584a91d25752d4d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/source-use-conditions-followup-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "787df50d526e9507c4edbdd46f5e2dd86e2db35e8b09bdd0653b5614c3c0a87d",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/test-design.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "f8d112e49fa9e7668faccb5bc29b7c0832ffda280e69333c5c8970faa672cbef",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/three-country-latest-report-preparation-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "25934409d4948f1187052eba9e13eeabe2344c08b4e9387b95dcb117925cdc16",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/three-country-latest-report-result-20261028.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "b937d54bfc7b3a9c496f85246e94d733594b90e0b300a39bdda1dc9e55fd64f8",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/transition-preparation-20261030.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "490df06000aa20a418851258f99bb007486b6ff38bca2795ba479ab42d08a6c3",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/ui2-diagnostic-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "fbcd4da621625866057b4b7fdb460a52e52622f3f84217690e0a47e3eb38d1cb",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/ui2-implementation-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "8b2597ee9ecb728855722c5c558de63620743acdd4a76e102073a45f32ef8cdc",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/ui2-refinement-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c7f7da1e75a3759f396a27d36d7007c1af400272ab48cc348fd2959689758460",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/ui2-style-comparison-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "c59a406d840d102301212e2c9b12b798099cdd7d106119a70c3b722351bd2279",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/unattended-integration-20261101.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "770fb91f6ff12ae17b215dbe0746e06a3db08ed6cf8084f99bcc1487889ef015",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/validity-error-and-news-scope-fixes-20261102.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "2a001b4290c90f6d8b5e8196e67e5b3b70d98d06468346e77be63b38d4c43427",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/webapp-final-check-20261031.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "7edbfab8248ad6fef496d416603b522357b57c968b28f41432b6aee3438347fe",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/webapp-navigation-spec-20261030.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "369c640089926fbe2c6b61856cf275ed97a76c4e1574a8b6bc97ac904f15045e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2.0/writer-model-suitability.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "36d75c87b616b8a731e2d4fb4ee3c218b8fb2e0fb6faf00486a65ea710ef2b9e",
+        "unchanged": true
+      },
+      {
+        "path": "docs/2x-rollout.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "3e3aa55ad0b9a38744e861b6b15496688a7ad91fcc318443cb276567a2d3971a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/maintenance-20261104.json",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "300c5e60481b22c9e80496a0b9304c34d8b4a86bfe755ca75525720b3fa1b56c",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/maintenance-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "90aecd53626959886568a86a0ddb45ab9a1d3c79b5ccdf6ab50b0798caf3dd1a",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/reference-rollout-review-20261108.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "73b9e88c6af9bcd5de812f5c8e9d42ee605174adcb65e524f4a931e57193a789",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/release-readiness-20261104.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "0c426096a25c39c7ab5c9d3364988064a78c2a33d32e907556d4d75330ff0bb6",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/source-gap-review-20261108.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "b8ad1aea4594e55491516ea0253084592fe83a3fc7573709d782140ffc766737",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/unattended-operation-completion-20261108.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "fa5a126922fa4a40694cbf23161cf036299c96dff2b58e718e0612243b7236f1",
+        "unchanged": true
+      },
+      {
+        "path": "docs/guide/unattended-operation-review-20261108.md",
+        "role": "설계·결정·검증의 과거 기록",
+        "normalizedSha256": "34c4fe79bc291c86ed70094c5bf3e02cbf5b3e94d5758fc7e4bf7af76525686c",
+        "unchanged": true
+      }
+    ]
+  },
+  "diagramEvidence": "diagram-verification-20261110.json",
+  "operatingEvidence": "frozen-storage-production-20261110.json",
+  "validation": {
+    "status": "passed",
+    "currentDocuments": 20,
+    "localLinks": 836,
+    "currentLinkFailures": 0,
+    "matchingMermaidSources": 6,
+    "historicalLinkIssues": 67,
+    "protectedDocumentsUnchanged": 256,
+    "secretOrEmailPatternHits": 0,
+    "securityNote": "Pattern scan plus review of sanitized summaries; no private article payloads copied.",
+    "externalLinks": "not refetched; no network calls"
+  },
+  "limitations": [
+    "No new production observation during documentation editing; status is the dated snapshot.",
+    "Storage roundtrip success does not establish actual paid generation success.",
+    "Historical link problems retained separately; external URLs were not all refetched.",
+    "App tests not repeated because only documentation changed."
+  ],
+  "publishing": "Local documentation commit only; this refresh has not been pushed or deployed."
+}

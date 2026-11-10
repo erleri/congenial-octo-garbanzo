@@ -57,7 +57,7 @@ it('keeps shared permission and schema errors as global no-dispatch failures',as
   expect(f.state.posts).toEqual([])
  }
  const f=await operatingFixture()
- await runOperatingCycle({...f,execute:true,preflightSource:async()=>{throw Error('synthetic_endpoint_outage')}})
+ await runOperatingCycle({...f,execute:true,preflightSource:async()=>{if(f.state.batch)throw Error('synthetic_endpoint_outage');return f.preflightSource()}})
  const prior=structuredClone(f.state.batch),key='e'.repeat(64)
  const {restoreFrozenInput}=await import('./operating-storage.js')
  const {restoreOperatingPayload}=await import('./runtime-store.js')
