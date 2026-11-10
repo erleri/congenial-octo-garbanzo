@@ -213,7 +213,6 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
    }
   }
   summary.endpointChecks=checks
-  if(execute&&checks.length){const incident=await storageState(store,'endpoint',null,null,true);if(!incident.recorded)return {...summary,status:'operating_storage_failure',reason:'operating_incident_record_failed',incident}}
  }
  if(verifyStorage){
   try{
@@ -261,19 +260,15 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   return store.reserve({...request,context:{...request.context,operatingBatchKey:key,operatingOwner:owner,operatingCaseKey:currentCase,
    ...(testOnly?{testOnly:true}:{} )}})
  }}
- let endpointHealthyRecorded=false
+ let endpointChecked=false,endpointFailed=false
  const checkedSource=async request=>{
   let metadata
-  try{metadata=await preflightSource(request);inspectNewsModelEndpoint(request,metadata.catalog,metadata.zdr)}
+  try{metadata=await preflightSource(request);inspectNewsModelEndpoint(request,metadata.catalog,metadata.zdr);endpointChecked=true}
   catch(error){
+   endpointFailed=true
    const recorded=await storageState(store,'endpoint',Error(error.endpointCategory?`source_endpoint_${error.endpointCategory}`:'source_endpoint_metadata_unavailable'),endpointDiagnostic(error,request,metadata,clock),true)
    if(!recorded.recorded)throw Error('operating_incident_record_failed')
    throw error
-  }
-  if(!endpointHealthyRecorded){
-   const recorded=await storageState(store,'endpoint',null,null,true)
-   if(!recorded.recorded)throw Error('operating_incident_record_failed')
-   endpointHealthyRecorded=true
   }
   return metadata
  }
@@ -349,6 +344,11 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
     }
     await heartbeat({status:stage,currency,resultStatus:value.status??null,runId:value.runId??null})
    }})
+  // One successful request cannot resolve another failed stage in the same run.
+  if(endpointChecked&&!endpointFailed){
+   const recorded=await storageState(store,'endpoint',null,null,true)
+   if(!recorded.recorded)throw Error('operating_incident_record_failed')
+  }
   // A temporary pre-dispatch wait preserves the exact batch/case for resume.
   const state=result.unknownCost?'cost_unresolved':deadlineHeld||result.rows.some(r=>r.continuation?.resumeExact)?'paused':'completed'
   const outcome={...result,collectionResults:refreshed.collectionResults}

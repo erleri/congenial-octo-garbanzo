@@ -120,3 +120,16 @@ it('passes identical mock model request bodies and publication inputs before and
  expect(requests[1]).toEqual(requests[0])
  expect(second.state.inputHistory.map(t=>t.binding)).toEqual(first.state.inputHistory.map(t=>t.binding))
 })
+it('does not clear a recurring comparison outage just because extraction preflight succeeds',async()=>{
+ const f=await operatingFixture()
+ const preflightSource=async request=>{
+  if(f.state.batch&&request?.stage==='compare')throw Error('synthetic_compare_metadata_outage')
+  return f.preflightSource()
+ }
+ for(let i=0;i<2;i++)await runOperatingCycle({...f,execute:true,preflightSource})
+ const incidents=f.store.incidents.filter(i=>i.stage==='endpoint')
+ expect(incidents.length).toBeGreaterThan(0)
+ expect(incidents.every(i=>!i.healthy)).toBe(true)
+ await runOperatingCycle({...f,execute:true})
+ expect(f.store.incidents.filter(i=>i.stage==='endpoint').at(-1).healthy).toBe(true)
+})
