@@ -172,7 +172,7 @@ it('prices the complete long request and checks endpoint capacity instead of inh
  const catalog={data:{endpoints:[endpoint]}},zdr={data:[{model_id:p.model,tag:p.route}]}
  expect(inspectNewsModelEndpoint(plan.extraction,catalog,zdr).zdr).toBe(true)
  endpoint.context_length=plan.extraction.inputBound+p.maxOutputTokens-1
- expect(()=>inspectNewsModelEndpoint(plan.extraction,catalog,zdr)).toThrow('news_review_endpoint_privacy_support_or_price_hold')
+ expect(()=>inspectNewsModelEndpoint(plan.extraction,catalog,zdr)).toThrow('source_endpoint_price_or_input_limit')
 })
 it('keeps an over-budget body intact and returns its required reservation without dispatching or truncating it',async()=>{
  const f=await fixture(false,false,[{kind:'paragraph',text:'x'.repeat(50000)}]),before=fingerprint(f.original),extract=vi.fn(),compare=vi.fn()

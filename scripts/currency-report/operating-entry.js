@@ -12,7 +12,8 @@ import {fingerprint} from './research-harness.js'
 import {runOperatingCycle} from './operating-cycle.js'
 import {REPORT_CURRENCIES} from './shared-price-contract.js'
 import {dashboardReferenceState} from './dashboard-reference-state.js'
-import {eventTrialEndpointPreflight} from './lifecycle-control.js'
+import {createEndpointMetadata} from './endpoint-metadata.js'
+import {inspectWriterEndpoint} from './writer-policy.js'
 import {callOpenRouterStream,reconcileGenerationCost} from './openrouter-stream.js'
 import {NEWS_REVIEW_POLICY} from './news-model-review.js'
 import {operatingResultState,referenceReadiness} from './operating-result.js'
@@ -110,7 +111,10 @@ export async function operatingEntry({action='inspect',input,requireReady=false,
   loader:createOfficialInputLoader({workspace:root,env,savedByCurrency:officialInputsByCurrency,fetchImpl}),store,
   review:async({currency,inputs,asOf})=>(await acquireOfficialBackground({...inputs,snapshot:{currency},asOf,sourcePlan,sourceRegister,mode:'saved',
    fetchImpl:()=>{throw Error('official_cache_review_network_forbidden')}})).admission})
- let adapters={}
+ const metadata=createEndpointMetadata({fetchImpl})
+ let adapters={preflightSource:request=>metadata(request.body),preflightWriter:async(body,profile)=>{
+  const data=await metadata(body);return {...inspectWriterEndpoint(body,profile,data.catalog,data.zdr),checkedAt:data.checkedAt,metadataHash:data.metadataHash}
+ }}
  if(action==='execute'){
   // No key is loaded for plan/inspect. Disabled or unconfigured execution stops
   // inside the coordinator before preflight/POST; a missing key fails there.
@@ -118,17 +122,7 @@ export async function operatingEntry({action='inspect',input,requireReady=false,
    if(!env.OPENROUTER_API_KEY)throw Error('operating_model_key_missing')
    return callOpenRouterStream({...args,apiKey:env.OPENROUTER_API_KEY,fetchImpl,timeoutMs:120000,maxBytes:250000})
   })
-  const get=async url=>{
-   const r=await fetchImpl(url,{signal:AbortSignal.timeout(15000)})
-   if(!r.ok)throw Error('operating_endpoint_metadata_unavailable')
-   return r.json()
-  }
-  adapters={send,dispatchHolds:!transport&&!env.OPENROUTER_API_KEY?['operating_model_key_missing']:[],preflightWriter:(body,profile)=>eventTrialEndpointPreflight(body,fetchImpl,profile),
-   preflightSource:async()=>{
-    const [catalog,zdr]=await Promise.all([
-     get(`https://openrouter.ai/api/v1/models/${NEWS_REVIEW_POLICY.model}/endpoints`),get('https://openrouter.ai/api/v1/endpoints/zdr')])
-    return {catalog,zdr}
-   },reconcile:args=>reconcileGenerationCost({...args,apiKey:env.OPENROUTER_API_KEY,fetchImpl})}
+  adapters={...adapters,send,dispatchHolds:!transport&&!env.OPENROUTER_API_KEY?['operating_model_key_missing']:[],reconcile:args=>reconcileGenerationCost({...args,apiKey:env.OPENROUTER_API_KEY,fetchImpl})}
  }
  const calendars=manifest?.calendarByCurrency??automaticReferenceCalendars(dataset,operatingAsOf)
  if(workflow&&env.FX_REPORT_DATA_REFRESH==='not_confirmed')for(const calendar of Object.values(calendars)){

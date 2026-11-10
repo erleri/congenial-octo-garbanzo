@@ -19,7 +19,7 @@ describe('approved dashboard email boundary',()=>{
     expect(emailEditionDate('2026-11-02T15:01:00Z')).toBe('2026-11-03')
     const payload=buildApprovedEmailPayload(frame(),{reports:[report()],notices:[]})
     expect(payload.refs).toEqual([{key:'report:MXN-public-1',kind:'report',publicId:'MXN-public-1',currency:'MXN',baseDate:'2026-11-02',stateVersion:2}])
-    expect(payload.html).toContain('https://latamforex.netlify.app/?run=MXN-public-1#report/MXN/2026-11-02')
+    expect(payload.html).toContain('https://latamforex.netlify.app/?entry=email&amp;run=MXN-public-1#report/MXN/2026-11-02')
     expect(payload.html).toContain('승인된 제목 &lt;원문&gt;')
     expect(payload.html).toContain(report().summary)
     expect(payload.text).toContain(report().summary)

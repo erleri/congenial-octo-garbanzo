@@ -32,7 +32,7 @@ export function countryWorkOrder(countries){
 }
 
 export async function runOperationalReportBatch({dataset,countries,asOf,store,env,approval,sourcePlan,sourceRegister,registry,processingRules,
- preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],testOnly=false,writer='sol',sourceAdmissionState}) {
+ preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],testOnly=false,writer='sol',reviewer,sourceAdmissionState}) {
  if(sourceAdmissionState){
   const expanded=admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf})
   if(expanded.binding!==approval?.sourceAdmissionBinding)throw Error('source_admission_snapshot_changed')
@@ -104,11 +104,11 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
    const publications=runtimePublications(await store.history(currency),currency)
    const supplyWith=onlySaved=>supplyRuntimeInput({dataset,currency,asOf,calendar:country.calendar,
     commentaryTarget:country.commentaryTarget,publications,handoff:country.handoff,
-    claimTypingReview:country.claimTypingReview,periodicInput:country.periodicInput,eventCandidateIds:country.eventCandidateIds??[],sourcePlan,sourceRegister,processingRules,store:accountingStore,writer,
+    claimTypingReview:country.claimTypingReview,periodicInput:country.periodicInput,eventCandidateIds:country.eventCandidateIds??[],sourcePlan,sourceRegister,processingRules,store:accountingStore,writer,reviewer,
     acquire:async()=>({collection:country.collection,officialBackground:country.officialBackground,sources:[...new Set(country.collection.reviewQueue.map(c=>c.sourceId))],networkCalls:0}),
     review:async args=>{
      const reviewed=await reviewRuntimeSources({...args,registry,processingRules,saved:country.savedSourceReviews??[],onlySaved,
-      dispatchCardBindings:country.preparation?.dispatchCardBindings,
+      dispatchCardBindings:country.preparation?.dispatchCardBindings,sourceWriter:country.preparation?.sourceWriter??'sol',
       extract:sourceTransport.extract,compare:sourceTransport.compare})
      await checkpoint(currency,'source-review',reviewed)
      return reviewed

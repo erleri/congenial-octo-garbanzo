@@ -53,14 +53,14 @@ function assertPeriodicPlan(plan) {
  if(plan.requestHash!==fingerprint(plan.body)||!plan.packet.periodicCheck)throw Error('periodic_runtime_plan_changed')
 }
 export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calendar,handoff,periodicInput,
- writer='sol',eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,claimTypingReview}) {
+ writer='sol',reviewer:approvedReviewer,eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,claimTypingReview}) {
  const snapshot=buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calendar})
  const cadence=evaluatePublicationCadence({snapshot,asOf,publications,calendar,eventCandidateIds,correctionReportIds,previousChecks,openCase})
  if(cadence.status!=='research_candidate')return {version:RUNTIME_VERSION,status:'held',reason:cadence.status,cadence,modelCalls:0}
  if(cadence.dataHolds.length||cadence.comparisonHolds.length)return {version:RUNTIME_VERSION,status:'held',reason:'reference_data_hold',cadence,modelCalls:0}
  const purpose=cadence.triggers.includes('cumulative')?'market':cadence.triggers.includes('bootstrap')?'initial'
   :cadence.triggers.includes('event_research')?'policy':'periodic'
- const reviewer=writer==='sol'?DEFAULT_RUNTIME_REVIEWER:writer
+ const reviewer=approvedReviewer??(writer==='sol'?DEFAULT_RUNTIME_REVIEWER:writer)
  let plan
  if(purpose==='periodic'&&periodicInput)return {version:RUNTIME_VERSION,status:'held',reason:'legacy_periodic_input_requires_shared_fx_adapter',cadence,modelCalls:0}
  {

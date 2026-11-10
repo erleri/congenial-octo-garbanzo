@@ -9,7 +9,7 @@ import CurrencyReportDetail from './CurrencyReportDetail'
 import '../local-report/report.css'
 import './published-currency-report.css'
 import { REPORT_DATA_POLICY } from '../lib/report-data-policy.js'
-import { recordUsage } from '../lib/usage'
+import { recordUsage, observeReportDwell } from '../lib/usage'
 
 const names = { BRL:'브라질', MXN:'멕시코', CLP:'칠레', COP:'콜롬비아', PEN:'페루', ARS:'아르헨티나' }
 const provider = publicReportHistory
@@ -124,16 +124,14 @@ function Detail({currency,date,id,go,revision,onRetry,mobileNavigation}:{currenc
     // eslint-disable-next-line react-hooks/exhaustive-deps
   },[currency,baseDate,result?.data.state,revision])
   const state=result?.data
+  const usageReport=state?.state==='active'&&!state.report?.testOnly?state.report:undefined
+  const usageId=usageReport?.id,usageCurrency=usageReport?.currency
   useEffect(()=>{
-    const report=state?.state==='active'?state.report:undefined
-    if(!report||report.testOnly)return
-    const input={screen:'reports' as const,currency:report.currency,reportId:report.id}
+    if(!usageId||!usageCurrency)return
+    const input={screen:'reports' as const,currency:usageCurrency,reportId:usageId}
     void recordUsage({...input,event:'report_open'})
-    let timer:ReturnType<typeof setTimeout>|undefined
-    const arm=()=>{if(timer)clearTimeout(timer);if(document.visibilityState==='visible')timer=setTimeout(()=>{void recordUsage({...input,event:'report_30s'})},30_000)}
-    arm();document.addEventListener('visibilitychange',arm)
-    return()=>{clearTimeout(timer);document.removeEventListener('visibilitychange',arm)}
-  },[state])
+    return observeReportDwell(document,()=>{void recordUsage({...input,event:'report_30s'})})
+  },[usageId,usageCurrency])
   return <><nav className="report-detail-links" aria-label="보고서 이동">{state?.state!=='active'&&<a href={historyHash} onClick={e=>{e.preventDefault();go(historyHash)}}>← {names[currency]} 리포트 목록</a>}{(state?.state!=='active'||neighbors?.data.newer)&&<a href={reportLink(currency)} onClick={e=>{e.preventDefault();go(reportLink(currency))}}>최신 리포트 읽기</a>}</nav>
     {error?<ErrorNotice onRetry={onRetry}>{error}</ErrorNotice>:null}
     {empty?<div className="report-empty"><h1>현재 리포트 미발행</h1><p>발행된 자료와 과거 사례는 이 국가의 리포트 목록에서 확인할 수 있습니다.</p><button onClick={()=>go(historyHash)}>{names[currency]} 리포트 목록 보기</button></div>:null}

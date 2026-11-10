@@ -50,7 +50,7 @@ describe('UI 2.0 trust and navigation rules',()=>{
     expect(usagePayload({event:'report_open',screen:'reports',currency:'CLP',reportId:'<script>'})).toBeNull()
     const input={event:'report_open' as const,screen:'reports' as const,currency:'CLP' as const,reportId:'CLP-2026-10-09-1791893507884',email:'never-send@example.test',url:'https://private.test/?key=secret'}
     const payload=usagePayload(input)
-    expect(payload).toEqual({p_event:'report_open',p_screen:'reports',p_currency:'CLP',p_report_id:input.reportId})
+    expect(payload).toEqual({p_event:'report_open',p_screen:'reports',p_currency:'CLP',p_report_id:input.reportId,p_view:'',p_entry_source:'direct_or_unknown'})
     expect(JSON.stringify(payload)).not.toMatch(/email|private|secret/)
   })
 })

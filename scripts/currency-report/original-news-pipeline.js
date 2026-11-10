@@ -11,7 +11,7 @@ import {reviewSelectedNewsMaterial} from './selected-material-review.js'
 import {inspectSourceUses} from './source-use.js'
 import {validDate} from './core.js'
 import {marketCalendarDate} from './market-calendar.js'
-import {ORIGINAL_REVIEW_POLICY,ORIGINAL_REVIEW_PURPOSE,inspectNewsModelEndpoint,callNewsModelReview} from './news-model-review.js'
+import {ORIGINAL_REVIEW_POLICY,originalReviewPolicy,ORIGINAL_REVIEW_PURPOSE,inspectNewsModelEndpoint,callNewsModelReview} from './news-model-review.js'
 import {requestTokenBound} from './request-budget.js'
 import {NOTE_AUTHORING_GUIDE} from './note-authoring.js'
 import {assertAnalysisContext,MATERIAL_PROCESSING_VERSION} from './material-processing.js'
@@ -61,9 +61,9 @@ const common=version=>[NOTE_AUTHORING_GUIDE,version==='original-news-pipeline/2'
  '기사의 진실성이나 원인 기여도를 입증하는 작업이 아니다. 제공한 원문이 해당 요지를 지지하는지 판단한다. 이용 허가·집필·게시 승인은 반환하지 않는다.',
 ].join('\n')+(contextVersions.includes(version)?'\n보류·무관은 claims=[]. 원문 전체와 후보의 모든 문맥·귀속·조건·기간을 대조한다.':currentDateVersions.includes(version)?'\n보류·무관 추출은 claims=[]로 반환한다. 대조의 blockPositions는 실제 주장 근거, conditionBlockPositions는 필수 조건 문단이다. 발언자 소개가 앞 문단이면 그 문단도 포함한다. 검토는 후보의 모든 문단과 원문 전체를 대상으로 하며 본문·귀속·조건 중 어느 것도 생략해 승인하지 않는다.':'')
 
-function request(job,stage,candidate,sourceCredits=[],version=ORIGINAL_NEWS_PIPELINE_VERSION) {
+function request(job,stage,candidate,sourceCredits=[],version=ORIGINAL_NEWS_PIPELINE_VERSION,sourceWriter='sol') {
  if(!supportedVersions.includes(version))throw Error('unsupported_original_pipeline_version')
- const p=ORIGINAL_REVIEW_POLICY
+ const p=originalReviewPolicy(sourceWriter)
  const input={version,stage,currency:job.currency,
    time:job.time,publicationIdentity:new URL(job.url).hostname,requestedRoles:[...new Set(job.targets.map(t=>t.needId))],originHints:job.originHints,sourceCredits,blocks:job.blocks,
    ...(job.revalidation?{revalidation:job.revalidation}:{}),
@@ -82,11 +82,11 @@ function request(job,stage,candidate,sourceCredits=[],version=ORIGINAL_NEWS_PIPE
    provider:{only:[p.route],require_parameters:true,zdr:true,data_collection:'deny',allow_fallbacks:false,
      max_price:{prompt:p.prompt,completion:p.completion}}}
  const inputBound=requestTokenBound(body)
- return {stage,purpose:ORIGINAL_REVIEW_PURPOSE,body,requestHash:fingerprint(body),inputBound,maximumUsd:Math.ceil((inputBound*p.inputReservation+p.maxOutputTokens*p.completion)/1e6*1e9)/1e9,
+ return {...(sourceWriter==='sol'?{}:{sourceWriter}),stage,purpose:ORIGINAL_REVIEW_PURPOSE,body,requestHash:fingerprint(body),inputBound,maximumUsd:Math.ceil((inputBound*p.inputReservation+p.maxOutputTokens*p.completion)/1e6*1e9)/1e9,
    status:inputBound>p.maxInputTokens?'input_budget_hold':'prepared_not_called',timeoutMs:120000,retries:0}
 }
 
-export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGINAL_NEWS_PIPELINE_VERSION}) {
+export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGINAL_NEWS_PIPELINE_VERSION,sourceWriter='sol'}) {
  if(!supportedVersions.includes(version))throw Error('unsupported_original_pipeline_version')
  const {original}=validateSelectedReviewCard(collection,card)
  let job=prepareSelectedNewsReview({collection,card})
@@ -132,7 +132,7 @@ export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGI
  }
  if(unsafe(job.blocks))holds.push('unsafe_original_material')
  const sourceCredits=renderings.external_model??[]
- const extraction=request(job,'extract',undefined,sourceCredits,version)
+ const extraction=request(job,'extract',undefined,sourceCredits,version,sourceWriter)
  if(extraction.status==='input_budget_hold')holds.push('complete_original_exceeds_budget')
  // A synthetic size ceiling, never evidence or an actual model request. Do not
  // spend on extraction if a maximum-sized supported proposal cannot be checked.
@@ -140,14 +140,14 @@ export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGI
    eventDateEvidence:{basis:'relative',quote:'가'.repeat(480),blockPositions:Array.from({length:8},(_,n)=>Math.max(127,job.blocks.length-1)-n),relation:'previous_day'},
    claims:Array.from({length:4},(_,i)=>({id:`n${i}`,kind:'attributed_view',text:'가'.repeat(300),person:'가'.repeat(80),
        organization:'가'.repeat(80),causalScope:'global',blockPositions:Array.from({length:8},(_,n)=>Math.max(127,job.blocks.length-1)-n)}))}
- let worstComparison=request(job,'compare',worstCandidate,sourceCredits,version)
+ let worstComparison=request(job,'compare',worstCandidate,sourceCredits,version,sourceWriter)
  if(periodVersions.includes(version)){
   // A period and a single-event date proof are mutually exclusive. Reserve
   // the larger valid request, not an impossible candidate containing both.
   const periodComparison=request(job,'compare',{...worstCandidate,eventDate:'',
    eventDateEvidence:{basis:'unknown',quote:'',blockPositions:[],relation:'none'},
    marketPeriod:{kind:'month',start:'2099-12-01',end:'2099-12-31',quote:'가'.repeat(480),
-    blockPositions:worstCandidate.eventDateEvidence.blockPositions}},sourceCredits,version)
+    blockPositions:worstCandidate.eventDateEvidence.blockPositions}},sourceCredits,version,sourceWriter)
   if(periodComparison.inputBound>worstComparison.inputBound)worstComparison=periodComparison
  }
  if(worstComparison.status==='input_budget_hold')holds.push('comparison_worst_case_exceeds_budget')
@@ -156,7 +156,7 @@ export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGI
  const comparisonMaximumUsd=worstComparison.maximumUsd
  const maximumUsd=Number((extraction.maximumUsd+comparisonMaximumUsd).toFixed(9))
  if(maximumUsd>ORIGINAL_REVIEW_POLICY.maxPipelineUsd)holds.push('source_two_stage_budget_exceeded')
- const payload={version,currency:collection.currency,originalId:original.id,cardBinding:card.binding,
+ const payload={...(sourceWriter==='sol'?{}:{sourceWriter}),version,currency:collection.currency,originalId:original.id,cardBinding:card.binding,
    originalBinding:fingerprint(original),jobBinding:job.binding,useBinding:fingerprint({reviews,evaluatedOn,renderings}),
    status:holds.length?'original_review_hold':'prepared_not_called',holds,sourceUse:uses,
    extraction,sourceCredits,comparisonMaximumUsd,maximumUsd,
@@ -203,11 +203,11 @@ export function prepareOriginalComparison(plan,candidate) {
  if(supportedVersions.includes(plan.version)&&!candidate?.eventDateEvidence)throw Error('event_date_evidence_required')
  inspectExtractedNews(plan.job,candidate)
  if(candidate.decision!=='propose_notes')throw new Error('no_candidate_to_compare')
- return {...request(plan.job,'compare',candidate,plan.sourceCredits,plan.version),candidateHash:fingerprint(candidate),originalBinding:plan.originalBinding}
+ return {...request(plan.job,'compare',candidate,plan.sourceCredits,plan.version,plan.sourceWriter),candidateHash:fingerprint(candidate),originalBinding:plan.originalBinding}
 }
 
 export function completeOriginalNewsReview({collection,card,sourceUse,plan,candidate,comparison,checkedOn}) {
- const refreshed=prepareOriginalNewsCase({collection,card,sourceUse,version:plan.version})
+ const refreshed=prepareOriginalNewsCase({collection,card,sourceUse,version:plan.version,sourceWriter:plan.sourceWriter})
  if(plan.binding!==refreshed.binding||fingerprint(plan)!==fingerprint(refreshed)||plan.holds.length)throw new Error('original_pipeline_binding_or_use_changed')
  inspectExtractedNews(plan.job,candidate)
  if(candidate.decision!=='propose_notes'||!(contextVersions.includes(plan.version)?contextCompareSchema(comparison):Object.hasOwn(comparison??{},'marketPeriod')?periodCompareSchema(comparison):compareSchema(comparison))||unsafe(comparison)||!text(comparison.reason)
@@ -268,8 +268,8 @@ export function completeOriginalNewsReview({collection,card,sourceUse,plan,candi
 
 // Callbacks receive exact, bounded requests. They may be saved-response replay
 // or the explicitly budgeted adapter below; no model is called by default.
-export async function runOriginalNewsCase({collection,card,sourceUse,extract,compare,checkedOn}) {
- const plan=prepareOriginalNewsCase({collection,card,sourceUse}),before=fingerprint(collection)
+export async function runOriginalNewsCase({collection,card,sourceUse,extract,compare,checkedOn,sourceWriter='sol'}) {
+ const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter}),before=fingerprint(collection)
  if(plan.holds.length)return {...plan,status:'original_review_hold',stageInvocations:0}
  if(typeof extract!=='function'||typeof compare!=='function')return {...plan,status:'original_adapter_unavailable',stageInvocations:0}
  let stageInvocations=0
@@ -289,7 +289,7 @@ export async function runOriginalNewsCase({collection,card,sourceUse,extract,com
      throw new Error('comparison_not_a_separate_bound_response')
    const result=completeOriginalNewsReview({collection,card,sourceUse,plan,candidate,comparison:reviewed.output,checkedOn})
    return {...result,stageInvocations,extractionHash:fingerprint(candidate),comparisonHash:fingerprint(reviewed.output)}
- }catch(error){return {status:'original_pipeline_failed',stageInvocations,reason:/^[a-z_]+$/.test(error.message??'')?error.message:'original_stage_failed',publicationApproved:false}}
+ }catch(error){return {status:'original_pipeline_failed',stageInvocations,...(error.diagnostic?{diagnostic:error.diagnostic}:{}),reason:/^[a-z_]+$/.test(error.message??'')?error.message:'original_stage_failed',publicationApproved:false}}
  finally{if(fingerprint(collection)!==before)throw new Error('original_collection_mutated')}
 }
 

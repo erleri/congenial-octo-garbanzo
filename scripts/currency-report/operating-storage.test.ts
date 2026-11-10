@@ -101,7 +101,7 @@ it('detects a corrupted database readback before any execution claim or model re
 })
 it('resumes an existing /1 paused run without converting its payload or changing its case budget',async()=>{
  const f=await operatingFixture()
- await runOperatingCycle({...f,execute:true,preflightSource:async()=>{throw Error('synthetic_endpoint_outage')}})
+ await runOperatingCycle({...f,execute:true,preflightSource:async()=>{if(f.state.batch)throw Error('synthetic_endpoint_outage');return f.preflightSource()}})
  const legacy=await restoreFrozenInput(f.state.batch.payload,f.store,restoreOperatingPayload)
  f.state.batch.payload={...legacy,serializedOperatingPayload:JSON.stringify(legacy)}
  const before=JSON.stringify(f.state.batch.payload),result=await runOperatingCycle({...f,execute:true})

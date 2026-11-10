@@ -92,3 +92,15 @@
 .db-review .admin-review-inbox p{margin:6px 0 0;font-size:12px;line-height:1.6}
 .db-review .review-section-heading{margin:16px 0 8px}
 .db-review>.local-notice{padding:6px 8px;margin-bottom:10px;font-size:11px}
+
+/* Aggregate usage uses the existing admin palette and internal table scroll. */
+.usage-toolbar,.usage-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.usage-controls{justify-content:flex-end}.usage-controls select{font:inherit;min-height:36px;border:1px solid #cbd8e4;border-radius:6px;background:white;color:inherit}
+.usage-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.usage-kpis>div{padding:12px;border:1px solid #dce5ee;border-radius:8px;background:#f5f8fb}
+.usage-kpis span{display:block;font-size:13px}.usage-kpis strong{display:block;font-size:24px;margin-top:4px}
+.usage-definitions{font-size:13px;margin:12px 0}.usage-report-table table{min-width:600px}.usage-report-table th:first-child{min-width:220px;max-width:420px;text-align:left;white-space:normal}
+.usage-panel{min-width:0}.usage-panel .table-scroll{max-width:100%;overflow-x:auto}.usage-panel h4{margin:20px 0 8px}
+@media(max-width:600px){.usage-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.usage-report-table th:first-child{min-width:190px;max-width:240px}.usage-toolbar{align-items:flex-start}.usage-controls{font-size:13px}}
+.usage-chart svg{display:block;width:100%;max-height:210px}.usage-chart text{font-size:16px;fill:#51657a}.usage-chart{margin:8px 0 16px}.usage-panel summary{cursor:pointer;min-height:32px}
+.usage-panel .dense-table{min-width:0;font-size:13px}.usage-panel .dense-table thead th{font-size:12px}.usage-panel .usage-report-table table{min-width:600px}
