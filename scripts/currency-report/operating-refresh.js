@@ -1,7 +1,7 @@
 // A failed or incomplete lookup is not evidence that an earlier source changed.
 // Only positively observed editions can supersede a frozen country input.
 import {fingerprint} from './research-harness.js'
-import {operatingMaterialHash,reuseOperatingSources} from './operating-source-cache.js'
+import {operatingMaterialHash,operatingSourceKey,reuseOperatingSources} from './operating-source-cache.js'
 
 const originalEdition=o=>fingerprint({sourceId:o.sourceId,url:o.url,body:o.blocks??o.observations??o.sha256,
  metadata:o.metadata??null,originHints:o.originHints??null})
@@ -28,7 +28,25 @@ export function frozenSourceReviewHolds(country,cache,rulesBinding,{materialEdit
  const current=reuseOperatingSources(collection,cache,rulesBinding)
  const holds=current.collection.reviewRevalidations.flatMap(r=>['conflict','revalidation_required'].includes(r.reason)
   ?[`source_review_${r.reason}`]:[])
- for(const review of current.savedSourceReviews)if(review.heldStatus)holds.push(review.heldStatus)
+ // A first rejection of a candidate is not revocation of evidence. Before a
+ // task is staged, let normal selection use the other independently accepted
+ // sources. Previously accepted or explicitly withdrawn judgments still block;
+ // staged tasks are already scoped to their actual news dependencies above.
+ const acceptedKeys=new Set(cache.filter(r=>!r.review?.heldStatus&&r.review?.receipt)
+  .map(r=>r.sourceKey??operatingSourceKey(r.original,rulesBinding)))
+ for(const review of country.savedSourceReviews??[]){
+  if(review.heldStatus||!review.receipt)continue
+  const card=country.collection.reviewQueue.find(c=>c.binding===review.cardBinding)
+  const original=country.collection.originals.find(o=>o.id===card?.originalId)
+  if(original)acceptedKeys.add(operatingSourceKey(original,rulesBinding))
+ }
+ for(const review of current.savedSourceReviews){
+  if(!review.heldStatus)continue
+  const card=current.collection.reviewQueue.find(c=>c.binding===review.cardBinding)
+  const original=current.collection.originals.find(o=>o.id===card?.originalId)
+  if(materialEditions!==undefined||review.heldStatus==='source_review_withdrawn'
+   ||original&&acceptedKeys.has(operatingSourceKey(original,rulesBinding)))holds.push(review.heldStatus)
+ }
  return [...new Set(holds)]
 }
 

@@ -17,6 +17,19 @@ it('separates recoverable stage waits, immutable content rejection and global un
   .toMatchObject({kind:'action_required',exitCode:2})
 })
 
+it('keeps ordinary discovery results out of repair alerts without hiding an unknown error attached to one',()=>{
+ for(const issue of [{status:'partial_pending_review'},
+  {status:'no_candidates_in_listing',reason:'listing_did_not_identify_matching_article'},
+  {status:'no_candidates_in_listing',reason:'no_candidates_in_attempt'}]){
+  const continuation=sourceContinuation(issue)
+  expect(continuation).toMatchObject({category:'discovery',resumeExact:false})
+  expect(operatingResultState({status:'completed_with_country_results',rows:[{status:'pending_admin_review',
+   continuation:{action:'await_admin_review',issues:[continuation]}}]})).toMatchObject({kind:'review_wait',exitCode:0})
+ }
+ expect(sourceContinuation({status:'partial_pending_review',reason:'unclassified_pipeline_bug'})).toMatchObject({category:'technical'})
+ expect(sourceContinuation({status:'no_candidates_in_listing',holds:['source_endpoint_preflight_hold']})).toMatchObject({resumeExact:true})
+})
+
 it('uses rejected-source feedback to select a different article without banning corrections at the same URL',()=>{
  const base='https://www.valoraanalitik.com/',old=base+'dolar-colombia-cae-por-oferta-local/',other=base+'dolar-colombia-ante-demanda-externa/'
  const html=`<a href="${old}">El dólar en Colombia cae por oferta local</a><a href="${other}">El dólar en Colombia ante demanda externa</a>`

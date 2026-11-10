@@ -23,6 +23,11 @@ try{
  run(['exec','-i',container,'psql','-X','-q','-v','ON_ERROR_STOP=1','-U','supabase_admin','-d',target],
   dump.replaceAll('CREATE SCHEMA public;','CREATE SCHEMA IF NOT EXISTS public;'))
  sql('insert into app_private.currency_report_runtime_control(singleton) values(true);insert into app_private.usage_settings(singleton) values(true);')
+ // Apply explicitly selected pending migrations only to this fresh clone.
+ for(const name of process.argv.slice(2)){
+  if(!/^supabase\/migrations\/[0-9]+_[a-z0-9_]+\.sql$/.test(name))throw Error('local_migration_path_required')
+  sql(await fs.readFile(name,'utf8'))
+ }
  for(const name of (await fs.readdir('supabase/tests')).filter(n=>n.endsWith('.sql')).sort()){
   const output=sql(await fs.readFile('supabase/tests/'+name,'utf8'))
   await fs.writeFile(directory+'/'+name+'.tap',output)
