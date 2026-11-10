@@ -89,6 +89,38 @@ create table app_private.currency_report_technical_recoveries(
 alter table app_private.currency_report_technical_recoveries enable row level security;
 revoke all on app_private.currency_report_technical_recoveries from public,anon,authenticated;
 grant select,insert on app_private.currency_report_technical_recoveries to service_role;
+create function app_private.runtime_technical_recovery_reason(c app_private.currency_report_operating_cases) returns text
+language plpgsql stable security invoker set search_path='' as $$
+begin
+ if c.state<>'held' or c.run_id is not null or exists(select 1 from app_private.currency_report_technical_recoveries r
+  where r.case_key=c.case_key and r.repair_version='runtime-document/2') then return null;end if;
+ if (coalesce(c.result->'sourceHolds','[]') @> '["source_endpoint_preflight_hold"]'::jsonb
+   or coalesce(c.result->'holds','[]') @> '["source_endpoint_preflight_hold"]'::jsonb)
+  and coalesce((c.result->>'modelCalls')::integer,-1)=0
+  and not exists(select 1 from app_private.currency_report_runtime_jobs where context->>'operatingCaseKey'=c.case_key) then
+   return 'zero_dispatch_endpoint_hold';
+ elsif c.result->>'status'='writer_preparation_hold'
+  and coalesce(c.result->'sourceHolds','[]') @> '["unsafe_or_oversized_runtime_payload"]'::jsonb
+  and not exists(select 1 from app_private.currency_report_runtime_jobs
+    where context->>'operatingCaseKey'=c.case_key and (context->>'purpose' is distinct from 'original_source_review'
+     or cost_state<>'confirmed' or state not in ('received','held','finished') or actual_nano>reserved_nano)) then
+   return 'legacy_runtime_capacity_hold';
+ end if;
+ return null;
+end;$$;
+revoke all on function app_private.runtime_technical_recovery_reason(app_private.currency_report_operating_cases) from public,anon,authenticated;
+grant execute on function app_private.runtime_technical_recovery_reason(app_private.currency_report_operating_cases) to service_role;
+create function public.inspect_currency_report_operating_technical_holds(p_revision bigint) returns jsonb
+language sql stable security invoker set search_path='' as $$
+ select coalesce(jsonb_agg(to_jsonb(b) order by b.created_at,b.batch_key),'[]'::jsonb) from (
+  select * from app_private.currency_report_operating_batches b where b.policy_revision=p_revision
+   and b.state in ('completed','paused') and exists(select 1 from app_private.currency_report_operating_cases c
+    where c.batch_key=b.batch_key and app_private.runtime_technical_recovery_reason(c) is not null)
+   order by b.created_at,b.batch_key limit 17
+ ) b;
+$$;
+revoke all on function public.inspect_currency_report_operating_technical_holds(bigint) from public,anon,authenticated;
+grant execute on function public.inspect_currency_report_operating_technical_holds(bigint) to service_role;
 create function public.recover_currency_report_operating_technical_holds(p_revision bigint) returns jsonb
 language plpgsql security invoker set search_path='' as $$
 declare c app_private.currency_report_operating_cases; b app_private.currency_report_operating_batches;
@@ -106,19 +138,7 @@ begin
   for c in select * from app_private.currency_report_operating_cases where batch_key=b.batch_key and state='held' and run_id is null
    and not exists(select 1 from app_private.currency_report_technical_recoveries r where r.case_key=currency_report_operating_cases.case_key and repair_version='runtime-document/2')
    order by currency for update skip locked loop
-   why:=null;
-   if (coalesce(c.result->'sourceHolds','[]') @> '["source_endpoint_preflight_hold"]'::jsonb
-     or coalesce(c.result->'holds','[]') @> '["source_endpoint_preflight_hold"]'::jsonb)
-    and coalesce((c.result->>'modelCalls')::integer,-1)=0
-    and not exists(select 1 from app_private.currency_report_runtime_jobs where context->>'operatingCaseKey'=c.case_key) then
-     why:='zero_dispatch_endpoint_hold';
-   elsif c.result->>'status'='writer_preparation_hold'
-    and coalesce(c.result->'sourceHolds','[]') @> '["unsafe_or_oversized_runtime_payload"]'::jsonb
-    and not exists(select 1 from app_private.currency_report_runtime_jobs
-      where context->>'operatingCaseKey'=c.case_key and (context->>'purpose' is distinct from 'original_source_review'
-       or cost_state<>'confirmed' or state not in ('received','held','finished') or actual_nano>reserved_nano)) then
-     why:='legacy_runtime_capacity_hold';
-   end if;
+   why:=app_private.runtime_technical_recovery_reason(c);
    if why is null then continue;end if;
    insert into app_private.currency_report_technical_recoveries values(c.case_key,'runtime-document/2',c.state,c.result,b.state,clock_timestamp());
    update app_private.currency_report_operating_cases set state='paused',updated_at=clock_timestamp() where case_key=c.case_key;

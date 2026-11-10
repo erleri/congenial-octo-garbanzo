@@ -29,6 +29,8 @@ insert into app_private.currency_report_runtime_jobs(task_key,currency,base_date
 update app_private.currency_report_runtime_control set enabled=false,review_enabled=true;
 select is((public.recover_currency_report_operating_technical_holds(current_setting('runtime_document.revision')::bigint)->>'recovered')::int,0,'disabled worker cannot requeue cases');
 update app_private.currency_report_runtime_control set enabled=true;
+select is(jsonb_array_length(public.inspect_currency_report_operating_technical_holds(current_setting('runtime_document.revision')::bigint)),1,'free inspection includes the original completed envelope');
+select is((select state from app_private.currency_report_operating_batches where batch_key=repeat('9',64)),'completed','inspection does not requeue or reset anything');
 savepoint accounting_boundary;
 insert into app_private.currency_report_runtime_jobs(task_key,currency,base_date,stage,state,request_hash,context,reserved_nano,cost_state,control_revision)
  values(repeat('b',64),'ARS','2099-11-10','writer','calling',repeat('e',64),'{}',20000000,'unknown',1);

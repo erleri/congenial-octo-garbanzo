@@ -88,7 +88,9 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
   }
  }
  const current=await store.operatingBatch(freshKey)
- const pending=store.pendingBatches?await store.pendingBatches(configured.revision):[]
+ const pending=[...new Map([...(store.pendingBatches?await store.pendingBatches(configured.revision):[]),
+  ...(!execute&&store.inspectTechnicalHolds?(await store.inspectTechnicalHolds(configured.revision)).map(b=>({...b,technicalRecoveryInspection:true})):[])]
+  .map(batch=>[batch.batch_key,batch])).values()]
  if(pending.length>16)return {status:'operating_queue_capacity_hold',modelCalls:0,publicationApproved:false,collectionResults:prepared.collectionResults}
  const queue=[],seen=new Set(),recoveredCountries=new Set()
  for(const candidate of [...pending,...(current&&current.state!=='completed'?[current]:[])]){
@@ -163,7 +165,7 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
  let prepared=refreshed,executionDataset=dataset
  const deferredFreshMaterial=!!previous&&key!==freshKey
  if(previous){
-  if(previous.state==='completed')return {status:correctionHolds.length?'correction_recording_required':recovery?.status==='action_required'?'cost_reconciliation_required':'completed',batchKey:key,recovery,modelCalls:0,previousResult:previous.result,
+  if(previous.state==='completed'&&!(previous.technicalRecoveryInspection&&!execute))return {status:correctionHolds.length?'correction_recording_required':recovery?.status==='action_required'?'cost_reconciliation_required':'completed',batchKey:key,recovery,modelCalls:0,previousResult:previous.result,
    collectionResults:prepared.collectionResults,publicationApproved:false}
   if(previous.state==='cost_unresolved'){
    if(recovery?.status!=='clear')return {status:'cost_reconciliation_required',recovery,collectionResults:prepared.collectionResults,modelCalls:0,publicationApproved:false}

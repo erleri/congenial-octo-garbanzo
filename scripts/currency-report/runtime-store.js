@@ -66,6 +66,7 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
   environment:mode,
   runtimeDocumentCapability:()=>rpc('currency_report_runtime_document_capability'),
   recoverTechnicalHolds:revision=>rpc('recover_currency_report_operating_technical_holds',{p_revision:revision}),
+  inspectTechnicalHolds:revision=>rpc('inspect_currency_report_operating_technical_holds',{p_revision:revision}),
   storageInspect:ids=>rpc('currency_report_storage_inspect',{p_ids:ids}),
   storagePrepare:metadata=>rpc('prepare_currency_report_storage_object',{p_meta:metadata}),
   storageChunk:(id,index,data)=>rpc('put_currency_report_storage_chunk',{p_id:id,p_index:index,p_data:data}),
