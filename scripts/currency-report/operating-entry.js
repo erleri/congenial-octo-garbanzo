@@ -1,5 +1,6 @@
 // Concrete local/workflow entry. Defaults to inspection; executing never enables
-// controls, installs a policy, retries, falls back or publishes. The local sender
+// controls, installs a policy, falls back or publishes. A separately configured
+// server recovery policy can authorize one later exact-stage attempt. The local sender
 // code scope was explicitly authorized on 2026-11-01, not a paid run/activation.
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -21,6 +22,7 @@ import {createOfficialInputLoader} from './official-input-loader.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
 import {withOfficialInputCache} from './official-input-cache.js'
 import {acquireOfficialBackground} from './runtime-official-supply.js'
+import {recoverOperatingCalls} from './operating-recovery.js'
 
 export function automaticReferenceCalendars(dataset,asOf) {
  // Share the dashboard's stored selection, carry-forward provenance and age
@@ -34,7 +36,7 @@ export function automaticReferenceCalendars(dataset,asOf) {
 }
 export async function operatingEntry({action='inspect',input,requireReady=false,env=process.env,workspace=process.cwd(),store,
  asOf=new Date().toISOString(),fetchImpl=fetch,transport,acquire}={}) {
- if(!['inspect','draft-policy','draft-trial','draft-recurring','configure-policy','plan','verify-storage','execute'].includes(action))throw Error('operating_action_required')
+ if(!['inspect','draft-policy','draft-trial','draft-recurring','configure-policy','plan','verify-storage','execute','reconcile'].includes(action))throw Error('operating_action_required')
  if(requireReady&&action!=='plan')throw Error('reference_readiness_is_plan_only')
  const root=await fs.realpath(workspace),privateRoot=path.join(root,'.local-reports/private')
  const readPrivate=async file=>{
@@ -92,6 +94,13 @@ export async function operatingEntry({action='inspect',input,requireReady=false,
   const control=await store.control()
   return {status:'policy_saved_controls_unchanged',revision,enabled:control.enabled,modelCalls:0}
  }
+ if(action==='reconcile'){
+  if(input||!env.OPENROUTER_API_KEY)throw Error('recovery_operating_key_required')
+  const recovery=await recoverOperatingCalls({store,executionId:store.recoveryExecutionId,diagnosticOnly:true,
+   reconcile:args=>reconcileGenerationCost({...args,apiKey:env.OPENROUTER_API_KEY,fetchImpl})})
+  return {status:recovery.status==='action_required'?'cost_reconciliation_required':'recovery_checked',recovery,
+   modelCalls:0,budgetReserved:false,publicationApproved:false}
+ }
  const manifest=input?await readPrivate(input):null
  if(manifest&&manifest.version!=='operating-local-manifest/1')throw Error('operating_manifest_required')
  if(workflow&&manifest)throw Error('workflow_server_configuration_only')
@@ -142,6 +151,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
   if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,
    `\n### Currency report execution\n\n${outcome.kind==='action_required'||outcome.kind==='failure'?'기술 장애':outcome.kind==='review_wait'?'관리자 검토 대기':outcome.kind==='waiting'?'자료 보류':result.status==='no_report_due'?'대상 없음':'준비 완료'} (${result.status}). Model calls: ${Number.isInteger(result.modelCalls)?result.modelCalls:'unconfirmed'}. Publication: administrator review required.\n`
    +(result.storage?`\nStorage: ${result.storage.rawBytes} raw bytes → ${result.storage.compressedBytes} gzip bytes. Manifest: ${result.storage.manifestBytes} bytes. New: ${result.storage.newBytes}; reusable: ${result.storage.reusedBytes}.\n`:'')
+   +(result.recovery?.items?.length?'\nRecovery: '+result.recovery.items.map(i=>`${i.currency??'shared'}: ${i.status} (${i.scope??'unverified'})${i.lookupReason?' / '+i.lookupReason:''}`).join('; ')+'.\n':'')
    +(result.incident?.recordFailure?'\nIncident record failed. Check report job logs; do not treat the workflow as healthy.\n':''))
   process.exitCode=outcome.exitCode
  })

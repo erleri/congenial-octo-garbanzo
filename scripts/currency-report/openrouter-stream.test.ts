@@ -97,7 +97,7 @@ describe('private streaming diagnostic transport', () => {
       expect(url).toBe('https://openrouter.ai/api/v1/generation?id=gen-test')
       return new Response(JSON.stringify({ data: { id: 'gen-test', finish_reason: 'stop', total_cost: .003 } }))
     })
-    expect(await reconcileGenerationCost({ responseId: 'gen-test', apiKey: key, fetchImpl })).toEqual({ costUsd: .003, costSource: 'generation.total_cost' })
+    expect(await reconcileGenerationCost({ responseId: 'gen-test', apiKey: key, fetchImpl })).toMatchObject({ costUsd: .003, costSource: 'generation.total_cost',lookup:{reason:'confirmed'} })
     const mismatch = vi.fn(async () => new Response(JSON.stringify({ data: { id: 'gen-other', total_cost: .003 } })))
     expect((await reconcileGenerationCost({ responseId: 'gen-test', apiKey: key, fetchImpl: mismatch })).costUsd).toBeNull()
     const pending = vi.fn(async () => new Response(JSON.stringify({ data: { id: 'gen-test', finish_reason: null, total_cost: 0 } })))

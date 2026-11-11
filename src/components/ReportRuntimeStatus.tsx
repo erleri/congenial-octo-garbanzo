@@ -2,6 +2,7 @@ import {useEffect,useState} from 'react'
 import {getReportClient} from '../lib/reports/client'
 import {withConnectionDeadline} from '../lib/reports/connection-deadline'
 import ReportSourceManagement from './ReportSourceManagement'
+import ReportRecoveryStatus from './ReportRecoveryStatus'
 import type {InboxItem} from './AdminReviewInbox'
 
 interface Status {enabled:boolean;reviewEnabled:boolean;writer:string;monthlyLimitUsd:number;confirmedUsd:number;reservedUsd:number;unresolvedCalls:number;monthBasis:string;checks?:{currency:string;checkedAt:string;result:{status:string;baseDate:string|null;sources?:{sourceId:string;statuses:string[]}[]}}[]}
@@ -55,7 +56,8 @@ export default function ReportRuntimeStatus({focus=null}:{focus?:InboxItem|null}
  return <div className="runtime-status" role="status" id={focus?.kind==='incident'?`review-target-${focus.target_id}`:undefined} tabIndex={-1}>
   <p><strong>새 리포트 생성 {status.enabled?'활성':'중지'}</strong> · 집필 {status.writer} · 자동 내용 검토 {status.reviewEnabled?'활성':'중지'}</p>
   <p>새 생성 경로 · 이번 달 확인 비용 ${status.confirmedUsd.toFixed(3)} · 미확정 예약 ${status.reservedUsd.toFixed(3)} · 한도 ${status.monthlyLimitUsd.toFixed(2)} <small>({status.monthBasis})</small></p>
-  {status.unresolvedCalls>0&&<p>비용 확인이 필요한 호출 {status.unresolvedCalls}건 — 추가 생성을 보류합니다.</p>}
+  {status.unresolvedCalls>0&&<p>비용 확인이 필요한 호출 {status.unresolvedCalls}건 · 추가 처리 가능 여부는 공통 복구 상태에서 확인합니다.</p>}
+  <ReportRecoveryStatus/>
   {operating?<><p>자동 처리 설정 {operating.policyState==='operator_configured'?'등록됨':operating.policyState==='proposal_not_enabled'?'제안 · 실행 전':'미설정'} · 원문 비공개 분석 {operating.externalProcessingConfigured?'설정됨':'미확정'} · 반복 예산 {operating.recurringBudgetConfigured?'설정됨':'미확정'}</p>
    {operating.cases.length>0&&<ul>{operating.cases.map(c=><li key={c.currency}>{c.currency} · {statusLabels[c.status??'']??statusLabels[c.state]??'실행 기록 확인 필요'}{c.testOnly?' · 합성 연결 시험':''}
     {c.sourceIssues?.some(s=>statusLabels[s.status])&&<details><summary>자료 연결 확인</summary><ul>{c.sourceIssues.filter(s=>statusLabels[s.status]).map((s,i)=><li key={`${s.sourceId}-${i}`}>{s.sourceId} · {statusLabels[s.status]}</li>)}</ul></details>}

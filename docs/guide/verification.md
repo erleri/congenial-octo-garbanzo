@@ -2,6 +2,8 @@
 
 ## 기준점
 
+11월11일 공통 복구 후속 변경은 [별도 정책 안내](common-recovery-policy.md)에서 로컬 구현·검증 상태로 관리합니다. 기준 운영 코드 `0a033be`와 원래 ARS 미확정 비용은 이번 로컬 검사로 바뀌지 않습니다. 아래 이전 배포의 검사 결과는 당시 기록으로 보존합니다.
+
 현재 구현 기준은 [PR #26](https://github.com/erleri/congenial-octo-garbanzo/pull/26)의 `681de0c`입니다. 아래 UI 검증 표는 [PR #25](https://github.com/erleri/congenial-octo-garbanzo/pull/25)의 `fa9b58f`, 당시 로컬 시작 `4b4507f`, Netlify `6af1d0e87c67f14a05dcb421` 기준의 기록을 보존합니다. 입력 저장 변경의 로컬·운영 검증은 별도로 구분합니다. 자료 자동 커밋이나 새 AI 원고 성공을 기존 검사에 합산하지 않습니다.
 
 [로컬 검증 사본](evidence/ui-local-verification-20261109.json)과 [배포 검증 사본](evidence/ui-production-verification-20261109.json)은 기존 검증 기록을 재사용했습니다. 이번 문서 작업에서 전체 앱 테스트·DB 권한 검사·메일 발송을 다시 실행한 결과가 아닙니다.

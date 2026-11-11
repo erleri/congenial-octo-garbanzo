@@ -5,18 +5,27 @@ const money = value => typeof value === 'number' && Number.isFinite(value) && va
 
 export async function reconcileGenerationCost({ responseId, apiKey, fetchImpl = fetch }) {
   if (!generationId(responseId) || !apiKey) throw new Error('invalid_cost_lookup')
+  const result=(reason,status=null,costUsd=null)=>({costUsd,costSource:costUsd===null?'unknown':'generation.total_cost',
+    lookup:{version:'generation-cost-lookup/1',reason,httpStatus:status}})
   try {
-    const response = await fetchImpl(`https://openrouter.ai/api/v1/generation?id=${encodeURIComponent(responseId)}`, {
-      headers: { Authorization: `Bearer ${apiKey}` }, signal: AbortSignal.timeout(10000),
-    })
-    if (!response.ok) return { costUsd: null, costSource: 'unknown' }
-    const payload = await response.json()
+    let response
+    for(let attempt=0;attempt<2;attempt++){
+      try{response=await fetchImpl(`https://openrouter.ai/api/v1/generation?id=${encodeURIComponent(responseId)}`, {
+        headers: { Authorization: `Bearer ${apiKey}` }, signal: AbortSignal.timeout(10000),
+      })}catch(error){if(attempt===0)continue;return result(error?.name==='TimeoutError'||error?.name==='AbortError'?'timeout':'network_error')}
+      if(response.status<500||attempt===1)break
+      await response.body?.cancel().catch(()=>{})
+    }
+    if(!response.ok)return result(({401:'authentication_error',403:'permission_error',404:'record_not_found',429:'lookup_rate_limited'})[response.status]
+      ??(response.status>=500?'provider_error':'http_error'),response.status)
+    let payload
+    try{payload=await response.json()}catch{return result('invalid_json',response.status)}
     // Refuse a mismatched activity record rather than attributing another call's cost.
-    if (payload.data?.id !== responseId || typeof payload.data.finish_reason !== 'string' || !payload.data.finish_reason)
-      return { costUsd: null, costSource: 'unknown' }
+    if(payload.data?.id!==responseId)return result('identity_mismatch',response.status)
+    if(typeof payload.data.finish_reason!=='string'||!payload.data.finish_reason)return result('completion_not_confirmed',response.status)
     const costUsd = money(payload.data.total_cost)
-    return { costUsd, costSource: costUsd === null ? 'unknown' : 'generation.total_cost' }
-  } catch { return { costUsd: null, costSource: 'unknown' } }
+    return result(costUsd===null?'cost_missing':'confirmed',response.status,costUsd)
+  } catch { return result('lookup_error') }
 }
 
 export async function callOpenRouterStream({ body, apiKey, fetchImpl = fetch,
@@ -31,7 +40,7 @@ export async function callOpenRouterStream({ body, apiKey, fetchImpl = fetch,
   const state = { responseId: null, actualModel: null, partialText: '', usage: null,
     headersMs: null, firstEventMs: null, firstContentMs: null, comments: 0, events: 0,
     finishReason: null, done: false, bytes: 0, providerError: null }
-  let reader, raw = '', buffer = '', data = [], error = null, httpStatus = null
+  let reader, raw = '', buffer = '', data = [], error = null, httpStatus = null, retryAfterAt = null
   const elapsed = () => Date.now() - start
   const record = async phase => {
     if (JSON.stringify(state).includes(apiKey)) throw new Error('credential_in_response')
@@ -101,6 +110,9 @@ export async function callOpenRouterStream({ body, apiKey, fetchImpl = fetch,
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' }, body: serialized,
     }))
     httpStatus = response.status; state.headersMs = elapsed()
+    const retryAfter=response.headers.get('retry-after')
+    if(retryAfter){const until=/^\d+$/.test(retryAfter)?Date.now()+Number(retryAfter)*1000:Date.parse(retryAfter)
+      if(Number.isFinite(new Date(until).getTime())&&until>Date.now())retryAfterAt=new Date(until).toISOString()}
     acceptId(response.headers.get('x-generation-id'))
     await record('headers')
     if (!response.body) throw new Error('missing_response_body')
@@ -147,7 +159,7 @@ export async function callOpenRouterStream({ body, apiKey, fetchImpl = fetch,
     if (error === 'credential_in_response') { state.partialText = ''; state.actualModel = null; state.usage = null; state.providerError = null }
   } finally { reader?.releaseLock() }
   const costUsd = money(state.usage?.cost)
-  const result = { ...state, valid: !error, errors: error ? [error] : [], httpStatus,
+  const result = { ...state, valid: !error, errors: error ? [error] : [], httpStatus,...(retryAfterAt?{retryAfterAt}:{}),
     latencyMs: elapsed(), costUsd, costSource: costUsd === null ? 'unknown' : 'usage.cost',
     generationCalls: 1, retries: 0,
     // Only COMPLETE transport output may be passed to existing full report checks.

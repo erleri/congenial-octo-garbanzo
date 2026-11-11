@@ -2,6 +2,8 @@
 
 기준: 운영 배포 `fe86f65` / 2026-11-10. 아래 여섯 도식은 현재 구현의 책임과 경계를 설명합니다. **운영 저장·복원 통과와 실제 AI 생성 성공은 다릅니다.** 확인 범위는 [운영 상태](operational-status.md)를 봅니다. 노드의 자동·AI·관리자 표기를 구분하며, 화살표는 권한·사용 범위·예산 검사를 생략하는 지름길이 아닙니다.
 
+11월11일 로컬 후속 구현인 [공통 복구 정책](common-recovery-policy.md)은 기존 비용 조회 → 서버 복구 판정 → 전액 예약 분리/공통 차단 → 다음 실행의 실패 단계 추가 1회로 연결합니다. 생성·게시·독자 메일과 분리된 비용 전용 동작을 추가하며, 운영 반영·정책 활성화는 아직 하지 않았습니다.
+
 [여섯 도식 보기](diagrams/index.html)에서 확대해 볼 수 있습니다. 원본은 `.mmd`, 렌더링은 같은 이름의 `.svg`로 관리합니다. 원본 변경 시 두 결과를 함께 갱신합니다.
 ## 독자·관리자의 화면 이동
 
@@ -185,6 +187,8 @@ flowchart TD
 
 위 도식에 분리 저장과 장애 알림 연결을 반영했습니다. 조각·해시·구형 `/1` 및 신형 `/2` 재개는 [저장·복원 상세 흐름](frozen-input-storage.md#저장과-재개-흐름)을 함께 봅니다. 원본 객체는 로그인 관리자도 직접 조회할 수 없으며 기존 검토 화면은 허용된 정보만 받습니다. AI·공개·비용 승인 경계는 바뀌지 않습니다.
 
+PR #28부터 같은 비공개 객체 저장을 배치 원본뿐 아니라 큰 집필 task·요청 context에도 사용합니다. `runtime-document/2`의 압축 바이트는 정확히 복원하고, 기존 실행 행에는 작은 명세서만 연결합니다. PR #29는 미사용 탈락 후보와 채택 근거의 무효화를 구분하고, 과거 잘못된 사전 차단은 worker가 감사 이력을 남겨 재검사합니다. 구체적인 저장·복구 조건과 실제 실행 결과는 [집필 입력·재개 정상화](runtime-storage-recovery.md)에 모읍니다.
+
 | 흐름 | 구현 진입점 | 권한·실패 경계 |
 | --- | --- | --- |
 | 화면·선택·URL | [App](../../src/App.tsx), [리포트 목록](../../src/components/PublishedCurrencyReports.tsx) | 공개와 관리자 조회 구분 |
@@ -193,6 +197,8 @@ flowchart TD
 | 발행 판단 | [publication-cadence](../../scripts/currency-report/publication-cadence.js) | 후보와 발행 승인 분리 |
 | 운영 조율 | [operating-entry](../../scripts/currency-report/operating-entry.js), [operating-cycle](../../scripts/currency-report/operating-cycle.js) | 설정·용량·예약·중복·국가별 상태 |
 | 입력 보관·재개 | [operating-storage](../../scripts/currency-report/operating-storage.js), [추가 DB 변경](../../supabase/migrations/20261109150211_currency_operating_frozen_objects.sql) | 원본 무손실·서버 전용·조각 완전성·`/1`/`/2` 호환 |
+| 큰 집필 입력·문맥 | [runtime-document](../../scripts/currency-report/runtime-document.js), [저장·재개 DB 변경](../../supabase/migrations/20261110130228_runtime_document_recovery.sql) | 원래 요청·해시·비용 유지, 서버 전용 명세 연결 |
+| 후보 범위·기술 보류 재검사 | [operating-refresh](../../scripts/currency-report/operating-refresh.js), [복구 DB 변경](../../supabase/migrations/20261110140738_source_candidate_scope_recovery.sql) | 미사용 후보 탈락은 대체 근거와 분리, 철회·충돌·미확정 비용 차단 유지 |
 | 무과금 저장 확인 | [전용 workflow](../../.github/workflows/report-storage-check.yml) | 모델 키·메일 인증정보 없음, 원본 저장은 수행 |
 | 자료·원문 | [runtime-supply](../../scripts/currency-report/runtime-supply.js), [original-news-pipeline](../../scripts/currency-report/original-news-pipeline.js) | 이용 범위·판본·원문 대조 |
 | 집필·검토 | [shared-writer](../../scripts/currency-report/shared-writer.js), [runtime-worker](../../scripts/currency-report/runtime-worker.js) | 모델 결과와 최종 게시 분리 |
