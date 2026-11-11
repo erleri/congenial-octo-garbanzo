@@ -24,3 +24,14 @@ it('keeps withdrawal disabled without a reason, and exposes evidence through a d
     expect(html).not.toContain('>승인</button>')
   }
 })
+
+it('shows a rejected approval beside that manuscript without scrolling to the header',()=>{
+ const html=renderToStaticMarkup(<ReportReviewCard {...defaults} actionNotice="공개용 숫자·날짜 형식 검사에서 거부됐습니다."/> )
+ expect(html).toContain('role="status"')
+ expect(html.indexOf('공개용 숫자')).toBeGreaterThan(html.indexOf('review-card-actions'))
+})
+it('keeps cause-score failures blocked and explains the unmet threshold',()=>{
+ const html=renderToStaticMarkup(<ReportReviewCard {...defaults} run={{...run,validation:{...run.validation,contentReview:'unverified',review:{scores:{cause:3}}}}}/> )
+ expect(html).toContain('원인 설명 3점');expect(html).toContain('필수 4~5점')
+ expect(html).toContain('class="review-primary" disabled=""')
+})

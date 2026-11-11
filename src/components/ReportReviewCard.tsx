@@ -8,9 +8,10 @@ export interface ReviewRun {
 }
 
 // Presentation only: current-version, permission and storage checks remain in the caller and DB.
-export default function ReportReviewCard({run,busy,reason,revision,focused,targetUnavailable,onRevision,onReview}:{
+export default function ReportReviewCard({run,busy,reason,revision,focused,targetUnavailable,onRevision,onReview,actionNotice}:{
   run: ReviewRun; busy: boolean; reason: string; revision: string; focused: boolean; targetUnavailable: boolean
   onRevision: (value:string)=>void; onReview: (decision:string)=>void
+  actionNotice?:string
 }) {
   const published=run.status==='published', blockers=approvalBlockers(run.validation)
   return <article id={`review-target-${run.id}`} tabIndex={-1} className="db-review-run">
@@ -33,5 +34,6 @@ export default function ReportReviewCard({run,busy,reason,revision,focused,targe
     <footer className="review-card-actions">
       {published?<button className="review-danger" disabled={busy||!reason.trim()} onClick={()=>onReview('withdrawn')}>철회</button>:<><button className="review-primary" disabled={busy||targetUnavailable||blockers.length>0||!!run.expectedPublicId&&!revision} onClick={()=>onReview('approved')}>승인</button><button disabled={busy||targetUnavailable} onClick={()=>onReview('rejected')}>반려</button></>}
     </footer>
+    {actionNotice&&<p role="status" className="review-notice">{actionNotice}</p>}
   </article>
 }
