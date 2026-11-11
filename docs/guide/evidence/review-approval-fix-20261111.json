@@ -1,0 +1,71 @@
+{
+  "version": "review-approval-fix/1",
+  "state": "local_verified_not_deployed",
+  "productionBase": "3268a6c3727f6fa07d3b98ae314c7f7477d34ae4",
+  "localCodeCommit": "d4f27ed",
+  "productionReadOnly": {
+    "at": "2026-11-11T14:14:15.255859+00:00",
+    "clp": {
+      "status": "pending_review",
+      "candidateMd5": "8de11988a8c0de3157cfa0d4715e53e7",
+      "packetMd5": "cb4e32fe995f0817c1bf32076bde8945",
+      "validationMd5": "103d2e1db8125a595db8f8ff70df17f5"
+    },
+    "publicCount": 10,
+    "jobCount": 94,
+    "confirmedNano": 2266382900,
+    "unknownReservedNano": 443392500
+  },
+  "clpDiagnosis": {
+    "seriesPoints": 5633,
+    "numericPoints": 4388,
+    "explicitNullPoints": 1245,
+    "storageCandidatePacketValidationMatched": true,
+    "oldPublicGuardRejectsNonNumericSeries": true,
+    "rawInputExportPerformed": false
+  },
+  "cop": {
+    "contentReview": "unverified",
+    "causeScore": 3,
+    "requiredCauseScore": 4,
+    "qualityAverage": 4,
+    "evidenceScore": 5,
+    "approvalRemainsBlocked": true
+  },
+  "historicalUnknown": {
+    "count": 3,
+    "totalReservedUsd": 0.4433925,
+    "lookupReason": "record_not_found",
+    "terminalProviderError": 429,
+    "manualAccountingApproval": false
+  },
+  "verification": {
+    "unitFiles": 208,
+    "unitCases": 1479,
+    "unitPassed": true,
+    "dbFiles": 31,
+    "dbCases": 609,
+    "dbPassed": true,
+    "dbFixture": "synthetic same-size null/numeric series; not copied private article inputs",
+    "typecheck": true,
+    "lint": true,
+    "productionBuild": true,
+    "reportBuild": true,
+    "localAppBuild": true,
+    "bundleBoundary": true,
+    "documentLocalLinks": 876,
+    "documentFailures": 0
+  },
+  "changes": {
+    "publicationNullFilterOnly": true,
+    "sourceManuscriptRewritten": false,
+    "missingValuesFilled": false,
+    "storedFxRewritten": false,
+    "publicationPermissionsExpanded": false,
+    "modelCalls": 0,
+    "mailSent": 0,
+    "productionWrites": 0,
+    "clpApprovalPerformed": false,
+    "sourceRouteTransitionIncluded": false
+  }
+}
