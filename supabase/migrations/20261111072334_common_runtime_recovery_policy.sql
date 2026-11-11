@@ -177,7 +177,7 @@ begin
  select * into p from app_private.currency_report_recovery_policy where singleton;
  if not p.enabled then return jsonb_build_object('enabled',false);end if;
  select * into j from app_private.currency_report_runtime_jobs where task_key=p_task_key;
- if j.id is null or not app_private.runtime_terminal_rejection(j) then return jsonb_build_object('enabled',true,'allowed',false);end if;
+ if j.id is null or not app_private.runtime_terminal_rejection(j) then return jsonb_build_object('enabled',true,'allowed',false,'executionId',p_execution);end if;
  select * into d from app_private.currency_report_recovery_decisions where job_id=j.id;
  why:=case when p_execution is null then 'recovery_execution_required'
   when j.request_hash<>p_request_hash then 'recovery_request_changed'
@@ -185,7 +185,7 @@ begin
    and not(state='cancelled' and actual_nano=0 and checkpoint->>'phase'='unsent_released_never_dispatched')) then 'recovery_retry_exhausted'
   when coalesce((j.context->>'retryAttempt')::integer,0)>0 then 'recovery_retry_exhausted'
   when d.job_id is null or d.scope<>'job' then 'recovery_accounting_hold'
-  when d.execution_id=p_execution then 'recovery_next_execution_wait'
+  when coalesce(j.context->>'recoveryExecutionId',j.context->>'operatingOwner')=p_execution::text then 'recovery_next_execution_wait'
   when j.cost_state<>'confirmed' and not app_private.runtime_cost_escrowed(j.id) then 'recovery_accounting_hold'
   when exists(select 1 from app_private.currency_report_recovery_routes r where
    r.model=app_private.runtime_recovery_route(j)->>'model' and r.provider=app_private.runtime_recovery_route(j)->>'provider' and r.blocked_until>clock_timestamp()) then 'recovery_route_wait'
@@ -263,7 +263,8 @@ begin
  for c in select * from app_private.currency_report_operating_cases where state='held' and run_id is null
   and result->>'status' in('source_cost_unresolved','cost_unresolved','output_hold','source_response_or_cost_hold','country_execution_hold','writing_input_hold') for update skip locked loop
   if exists(select 1 from app_private.currency_report_runtime_jobs j join app_private.currency_report_recovery_decisions d on d.job_id=j.id
-   where j.context->>'operatingCaseKey'=c.case_key and d.status='recovery_retry_wait' and d.scope='job' and d.execution_id<>p_execution)
+   where j.context->>'operatingCaseKey'=c.case_key and d.status='recovery_retry_wait' and d.scope='job'
+    and coalesce(j.context->>'recoveryExecutionId',j.context->>'operatingOwner','')<>p_execution::text)
    and not exists(select 1 from app_private.currency_report_technical_recoveries where case_key=c.case_key and repair_version='terminal-recovery/1') then
    insert into app_private.currency_report_technical_recoveries values(c.case_key,'terminal-recovery/1',c.state,c.result,
     (select state from app_private.currency_report_operating_batches where batch_key=c.batch_key),clock_timestamp());

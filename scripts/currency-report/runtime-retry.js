@@ -13,8 +13,8 @@ export async function selectRuntimeAttempt({store,taskKey,requestHash,enabled=fa
  if(store.recoveryAttempt){
   const policy=await store.recoveryAttempt({taskKey,requestHash})
   if(policy.enabled){
-   if(!prior)return {taskKey,prior,retry:{},policyActive:true}
-   if(!terminalRateLimit(prior))return {taskKey,prior,retry:{},policyActive:true}
+   if(!prior)return {taskKey,prior,retry:policy.executionId?{recoveryExecutionId:policy.executionId}:{},policyActive:true}
+   if(!terminalRateLimit(prior))return {taskKey,prior,retry:prior.context?.recoveryExecutionId?{recoveryExecutionId:prior.context.recoveryExecutionId}:{},policyActive:true}
    // The new ceiling must not hide an already paid successful legacy attempt.
    // This path can only reuse a stored response; it cannot create attempt two.
    if(prior.request_hash===requestHash)for(const attempt of [1,2]){

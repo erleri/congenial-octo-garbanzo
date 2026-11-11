@@ -46,7 +46,7 @@ export function operatingReferenceIdentity(dataset,countries,asOf) {
 // A new fetch timestamp is not new material. Edition/content/period changes are.
 export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,sourcePlan,sourceRegister,registry,processingRules,
  env={},mode='saved',capturesByCurrency={},acquire,execute=false,verifyStorage=false,preflightSource,preflightWriter,send,reconcile,dispatchHolds=[],
- clock=()=>Date.now(),deadlineMs=Date.now()+138*60*1000,owner=randomUUID(),testOnly=false}={}) {
+ clock=()=>Date.now(),deadlineMs=Date.now()+138*60*1000,owner=store?.recoveryExecutionId??randomUUID(),testOnly=false}={}) {
  const configured=await store.operatingPolicy()
  if(!configured)return {status:'operating_configuration_missing',modelCalls:0,publicationApproved:false}
  const policy=assertOperatingPolicy(configured.policy),control=await store.control()

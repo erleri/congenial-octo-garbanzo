@@ -1,0 +1,50 @@
+{
+  "version": "common-recovery-local-verification/1",
+  "dateKst": "2026-11-11",
+  "state": "local_verified_not_deployed",
+  "baseExecutionCode": "0a033be",
+  "preservedScheduledDataCommit": "fe65ae7",
+  "policyDefaultEnabled": false,
+  "checks": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "codeTests": 1470,
+    "codeFiles": 207,
+    "databaseAssertions": 590,
+    "databaseFiles": 30,
+    "databaseEnvironment": "fresh schema clone in existing isolated local database container; original local records untouched",
+    "productionBuild": "passed",
+    "reportBuild": "passed",
+    "localAppBuild": "passed",
+    "publicBundleBoundary": "passed"
+  },
+  "savedInputReplay": {
+    "currencies": ["BRL", "MXN", "COP", "PEN", "CLP", "ARS"],
+    "largeTaskBytes": 1612274,
+    "largeTaskGzipBytes": 87110,
+    "taskHashMatched": true,
+    "modelRequestHashMatched": true,
+    "actualModelCalls": 0
+  },
+  "scenarios": [
+    "one funded retry of the failed writer/reviewer for each currency",
+    "source comparison reuses its successful extraction",
+    "six-country common coordinator resumes without manual case reset",
+    "missing or partial response remains globally uncertain",
+    "monthly rollover preserves unknown reservations",
+    "changed task identifiers do not reset retry allowance",
+    "one provider probe and 15-minute/24-hour backoff",
+    "verified late receipts and mismatched receipt rejection",
+    "full pagination and restricted role checks",
+    "stable administrator notice identity and append-only recovery audit"
+  ],
+  "ui": {"desktop": "synthetic component render checked", "contentWidth390": "checked without horizontal overflow", "actualIphoneSafari": "not_tested"},
+  "productionWrites": 0,
+  "actualPaidCalls": 0,
+  "fifthExecuteUsed": false,
+  "limitations": [
+    "Recovery scenarios use synthetic provider responses; saved input replay is a separate historical production-input check.",
+    "Production migration, deployment, policy activation and original ARS expense confirmation remain pending.",
+    "Code and database checks are not economic report quality or business-impact measurements."
+  ]
+}

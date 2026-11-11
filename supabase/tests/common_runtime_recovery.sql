@@ -9,7 +9,7 @@ update app_private.currency_report_runtime_control set enabled=false,review_enab
 select is(public.configure_currency_report_recovery_policy(true,1,'synthetic-local-only'),2::bigint,'explicit paused policy activation');
 insert into app_private.currency_report_runtime_jobs(id,task_key,currency,base_date,stage,state,request_hash,context,response,response_id,reserved_nano,cost_state,control_revision,received_at)
 values('91000000-0000-0000-0000-000000000001',repeat('9',64),'ARS','2099-11-10','writer','received',repeat('8',64),
- jsonb_build_object('operatingBatchKey',repeat('7',64),'model','openai/gpt-6.1-sol','provider','azure/us'),
+ jsonb_build_object('operatingBatchKey',repeat('7',64),'model','openai/gpt-6.1-sol','provider','azure/us','recoveryExecutionId','92000000-0000-0000-0000-000000000001'),
  '{"valid":false,"partialText":"","usage":null,"providerError":{"code":429},"errors":["provider_stream_error"]}','gen-synthetic-terminal',94902500,'unknown',1,clock_timestamp()-interval '1 hour');
 set local role service_role;
 select is(public.decide_currency_report_recovery('91000000-0000-0000-0000-000000000001','92000000-0000-0000-0000-000000000001')->>'scope','job','terminal rejection can be isolated');
@@ -18,6 +18,14 @@ select public.decide_currency_report_recovery('91000000-0000-0000-0000-000000000
 select ok((public.currency_report_recovery_attempt(repeat('9',64),repeat('8',64),'92000000-0000-0000-0000-000000000002')->>'allowed')::boolean,'later execution does not reset first decision identity');
 select is(public.currency_report_recovery_attempt(repeat('9',64),repeat('1',64),'92000000-0000-0000-0000-000000000002')->>'reason','recovery_request_changed','changed input cannot alias retry');
 select is(public.currency_report_recovery_attempt(repeat('9',64),repeat('8',64),null)->>'reason','recovery_execution_required','missing execution identity cannot authorize retry');
+savepoint first_late_decision;
+insert into app_private.currency_report_runtime_jobs(id,task_key,currency,base_date,stage,state,request_hash,context,response,response_id,reserved_nano,cost_state,control_revision,received_at)
+values('95000000-0000-0000-0000-000000000001',repeat('a',64),'BRL','2099-11-10','writer','received',repeat('b',64),
+ jsonb_build_object('operatingBatchKey',repeat('7',64),'model','openai/gpt-6.1-sol','provider','azure','recoveryExecutionId','92000000-0000-0000-0000-000000000001'),
+ '{"valid":false,"partialText":"","usage":null,"providerError":{"code":429},"errors":["provider_stream_error"]}','gen-first-late-decision',1000000,'unknown',1,clock_timestamp()-interval '1 hour');
+select is(public.decide_currency_report_recovery('95000000-0000-0000-0000-000000000001','92000000-0000-0000-0000-000000000002')->>'scope','job','next worker can first isolate a prior request');
+select ok((public.currency_report_recovery_attempt(repeat('a',64),repeat('b',64),'92000000-0000-0000-0000-000000000002')->>'allowed')::boolean,'first recovery decision does not postpone retry by another worker cycle');
+rollback to first_late_decision;
 reset role;
 select is((select actual_nano from app_private.currency_report_runtime_jobs where id='91000000-0000-0000-0000-000000000001'),null::bigint,'unknown expense is not set to zero');
 select is((select reserved_nano from app_private.currency_report_runtime_jobs where id='91000000-0000-0000-0000-000000000001'),94902500::bigint,'entire reservation retained');
