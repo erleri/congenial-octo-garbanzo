@@ -12,6 +12,13 @@ values('91000000-0000-0000-0000-000000000001',repeat('9',64),'ARS','2099-11-10',
  jsonb_build_object('operatingBatchKey',repeat('7',64),'model','openai/gpt-6.1-sol','provider','azure/us','recoveryExecutionId','92000000-0000-0000-0000-000000000001'),
  '{"valid":false,"partialText":"","usage":null,"providerError":{"code":429},"errors":["provider_stream_error"]}','gen-synthetic-terminal',94902500,'unknown',1,clock_timestamp()-interval '1 hour');
 set local role service_role;
+savepoint disabled_diagnostics;
+update app_private.currency_report_recovery_policy set enabled=false;
+select public.record_currency_report_recovery_lookup('91000000-0000-0000-0000-000000000001','92000000-0000-0000-0000-000000000006','{"version":"generation-cost-lookup/1","reason":"record_not_found","httpStatus":404}',null);
+select ok((public.decide_currency_report_recovery('91000000-0000-0000-0000-000000000001','92000000-0000-0000-0000-000000000006')->>'diagnosticOnly')::boolean,'disabled policy supports diagnostic-only cost inspection');
+select ok(not app_private.runtime_cost_escrowed('91000000-0000-0000-0000-000000000001'),'diagnostic-only inspection cannot isolate a reservation');
+select is((select count(*) from app_private.currency_report_recovery_decisions),0::bigint,'diagnostic-only inspection does not create a resume decision');
+rollback to disabled_diagnostics;
 select is(public.decide_currency_report_recovery('91000000-0000-0000-0000-000000000001','92000000-0000-0000-0000-000000000001')->>'scope','job','terminal rejection can be isolated');
 select is(public.currency_report_recovery_attempt(repeat('9',64),repeat('8',64),'92000000-0000-0000-0000-000000000001')->>'reason','recovery_next_execution_wait','same execution cannot retry');
 select public.decide_currency_report_recovery('91000000-0000-0000-0000-000000000001','92000000-0000-0000-0000-000000000002');

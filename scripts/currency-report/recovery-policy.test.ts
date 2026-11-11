@@ -55,3 +55,10 @@ it('keeps a lease-protected reservation globally blocking instead of reporting r
 it('does not label a funded pending expense as completed recovery',()=>{
  expect(operatingResultState({status:'recovery_checked',recovery:{items:[{status:'recovery_retry_wait',scope:'job'}]}})).toMatchObject({kind:'waiting',exitCode:0})
 })
+it('permits diagnostic-only cost inspection before activation without automatically changing policy decisions',async()=>{
+ const recordRecoveryLookup=vi.fn(),decideRecovery=vi.fn(async()=>({scope:'global',status:'cost_still_unconfirmed',diagnosticOnly:true}))
+ const r=await recoverOperatingCalls({diagnosticOnly:true,store:{recoveryPolicy:async()=>({enabled:false}),
+  recoveryCandidates:async()=>({items:[{id:'old',state:'received',cost_state:'unknown',response_id:'gen-old',lookupDue:true}],nextCursor:null}),recordRecoveryLookup,decideRecovery},
+  reconcile:async()=>({costUsd:null,lookup:{reason:'record_not_found',httpStatus:404}})})
+ expect(recordRecoveryLookup).toHaveBeenCalledTimes(1);expect(r.items[0]).toMatchObject({diagnosticOnly:true,lookupReason:'record_not_found'});expect(r.modelCalls).toBe(0)
+})

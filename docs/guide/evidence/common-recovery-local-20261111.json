@@ -8,9 +8,9 @@
   "checks": {
     "typecheck": "passed",
     "lint": "passed",
-    "codeTests": 1470,
+    "codeTests": 1471,
     "codeFiles": 207,
-    "databaseAssertions": 590,
+    "databaseAssertions": 593,
     "databaseFiles": 30,
     "databaseEnvironment": "fresh schema clone in existing isolated local database container; original local records untouched",
     "productionBuild": "passed",
@@ -19,7 +19,14 @@
     "publicBundleBoundary": "passed"
   },
   "savedInputReplay": {
-    "currencies": ["BRL", "MXN", "COP", "PEN", "CLP", "ARS"],
+    "currencies": [
+      "BRL",
+      "MXN",
+      "COP",
+      "PEN",
+      "CLP",
+      "ARS"
+    ],
     "largeTaskBytes": 1612274,
     "largeTaskGzipBytes": 87110,
     "taskHashMatched": true,
@@ -38,7 +45,11 @@
     "full pagination and restricted role checks",
     "stable administrator notice identity and append-only recovery audit"
   ],
-  "ui": {"desktop": "synthetic component render checked", "contentWidth390": "checked without horizontal overflow", "actualIphoneSafari": "not_tested"},
+  "ui": {
+    "desktop": "synthetic component render checked",
+    "contentWidth390": "checked without horizontal overflow",
+    "actualIphoneSafari": "not_tested"
+  },
   "productionWrites": 0,
   "actualPaidCalls": 0,
   "fifthExecuteUsed": false,

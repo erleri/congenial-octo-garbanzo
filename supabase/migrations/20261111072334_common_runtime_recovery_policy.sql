@@ -101,7 +101,7 @@ language plpgsql security invoker set search_path='' as $$
 declare j app_private.currency_report_runtime_jobs;
 begin
  select * into j from app_private.currency_report_runtime_jobs where id=p_id for update;
- if j.id is null or p_execution is null or not exists(select 1 from app_private.currency_report_recovery_policy where enabled)
+ if j.id is null or p_execution is null
  or p_diagnostic->>'version' is distinct from 'generation-cost-lookup/1'
  or p_diagnostic->>'reason' not in('confirmed','record_not_found','authentication_error','permission_error','lookup_rate_limited','provider_error','http_error','timeout','network_error','invalid_json','identity_mismatch','completion_not_confirmed','cost_missing','lookup_error')
  or exists(select 1 from jsonb_object_keys(p_diagnostic) k where k not in('version','reason','httpStatus'))
@@ -124,7 +124,12 @@ begin
  perform 1 from app_private.currency_report_runtime_control where singleton for update;
  select * into p from app_private.currency_report_recovery_policy where singleton;
  select * into j from app_private.currency_report_runtime_jobs where id=p_id for update;
- if not p.enabled or j.id is null or p_execution is null then raise exception 'enabled recovery and existing job required';end if;
+ if j.id is null or p_execution is null then raise exception 'existing recovery job and execution required';end if;
+ if not p.enabled then
+  return jsonb_build_object('diagnosticOnly',true,'scope',case when j.actual_nano>j.reserved_nano or j.state in('reserved','calling') or j.cost_state='unknown' and not app_private.runtime_cost_escrowed(j.id) then 'global' else 'job' end,
+   'status',case when j.actual_nano>j.reserved_nano then 'cost_exceeded' when j.cost_state='unknown' then 'cost_still_unconfirmed' when j.response->>'valid'='true' then 'expense_reconciled_valid_response' else 'response_failed_no_automatic_retry' end,
+   'lookupReason',(select reason from app_private.currency_report_recovery_lookups where job_id=p_id order by checked_at desc limit 1));
+ end if;
  select * into previous from app_private.currency_report_recovery_decisions where job_id=p_id;
  if j.actual_nano>j.reserved_nano then s:='cost_exceeded';
  elsif j.state in('reserved','calling') then s:='execution_uncertain';

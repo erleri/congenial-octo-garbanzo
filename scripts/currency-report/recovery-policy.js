@@ -17,9 +17,9 @@ export async function inspectRecoveryPolicy(store){
  return {status:globalHold?'action_required':'clear',version:'runtime-recovery/1',inspectionOnly:true,modelCalls:0,
   items:jobs.map(j=>({id:j.id,currency:j.currency,status:j.recoveryStatus??'recovery_not_yet_decided',scope:j.scope??'global'}))}
 }
-export async function recoverWithPolicy({store,reconcile,executionId=randomUUID()}){
+export async function recoverWithPolicy({store,reconcile,executionId=randomUUID(),diagnosticOnly=false}){
  const policy=await store.recoveryPolicy()
- if(!policy?.enabled)return null
+ if(!policy?.enabled&&!diagnosticOnly)return null
  const items=[];let globalHold=false,lookups=0
  const jobs=(await recoveryJobs(store)).sort((a,b)=>(Date.parse(a.checkedAt??'')||0)-(Date.parse(b.checkedAt??'')||0))
   for(const job of jobs){
@@ -37,7 +37,7 @@ export async function recoverWithPolicy({store,reconcile,executionId=randomUUID(
     await store.recordRecoveryLookup({id:job.id,executionId,diagnostic:recoveryLookup(cost),receipt})
    }
    const decision=await store.decideRecovery({id:job.id,executionId})
-   items.push({id:job.id,currency:job.currency,...decision})
+   items.push({id:job.id,currency:job.currency,...decision,...(cost?.lookup?{lookupReason:recoveryLookup(cost).reason}:{})})
    if(decision.scope==='global')globalHold=true
   }
  return {status:globalHold?'action_required':'clear',version:'runtime-recovery/1',items,modelCalls:0,executionId}

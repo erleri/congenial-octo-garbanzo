@@ -36,8 +36,8 @@ const withdraw=(f,currency)=>{
 }
 
 it('does not let a never-accepted candidate reject other frozen evidence before staging, while retaining dependency revocation',async()=>{
+ const f=await operatingFixture();await run(f)
  for(const currency of REPORT_CURRENCIES){
-  const f=await operatingFixture();await run(f)
   const prior=f.state.sourceCache.find(r=>r.currency===currency),collection=structuredClone(f.collections[currency])
   const original=structuredClone(prior.original);original.url+='-candidate';delete original.id;delete original.sourceId
   const bound=bindSelectedOriginalReview({record:original,request:{sourceId:prior.original.sourceId,period:'2026-10-27'},
