@@ -100,7 +100,11 @@ export function projectPublicReport(report) {
   if(report.content){const c=report.content;publicReport.content={...leaf(c,['title','summary']),...(c.limitations?{limitations:strings(c.limitations)}:{}),...(c.change?{change:claim(c.change)}:{}),
     ...Object.fromEntries(['drivers','implications','watch'].filter(k=>Array.isArray(c[k])).map(k=>[k,c[k].map(claim)]))}}
   if(report.facts)publicReport.facts=report.facts.map(r=>leaf(r,['id','value','label']))
-  if(report.series)publicReport.series=report.series.map(r=>leaf(r,['date','value']))
+  if(report.series){
+    if(!Array.isArray(report.series)||report.series.some(r=>typeof r?.date!=='string'||r.value!==null&&!Number.isFinite(r.value)))throw Error('invalid_public_field_type')
+    // Missing observations stay in the private packet; never become zero or carry-forward.
+    publicReport.series=report.series.filter(r=>r.value!==null).map(r=>leaf(r,['date','value']))
+  }
   publicReport.evidence = (report.evidence??[]).map(original => {
     assertOfficialPublicSummary(original)
     const e=pick(original,['id','country','title','publisher','url','publishedAt','eventDate','period','collectedAt','summary','eventAt','scope','role','causalStatus','provenance'])

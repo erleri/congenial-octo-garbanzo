@@ -3,6 +3,18 @@ import { fixtureReports, projectPublicReport } from './storage.js'
 import { currentCase } from './test-support.js'
 
 describe('currency report fixtures', () => {
+  it('omits explicit missing chart observations without mutating the sealed input or filling zero',()=>{
+    const a=currentCase(),report={...a.packet,content:a.content,series:[{date:'2026-11-01',value:10},{date:'2026-11-02',value:null},{date:'2026-11-03',value:12}]}
+    const before=JSON.stringify(report)
+    expect(projectPublicReport(report).series).toEqual([{date:'2026-11-01',value:10},{date:'2026-11-03',value:12}])
+    expect(JSON.stringify(report)).toBe(before)
+    expect(projectPublicReport({...report,series:[{date:'2026-11-02',value:null}]}).series).toEqual([])
+  })
+  it('continues to reject malformed chart values rather than silently omitting them',()=>{
+    const a=currentCase()
+    for(const point of [{date:'2026-11-01',value:'10'},{date:'2026-11-01'},{date:12,value:null},{date:'2026-11-01',value:Infinity}])
+      expect(()=>projectPublicReport({...a.packet,content:a.content,series:[point]})).toThrow('invalid_public_field_type')
+  })
   it('allowlists future root, claim, evidence and numeric fields and excludes comparison from public results',()=>{
     const a=currentCase(),original={...a.packet,content:structuredClone(a.content),comparison:{costUsd:1,reviewNotes:['PRIVATE_FUTURE']},futureAdminData:'PRIVATE_FUTURE'}
     original.content.drivers[0]={...original.content.drivers[0],futureSecret:'PRIVATE_FUTURE'} as typeof original.content.drivers[0]

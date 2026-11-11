@@ -31,9 +31,10 @@ export function ReportRecoveryView({value}:{value:Recovery}){
  return <section aria-label="공통 복구 상태"><h4>공통 복구</h4><p>자동 복구 정책 {value.policy.enabled?'활성':'비활성'} · 추가 재시도 최대 1회</p>
  {value.globalBlocked&&<p>새 유료 처리 공통 보류 · 기존 공개 리포트와 환율은 유지됩니다.</p>}
  {(value.totalItems??0)>value.items.length&&<p className="table-help">전체 {value.totalItems}건 중 최근 {value.items.length}건 표시 · 공통 차단 여부는 전체 기록 기준입니다.</p>}
+ {value.items.length>0&&<p className="table-help">미확정 예약은 확정 청구액이 아닙니다. 원고 승인으로 정산하지 않으며 자동 비용 조회와 복구 기록을 유지합니다. 개별 분리 상태는 다른 적격 작업을 막지 않습니다.</p>}
  {!value.items.length?<p className="table-help">저장된 복구 판정이 없습니다.</p>:<ul>{value.items.map(i=><li key={i.id}>
   <strong>{i.currency}</strong> · {recoveryLabels[i.status]??'복구 확인 필요'}{i.scope==='global'?' · 공통 차단':''}
-  <p className="table-help">{i.base_date} · 미확정 예약 ${i.reservedUsd.toFixed(5)} · 추가 시도 {i.attempt}/1
+  <p className="table-help">{i.base_date} · 미확정 예약 ${i.reservedUsd.toFixed(5)} · 기존 이력 포함 추가 시도 {i.attempt}회
    {i.lookupReason?` · 비용 조회: ${lookupLabels[i.lookupReason]??'확인 필요'}`:''}</p>
   {i.status==='recovery_retry_wait'&&<p className="table-help">다음 실행에서 대기 시간·예산·근거 자격을 다시 확인합니다. 비용이 확인된 상태는 아닙니다.</p>}
   {i.costState==='unknown'&&i.nextLookupAt&&<p className="table-help">다음 비용 조회 가능: {time(i.nextLookupAt)} 이후 실행</p>}

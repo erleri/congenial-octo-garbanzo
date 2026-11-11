@@ -9,6 +9,7 @@ import type { DatasetSource, ExchangeRateDataset } from '../types/exchangeRate'
 import AdminReviewInbox from './AdminReviewInbox'
 import type {InboxItem} from './AdminReviewInbox'
 import {parseReviewRequest} from '../lib/review-request.js'
+import {createReviewActionGate,reviewFailureMessage} from '../lib/reports/review-action'
 
 interface Correction {key:string;revision:number;createdAt:string;status:string;lastReview?:{reason:string;decision:string;createdAt:string}|null;record:{currency:string;reportId:string;baseDate:string;claimId:string;quote:string;kind:string;reason:string;sourceUrl:string;before:{value?:number;period?:string};after:{value?:number;period?:string};testOnly:boolean}}
 interface Corrections {items:Correction[];pending:number;checks:{currency:string;checkedAt:string;coverage:{reportsChecked:number;missingSnapshotReports:number;unmappedEvidence:number;historyWindowLimited?:boolean;issues:string[]}}[]}
@@ -18,6 +19,8 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
   const [admin, setAdmin] = useState(false)
   const [runs, setRuns] = useState<Run[]>([]), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false)
   const [reason, setReason] = useState('')
+  const [actions]=useState(createReviewActionGate)
+  const [actionNotice,setActionNotice]=useState<{id:string;message:string}|null>(null)
   const [includeTest,setIncludeTest]=useState(false)
   const [pendingTotal,setPendingTotal]=useState(0)
   const [revisions,setRevisions]=useState<Record<string,string>>({})
@@ -28,9 +31,9 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
   const epoch = useRef(0)
   const attended = useRef(true)
   const invalidate = useCallback(() => { epoch.current++ }, [])
-  const reset = useCallback(() => { invalidate(); setRuns([]);setPendingTotal(0); setAdmin(false); setReason('');setRevisions({});setCorrections(null);setCorrectionReasons({});setTargetItem(null);setTargetState('checking') }, [invalidate])
+  const reset = useCallback(() => { invalidate(); setRuns([]);setPendingTotal(0); setAdmin(false); setReason('');setActionNotice(null);setRevisions({});setCorrections(null);setCorrectionReasons({});setTargetItem(null);setTargetState('checking') }, [invalidate])
   const load = useCallback(async () => {
-    if(!attended.current || !canManage)return
+    if(!attended.current || !canManage || actions.busy)return
     const version = ++epoch.current
     try {
       const snapshot = await withConnectionDeadline(async signal => {
@@ -77,7 +80,7 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
       setNotice(previous=>previous==='연결 실패. 이전 초안은 숨겼습니다.'?'':previous)
       if(!snapshot.admin){setReason('');void recheck()}
     } catch { if (epoch.current === version) { setAdmin(false); setRuns([]);setCorrections(null);setCorrectionReasons({});setTargetState('unavailable');setTargetItem(null); setNotice('연결 실패. 이전 초안은 숨겼습니다.') } }
-  }, [includeTest,canManage,recheck,correctionPages,target])
+  }, [includeTest,canManage,recheck,correctionPages,target,actions])
   useEffect(() => {
     let active = true
     queueMicrotask(()=>{if(active)void load()})
@@ -90,21 +93,29 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
     return () => { active = false; invalidate(); clearInterval(timer);window.removeEventListener('focus',focus);window.removeEventListener('blur',hide);document.removeEventListener('visibilitychange',visibility) }
   }, [load, reset, invalidate, revision])
   async function review(runId: string, decision: string) {
-    if (busy) return
+    if (busy||actions.busy) return
     setBusy(true)
-    const version=epoch.current
+    const version=++epoch.current
+    setActionNotice({id:runId,message:'처리 중입니다. 응답을 기다려 주세요.'})
     try {
       const run=runs.find(r=>r.id===runId)
-      const client = await getReportClient()
       const requested=target?.kind==='report'&&target.id===runId
-      const result = await client.rpc(requested?'review_currency_report_request':'review_currency_report_version',{p_run_id:runId,...(requested?{p_version:target.version}:{}),p_decision:decision,p_reason:reason.trim() || null,p_expected_public_id:run?.expectedPublicId??null,p_revision_kind:revisions[runId]||null,
-        p_report_kind:run?.candidate.purpose==='periodic_check'?'periodic':run?.candidate.purpose==='fx_explanation'?'movement':undefined})
+      const outcome=await actions.run(async signal=>{
+        const client=await getReportClient()
+        return await client.rpc(requested?'review_currency_report_request':'review_currency_report_version',{p_run_id:runId,...(requested?{p_version:target.version}:{}),p_decision:decision,p_reason:reason.trim() || null,p_expected_public_id:run?.expectedPublicId??null,p_revision_kind:revisions[runId]||null,
+          p_report_kind:run?.candidate.purpose==='periodic_check'?'periodic':run?.candidate.purpose==='fx_explanation'?'movement':undefined}).abortSignal(signal)
+      })
       if(epoch.current!==version||!attended.current)return
+      if(outcome.state!=='received'){
+        setActionNotice({id:runId,message:'처리 응답을 확인하지 못했습니다. 자동 재전송하지 않았습니다. 현재 상태를 다시 읽은 뒤 승인 여부를 확인해 주세요.'})
+        await load();return
+      }
+      const result=outcome.value
       if (result.error) {
         if (result.error.code === '42501') {reset();void access.recheck()}
         if(result.error.code==='55000'){setRuns([]);setRevisions({})}
-        setNotice(result.error.code === '55000' ? '공개 판본이 바뀌었거나 이미 처리됐습니다. 갱신된 대상과 교체 유형을 다시 확인해 주세요.' : result.error.code === '42501' ? '관리자 권한이 해제되었습니다.' : '처리하지 못했습니다. 검증 결과와 사유를 확인해 주세요.')
-      } else { setNotice(decision === 'approved' ? '승인 결과를 공개 목록에 저장했습니다.' : decision === 'withdrawn' ? '정정 대상으로 철회했습니다. 원고와 감사 이력은 보존됩니다.' : '반려했습니다. 이전 공개 보고서를 유지합니다.'); setReason('') }
+        const message=reviewFailureMessage(result.error);setNotice(message);setActionNotice({id:runId,message})
+      } else { const message=decision === 'approved' ? '승인 결과를 공개 목록에 저장했습니다.' : decision === 'withdrawn' ? '정정 대상으로 철회했습니다. 원고와 감사 이력은 보존됩니다.' : '반려했습니다. 이전 공개 보고서를 유지합니다.';setNotice(message);setActionNotice({id:runId,message}); setReason('') }
       await load()
     } catch { reset(); setNotice('연결을 확인하지 못해 초안을 숨겼습니다.') }
     finally { setBusy(false) }
@@ -124,7 +135,7 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
     }catch{reset();setNotice('연결 실패로 비공개 검토 정보를 숨겼습니다.')}
     finally{setBusy(false)}
   }
-  const renderRun=(run:Run)=><ReportReviewCard key={run.id} run={run} busy={busy} reason={reason} revision={revisions[run.id]??''} focused={target?.kind==='report'&&target.id===run.id} targetUnavailable={target?.kind==='report'&&target.id===run.id&&targetState!=='current'} onRevision={value=>setRevisions(old=>({...old,[run.id]:value}))} onReview={decision=>void review(run.id,decision)}/>
+  const renderRun=(run:Run)=><ReportReviewCard key={run.id} run={run} busy={busy} reason={reason} revision={revisions[run.id]??''} focused={target?.kind==='report'&&target.id===run.id} targetUnavailable={target?.kind==='report'&&target.id===run.id&&targetState!=='current'} onRevision={value=>setRevisions(old=>({...old,[run.id]:value}))} onReview={decision=>void review(run.id,decision)} actionNotice={actionNotice?.id===run.id?actionNotice.message:undefined}/>
   return <section className="generation-status db-review" aria-label="관리자 리포트 검토">
     <div className="review-page-heading"><h2>데이터·리포트 관리</h2><a className="quiet-button" href="#report">승인 보고서 목록 →</a></div>{localReportMode()&&<p className="local-notice">격리된 로컬 DB · 운영 반영 없음</p>}
     {notice&&<p role="status" className="review-notice">{notice}</p>}
