@@ -16,7 +16,7 @@ import {admittedSourceCatalog} from './source-admission-catalog.js'
 
 // Scheduling hint only; supply still validates every date, use decision and
 // claim. Do not let an optional pending source precede ready initial drafts.
-export function countryWorkOrder(countries){
+export function countryWorkOrder(countries,retryCurrencies=[]){
  const ready=country=>{
   const groups=new Map()
   for(const review of country.savedSourceReviews??[])if(!review.heldStatus&&review.receipt)
@@ -28,11 +28,11 @@ export function countryWorkOrder(countries){
    }
   return [...groups.values()].some(roles=>roles.has('market_observation')&&roles.has('attributed_fx_explanation'))
  }
- return [...countries].sort((a,b)=>Number(ready(b))-Number(ready(a)))
+ return [...countries].sort((a,b)=>Number(retryCurrencies.includes(b.currency))-Number(retryCurrencies.includes(a.currency))||Number(ready(b))-Number(ready(a)))
 }
 
 export async function runOperationalReportBatch({dataset,countries,asOf,store,env,approval,sourcePlan,sourceRegister,registry,processingRules,
- preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],testOnly=false,writer='sol',reviewer,sourceAdmissionState}) {
+ preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],retryCurrencies=[],testOnly=false,writer='sol',reviewer,sourceAdmissionState}) {
  if(sourceAdmissionState){
   const expanded=admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf})
   if(expanded.binding!==approval?.sourceAdmissionBinding)throw Error('source_admission_snapshot_changed')
@@ -80,7 +80,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
   approval:{version:'runtime-source-approval/1',planBindings:approval.sourcePlanBindings,
    budgetUsd:approval.sourceBudgetUsd,maxCalls:sourceCalls},preflight:preflightSource,send:guardedSend,reconcile})
  const rows=[]
- for(const {currency} of countryWorkOrder(REPORT_CURRENCIES.map(c=>countries.find(r=>r.currency===c)))){
+ for(const {currency} of countryWorkOrder(REPORT_CURRENCIES.map(c=>countries.find(r=>r.currency===c)),retryCurrencies)){
   if(unknownCost){rows.push({currency,status:'batch_cost_unresolved_no_call',modelCalls:0});continue}
   if(excludedCountries.includes(currency)){rows.push({currency,status:'country_owned_by_prior_batch',modelCalls:0,publicationApproved:false});continue}
   const country=countries.find(c=>c.currency===currency),beforeCalls=calls,beforeCost=confirmedUsd

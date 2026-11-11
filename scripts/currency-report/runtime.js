@@ -4,7 +4,7 @@ import {inspectFxPriority,fxMaterialHolds,FX_REPORT_PRIORITY_INSTRUCTIONS} from 
 import {encodeReviewInput} from './review-transport.js'
 import {COMPACT_REVIEW_VERSION,compactReviewContract,decodeCompactReview} from './compact-review.js'
 import {withoutOptionalBackground} from './runtime-material-selection.js'
-import {selectRuntimeAttempt} from './runtime-retry.js'
+import {selectRuntimeAttempt,terminalRateLimit} from './runtime-retry.js'
 import {publicSourceDelivery} from './public-source-delivery.js'
 import {assertRuntimeDocumentCapacity} from './runtime-document.js'
 import {RUNTIME_ASSEMBLY_VERSION,DEFAULT_RUNTIME_REVIEWER} from './runtime-assembly.js'
@@ -220,6 +220,7 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   const baseTaskKey=stage==='writer'?(fixtureKey??task.taskKey):fingerprint({parentId,stage})
   const attempt=await selectRuntimeAttempt({store,taskKey:baseTaskKey,requestHash:hash,
    enabled:!testOnly&&env.FX_REPORT_RETRY_TRANSIENT==='bounded'})
+  if(attempt.hold)return {status:attempt.hold}
   const taskKey=attempt.taskKey
   let prior=attempt.prior
   // Preserve a paid pre-upgrade stage for the identical frozen input. A changed
@@ -230,6 +231,8 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   }
   const unsent=prior?.state==='cancelled'&&prior.actual_nano===0&&prior.checkpoint?.phase==='unsent_released_never_dispatched'
   if(prior&&!unsent){
+   if(attempt.policyActive&&prior.cost_state==='confirmed'&&prior.actual_nano<=prior.reserved_nano&&!prior.response?.valid)
+    return {status:'response_failed_no_automatic_retry'}
    if(prior.request_hash!==hash||prior.cost_state!=='confirmed'||prior.actual_nano>prior.reserved_nano
     ||!['received','finished'].includes(prior.state)||!prior.response?.valid)return {status:'existing_runtime_call_hold'}
    const response={...prior.response,costUsd:prior.actual_nano/1e9,costSource:'confirmed_runtime_ledger'},correct=response.actualModel===selected.body.model||response.actualModel?.startsWith(selected.body.model+'-20')
@@ -244,7 +247,7 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   if(verified.model!==selected.body.model||verified.route!==(selected.profile??selected.writerProfile).route||verified.zdr!==true||verified.dataCollection!=='deny')throw Error('runtime_endpoint_required')
   const reservation=await store.reserve({taskKey,currency:task.currency,baseDate:task.baseDate,stage,
    parentId,requestHash:hash,reservedNano:runtimeNano(selected.maximumUsd),revision:config.revision,
-   context:assertRuntimeDocumentCapacity({writer:task.writer,ruleVersion:SHARED_REPORT_RULE_VERSION,packet:task.plan.packet,task,request:selected.body,...attempt.retry,...(testOnly?{testOnly:true}:{})},'context')})
+   context:assertRuntimeDocumentCapacity({writer:task.writer,model:selected.body.model,provider:selected.body.provider.only[0],ruleVersion:SHARED_REPORT_RULE_VERSION,packet:task.plan.packet,task,request:selected.body,...attempt.retry,...(testOnly?{testOnly:true}:{})},'context')})
   if(!reservation.reserved)return {status:reservation.reason}
   if(runtimeMode(env)!=='currency'||!await store.begin(reservation.id,hash))return {status:'runtime_stopped_before_call'}
   let response,lastId=null
@@ -259,7 +262,9 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   await store.receive(reservation.id,safe(response),typeof response.costUsd==='number'?runtimeNano(response.costUsd):null)
   const costKnown=typeof response.costUsd==='number'&&Number.isFinite(response.costUsd)&&response.costUsd>=0
   const correctModel=response.actualModel===selected.body.model||response.actualModel?.startsWith(selected.body.model+'-20')
-  const result={id:reservation.id,response,reservedUsd:selected.maximumUsd,status:!costKnown?'cost_unresolved':response.costUsd>selected.maximumUsd?'cost_exceeded':!response.valid||!correctModel?'output_hold':'received'}
+  const terminal=attempt.policyActive&&terminalRateLimit({state:'received',response})
+  const result={id:reservation.id,response,reservedUsd:selected.maximumUsd,status:!costKnown?'cost_unresolved':response.costUsd>selected.maximumUsd?'cost_exceeded':terminal
+   ?attempt.retry.retryAttempt===1?'recovery_retry_exhausted':'recovery_retry_wait':!response.valid||!correctModel?'output_hold':'received'}
   return result
  }
  const readiness=preflightRuntimeReview(task)
@@ -296,7 +301,7 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
  if(unknownCost)return {status:'cost_unresolved',waitingStage:'accounting',modelCalls:calls,cost,publicationApproved:false}
  // A pre-dispatch wait has no failed manuscript verdict. Keep the writer job
  // received so the exact response can be reused when review becomes available.
- if(['runtime_endpoint_preflight_wait','runtime_disabled','runtime_stopped_before_call','execution_time_budget_wait',
+ if(/^recovery_/.test(reviewing.status)||['runtime_endpoint_preflight_wait','runtime_disabled','runtime_stopped_before_call','execution_time_budget_wait',
   'monthly_budget_hold','operating_batch_budget_hold','batch_budget_hold','batch_stopped_before_dispatch'].includes(reviewing.status))
   return {status:reviewing.status,waitingStage:'reviewer',modelCalls:calls,cost,publicationApproved:false}
  if(reviewing.status!=='received')validation={...validation,contentReview:'unverified'}

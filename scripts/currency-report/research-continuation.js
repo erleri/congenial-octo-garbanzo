@@ -13,7 +13,11 @@ export function sourceContinuation(item) {
   category='discovery';action='review_available_sources';resumeWhen='next_cycle_with_available_material'
  }else if(match(reasons,/frozen_country_(?:reference|material)_superseded/)){
   category='superseded';action='prepare_current_input';resumeWhen='next_cycle_with_current_input_and_original_budget_gates'
- }else if(match(reasons,/cost_unresolved|cost_reconciliation|existing_source_call_not_reusable|unresolved_or_inflight/)){
+ }else if(match(reasons,/recovery_(?:next_execution_wait|route_wait|retry_wait)/)){
+  category='temporary';action='resume_saved_stages';resumeWhen='next_authorized_execution_after_cooldown';resumeExact=true
+ }else if(match(reasons,/recovery_retry_exhausted|response_failed_no_automatic_retry/)){
+  category='output';action='find_other_evidence';resumeWhen='new_material_or_operator_review'
+ }else if(match(reasons,/cost_unresolved|cost_reconciliation|existing_source_call_not_reusable|unresolved_or_inflight|recovery_accounting_hold/)){
   category='accounting';action='stop_paid_work';resumeWhen='confirmed_accounting_recovery'
  }else if(match(reasons,/unsafe_or_oversized_runtime_payload|runtime_document_|unsafe_supply_payload/)){
   category='technical';action='await_pipeline_repair';resumeWhen='verified_runtime_storage_repair';resumeExact=true

@@ -11,6 +11,7 @@ import {restoreOperatingPayload,runtimePublications,assertStagedRuntimeInput,isT
 import {buildSharedDashboardPriceSnapshot,referenceEdition} from './shared-price-contract.js'
 import {evaluatePublicationCadence} from './publication-cadence.js'
 import {recoverOperatingCalls} from './operating-recovery.js'
+import {inspectRecoveryPolicy} from './recovery-policy.js'
 import {runtimeMode} from './runtime.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
 import {reuseOperatingSources,operatingSourceRecords,operatingMaterialHash,persistDeferredSources} from './operating-source-cache.js'
@@ -50,6 +51,13 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  if(!configured)return {status:'operating_configuration_missing',modelCalls:0,publicationApproved:false}
  const policy=assertOperatingPolicy(configured.policy),control=await store.control()
  const configurationHolds=operatingConfigurationHolds(policy,control)
+ const recovery=execute&&!configurationHolds.length&&!dispatchHolds.length
+  ?await recoverOperatingCalls({store,reconcile,executionId:store.recoveryExecutionId??owner})
+  :!execute&&store.recoveryPolicy?await inspectRecoveryPolicy(store):null
+ if(recovery?.version==='runtime-recovery/1'&&recovery.status==='action_required')
+  return {status:'cost_reconciliation_required',recovery,modelCalls:0,publicationApproved:false}
+ if(execute&&recovery?.version==='runtime-recovery/1'&&recovery.status==='clear'&&store.recoverTerminalCases)
+  await store.recoverTerminalCases()
  // Refresh free material before checking paid idempotency. An identical FX
  // snapshot must not hide a weekend release, revised body or recovered source.
  const prepared=await planAutomaticSupply({dataset,asOf,calendarByCurrency,store,policy,sourcePlan,sourceRegister,registry,processingRules,
@@ -73,7 +81,6 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
    dispatch:prepared.privateCountries.find(c=>c.currency===r.currency)?.preparation?.dispatchBinding??null}))})
  // Accounting recovery is independent from a usable new article/price. It is
  // still opt-in execution under the configured policy, never part of plan.
- const recovery=execute&&!configurationHolds.length&&!dispatchHolds.length?await recoverOperatingCalls({store,reconcile}):null
  if(store.runtimeDocumentCapability){
   try{
    if((await store.runtimeDocumentCapability())?.version!=='runtime-document/2')throw Error('runtime_document_capability_missing')
@@ -155,7 +162,7 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  if(!results.length||execute&&hasWaiting&&availableFresh&&!seen.has(freshKey)&&!unresolved&&policy.state==='operator_configured'){
   results.push(await executeOperatingEnvelope({...common,key:freshKey,previous:current,owned}))
  }
- if(results.length===1)return {...results[0],collectionResults:prepared.collectionResults}
+ if(results.length===1)return {...results[0],recovery,collectionResults:prepared.collectionResults}
  const rows=new Map()
  for(const result of results)for(const row of executionRows(result)){
   if(rows.has(row.currency)&&(row.status==='country_owned_by_prior_batch'||owned.has(row.currency)&&owned.get(row.currency)!==result.batchKey))continue
@@ -299,6 +306,7 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
  }
  try{
   const result=await runOperationalReportBatch({dataset:executionDataset,countries:prepared.privateCountries,asOf:prepared.asOf,store:scoped,env,approval,writer:policy.writer,reviewer:policy.destination.reviewProvider==='azure'?'sol':'sol-us',
+   retryCurrencies:(recovery?.items??[]).filter(i=>i.status==='recovery_retry_wait').map(i=>i.currency),
    sourcePlan,sourceRegister,registry,processingRules,preflightSource:checkedSource,preflightWriter,send,reconcile,testOnly,sourceAdmissionState:prepared.sourceAdmissionState,
    excludedCountries:[...owned].filter(([,batchKey])=>batchKey!==key).map(([currency])=>currency),
    beforeCountry:async country=>{

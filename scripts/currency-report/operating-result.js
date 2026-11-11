@@ -32,7 +32,8 @@ export function operatingResultState(result) {
   ||collections.some(r=>r.acquisitionError||r.referenceStatus==='upstream_fx_refresh_not_confirmed'||r.candidates===0&&r.lookupFailures?.length)
  const partial=recorded.some(r=>r?.partialSourceFailure)||collections.some(r=>r.lookupFailures?.length)
  const review=recorded.some(r=>r?.kind==='review_wait')||statuses.includes('pending_admin_review')
- const waiting=recorded.some(r=>r?.kind==='waiting')||(result.holds?.length??0)>0||statuses.some(s=>/(?:_hold|_wait|not_enabled|required|configuration_pending|source_dispatch_deferred)$/.test(s??''))
+ const recoveryWaiting=(result.recovery?.items??[]).some(i=>/retry_wait|retry_exhausted|unconfirmed/.test(i.status??''))
+ const waiting=recoveryWaiting||recorded.some(r=>r?.kind==='waiting')||(result.holds?.length??0)>0||statuses.some(s=>/(?:_hold|_wait|not_enabled|required|configuration_pending|source_dispatch_deferred)$/.test(s??''))
  return {kind:attention?'action_required':failed?'failure':review?'review_wait':waiting?'waiting':'normal',
   exitCode:attention?2:failed?1:0,partialSourceFailure:!!partial,publicationApproved:false}
 }

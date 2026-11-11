@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'plan is free; execute requires existing server controls and budget'
+        description: 'plan inspects; reconcile checks existing costs only; execute requires server policy and budget'
         type: choice
-        options: [plan, execute]
+        options: [plan, reconcile, execute]
         default: plan
 permissions:
   contents: read
@@ -17,7 +17,7 @@ jobs:
   report:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: ${{ inputs.action == 'reconcile' && 10 || 150 }}
     env:
       VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
@@ -36,16 +36,23 @@ jobs:
           node-version: 20.19.0
           cache: npm
       - uses: actions/setup-python@v5
+        if: inputs.action != 'reconcile'
         with:
           python-version: '3.12'
       - run: npm ci
       - run: python -m pip install --disable-pip-version-check -r scripts/currency-report/requirements-official.txt
+        if: inputs.action != 'reconcile'
       - name: Free preparation against the committed reference
         if: inputs.action == 'plan'
         run: npm run report:operate -- --action plan
       - name: Process only authorized report work
         if: inputs.action == 'execute' && vars.FX_REPORT_EXECUTION_MODE == 'execute'
         run: npm run report:operate -- --action execute
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      - name: Reconcile existing expenses without model calls
+        if: inputs.action == 'reconcile'
+        run: npm run report:operate -- --action reconcile
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       - name: Reject disabled execution
@@ -55,7 +62,7 @@ jobs:
     needs: report
     if: >-
       ${{ always() && !cancelled() && github.ref == 'refs/heads/main'
-          && inputs.action == 'execute' && vars.FX_ADMIN_REVIEW_EMAIL_ENABLED == 'true'
+          && (inputs.action == 'execute' || inputs.action == 'reconcile') && vars.FX_ADMIN_REVIEW_EMAIL_ENABLED == 'true'
           && vars.FX_ADMIN_REVIEW_EMAIL_SEND_APPROVED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -1,6 +1,8 @@
 // Only reconcile existing generation IDs. Never dispatch a model request here.
 // The DB owns lease checks and cancellation of reservations never begun.
-export async function recoverOperatingCalls({store,reconcile}) {
+import {recoverWithPolicy} from './recovery-policy.js'
+export async function recoverOperatingCalls({store,reconcile,executionId}) {
+ if(store.recoveryPolicy){const current=await recoverWithPolicy({store,reconcile,executionId});if(current)return current}
  if(!store.recoverableCalls)return {status:'adapter_not_available',modelCalls:0,items:[]}
  const jobs=await store.recoverableCalls(),items=[]
  for(const job of jobs){

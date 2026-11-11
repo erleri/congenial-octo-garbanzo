@@ -8,6 +8,8 @@
 
 ## 문서 시작점
 
+로컬 후속 변경: [공통 복구 정책](docs/guide/common-recovery-policy.md)의 비용 진단·전액 예약 유지·다음 실행의 단계별 추가 1회를 구현하고 검증합니다. 운영 DB·코드 반영과 정책 활성화는 아직 하지 않았습니다.
+
 배치 원본의 [무손실 저장·복원](docs/guide/frozen-input-storage.md)에 이어, 큰 집필 입력·요청 문맥과 과거 기술 보류의 [자동 재개 경로](docs/guide/runtime-storage-recovery.md)를 운영에 반영했습니다. 실제 후속 실행에서 새 원고 집필·독립 검토·관리자 검토함 저장을 확인했습니다. 자료·기간·원고 품질 보류는 생성 성공과 구분하며 공개는 관리자 승인으로 유지합니다. 익명 이용 집계도 활성화돼 있습니다. 과거 [실패 기록](docs/guide/report-followup-usage.md#후속-실행-종료와-남은-결함)은 당시 사실로 보존하고, 현재 결과는 [운영 상태](docs/guide/operational-status.md)를 확인합니다.
 
 | 알고 싶은 것 | 담당 문서 |

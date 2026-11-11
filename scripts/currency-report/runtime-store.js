@@ -2,6 +2,7 @@
 import {createClient} from '@supabase/supabase-js'
 import {assertLocalApi} from './local-db.js'
 import {fingerprint} from './research-harness.js'
+import {randomUUID} from 'node:crypto'
 import {requiresRuntimeArchive,encodeRuntimeDocument,persistRuntimeDocument,restoreRuntimeDocument} from './runtime-document.js'
 
 const canonical=value=>JSON.stringify(sort(value))
@@ -45,6 +46,7 @@ export function assertRuntimeDestination(url,mode,env={}) {
 export function createRuntimeStore({url,key,mode,env={},client}) {
  if(!key)throw Error('runtime_service_key_required')
  const endpoint=assertRuntimeDestination(url,mode,env)
+ const recoveryExecutionId=randomUUID()
  const db=client??createClient(endpoint,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}})
  const rpc=async(name,args,signal)=>{
   const {data,error,status}=await db.rpc(name,args).abortSignal(signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000))
@@ -63,6 +65,13 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
  const unpack=async(value,field)=>value?.runtimeDocument
   ?restoreRuntimeDocument(value,(m,i)=>archive.storageReadChunk(m.id,i).then(b=>Buffer.from(b,'base64'))):ordered(value,field)
  return {
+  recoveryExecutionId,
+  recoveryPolicy:()=>rpc('currency_report_recovery_policy'),
+  recoveryCandidates:cursor=>rpc('currency_report_recovery_candidates',{p_after:cursor}),
+  recordRecoveryLookup:r=>rpc('record_currency_report_recovery_lookup',{p_id:r.id,p_execution:r.executionId,p_diagnostic:r.diagnostic,p_receipt:r.receipt}),
+  decideRecovery:r=>rpc('decide_currency_report_recovery',{p_id:r.id,p_execution:r.executionId}),
+  recoveryAttempt:r=>rpc('currency_report_recovery_attempt',{p_task_key:r.taskKey,p_request_hash:r.requestHash,p_execution:recoveryExecutionId}),
+  recoverTerminalCases:()=>rpc('recover_currency_report_terminal_cases',{p_execution:recoveryExecutionId}),
   environment:mode,
   runtimeDocumentCapability:()=>rpc('currency_report_runtime_document_capability'),
   recoverTechnicalHolds:revision=>rpc('recover_currency_report_operating_technical_holds',{p_revision:revision}),
@@ -120,7 +129,7 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
    ...(row.runtimeContext?.runtimeDocument?{runtimeContext:preserveOrder(await unpack(row.runtimeContext,'serializedRuntimeContext'),'serializedRuntimeContext')}:{})}))),
   check:r=>rpc('record_currency_report_runtime_check',{p_check_key:r.key,p_currency:r.currency,p_checked_at:r.checkedAt,p_result:r.result}),
   reserve:async r=>rpc('reserve_currency_report_runtime',{p_task_key:r.taskKey,p_currency:r.currency,p_date:r.baseDate,p_stage:r.stage,
-   p_request_hash:r.requestHash,p_context:await pack(r.context,'context','serializedRuntimeContext'),p_reserved_nano:r.reservedNano,p_revision:r.revision,p_parent_id:r.parentId}),
+   p_request_hash:r.requestHash,p_context:await pack({...r.context,...(r.context.recoveryRevision?{recoveryExecutionId:r.context.recoveryExecutionId??recoveryExecutionId}:{})},'context','serializedRuntimeContext'),p_reserved_nano:r.reservedNano,p_revision:r.revision,p_parent_id:r.parentId}),
   begin:(id,hash)=>rpc('begin_currency_report_runtime',{p_id:id,p_request_hash:hash}),
   checkpoint:(id,checkpoint)=>rpc('checkpoint_currency_report_runtime',{p_id:id,p_checkpoint:checkpoint}),
   receive:(id,response,actual)=>rpc('receive_currency_report_runtime',{p_id:id,p_response:preserveOrder(response,'serializedRuntimeResponse'),p_actual_nano:actual}),
