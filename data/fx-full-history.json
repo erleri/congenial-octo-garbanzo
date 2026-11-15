@@ -1,6 +1,6 @@
 {
-  "baseDate": "2026-11-14",
-  "fetchedAt": "2026-11-14T06:27:48.900Z",
+  "baseDate": "2026-11-15",
+  "fetchedAt": "2026-11-15T06:37:44.410Z",
   "dailyRates": [
     {
       "currency": "ARS",
@@ -73947,13 +73947,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "ARS",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "ARS",
       "rateType": "LOCAL_PER_USD",
       "value": 1546.03569399,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "ARS",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 1544.79579929,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -147903,13 +147915,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "ARS",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "ARS",
       "rateType": "KRW",
       "value": 0.8648191966896775,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "ARS",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 0.865316645911631,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -221859,13 +221883,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "BRL",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "BRL",
       "rateType": "LOCAL_PER_USD",
       "value": 5.6483,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "BRL",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 5.6481,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -295815,13 +295851,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "BRL",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "BRL",
       "rateType": "KRW",
       "value": 236.7157103783439,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "BRL",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 236.67029968662027,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -363447,13 +363495,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "CLP",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "CLP",
       "rateType": "LOCAL_PER_USD",
       "value": 994.99740146,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "CLP",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 994.97986838,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -431079,13 +431139,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "CLP",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "CLP",
       "rateType": "KRW",
       "value": 1.3437636570388074,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "CLP",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 1.3434819760086614,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -498711,13 +498783,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "COP",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "COP",
       "rateType": "LOCAL_PER_USD",
       "value": 3322.56554083,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "COP",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 3311.68819822,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -566343,13 +566427,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "COP",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "COP",
       "rateType": "KRW",
       "value": 0.40241233182596536,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "COP",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 0.4036423236881067,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -632415,13 +632511,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "GTQ",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "GTQ",
       "rateType": "LOCAL_PER_USD",
       "value": 7.64354109,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "GTQ",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 7.64313302,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -698487,13 +698595,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "GTQ",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "GTQ",
       "rateType": "KRW",
       "value": 174.9243356170667,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "GTQ",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 174.89392323306708,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -772443,13 +772563,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "MXN",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "MXN",
       "rateType": "LOCAL_PER_USD",
       "value": 18.5616,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "MXN",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 18.5531,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -846399,13 +846531,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "MXN",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "MXN",
       "rateType": "KRW",
       "value": 72.03265596338677,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "MXN",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 72.04928123386388,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -912471,13 +912615,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "PYG",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "PYG",
       "rateType": "LOCAL_PER_USD",
       "value": 6205.98356452,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "PYG",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 6211.76179935,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -978543,13 +978699,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "PYG",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "PYG",
       "rateType": "KRW",
       "value": 0.21544390716307238,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "PYG",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 0.21519458775767555,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1046175,13 +1046343,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "PEN",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "PEN",
       "rateType": "LOCAL_PER_USD",
       "value": 3.40369093,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "PEN",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 3.4033378,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1113807,13 +1113987,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "PEN",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "PEN",
       "rateType": "KRW",
       "value": 392.82102118772576,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "PEN",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 392.77250693716036,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1187763,13 +1187955,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "CNY",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "CNY",
       "rateType": "LOCAL_PER_USD",
       "value": 6.6849,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "CNY",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 6.6897,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1261719,13 +1261923,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "CNY",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "CNY",
       "rateType": "KRW",
       "value": 200.00917694056753,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "CNY",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 199.82024898874388,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1327791,13 +1328007,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "UYU",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "UYU",
       "rateType": "LOCAL_PER_USD",
       "value": 40.56434043,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "UYU",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "LOCAL_PER_USD",
+      "value": 40.58827975,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1393863,13 +1394091,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "UYU",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "UYU",
       "rateType": "KRW",
       "value": 32.96100300798111,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "UYU",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 32.934076730857264,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1467819,11 +1468059,23 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "USD",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "USD",
+      "rateType": "LOCAL_PER_USD",
+      "value": 1,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "USD",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
       "rateType": "LOCAL_PER_USD",
       "value": 1,
       "status": "ok",
@@ -1541775,13 +1542027,25 @@
       "imputationMethod": "NONE"
     },
     {
-      "currency": "USD",
+      "date": "2026-11-14",
       "year": 2026,
       "month": 11,
       "day": 14,
-      "date": "2026-11-14",
+      "currency": "USD",
       "rateType": "KRW",
       "value": 1337.04134693,
+      "status": "ok",
+      "source": "API",
+      "imputationMethod": "NONE"
+    },
+    {
+      "currency": "USD",
+      "year": 2026,
+      "month": 11,
+      "day": 15,
+      "date": "2026-11-15",
+      "rateType": "KRW",
+      "value": 1336.73751966,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1545833,7 +1546097,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 1544.508918857143,
+      "value": 1544.5280442193334,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1545843,7 +1546107,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 0.8703543609607677,
+      "value": 0.8700185132908252,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1549913,7 +1550177,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 5.514728571428572,
+      "value": 5.52362,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1549923,7 +1550187,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 243.79337836630592,
+      "value": 243.31850645432687,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1553993,7 +1554257,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 981.5249149357143,
+      "value": 982.421911832,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1554003,7 +1554267,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 1.3697088033846636,
+      "value": 1.3679603482262634,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1558073,7 +1558337,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 3252.6364499364286,
+      "value": 3256.573233155333,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1558083,7 +1558347,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 0.4133590050983788,
+      "value": 0.412711226337694,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1562153,7 +1562417,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 7.6448664385714284,
+      "value": 7.644750877333333,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1562163,7 +1562427,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 175.8396543011245,
+      "value": 175.77660556325404,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1566233,7 +1566497,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 18.656278571428572,
+      "value": 18.6494,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1566243,7 +1566507,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 72.05560450182409,
+      "value": 72.05518295062673,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1570313,7 +1570577,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 6110.065033985716,
+      "value": 6116.844818343335,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1570323,7 +1570587,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 0.2201641807429208,
+      "value": 0.21983287454390446,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1574393,7 +1574657,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 3.440075083571428,
+      "value": 3.4376259313333333,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1574403,7 +1574667,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 390.7718190596776,
+      "value": 390.90519825150983,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1578473,7 +1578737,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 6.6766000000000005,
+      "value": 6.677473333333334,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1578483,7 +1578747,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 201.3396914944192,
+      "value": 201.2383953273742,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1582553,7 +1582817,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "LOCAL_PER_USD",
-      "value": 40.36920162214285,
+      "value": 40.383806830666664,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1582563,7 +1582827,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 33.300756558239925,
+      "value": 33.276311236414415,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1586643,7 +1586907,7 @@
       "year": 2026,
       "month": 11,
       "rateType": "KRW",
-      "value": 1344.2621169085717,
+      "value": 1343.7604770920002,
       "status": "ok",
       "source": "API",
       "imputationMethod": "NONE"
@@ -1586925,17 +1587189,17 @@
     {
       "label": "15일",
       "values": {
-        "KRW": null,
-        "BRL": null,
-        "COP": null,
-        "CLP": null,
-        "PEN": null,
-        "ARS": null,
-        "MXN": null,
-        "PYG": null,
-        "GTQ": null,
-        "UYU": null,
-        "CNY": null,
+        "KRW": 1336.73751966,
+        "BRL": 5.6481,
+        "COP": 3311.68819822,
+        "CLP": 994.97986838,
+        "PEN": 3.4033378,
+        "ARS": 1544.79579929,
+        "MXN": 18.5531,
+        "PYG": 6211.76179935,
+        "GTQ": 7.64313302,
+        "UYU": 40.58827975,
+        "CNY": 6.6897,
         "OIL": null
       },
       "isPercent": false
@@ -1587231,17 +1587495,17 @@
     {
       "label": "평균(실적)",
       "values": {
-        "KRW": 1344.2621169085717,
-        "BRL": 5.514728571428572,
-        "COP": 3252.6364499364286,
-        "CLP": 981.5249149357143,
-        "PEN": 3.440075083571428,
-        "ARS": 1544.508918857143,
-        "MXN": 18.656278571428572,
-        "PYG": 6110.065033985716,
-        "GTQ": 7.6448664385714284,
-        "UYU": 40.36920162214285,
-        "CNY": 6.6766000000000005,
+        "KRW": 1343.7604770920002,
+        "BRL": 5.52362,
+        "COP": 3256.573233155333,
+        "CLP": 982.421911832,
+        "PEN": 3.4376259313333333,
+        "ARS": 1544.5280442193334,
+        "MXN": 18.6494,
+        "PYG": 6116.844818343335,
+        "GTQ": 7.644750877333333,
+        "UYU": 40.383806830666664,
+        "CNY": 6.677473333333334,
         "OIL": null
       },
       "isPercent": false
@@ -1587249,17 +1587513,17 @@
     {
       "label": "누적(1월~현재)",
       "values": {
-        "KRW": 1440.5398413348569,
-        "BRL": 5.181626004049712,
-        "COP": 3453.6060001678543,
-        "CLP": 919.7938102742598,
-        "PEN": 3.406926045184122,
-        "ARS": 1458.7038906561588,
-        "MXN": 17.61294475911186,
-        "PYG": 6205.952417464691,
-        "GTQ": 7.640536468867373,
-        "UYU": 39.87880508177886,
-        "CNY": 6.7979591649210995,
+        "KRW": 1440.4942377151685,
+        "BRL": 5.182434315738025,
+        "COP": 3453.963889551391,
+        "CLP": 919.8753554466493,
+        "PEN": 3.4067033949806595,
+        "ARS": 1458.7056293254486,
+        "MXN": 17.612319434436532,
+        "PYG": 6206.568761497201,
+        "GTQ": 7.6405259633002744,
+        "UYU": 39.88013282800829,
+        "CNY": 6.798038558860495,
         "OIL": null
       },
       "isPercent": false
@@ -1587303,17 +1587567,17 @@
     {
       "label": "이동",
       "values": {
-        "KRW": 1347.377110690287,
-        "BRL": 5.261294254992319,
-        "COP": 3216.218086803186,
-        "CLP": 970.4270882451307,
-        "PEN": 3.418776500642089,
-        "ARS": 1527.0401847832663,
-        "MXN": 18.108497875064003,
-        "PYG": 5937.849886462621,
-        "GTQ": 7.639948131387609,
-        "UYU": 40.25510503317665,
-        "CNY": 6.689983369175626,
+        "KRW": 1347.2098974180965,
+        "BRL": 5.26425806451613,
+        "COP": 3217.530347876154,
+        "CLP": 970.7260872105593,
+        "PEN": 3.4179601165627242,
+        "ARS": 1527.0465599039965,
+        "MXN": 18.106205017921145,
+        "PYG": 5940.109814581828,
+        "GTQ": 7.639909610974911,
+        "UYU": 40.25997343601792,
+        "CNY": 6.690274480286739,
         "OIL": null
       },
       "isPercent": false
@@ -1587321,17 +1587585,17 @@
     {
       "label": "이동 대비",
       "values": {
-        "KRW": 0.0023172517789008308,
-        "BRL": -0.045955900304736376,
-        "COP": -0.011196567367359592,
-        "CLP": -0.011306719291288138,
-        "PEN": -0.006191313390528514,
-        "ARS": -0.011310218970313661,
-        "MXN": -0.029361734403102007,
-        "PYG": -0.028185485189632348,
-        "GTQ": -0.0006433476926431119,
-        "UYU": -0.0028263276057365126,
-        "CNY": 0.002004518643564887,
+        "KRW": 0.0025669904606519574,
+        "BRL": -0.046955064882064676,
+        "COP": -0.011988947425373918,
+        "CLP": -0.011905093402925594,
+        "PEN": -0.005720754719516952,
+        "ARS": -0.01131833402492397,
+        "MXN": -0.029126673355649797,
+        "PYG": -0.028893164533373476,
+        "GTQ": -0.000633279806772598,
+        "UYU": -0.003066412118302451,
+        "CNY": 0.0019170644814862033,
         "OIL": null
       },
       "isPercent": true
@@ -1587357,17 +1587621,17 @@
     {
       "label": "전년 동월 대비",
       "values": {
-        "KRW": 0.015644209233315953,
-        "BRL": -0.07573052606651273,
-        "COP": -0.15189715650374927,
-        "CLP": -0.03570211604101698,
-        "PEN": -0.04971326623859823,
-        "ARS": 0.19110228982305918,
-        "MXN": -0.08882843910991763,
-        "PYG": -0.18728546454760572,
-        "GTQ": -0.0049138970189437125,
-        "UYU": -0.034522668138720576,
-        "CNY": -0.056046962271093764,
+        "KRW": 0.015612056667362888,
+        "BRL": -0.07558634394716504,
+        "COP": -0.1518092695230631,
+        "CLP": -0.03561662531874433,
+        "PEN": -0.0497753695927109,
+        "ARS": 0.1911037095306404,
+        "MXN": -0.08886078907003347,
+        "PYG": -0.18720474982078145,
+        "GTQ": -0.004915265240123817,
+        "UYU": -0.034490523020922904,
+        "CNY": -0.056035937763818676,
         "OIL": null
       },
       "isPercent": true
@@ -1587379,7 +1587643,7 @@
       "s1": {
         "provider": "frankfurter_v1",
         "endpoint": "https://api.frankfurter.dev/v1",
-        "capturedAt": "2026-11-14T06:27:38.583Z",
+        "capturedAt": "2026-11-15T06:37:33.836Z",
         "responseSha256": "0a96d4f8539ef519328397b370ab04c7638f806479a528714bd1c9381d70f0f2",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587413,7 +1587677,7 @@
       "s3": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-04-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.615Z",
+        "capturedAt": "2026-11-15T06:37:35.305Z",
         "responseSha256": "49740ab6c478ef822b2b1cb02e6c7184b3817c396475d3533338f208bbfa7099",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587430,7 +1587694,7 @@
       "s4": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-05-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.310Z",
+        "capturedAt": "2026-11-15T06:37:35.329Z",
         "responseSha256": "5c6806bd0ad9c1d8289e64211da6eb298d552d28354a85cd70441432b7a4cbe3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587447,7 +1587711,7 @@
       "s5": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-06-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.317Z",
+        "capturedAt": "2026-11-15T06:37:34.609Z",
         "responseSha256": "81f12b1ace657921fb547f40715a8b114ff1d5408940b1e8c993d067914652c0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587464,7 +1587728,7 @@
       "s6": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-07-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.321Z",
+        "capturedAt": "2026-11-15T06:37:34.604Z",
         "responseSha256": "18d1e046f34babc6c753aa131193b046721fa80dce99c5fd6ed937b344bc7085",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587481,7 +1587745,7 @@
       "s7": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-08-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.316Z",
+        "capturedAt": "2026-11-15T06:37:34.603Z",
         "responseSha256": "5274803252c283e9d3778b1a8420dbabc0a0a82537dc1e0cfa86596bb2a0636f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587498,7 +1587762,7 @@
       "s8": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-09-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.320Z",
+        "capturedAt": "2026-11-15T06:37:34.584Z",
         "responseSha256": "5a48fa6ad4c4af1754fa344a70fd0c734372798aff56cfe6fdb34a1f795e4358",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587515,7 +1587779,7 @@
       "s9": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-10-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.320Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "d09efd638cc52d538706e2798b1490e7a699df6b650af8990c3af65ad4309273",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587532,7 +1587796,7 @@
       "s10": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-11-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.320Z",
+        "capturedAt": "2026-11-15T06:37:34.586Z",
         "responseSha256": "7caadf97b585225c4c8dec2f32b4175f1311e3461e7fde1099252cb2e1c00af1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587549,7 +1587813,7 @@
       "s11": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2024-12-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.331Z",
+        "capturedAt": "2026-11-15T06:37:34.584Z",
         "responseSha256": "b603909eb886ea438d9806e3fde1655df11c2201f706b6dddd4cac5cc83afcfa",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587566,7 +1587830,7 @@
       "s12": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-01-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.384Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "833132a6d27e470756114f6c773a6c4c3f5781312e61fdd3ccdb00b4d6f119c2",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587583,7 +1587847,7 @@
       "s13": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-02-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.293Z",
+        "capturedAt": "2026-11-15T06:37:34.609Z",
         "responseSha256": "e2c00629a103f7634235f0ede9306f64a4fbed9ec0653fe73b624b93013af1cc",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587600,7 +1587864,7 @@
       "s14": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-03-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.406Z",
+        "capturedAt": "2026-11-15T06:37:34.612Z",
         "responseSha256": "65d6a1eec75af2e2a51162084c4315e61420a8a15ee58f7c99585d997d01bfa7",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587617,7 +1587881,7 @@
       "s15": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-04-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.294Z",
+        "capturedAt": "2026-11-15T06:37:34.604Z",
         "responseSha256": "51943d6f07d4929900a6c1f4cb99376a0f44e43cf6869a26ad357786659b741c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587634,7 +1587898,7 @@
       "s16": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-05-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.294Z",
+        "capturedAt": "2026-11-15T06:37:34.578Z",
         "responseSha256": "5a6149a363728c18189cb38c5374c61cc19689dea3c42b2a46dc4d398ed87d1e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587651,7 +1587915,7 @@
       "s17": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-06-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.294Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "c5be98f4fbc69933be85dd2debf37ddd4b2e7b4bcd87194ba80938eeab37e2e2",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587668,7 +1587932,7 @@
       "s18": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-07-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.294Z",
+        "capturedAt": "2026-11-15T06:37:34.576Z",
         "responseSha256": "ac37a0bc1fdb4e31fbd6b887ae29cad61e10a59a45cdcff3a805a6679e3f88cc",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587685,7 +1587949,7 @@
       "s19": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-08-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.338Z",
+        "capturedAt": "2026-11-15T06:37:34.590Z",
         "responseSha256": "903005c354fb6f25e37eea644fea1f9dda2eb0582b460427130f766c3a7bc917",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587702,7 +1587966,7 @@
       "s20": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-09-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.340Z",
+        "capturedAt": "2026-11-15T06:37:34.586Z",
         "responseSha256": "326ac272d405f48f1522ac417cd1604dbc083ccc98b5f427286ee6277271bd11",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587719,7 +1587983,7 @@
       "s21": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-10-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.333Z",
+        "capturedAt": "2026-11-15T06:37:35.135Z",
         "responseSha256": "b615082af0b477534547abc6602348e97f23aa6e0cd7e96ef377dbdaff9e4b4b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587736,7 +1588000,7 @@
       "s22": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-11-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.336Z",
+        "capturedAt": "2026-11-15T06:37:34.590Z",
         "responseSha256": "3cd32c9dfcb4a88b948a90c732d405169625032b99d5ae0b49984480bc5069d2",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587753,7 +1588017,7 @@
       "s23": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2025-12-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.299Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "054562e96b48396487001b47a6126a96b0132e8eb0d2cd73f8b7b8a0aa67e455",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587770,7 +1588034,7 @@
       "s24": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.341Z",
+        "capturedAt": "2026-11-15T06:37:34.578Z",
         "responseSha256": "60830733943cf746407966cacfc1a65030ca0813faf35039658456b74ada1980",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587787,7 +1588051,7 @@
       "s35": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.553Z",
+        "capturedAt": "2026-11-15T06:37:43.882Z",
         "responseSha256": "21881c62dc9b2890c3d5274b7885c9371cc81ad1f95ba0e334a770502ae8b3dd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587804,7 +1588068,7 @@
       "s36": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.590Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "228f8d940fbe6aba882182c1b5e2ec92dfc903d971dc125b2e9e0759de633a81",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587821,7 +1588085,7 @@
       "s37": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "0589082b5ce3188839f9218e97504fab58244c96950fc64849aa5203fcfb9b4f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587838,7 +1588102,7 @@
       "s38": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.591Z",
+        "capturedAt": "2026-11-15T06:37:43.833Z",
         "responseSha256": "4da74f419eabc6763508b58f2645412868487b51e00efb20002eaaefaca15c21",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587855,7 +1588119,7 @@
       "s39": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.589Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "c6c5ab833d8d0b16a4367b3bda12ee130ecf52eb5ed08a3b263040dcd1a4bcda",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587872,7 +1588136,7 @@
       "s40": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.976Z",
         "responseSha256": "2fb694d7f8748b36ff3a97a196513c200765e47fcb5c250638bd0242d8171637",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587889,7 +1588153,7 @@
       "s41": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.590Z",
+        "capturedAt": "2026-11-15T06:37:43.813Z",
         "responseSha256": "1945fea51e598c3c4c7f1e288704c8130f74184d9445e197aabb1f310a2b3a68",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587906,7 +1588170,7 @@
       "s42": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.959Z",
         "responseSha256": "5efbb1eb2da569e4a48bed7f0bda121648486f379491b87b1191fe280044c442",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587923,7 +1588187,7 @@
       "s43": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.813Z",
         "responseSha256": "e824f3b40aa0aa9b6b8c207169ffb8671dc555a20c10e2d85bcaebbf24b37896",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587940,7 +1588204,7 @@
       "s44": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.591Z",
+        "capturedAt": "2026-11-15T06:37:43.995Z",
         "responseSha256": "d4e4288848a788a445145fe9aa33ce830049c92146b728b75e56be79bf454603",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587957,7 +1588221,7 @@
       "s45": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-19/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.814Z",
         "responseSha256": "523a0c380f9791cdf1e5eba130409cc859c2d16e120163b15848d2c0e4fb238f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587974,7 +1588238,7 @@
       "s46": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "7fa97ecbdad0e3df5ba7054b6b5a2e25236dac287d96e39890408099371d556a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1587991,7 +1588255,7 @@
       "s47": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.814Z",
         "responseSha256": "dd23e7c2c94ffd80193af0d0175cb3fbcc4e3dbdea8a3e15d3b5b77694b11018",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588008,7 +1588272,7 @@
       "s48": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.609Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "c140e1c6837bbcd48de3d967246a5c30ac7b59fd10d862f92d89ca458913a695",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588025,7 +1588289,7 @@
       "s49": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.609Z",
+        "capturedAt": "2026-11-15T06:37:43.875Z",
         "responseSha256": "a5d52e827f30244fb9b1d72d6d2eeddd00619ac6a401deec6fee3731cb4d14f8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588042,7 +1588306,7 @@
       "s50": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.520Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "38552ed9924281e5c00f9bf20697f7b861eecc906c6130b507780c35280526eb",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588059,7 +1588323,7 @@
       "s51": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.875Z",
         "responseSha256": "7e5ae0e6351ac395b52cfb41642268944e20910ad4a14045638210a2f68961d6",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588076,7 +1588340,7 @@
       "s52": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "be556e11fe566138f6974597f0672b8c82515711ca67762849cb4be5be65c7b5",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588093,7 +1588357,7 @@
       "s53": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.800Z",
         "responseSha256": "b28e845ad457a3ba6eef1322cf5f74ca7e3de653d25ae9e1bff50bc24c23c326",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588110,7 +1588374,7 @@
       "s54": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-01-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.589Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "5c134e8a38aef8519bd8459a29b2faf6049531c20bc3161ebad5e815d3f7f120",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588127,7 +1588391,7 @@
       "s25": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.343Z",
+        "capturedAt": "2026-11-15T06:37:34.612Z",
         "responseSha256": "2da3542b517ce55ed38a7fcf008259d1e58a70f4ca21b39d29c40dfe04d11d4c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588144,7 +1588408,7 @@
       "s55": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.842Z",
         "responseSha256": "ea971620e05d3ba382264f2cd29b414c5dcbf66a3dba74bdff8135b4ba229f97",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588161,7 +1588425,7 @@
       "s56": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.537Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "cccd527afb6ebab114ed649d4a30ffa375f6193e8cbc50c0587d51f1342d6423",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588178,7 +1588442,7 @@
       "s57": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.816Z",
         "responseSha256": "8e44edfed072138ec4b750cadb58a23e49d98ad1b1e2dacc0538d1f3316f78b7",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588195,7 +1588459,7 @@
       "s58": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.589Z",
+        "capturedAt": "2026-11-15T06:37:43.813Z",
         "responseSha256": "76c8525f30853f1bff283bfc1f1ee24180cc6634b654810d266d4d58fb13172e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588212,7 +1588476,7 @@
       "s59": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.517Z",
+        "capturedAt": "2026-11-15T06:37:43.816Z",
         "responseSha256": "14fe9ff27aa652802b0be19c4a550aedc0c958592cffb05bfaddac36220a8924",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588229,7 +1588493,7 @@
       "s60": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.537Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "ed322b5b997fee3a2f849b5b6382d380aa216af6b7461f156b096ee0750a34eb",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588246,7 +1588510,7 @@
       "s61": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-11/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.813Z",
         "responseSha256": "9110e8340e2c417620f91a1cdc26e512101333a3e93b0451b3ed08c68d0f5d80",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588263,7 +1588527,7 @@
       "s62": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.517Z",
+        "capturedAt": "2026-11-15T06:37:43.816Z",
         "responseSha256": "61319518ece8412d272bc55ccdd6f7663e328eb69f11a38dbafa9089fa0dd28f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588280,7 +1588544,7 @@
       "s63": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.591Z",
+        "capturedAt": "2026-11-15T06:37:43.842Z",
         "responseSha256": "5ef4a591c1c0b04d6da587be2b91101100da4348951e4dc6230af5b8933e01b0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588297,7 +1588561,7 @@
       "s64": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "47cc9f32ea5a6192338dfefaef0a954eedc49eaeabe6563eb26e9c0f02e372f1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588314,7 +1588578,7 @@
       "s65": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.591Z",
+        "capturedAt": "2026-11-15T06:37:43.842Z",
         "responseSha256": "0b1ef4ccd94cf64034f4e874abc3b46ba73873f6f9508a122fbdc31761db0ff6",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588331,7 +1588595,7 @@
       "s66": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-18/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "76f6d970e08929915bbfc54decce5b8c4c7b8e68295f70873017c4ff53a98b1c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588348,7 +1588612,7 @@
       "s67": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-19/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.584Z",
+        "capturedAt": "2026-11-15T06:37:43.814Z",
         "responseSha256": "a5d686ed9ba194bc52a74328f502c3bfd2c6133207cb7e3c43096c6275a0a2f9",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588365,7 +1588629,7 @@
       "s68": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "f9a7f9d3eadd67ab56fc27636552c21f8422fa619e501d51c36e09c426e6d3b1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588382,7 +1588646,7 @@
       "s69": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.575Z",
+        "capturedAt": "2026-11-15T06:37:43.801Z",
         "responseSha256": "069bbfd9b8340af0e0be49ea2900e8aab38b9647ac6aed72a2dd62cdf4839884",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588399,7 +1588663,7 @@
       "s70": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "66bdb6caa553549941faf04c49a6aacf3b4033353cc6099c39e5c00ef64f481e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588416,7 +1588680,7 @@
       "s71": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-25/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.574Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "66e86caed9eb4123d40959a8878b14f1fcead9ecbf92cf172ff178e2c503d216",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588433,7 +1588697,7 @@
       "s72": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.814Z",
         "responseSha256": "08f1fa89d3a8ae8bcd16cbea722c0b284bde85d72279bc776895c95af88b5c95",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588450,7 +1588714,7 @@
       "s73": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-02-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.553Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "2c7c697dc59465d6c68689456dd89f307a4d3944d6053da1920646b815a5a869",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588467,7 +1588731,7 @@
       "s26": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.349Z",
+        "capturedAt": "2026-11-15T06:37:35.135Z",
         "responseSha256": "5325ef626adb0101a87bd58d3fbb87fae7f92d1a5cbac91d3c08682b720933e6",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588484,7 +1588748,7 @@
       "s74": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "056436168961d601b099e00617268f355956c9d879a16199a8697fda3dc16939",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588501,7 +1588765,7 @@
       "s75": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:44.003Z",
         "responseSha256": "e365abbb4a938cb27a9acb4e27db5a84b80c29ab685d09b224120ed84665bb63",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588518,7 +1588782,7 @@
       "s76": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.609Z",
+        "capturedAt": "2026-11-15T06:37:43.950Z",
         "responseSha256": "1ff36d0d1d4a4bba46b63ac9284877d07ee0910185d1bfb5a186da992b3e5865",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588535,7 +1588799,7 @@
       "s77": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.623Z",
+        "capturedAt": "2026-11-15T06:37:44.002Z",
         "responseSha256": "0295d85f9b4165e106835b85d5e6e839ea96d5d29bfbc4c10def829882762391",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588552,7 +1588816,7 @@
       "s78": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.834Z",
         "responseSha256": "9dd54c67f26ba2663a1956ee7db62f4af0ff0e11b7bef2f88d462d14c734706c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588569,7 +1588833,7 @@
       "s79": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "8a4acdfa4336aad18fa2b43610096a219bd057eeac57bea1bcf155c043f46613",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588586,7 +1588850,7 @@
       "s80": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-11/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.584Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "eb3a521d0ba276875d68acd26939c414b064f5ff2307703c36f59dded7a29ffd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588603,7 +1588867,7 @@
       "s81": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.623Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "7cf89d49c2ef4481fbd25bcd793b6bb42b1323627fc6510eb8ea09423a0802a8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588620,7 +1588884,7 @@
       "s82": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "f9e61de6a5340f36120ddbdc7ed34671b0a6d2770a95f45f75527e7a10f4ec3c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588637,7 +1588901,7 @@
       "s83": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.518Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "39cba1befa42fda7154c73881a8836e3a826a3e6689b4f4383511c5056952c10",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588654,7 +1588918,7 @@
       "s84": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.574Z",
+        "capturedAt": "2026-11-15T06:37:43.984Z",
         "responseSha256": "c115d2513a1485a6027401209c0aa306d48df8b87ff922827dd979006e103970",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588671,7 +1588935,7 @@
       "s85": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-18/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.652Z",
+        "capturedAt": "2026-11-15T06:37:43.866Z",
         "responseSha256": "b50ecbff4feff8f4b28e437659e125d2542bed267af161b756259d0b52338e70",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588688,7 +1588952,7 @@
       "s86": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-19/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.623Z",
+        "capturedAt": "2026-11-15T06:37:43.965Z",
         "responseSha256": "d117ff923b704c44391c9ee3addd6dd0302f78aecb0bab530940101d04bc6293",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588705,7 +1588969,7 @@
       "s87": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "e48d8fa56e684fe812a5a3199b2f9524bf6d145d0be3819601e19a45f24dad6a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588722,7 +1588986,7 @@
       "s88": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "b777d26543b7ebec041f135911d6c705e67025e621efc7714bd17402f7e3c38f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588739,7 +1589003,7 @@
       "s89": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "b14ff98736b5acd70460fe5385571523567953d129ed5aaab9043c97f6f83ecd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588756,7 +1589020,7 @@
       "s90": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-25/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:44.024Z",
         "responseSha256": "9fa13116da6fc46215dd5ae118c98f9636217866337a9d8a568ab070f15e8743",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588773,7 +1589037,7 @@
       "s91": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "67089cb4cc28fe882e10919f5cc8b8ef680eaefe5d01f26a2a4bb653a208fbf3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588790,7 +1589054,7 @@
       "s92": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.591Z",
+        "capturedAt": "2026-11-15T06:37:43.878Z",
         "responseSha256": "90b54256379a3e6851495f3db55b97a1d015398ed05650aedacba36cd171b284",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588807,7 +1589071,7 @@
       "s93": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "8001c1393a4fdadcd6d5d0a80fcff0ecbd7eea519d5ced8947b2b6396b7958af",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588824,7 +1589088,7 @@
       "s94": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-03-31/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.652Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "355dcf666fd31db4c3fd143e5dab6773c5419c22c04410ad39032c09c76efc64",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588841,7 +1589105,7 @@
       "s27": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.345Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "db7eed8eadd3c57ead6a9a747798b33a65b06d7d9a57cd6af5315b93032973ca",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588858,7 +1589122,7 @@
       "s95": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.880Z",
         "responseSha256": "d0b86c52c5fdcb8bd5a8944d65256f66ea7373dd3316fd01ff2326b2de960a3e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588875,7 +1589139,7 @@
       "s96": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "464a688006d6c4d7dbd561bc2bbbe58c4d3f411a893bbec433fcf4f4dbd36680",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588892,7 +1589156,7 @@
       "s97": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "5188bffd83935502b9c5e8792a7a883b68a2a42ad877d5eb3d5a38a7f71d1bb0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588909,7 +1589173,7 @@
       "s98": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.928Z",
         "responseSha256": "c1b1ad8bbdea19c0e4a648304a1efced7604b35e11040f88369a568dac14762f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588926,7 +1589190,7 @@
       "s99": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.814Z",
         "responseSha256": "a5d5357a4fecd9b8d3d0526af26e49e62dfc5088f4c956959732204e8621d569",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588943,7 +1589207,7 @@
       "s100": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "d30d20330a0565ffd89d5a507cb8808ad0e4cd0e777d6afc82d33592c81a32a0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588960,7 +1589224,7 @@
       "s101": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.842Z",
         "responseSha256": "fe642173c3409cba6a19deb88aa476507de263e7c7a6a3e0d6850da48a6c9292",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588977,7 +1589241,7 @@
       "s102": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.609Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "06a53f74a62dc56205914879b457bbcc1779d638705678cc42f14b1f1c82a836",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1588994,7 +1589258,7 @@
       "s103": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.521Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "cfb85965a3532ee740468d3e0d59e9afa894a37b56d2883905a04f6db7ed14b3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589011,7 +1589275,7 @@
       "s104": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "c315ab85fde079cc5a1d8bbde1f52e599272579890569c528808e15c3f793be3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589028,7 +1589292,7 @@
       "s105": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.842Z",
         "responseSha256": "553334db482b412491805101a63808ef8eb6be5dd204c992491af7da125a47c4",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589045,7 +1589309,7 @@
       "s106": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.881Z",
         "responseSha256": "5e62ec1cf090ade3a7783bbe394d81b8e3288b35860068b39c7e98256d746ade",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589062,7 +1589326,7 @@
       "s107": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "f2fc1b521cb3aca00c3e047a723d10fd3a8572106f5f09f75ba6ee026b79748e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589079,7 +1589343,7 @@
       "s108": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.575Z",
+        "capturedAt": "2026-11-15T06:37:44.087Z",
         "responseSha256": "46654d35c7b44ea696b952d9a56766e5428c1a1505ed6767064a05ea901ba851",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589096,7 +1589360,7 @@
       "s109": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.610Z",
+        "capturedAt": "2026-11-15T06:37:43.842Z",
         "responseSha256": "075718c34db14f791d549583e9e9e4cbd5db4b468b8d8c7c575055c54627cb42",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589113,7 +1589377,7 @@
       "s110": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:44.006Z",
         "responseSha256": "0957fdccb1fa79a8a01837eab7706ee550f6e4aa472a0413336fe491e00cdeee",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589130,7 +1589394,7 @@
       "s111": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:44.011Z",
         "responseSha256": "8ca9a77c77967f1a420435969ee14ea76cdcd1ab238e26472b52e804739a8995",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589147,7 +1589411,7 @@
       "s112": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "0670f543eb655d4b1fef8f2ad69c70e52e9140b5d128fa662a1191b7c4b1cb0c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589164,7 +1589428,7 @@
       "s113": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-04-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "5d6d85e4d3ee1a64e5a355ed7ef37e5b39fb74ced18603253dc8c9ea51181f27",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589181,7 +1589445,7 @@
       "s28": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.343Z",
+        "capturedAt": "2026-11-15T06:37:34.577Z",
         "responseSha256": "e7845d089d141d58da3d1b09b929668b176e06ee2cb0463347e10487e491c0eb",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589198,7 +1589462,7 @@
       "s114": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.878Z",
         "responseSha256": "83b20cbadb1471ef45bd58989b225eef2fb92363404b73ff502aa2347d3d9f84",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589215,7 +1589479,7 @@
       "s115": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "7aec78ad19d7b187262065c5bb444194b97ae83812aee6a66577b5101b2022e8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589232,7 +1589496,7 @@
       "s116": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.878Z",
         "responseSha256": "38dec0a8ec5b591192777e59666afef49ea65b08b0b33da6e5ac6e6a507c3a8b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589249,7 +1589513,7 @@
       "s117": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.867Z",
         "responseSha256": "894580bc2d099185e3f2ca8cc2e999887bd5bde53ef40be0f51ce9bbc56e62ee",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589266,7 +1589530,7 @@
       "s118": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-11/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "0f55b19ec00e7658199765fbf3921b0e1b3b5f6e35ec081960c5c7adfcc4f05f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589283,7 +1589547,7 @@
       "s119": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "8918bc8309a2fbe60595dc5a58a6883c66c5dec7c9c3e2372904c316b4d5e199",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589300,7 +1589564,7 @@
       "s120": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "0301d8d41500d6f07ca15628e860a7a821a406d6b4b8cad0a297196f9d17cedd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589317,7 +1589581,7 @@
       "s121": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.965Z",
         "responseSha256": "356a59eefd41143cb09b566a27ccebf125113c278384c07b5ce69c6fa356c31b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589334,7 +1589598,7 @@
       "s122": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.834Z",
         "responseSha256": "efe80888e7819582c9fe35c3c07b7d0fbfb67040adaa7cc15ac69e36d71fc9b7",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589351,7 +1589615,7 @@
       "s123": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-18/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "b69e41f03f0fe1cb9997ffa7c051d6a24ade2e60f49e2982713de74287dac1b3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589368,7 +1589632,7 @@
       "s124": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-19/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "58006f17a7d8399766deaef04785c372ec562915ee3ee204c3a102a5f253fad2",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589385,7 +1589649,7 @@
       "s125": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "baf4a859f28df0aeeebdb7e740c261f8c359e2faa94b3656d782e5d0fb228475",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589402,7 +1589666,7 @@
       "s126": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.501Z",
+        "capturedAt": "2026-11-15T06:37:43.880Z",
         "responseSha256": "87a5752aa5873d7175683b4e5d49c5f95a6dceab56a997c48d08cc775876ad37",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589419,7 +1589683,7 @@
       "s127": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.867Z",
         "responseSha256": "1f235c69041ae9a39f5710a4c7cd681a162e93a03c3181b38966166c37f83ba3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589436,7 +1589700,7 @@
       "s128": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-25/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.962Z",
         "responseSha256": "9a2dab7d08f4adadd84e0a72982ef6981f52c6f3e9a5a331d171de3709e4f6c9",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589453,7 +1589717,7 @@
       "s129": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "a77f9e05902035fae545d6918c6bb72c0c52982315c520e5cf8071c275c4947b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589470,7 +1589734,7 @@
       "s130": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.834Z",
         "responseSha256": "52faf90e912157e7e43dd8c894ab0020b5a957ae30b991fc5ca7377e77cb7e35",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589487,7 +1589751,7 @@
       "s131": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.979Z",
         "responseSha256": "e5211263938d820b5ac4d580208f1a95912d34616dfb2e30963338c0e29620d4",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589504,7 +1589768,7 @@
       "s132": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-05-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "502a55e4c7ab4bc5abe6b27c60aa1fdbaeb596c76f21d4689e1a9ca592357033",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589521,7 +1589785,7 @@
       "s29": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.352Z",
+        "capturedAt": "2026-11-15T06:37:34.579Z",
         "responseSha256": "0127db1d796a269950c63bb45ededcb5d4dab353f5e25dac1c07f5c507650d99",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589538,7 +1589802,7 @@
       "s133": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "99c03f10fab43b2f3cb315aac0604003feac77c52ed6b6bada359ca6394992e3",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589555,7 +1589819,7 @@
       "s134": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "62f7f8e43aebdbaa639ea29b3638e06f3d40dafa53b622dfa2bb1b951382629d",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589572,7 +1589836,7 @@
       "s135": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.875Z",
         "responseSha256": "aaa54a84445fe8e775026f5f72f31b3ec0a13b3105bce2699182b281d1055c6e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589589,7 +1589853,7 @@
       "s136": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.878Z",
         "responseSha256": "b0ca2026b6afc80e79add47d9a1f27f0299c8bc1edf850df3c64191fc337ef5d",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589606,7 +1589870,7 @@
       "s137": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.966Z",
         "responseSha256": "ebf77523d6347d70b078111878340507e381b0486b0b43fb8e87c7cde0e261ad",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589623,7 +1589887,7 @@
       "s138": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.883Z",
         "responseSha256": "b6334bdc94e512fb64b114f61e846f1ae5c38346d1a23d3a730aa51b19b32c7b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589640,7 +1589904,7 @@
       "s139": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "5143de6192662db55c27e3f988de69108c4978f6898e98485be21db3b883cfac",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589657,7 +1589921,7 @@
       "s140": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-11/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.813Z",
         "responseSha256": "9f55f20d8b4ee251dda1a62c6452f81e87a17c7857d9f5e331e9df66b3668a92",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589674,7 +1589938,7 @@
       "s141": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.880Z",
         "responseSha256": "676eff0c6e7576a83d0a49f681d576821bfbd8eb36917783d55f337fc41b60fe",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589691,7 +1589955,7 @@
       "s142": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "9265e01026a2a8e3f365341c447d9a811300a622c0edd2ef51b3a951b51595aa",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589708,7 +1589972,7 @@
       "s143": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.875Z",
         "responseSha256": "2e056e89fce233bb6e945e01f5eeb8cab0d89d03cbf920d41f8a5f53e9a45bed",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589725,7 +1589989,7 @@
       "s144": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "5ea973ed9fb6d4469685ce88b5b82661663392e07310b263db24b584228c5861",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589742,7 +1590006,7 @@
       "s145": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-18/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "1ac36ba27b47779a5d1b0b99f4d468cc9455b8e0ae48656a971930637cb4fcbc",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589759,7 +1590023,7 @@
       "s146": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-19/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "38f378b9e50b6edcb30d9f80f96242ea883dce45076eabeb6bff6affa77e460a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589776,7 +1590040,7 @@
       "s147": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "daf58cee6ce465ba33033f9e91dd59aef7e472da266d5cf16e103d1722fd2282",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589793,7 +1590057,7 @@
       "s148": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.878Z",
         "responseSha256": "b19e8d8d5ddde8b6e7cdd24faa12cefddab0577d269f76bc3a39cee32ceae2fe",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589810,7 +1590074,7 @@
       "s149": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.793Z",
         "responseSha256": "1652cd90884d749b27522a04e9ab06608c2a70a00f73b72953c21b32e9738680",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589827,7 +1590091,7 @@
       "s150": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-25/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.879Z",
         "responseSha256": "f815ac8d455c6f9736e8ba85d57decd99824813a5ff4882fe61ea7069360e056",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589844,7 +1590108,7 @@
       "s151": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "d9240b79fa3003eac5693f65332757e1fc11f4c7f625027947d2e362351b93dd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589861,7 +1590125,7 @@
       "s152": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "30331a31ea139444334f67b48ec4e5cc1e8db1d0bcdc1cc2405856eb6322119f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589878,7 +1590142,7 @@
       "s153": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-06-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.869Z",
         "responseSha256": "49b4c97f95d17255754d73555beb8af2beaee4c59354cbed8c936db2fdd1db59",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589895,7 +1590159,7 @@
       "s30": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.353Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "1db33aef5131458700ede27583b06d45a10f32eb7ad83f864b088cb03ac07ab7",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589912,7 +1590176,7 @@
       "s154": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "3abd2077a08d755ebeb80281a8f2229767b6f8cbe1a3820617973bbd380f8e48",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589929,7 +1590193,7 @@
       "s155": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.793Z",
         "responseSha256": "7b47f9e6e751e379f2c9031c13014f3faa782c8df06220880e0a027d5f76becf",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589946,7 +1590210,7 @@
       "s156": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "15dd0a0fda75b2337affb9d938d06592cfd8dbb3db4ae77a4bc1aee6bb4c3b5b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589963,7 +1590227,7 @@
       "s157": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.834Z",
         "responseSha256": "ccc74c8eb41545efd276d5ec7ead35ecf668aee2a802659608e7c6dde274c4c1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589980,7 +1590244,7 @@
       "s158": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "6608aef5b0b4334ba2307c6bb019a915c52922f8c6d9c05e5ece9cc1a1662af5",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1589997,7 +1590261,7 @@
       "s159": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.875Z",
         "responseSha256": "70395ec59937824b003abd14e184aceff5af6e2c5b008da9881ae53ef2b1b9d0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590014,7 +1590278,7 @@
       "s160": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.612Z",
+        "capturedAt": "2026-11-15T06:37:43.816Z",
         "responseSha256": "ec96093156745dd66f159e5fab8481e09db34e0f003babe7ee6ff0d688efdc5f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590031,7 +1590295,7 @@
       "s161": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.815Z",
         "responseSha256": "f8ad9e7e0f95b8787114465d5f192a88ff75b99db308dcd28f17176a60502d66",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590048,7 +1590312,7 @@
       "s162": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.985Z",
         "responseSha256": "49dc8c4ee9de2ecef0f99d6986f44b0c7253a62bdef5394013ecdabd13925f41",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590065,7 +1590329,7 @@
       "s163": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "69619dd371ca16acacf6b86ec4ebe96de7afdb644bd23d9fe5840fa411b89112",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590082,7 +1590346,7 @@
       "s164": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.877Z",
         "responseSha256": "ff30e20b20532cb797bb379eaac9cd605f11910eaa3ce857cd18201256599ed1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590099,7 +1590363,7 @@
       "s165": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.816Z",
         "responseSha256": "b0eb2fd63f4630ad028572cc8a8bae50efd07cd96602b6897330f87a62b4b748",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590116,7 +1590380,7 @@
       "s166": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "007b21dc3d7c4f09b48f78a6c7c202b37e5b77adc2427137c273c987d145e68e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590133,7 +1590397,7 @@
       "s167": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.867Z",
         "responseSha256": "941b5208329f079de033522b8906c505b5bc241acf4cf8327d2e6960b3eca6e6",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590150,7 +1590414,7 @@
       "s168": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "bfa5aa3675b4c4ed14fb7c9c2199e6eebf4952f4a3d1fc9e209e7189a09475b5",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590167,7 +1590431,7 @@
       "s169": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.880Z",
         "responseSha256": "c4d5596d1b58e09c4ef2e2b5b814f0c525a7819b5546192cfb76242a61123f57",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590184,7 +1590448,7 @@
       "s170": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "a86909e5ad6a63a67e6f70b1c377bb6315d716841a0b41b293567e9d3edf4029",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590201,7 +1590465,7 @@
       "s171": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.793Z",
         "responseSha256": "04122d68dc5c2d888368523f5c8a0cd1b039ee08a1528ac508ab560135bcbeda",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590218,7 +1590482,7 @@
       "s172": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.834Z",
         "responseSha256": "a9202319549eed190d4f519b7190b2ab4f9bbde2ae3810699f1607c2e0ccee24",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590235,7 +1590499,7 @@
       "s173": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "aa70dbc7524a8d276d262f49ba0c5430703da5400574b4f29e3a393e8f6887c0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590252,7 +1590516,7 @@
       "s174": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "3761a2d9b274eec5b4ed2ef7083abd5dbabb7393865ddbe955a37285479872f8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590269,7 +1590533,7 @@
       "s175": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-07-31/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "9e475e3aa1834c4d5120e38269be8e9852ce5dc662672572e4bee19c043c8179",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590286,7 +1590550,7 @@
       "s31": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.345Z",
+        "capturedAt": "2026-11-15T06:37:34.579Z",
         "responseSha256": "a6a06f66df7ab05b28678e4a35d9be1872400f64d5fe42efc5ef984c83c51a29",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590303,7 +1590567,7 @@
       "s176": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.812Z",
         "responseSha256": "772d65ce2f36297655c0eec9da74fbf3544fb1731aa8f8cc1b828976f43b60e1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590320,7 +1590584,7 @@
       "s177": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "8814d98c243d743272ab1eee1708bc58052d2129fe89e8a3eb8bf6925b1e5440",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590337,7 +1590601,7 @@
       "s178": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "9e54a7803a64dedd2648072fcefde261d8e90ac7dbf20094caad2714419b0d92",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590354,7 +1590618,7 @@
       "s179": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "7e77d3da8494a7fb0f1f85374a996cdbe050011ab9b375fa13dc1f4d631d01fb",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590371,7 +1590635,7 @@
       "s180": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "bc94a7a5c06748840ff1ccedac9d8892c67c100afdf40592ce66fb4e4aec13e8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590388,7 +1590652,7 @@
       "s181": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-11/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.862Z",
         "responseSha256": "d54b5f5710a45397676df0e8367d27f8d8dd9f228c36b5d925c8dfa6cb1fdfd2",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590405,7 +1590669,7 @@
       "s182": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "286335f34f37215032f6747a134a8c4dafff6d28f7587333ccb3d82b9d82038d",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590422,7 +1590686,7 @@
       "s183": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.626Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "cac6bfd2df6a9f2ca387a06173e26d97a60d7fe817bf3cffc04c6a3a3e496755",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590439,7 +1590703,7 @@
       "s184": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.513Z",
+        "capturedAt": "2026-11-15T06:37:43.792Z",
         "responseSha256": "86ad22bea1846735df832d9b42c61c3a825e1e0cdae45ba3454d34946728a6da",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590456,7 +1590720,7 @@
       "s185": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "a39b0042c0eee54b0c47c4e2a45b3d7fa2447438d7ef66564675b901e5b18d50",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590473,7 +1590737,7 @@
       "s186": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-18/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "befa0dddd4e0a3fd93bbb2e20324776b0f251ec01b806160c8293b90c164bc9a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590490,7 +1590754,7 @@
       "s187": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "3ad05e8fa4de9e79d0b2fe633c8e28da10e0044c1e8d375f2a39b30e4880eb0e",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590507,7 +1590771,7 @@
       "s188": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.627Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "42202ed7efc1de6d96e02136bcdd8a0410751a0c60d0339f6541eed376eec4c4",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590524,7 +1590788,7 @@
       "s189": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.792Z",
         "responseSha256": "c66bbd0982330780da2a1614e72768fe1550c661eedf63897d6c9acbfafd200a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590541,7 +1590805,7 @@
       "s190": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-25/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "686b80297818a20a7b49c62eb359d6be25d4c5ee247089b6d474f1dc97ba8e4a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590558,7 +1590822,7 @@
       "s191": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "c93e9b8a5bc11d0be34623a5fe21ae55e5e678fbbf64aaf3887c7b592bff6d07",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590575,7 +1590839,7 @@
       "s192": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.513Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "356e952ed5943223fa4bb9e982b4ccac7ad92d4bb9aec16007073367dfa5bed1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590592,7 +1590856,7 @@
       "s193": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.881Z",
         "responseSha256": "0c1b61bfa8eb543e01c4a094ca644ccaa5e1c26ac31af57bbe2356cf61f2e7f6",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590609,7 +1590873,7 @@
       "s194": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-08-31/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "8186b319dfe52e22def98050d1ad1d2dd9deff08f32a2a121c8f1bb233a11c7d",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590626,7 +1590890,7 @@
       "s32": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.344Z",
+        "capturedAt": "2026-11-15T06:37:34.585Z",
         "responseSha256": "70645108a82524791531a087f04428873838030b91663d4db7678a8338802070",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590643,7 +1590907,7 @@
       "s195": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "9e17d947e33f5df759346778a7fa2f3d457ce5c76f600ec7d51ac4a6eb418764",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590660,7 +1590924,7 @@
       "s196": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.624Z",
+        "capturedAt": "2026-11-15T06:37:43.866Z",
         "responseSha256": "a6c0a5839440a8f32cd37befa8a4e869709a135e06bbe8e37b05aff81dee030b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590677,7 +1590941,7 @@
       "s197": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.590Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "ea4073b242e81b1d2f36718fe06b1d1f8f96eb1f7aa5ef885271fde104356ba0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590694,7 +1590958,7 @@
       "s198": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.574Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "a546fee1768b9e1f59701c46a092b34a15887b9620ac7e1a35810537e1da6d96",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590711,7 +1590975,7 @@
       "s199": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "94c2738bac2614046b812945d8d168995f0871636a3c98ebd9679eb97f933a6a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590728,7 +1590992,7 @@
       "s200": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "6b9f60fd037e50b4488517c02c99fdc4a918dd8a190542975b0c6cc4fe85f1ba",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590745,7 +1591009,7 @@
       "s201": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-10/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.640Z",
+        "capturedAt": "2026-11-15T06:37:43.812Z",
         "responseSha256": "d6965d951e2609fe115b00f77570bded8316a4b0ffff95d3983dd1c65b83d79a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590762,7 +1591026,7 @@
       "s202": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-11/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.812Z",
         "responseSha256": "faff03870d438857d1513187dadccc154f59440f7bd8ab3f5afbc77a3ed057c5",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590779,7 +1591043,7 @@
       "s203": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "33cb46028cb555c1b386647b83db61eba9d1ba32ffb7900732c91b2134cdbf40",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590796,7 +1591060,7 @@
       "s204": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "876fb0ae6adcbe0924c3cf0dd18b78c7445c06378322d03a6e1728f7b06d95d8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590813,7 +1591077,7 @@
       "s205": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "a488a03ebeae16d8e759953e305c86a94690a19542f39e08f5489462e9d2bf88",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590830,7 +1591094,7 @@
       "s206": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-17/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.836Z",
         "responseSha256": "8e976f7c7d1671e0d7f38c947d7d2a962150f92fb6f21e23636bb7b3bff1d2f6",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590847,7 +1591111,7 @@
       "s207": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-18/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.652Z",
+        "capturedAt": "2026-11-15T06:37:43.975Z",
         "responseSha256": "7c55ef181d7fb1c995a7ed86a50c9a1b0a01da09e7cbd8200eaa07f626086769",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590864,7 +1591128,7 @@
       "s208": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "68657c9f1de0fb7a82c7b573c920a414c3832c5baed1078872e1dea5a906c727",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590881,7 +1591145,7 @@
       "s209": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "175784230673fb1e40884884981d112748df4b503b2b4479a78b261cf754693b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590898,7 +1591162,7 @@
       "s210": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "936608c88693a45cfe626e69cb3ee6d78fe99e0ab559901d85bfcad5d3064f14",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590915,7 +1591179,7 @@
       "s211": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-24/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "9e6e8fd26e7b48cdebf1a3cb3edb087f908a8df31e133d2360a482733b35cc8c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590932,7 +1591196,7 @@
       "s212": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-25/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "1e68e6f2d349954a307d2162cbe2771d5597feb12df99dfd50636f8b8436f0de",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590949,7 +1591213,7 @@
       "s213": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.625Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "6b37bda59c0a016e6e82d80689a6c44efb8ce4897cda27935ddf85ced1089a75",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590966,7 +1591230,7 @@
       "s214": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "5497230130002a080bde48c79aed9fddcd925eb98e11aa7e7d7b0db6dcefc4a5",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1590983,7 +1591247,7 @@
       "s215": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-09-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.867Z",
         "responseSha256": "92bd035e746220443032493cbc476d4543203c0f49edf53b193b13c2e61b8aec",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591000,7 +1591264,7 @@
       "s33": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-01/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.344Z",
+        "capturedAt": "2026-11-15T06:37:34.584Z",
         "responseSha256": "413380195fb6a36d1fe8ac17cc92cb7b9059dd3e02bd8e008f28839c4f616e4a",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591017,7 +1591281,7 @@
       "s216": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.835Z",
         "responseSha256": "0f680df83cc49c3971844a1f7e94e425c1ac5e62f1e452eddfb6ca33ab2f1aab",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591034,7 +1591298,7 @@
       "s217": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "b33bd617e33cbaf9262c155a180a095ed942889c4845688787318f883b122e96",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591051,7 +1591315,7 @@
       "s218": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.873Z",
         "responseSha256": "fc990e72af906d10c96811413637b12271e0356526f47e3132f04d74aaf608bf",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591068,7 +1591332,7 @@
       "s219": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-07/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.611Z",
+        "capturedAt": "2026-11-15T06:37:43.861Z",
         "responseSha256": "ad35ebc6d121fddc39f03370cc0b64981825a2b96724172be34bda7c5d4c295c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591085,7 +1591349,7 @@
       "s220": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-08/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "579845a717af76ea0342cf43a154c2da95d20fe33e7cb183dc5d7e3f56136703",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591102,7 +1591366,7 @@
       "s221": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-09/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "33a3b52fc49b3747e7119487e2dad935a22ef86de718156bb9e5610c05588fc0",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591119,7 +1591383,7 @@
       "s222": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-12/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "14a0dd96b436c93ec0dad710406213632607eb15ed3f16b49f0f02ae0f6043be",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591136,7 +1591400,7 @@
       "s223": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-13/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.649Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "b8a8af11726fef00691715ccea4777d36ece59f249ee2f1e977b4d9921b99113",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591153,7 +1591417,7 @@
       "s224": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-14/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "d5f10ff2f35e10a5c1565a91f7ef02f254e2ede3c683c9a994e905185f95c43b",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591170,7 +1591434,7 @@
       "s225": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-15/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.515Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "66def6765d42b39680fed734160b0821cf6b4ad4a23be32ca6c86060e516e2dd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591187,7 +1591451,7 @@
       "s226": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-16/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.837Z",
         "responseSha256": "258c2d38ea391553c7163fcddf07faeedc587d797dc9dcae3a01d96a840a4ea5",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591204,7 +1591468,7 @@
       "s227": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-19/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.644Z",
+        "capturedAt": "2026-11-15T06:37:43.857Z",
         "responseSha256": "b6405bd4ddf1d9633a9fd92ef343f3a68d70179d75a2b3a878ccba2ca6919578",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591221,7 +1591485,7 @@
       "s228": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-20/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.513Z",
+        "capturedAt": "2026-11-15T06:37:43.859Z",
         "responseSha256": "9bcfee5656b54f964f40a6fdc68450fd7d374cdd3ec50a3ab33ec5b1d35c8230",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591238,7 +1591502,7 @@
       "s229": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-21/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "9d97ac9f469c84450b6e3917f6ed43b128189b2778344d0ae7c8229d3f2dddff",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591255,7 +1591519,7 @@
       "s230": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-22/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.866Z",
         "responseSha256": "8aa3901291f62bfe537373769e58f1a5bed3b3c5368e227a590b2c7d24cb76fd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591272,7 +1591536,7 @@
       "s231": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-23/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "baeea33b6647590fd1e23b51a7e71c7b088b1c7502c69b148d7747f365ecea46",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591289,7 +1591553,7 @@
       "s232": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-26/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.504Z",
+        "capturedAt": "2026-11-15T06:37:43.860Z",
         "responseSha256": "3877498a808cef1499ef20a1a4b68fd700acd40a6082cfc135c09f2476cff52f",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591306,7 +1591570,7 @@
       "s233": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-27/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.839Z",
         "responseSha256": "5780ed15b21b4a027eca727dcc9b961d13ec0ea375e807db7d3719fa1a03cf46",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591323,7 +1591587,7 @@
       "s234": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-28/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.639Z",
+        "capturedAt": "2026-11-15T06:37:43.856Z",
         "responseSha256": "716351f3eaa929af49307d0d07d6667e8bf806015f2f567f6265577ddf76772c",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591340,7 +1591604,7 @@
       "s235": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-29/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.645Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "7d9a26329e1a9895a91045a9f39b09e4e0e4d82450757545e2c13574815d12ff",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591357,7 +1591621,7 @@
       "s236": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-10-30/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.858Z",
         "responseSha256": "a91061fa8c127acb195eb60829076c05a66a8331546901006f2200ad6ecd41dd",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591374,7 +1591638,7 @@
       "s237": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-11-03/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.642Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "f0c8a61dcd3403ef1e524c087a383ada5077382b7c45202f4bd7f0ec653ac2c1",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591391,7 +1591655,7 @@
       "s238": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-11-04/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.840Z",
         "responseSha256": "220b0beee10d65e40d8cb5d74a9f137ef26af57abbd7f845add72b85fbc774fa",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591408,7 +1591672,7 @@
       "s239": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-11-05/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.643Z",
+        "capturedAt": "2026-11-15T06:37:43.841Z",
         "responseSha256": "413d5256cb6c4f0634dcb25284cb145cb37038891ab8aa80c1d4917f03db6341",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591425,7 +1591689,7 @@
       "s240": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-11-06/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:48.641Z",
+        "capturedAt": "2026-11-15T06:37:43.838Z",
         "responseSha256": "eef7419a47412450cb67dd7cb8e1f6af2e30dcf56325b21ab3db0b2d994313c4",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1591541,14 +1591805,31 @@
         "origin": "response",
         "transport": "direct"
       },
-      "s248": {
+      "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f": {
         "provider": "currency_api",
         "endpoint": "https://latest.currency-api.pages.dev/v1/currencies",
         "capturedAt": "2026-11-14T06:27:38.691Z",
         "responseSha256": "866750b1f9fcac01d0e53dff49a187a9170c2f193d037389a8b8f8ee16ab8760",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
+        "providerTimestampLocal": null,
         "providerDate": "2026-11-14",
+        "dateMeaning": "provider_payload_date",
+        "priceKind": "conversion_reference",
+        "providerTimeZone": null,
+        "observedAt": null,
+        "localSessionDate": null,
+        "origin": "response",
+        "transport": "direct"
+      },
+      "s248": {
+        "provider": "currency_api",
+        "endpoint": "https://latest.currency-api.pages.dev/v1/currencies",
+        "capturedAt": "2026-11-15T06:37:33.923Z",
+        "responseSha256": "e61c4ce8f444274b4051e5c9282372b9a7c80e921c22a3a3441781a3f8b606c3",
+        "digestMeaning": "parsed_json",
+        "providerUpdatedAt": null,
+        "providerDate": "2026-11-15",
         "dateMeaning": "provider_payload_date",
         "priceKind": "conversion_reference",
         "providerTimestampLocal": null,
@@ -1591660,14 +1591941,31 @@
         "origin": "response",
         "transport": "direct"
       },
-      "s246": {
+      "r3cbc6d44111ff3808ed7dc616638f311143a468f7fd63bb6dbb85356487b9b4a": {
         "provider": "exchange_rate_api",
         "endpoint": "https://v6.exchangerate-api.com/v6",
         "capturedAt": "2026-11-14T06:27:38.980Z",
         "responseSha256": "9ddabe682ccc8c122ee630965fd1f7da538964fcb8aa192b83c18c814f16c9fc",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": "2026-11-14T00:00:01.000Z",
+        "providerTimestampLocal": null,
         "providerDate": "2026-11-14",
+        "dateMeaning": "utc_update_date",
+        "priceKind": "conversion_reference",
+        "providerTimeZone": null,
+        "observedAt": null,
+        "localSessionDate": null,
+        "origin": "response",
+        "transport": "direct"
+      },
+      "s246": {
+        "provider": "exchange_rate_api",
+        "endpoint": "https://v6.exchangerate-api.com/v6",
+        "capturedAt": "2026-11-15T06:37:34.033Z",
+        "responseSha256": "57bcb7c042dc8830a065426df2bb37a7130d36d7fa00ff3875984078255952b1",
+        "digestMeaning": "parsed_json",
+        "providerUpdatedAt": "2026-11-15T00:00:02.000Z",
+        "providerDate": "2026-11-15",
         "dateMeaning": "utc_update_date",
         "priceKind": "conversion_reference",
         "providerTimestampLocal": null,
@@ -1591697,7 +1591995,7 @@
       "s34": {
         "provider": "currency_api",
         "endpoint": "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@2026-11-02/v1/currencies/usd.json",
-        "capturedAt": "2026-11-14T06:27:39.333Z",
+        "capturedAt": "2026-11-15T06:37:34.578Z",
         "responseSha256": "971a3dd899d633d8bf19659a7999c3d9b530935277088ea462ceb1ee16fe7cc8",
         "digestMeaning": "parsed_json",
         "providerUpdatedAt": null,
@@ -1739539,44 +1739837,90 @@
       },
       "2026-11-14": {
         "ARS": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 1546.03569399
         },
         "BRL": {
-          "sourceId": "s246",
+          "sourceId": "r3cbc6d44111ff3808ed7dc616638f311143a468f7fd63bb6dbb85356487b9b4a",
           "value": 5.6483
         },
         "CLP": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 994.99740146
         },
         "COP": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 3322.56554083
         },
         "GTQ": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 7.64354109
         },
         "MXN": {
-          "sourceId": "s246",
+          "sourceId": "r3cbc6d44111ff3808ed7dc616638f311143a468f7fd63bb6dbb85356487b9b4a",
           "value": 18.5616
         },
         "PYG": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 6205.98356452
         },
         "PEN": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 3.40369093
         },
         "CNY": {
-          "sourceId": "s246",
+          "sourceId": "r3cbc6d44111ff3808ed7dc616638f311143a468f7fd63bb6dbb85356487b9b4a",
           "value": 6.6849
         },
         "UYU": {
-          "sourceId": "s248",
+          "sourceId": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "value": 40.56434043
+        },
+        "USD": {
+          "sourceId": "r3cbc6d44111ff3808ed7dc616638f311143a468f7fd63bb6dbb85356487b9b4a",
+          "value": 1
+        }
+      },
+      "2026-11-15": {
+        "ARS": {
+          "sourceId": "s248",
+          "value": 1544.79579929
+        },
+        "BRL": {
+          "sourceId": "s246",
+          "value": 5.6481
+        },
+        "CLP": {
+          "sourceId": "s248",
+          "value": 994.97986838
+        },
+        "COP": {
+          "sourceId": "s248",
+          "value": 3311.68819822
+        },
+        "GTQ": {
+          "sourceId": "s248",
+          "value": 7.64313302
+        },
+        "MXN": {
+          "sourceId": "s246",
+          "value": 18.5531
+        },
+        "PYG": {
+          "sourceId": "s248",
+          "value": 6211.76179935
+        },
+        "PEN": {
+          "sourceId": "s248",
+          "value": 3.4033378
+        },
+        "CNY": {
+          "sourceId": "s246",
+          "value": 6.6897
+        },
+        "UYU": {
+          "sourceId": "s248",
+          "value": 40.58827975
         },
         "USD": {
           "sourceId": "s246",
@@ -1741019,6 +1741363,139 @@
           "UYU": "ra8f62536008529fc2e7d656d36b0917c04f5ea43da7581f7d36218bcfb7f282f",
           "USD": "r3cbc6d44111ff3808ed7dc616638f311143a468f7fd63bb6dbb85356487b9b4a"
         }
+      },
+      {
+        "id": "df0aaaf4f19de53613579cf8fd477251738428d8a4823d8c72c4abbb4e964c34",
+        "date": "2026-11-15",
+        "selectedForDate": "2026-11-15",
+        "selectedAt": "2026-11-15T06:37:44.410Z",
+        "recordedAt": "2026-11-15T06:37:44.788Z",
+        "basis": "generated_dashboard_selection",
+        "rows": [
+          [
+            "ARS",
+            "KRW",
+            0.865316645911631
+          ],
+          [
+            "ARS",
+            "LOCAL_PER_USD",
+            1544.79579929
+          ],
+          [
+            "BRL",
+            "KRW",
+            236.67029968662027
+          ],
+          [
+            "BRL",
+            "LOCAL_PER_USD",
+            5.6481
+          ],
+          [
+            "CLP",
+            "KRW",
+            1.3434819760086614
+          ],
+          [
+            "CLP",
+            "LOCAL_PER_USD",
+            994.97986838
+          ],
+          [
+            "CNY",
+            "KRW",
+            199.82024898874388
+          ],
+          [
+            "CNY",
+            "LOCAL_PER_USD",
+            6.6897
+          ],
+          [
+            "COP",
+            "KRW",
+            0.4036423236881067
+          ],
+          [
+            "COP",
+            "LOCAL_PER_USD",
+            3311.68819822
+          ],
+          [
+            "GTQ",
+            "KRW",
+            174.89392323306708
+          ],
+          [
+            "GTQ",
+            "LOCAL_PER_USD",
+            7.64313302
+          ],
+          [
+            "MXN",
+            "KRW",
+            72.04928123386388
+          ],
+          [
+            "MXN",
+            "LOCAL_PER_USD",
+            18.5531
+          ],
+          [
+            "PEN",
+            "KRW",
+            392.77250693716036
+          ],
+          [
+            "PEN",
+            "LOCAL_PER_USD",
+            3.4033378
+          ],
+          [
+            "PYG",
+            "KRW",
+            0.21519458775767555
+          ],
+          [
+            "PYG",
+            "LOCAL_PER_USD",
+            6211.76179935
+          ],
+          [
+            "USD",
+            "KRW",
+            1336.73751966
+          ],
+          [
+            "USD",
+            "LOCAL_PER_USD",
+            1
+          ],
+          [
+            "UYU",
+            "KRW",
+            32.934076730857264
+          ],
+          [
+            "UYU",
+            "LOCAL_PER_USD",
+            40.58827975
+          ]
+        ],
+        "sourceIds": {
+          "ARS": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "BRL": "rbb8ad7ed9211ae2483171a612bdb3649aaa9367576f429a2a874ecfe591be06f",
+          "CLP": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "COP": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "GTQ": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "MXN": "rbb8ad7ed9211ae2483171a612bdb3649aaa9367576f429a2a874ecfe591be06f",
+          "PYG": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "PEN": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "CNY": "rbb8ad7ed9211ae2483171a612bdb3649aaa9367576f429a2a874ecfe591be06f",
+          "UYU": "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7",
+          "USD": "rbb8ad7ed9211ae2483171a612bdb3649aaa9367576f429a2a874ecfe591be06f"
+        }
       }
     ],
     "sources": {
@@ -1741354,6 +1741831,40 @@
         "providerUpdatedAt": "2026-11-14T00:00:01.000Z",
         "providerTimestampLocal": null,
         "providerDate": "2026-11-14",
+        "dateMeaning": "utc_update_date",
+        "priceKind": "conversion_reference",
+        "providerTimeZone": null,
+        "observedAt": null,
+        "localSessionDate": null,
+        "origin": "response",
+        "transport": "direct"
+      },
+      "ra9ce3d13782cfe392e9780e1086649893a93771769131dee770ecda3f24762c7": {
+        "provider": "currency_api",
+        "endpoint": "https://latest.currency-api.pages.dev/v1/currencies",
+        "capturedAt": "2026-11-15T06:37:33.923Z",
+        "responseSha256": "e61c4ce8f444274b4051e5c9282372b9a7c80e921c22a3a3441781a3f8b606c3",
+        "digestMeaning": "parsed_json",
+        "providerUpdatedAt": null,
+        "providerTimestampLocal": null,
+        "providerDate": "2026-11-15",
+        "dateMeaning": "provider_payload_date",
+        "priceKind": "conversion_reference",
+        "providerTimeZone": null,
+        "observedAt": null,
+        "localSessionDate": null,
+        "origin": "response",
+        "transport": "direct"
+      },
+      "rbb8ad7ed9211ae2483171a612bdb3649aaa9367576f429a2a874ecfe591be06f": {
+        "provider": "exchange_rate_api",
+        "endpoint": "https://v6.exchangerate-api.com/v6",
+        "capturedAt": "2026-11-15T06:37:34.033Z",
+        "responseSha256": "57bcb7c042dc8830a065426df2bb37a7130d36d7fa00ff3875984078255952b1",
+        "digestMeaning": "parsed_json",
+        "providerUpdatedAt": "2026-11-15T00:00:02.000Z",
+        "providerTimestampLocal": null,
+        "providerDate": "2026-11-15",
         "dateMeaning": "utc_update_date",
         "priceKind": "conversion_reference",
         "providerTimeZone": null,
@@ -1742199,6 +1742710,237 @@
         "offeredIdentity": "[\"frankfurter_v1\",\"https://api.frankfurter.dev/v1\",\"provider_series_date\",\"conversion_reference\"]",
         "offeredSourceId": "rf8ed18c7af961332bb384a934fd09fd0f2983fb63ad18b6edc2fa021295e2a8b",
         "firstSeenAt": "2026-11-14T06:27:49.149Z"
+      },
+      {
+        "id": "6ad0d848e31601dbcb4738d508f24e16e4c0250baa41a35666bd7f7526a938f8",
+        "date": "2026-11-14",
+        "currency": "ARS",
+        "rateType": "KRW",
+        "selectedValue": 0.8648191966896775,
+        "offeredValue": 0.8637935641170004,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "b5ae86468c41ca066799a3ea04afc396575d8603e9300e264bd3154b4de47743",
+        "date": "2026-11-14",
+        "currency": "ARS",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 1546.03569399,
+        "offeredValue": 1545.24644071,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "55118a6f41895b7044b6ccdd574a0803b536d4b53f007845b2a9bde84f1c8d35",
+        "date": "2026-11-14",
+        "currency": "BRL",
+        "rateType": "KRW",
+        "selectedValue": 236.7157103783439,
+        "offeredValue": 235.67172174726767,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "a76616abea439a5c1356cdc489a593191017f87c8b2e207bee9a6af8925d3010",
+        "date": "2026-11-14",
+        "currency": "BRL",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 5.6483,
+        "offeredValue": 5.6637,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "58b45a639b588b61fd04977572c38aa4433b70bfb7e542cb3b41c1cd3cc3f1e6",
+        "date": "2026-11-14",
+        "currency": "CLP",
+        "rateType": "KRW",
+        "selectedValue": 1.3437636570388074,
+        "offeredValue": 1.3417760538193237,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "3d1f66a142f98bee9f9e0f3f5ef82e7b8296041a5ca7e8d4556685bd77282180",
+        "date": "2026-11-14",
+        "currency": "CLP",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 994.99740146,
+        "offeredValue": 994.78145154,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "63ecf67489b1296ed3355969af5cdd7c6fe97058ead939ec87bcc0d2b2c92051",
+        "date": "2026-11-14",
+        "currency": "CNY",
+        "rateType": "KRW",
+        "selectedValue": 200.00917694056753,
+        "offeredValue": 200.05904322007225,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "13c10660227da567bff58d5b925c6b8d69ba28b9e8af7af614e1c5d93ef282a1",
+        "date": "2026-11-14",
+        "currency": "CNY",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 6.6849,
+        "offeredValue": 6.6719,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "5f333c39cedb73512c8f4dc6a3a8ecdf47678ff858a33a7b486f58e639df36e0",
+        "date": "2026-11-14",
+        "currency": "COP",
+        "rateType": "KRW",
+        "selectedValue": 0.40241233182596536,
+        "offeredValue": 0.40296636967305355,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "1c1a2985029f6b8781cc6ba4e8e0decce7475285e88305fff3fa851e9d9134db",
+        "date": "2026-11-14",
+        "currency": "COP",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 3322.56554083,
+        "offeredValue": 3312.37053738,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "c533c567897862173150596e1c8ff39406cb9713450ddf844d7f849b1ec7e3fe",
+        "date": "2026-11-14",
+        "currency": "GTQ",
+        "rateType": "KRW",
+        "selectedValue": 174.9243356170667,
+        "offeredValue": 174.4803622817446,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "7c6d6e218d1358fa65f01df4e2e92a4e7c0cfe195452e1439b5da78479dde59c",
+        "date": "2026-11-14",
+        "currency": "GTQ",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 7.64354109,
+        "offeredValue": 7.64999518,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "4d98b02a47ca6956056a3e3f4ab49b5a65ab3c4a8fecf81771fe7c7e913f1309",
+        "date": "2026-11-14",
+        "currency": "MXN",
+        "rateType": "KRW",
+        "selectedValue": 72.03265596338677,
+        "offeredValue": 71.78905665895768,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "211b9cf48a195961b55fb3e8f7d2917a8977cc7aaf0e6b48e60c5c818393df3c",
+        "date": "2026-11-14",
+        "currency": "MXN",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 18.5616,
+        "offeredValue": 18.593,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "b7e250f1c594b77dbe81c06a5e6e6ebe18fbb8eff94c887d088fabc9a3ea97eb",
+        "date": "2026-11-14",
+        "currency": "PEN",
+        "rateType": "KRW",
+        "selectedValue": 392.82102118772576,
+        "offeredValue": 390.7797626877085,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "1662148ade7549f2e35d0308ea241e78b503efdccc8e57d2474070e58e0f537b",
+        "date": "2026-11-14",
+        "currency": "PEN",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 3.40369093,
+        "offeredValue": 3.415668,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "eb8cd3a2e31f84a783555d43f94f16a201038b183df37dfa63789700d9e6c5a5",
+        "date": "2026-11-14",
+        "currency": "PYG",
+        "rateType": "KRW",
+        "selectedValue": 0.21544390716307238,
+        "offeredValue": 0.21477552386585905,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "cb21e5ea8daa58221ce3c6d7dc4cbb782bc36727d8331a36c87698255080ca09",
+        "date": "2026-11-14",
+        "currency": "PYG",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 6205.98356452,
+        "offeredValue": 6214.73949375,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "69186e9598f38328970423214b257a63e57ce41a1431ebaf37459b152a13ec6c",
+        "date": "2026-11-14",
+        "currency": "USD",
+        "rateType": "KRW",
+        "selectedValue": 1337.04134693,
+        "offeredValue": 1334.77393046,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "124d55c6924282820a0f5f836dbfb8e61199e9618121afad9e96e043a03bd02f",
+        "date": "2026-11-14",
+        "currency": "UYU",
+        "rateType": "KRW",
+        "selectedValue": 32.96100300798111,
+        "offeredValue": 32.84014574116405,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
+      },
+      {
+        "id": "e7cc26b8ae60259c88ceeaa2ba7f2466d884848806d2be09dc985bf1351cd271",
+        "date": "2026-11-14",
+        "currency": "UYU",
+        "rateType": "LOCAL_PER_USD",
+        "selectedValue": 40.56434043,
+        "offeredValue": 40.64457999,
+        "offeredIdentity": null,
+        "offeredSourceId": null,
+        "firstSeenAt": "2026-11-15T06:37:44.788Z"
       }
     ],
     "recoveries": {
@@ -1742562,14 +1743304,14 @@
         ]
       }
     },
-    "digest": "fe4990c061d8579d259c3e817d4530cafda92bc33844496d3a200ee54bc84167"
+    "digest": "4aab65c968f3b51a10b6060c48561d17e1a81825d58018b9b0b4db78f303d0b4"
   },
   "coverage": {
     "dailyFrom": "2009-12-31",
-    "dailyTo": "2026-11-14",
+    "dailyTo": "2026-11-15",
     "monthlyFrom": "2010-01-01",
     "monthlyTo": "2026-12-01",
     "limitedDailyHistory": false,
-    "dataVersion": "c6f5792abab2fdce9d62ee3e89676e062f9bae91348cbdb373b6df3d6f1abe26"
+    "dataVersion": "4aeb0f7d4676f568658a71df2dd37a7f9ae81b9f44812161252f75eda65c0dc4"
   }
 }
