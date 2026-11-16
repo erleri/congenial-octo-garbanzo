@@ -1,4 +1,27 @@
+import type { CurrencyReport } from '../../types/currencyReport'
+
+export interface GenerationReason {
+  purpose: 'initial' | 'market' | 'periodic' | 'policy'
+  anchorBaseDate: string | null
+  cumulativePct: number | null
+  thresholdPct: number | null
+  periodicDueDate: string | null
+  change?: { reason: string; evidenceId: string; previousReportId: string }
+}
+
+export function missingReviewFacts(report: CurrencyReport, sharedReference=false): string[] {
+  const {summary,change,drivers,implications,watch}=report.content
+  const claims=[change,...drivers,...implications,...watch].filter(Boolean)
+  const texts=[summary,...claims.map(c=>c.text)]
+  const ids=new Set([...texts.flatMap(t=>Array.from(t.matchAll(/\{\{([^{}]+)\}\}/g),m=>m[1])),...claims.flatMap(c=>c.factIds)])
+  if(sharedReference) {
+    for(const id of ['spot','previous','day'])ids.add(id)
+  }
+  return [...ids].filter(id=>!report.facts.some(f=>f.id===id&&Number.isFinite(f.value)&&f.label?.trim()))
+}
+
 export interface ReviewValidation {
+  generationReason?: GenerationReason
   storageRequired?: boolean
   storageComplete?: boolean
   contentReview?: string

@@ -7,6 +7,22 @@ const run:ReviewRun={id:'preview',status:'pending_review',created_at:'2026-11-02
   candidate:{id:'preview',schemaVersion:'currency-report/1',currency:'CLP',baseDate:'2026-11-02',observedDate:'2026-10-30',publishedAt:null,generationMode:'editorial_fixture',status:'pending_review',
     content:{title:'검토 화면 시험',summary:'표시 검증',change:{title:'변화',text:'저장 사실',kind:'fact',factIds:[],evidenceIds:[]},drivers:[],implications:[],watch:[],limitations:[]},facts:[],evidence:[],series:[],limitations:[]}}
 const defaults={run,busy:false,reason:'',revision:'',focused:false,targetUnavailable:false,onRevision:()=>{},onReview:()=>{}}
+it('renders stored BRL facts in the review summary and body, including the previous rate',()=>{
+  const facts=[{id:'spot',value:5.6102,label:'5.6102 BRL_per_USD'},{id:'previous',value:5.5727,label:'5.5727 BRL_per_USD'},{id:'day',value:0.6729233585156145,label:'+0.67%'}]
+  const change={...run.candidate.content.change,text:'기준 {{spot}}, 이전 {{previous}}, 변화 {{day}}',factIds:facts.map(f=>f.id)}
+  const candidate:ReviewRun['candidate']={...run.candidate,currency:'BRL',facts,content:{...run.candidate.content,change,summary:'전일 대비 {{day}}'}}
+  const html=renderToStaticMarkup(<ReportReviewCard {...defaults} run={{...run,candidate}}/>)
+  expect(html).toContain('전일 대비 +0.67%')
+  expect(html).toContain('기준 5.6102 BRL / 1 USD, 이전 5.5727 BRL / 1 USD, 변화 +0.67%')
+  expect(html).not.toContain('{{')
+})
+it('explains a missing referenced value and disables approval',()=>{
+ const candidate={...run.candidate,content:{...run.candidate.content,summary:'전일 변화 {{day}}'}}
+ const html=renderToStaticMarkup(<ReportReviewCard {...defaults} run={{...run,candidate}}/>)
+ expect(html).toContain('저장 수치 확인 필요 · day')
+ expect(html).toContain('class="review-primary" disabled=""')
+})
+
 it('keeps approval gates when the shared review card is rendered',()=>{
   const scenarios=[{}, {busy:true},{targetUnavailable:true},{run:{...run,validation:{...run.validation,contentReview:'unverified'}}},{run:{...run,expectedPublicId:'old'}},{run:{...run,expectedPublicId:'old'},revision:'correction'},{run:{...run,validation:{...run.validation,storageRequired:true,storageComplete:false}}}]
   for(const [index,patch] of scenarios.entries()){

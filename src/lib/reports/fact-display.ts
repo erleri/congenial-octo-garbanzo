@@ -1,4 +1,10 @@
 import type { CurrencyReport } from '../../types/currencyReport'
+import { readerText } from './reader-display'
+
+export function reportSummaryText(report: CurrencyReport) {
+  return readerText(report.content.summary.replace(/\{\{([a-z_]+)\}\}/g, (_, id: string) =>
+    report.facts.find(fact => fact.id === id)?.label ?? '자료 없음'))
+}
 
 // Opt-in presentation only. Saved labels and numerical values stay untouched.
 // Unknown formats retain their complete labels rather than losing qualifiers.
