@@ -44,7 +44,7 @@ export default function CurrencyReportReview({dataset=null,datasetSource='none',
         const role = await client.from('business_plan_admins').select('active').eq('email', (session.user.email ?? '').toLowerCase()).abortSignal(signal).maybeSingle()
         if (role.error) throw role.error
         if (role.data?.active !== true) return { signedIn: true, admin: false, runs: [] as Run[],pending:0 }
-        const base=()=>{const query=client.from('currency_report_runs').select('id,status,candidate,validation,attempt,storage_required,created_at,cost');return includeTest?query:query.or('candidate->>testOnly.is.null,candidate->>testOnly.eq.false')}
+        const base=()=>{const query=client.from('currency_report_runs').select('id,status,candidate,validation,attempt,storage_required,created_at,cost,referenceVersion:packet->sharedReference->>version,editionKind:packet->sharedReference->edition->>kind');return includeTest?query:query.or('candidate->>testOnly.is.null,candidate->>testOnly.eq.false')}
         let countQuery=client.from('currency_report_runs').select('id',{head:true,count:'exact'}).eq('status','pending_review')
         if(!includeTest)countQuery=countQuery.or('candidate->>testOnly.is.null,candidate->>testOnly.eq.false')
         const [pending,recent,total]=await Promise.all([
