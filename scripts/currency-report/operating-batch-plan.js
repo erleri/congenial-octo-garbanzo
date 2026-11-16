@@ -1,6 +1,7 @@
 // OFFLINE planning only. No secrets, POSTs, reservations, DB activation or
 // publication. A deployment owner must separately enable and authorize the
 // processing policy. This cannot waive a host/tool's transmission approval.
+import {EVENT_RULE,eventBaseline,latestExplanation,reportPurpose} from './event-materiality.js'
 import {fingerprint} from './research-harness.js'
 import {REPORT_CURRENCIES,buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
 import {evaluatePublicationCadence} from './publication-cadence.js'
@@ -9,7 +10,7 @@ import {collectionAtReviewCutoff,validateSelectedReviewCard} from './selected-so
 import {applyMaterialProcessing} from './material-processing.js'
 import {prepareOriginalNewsCase} from './original-news-pipeline.js'
 import {writerProfile} from './writer-policy.js'
-import {savedSourceReview} from './operating-source-cache.js'
+import {savedSourceReview,newMaterialCandidates} from './operating-source-cache.js'
 import {inspectNewsPreselection} from './news-preselection.js'
 import {budgetedSourceDispatch} from './budgeted-source-dispatch.js'
 import {isolateUnregisteredArticles} from './registered-collection.js'
@@ -78,8 +79,11 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
    row.noReportDue=cadence.status==='no_active_trigger'&&!cadence.dataHolds.length&&!cadence.comparisonHolds.length
    if(!row.noReportDue&&(cadence.status!=='research_candidate'||cadence.dataHolds.length||cadence.comparisonHolds.length))row.holds.push('cadence_or_reference_hold')
   }
+  const baseline=cadence?.triggers.includes('event_research')&&reportPurpose(cadence.triggers)==='policy'
+   ?eventBaseline(latestExplanation(publicationsByCurrency[currency],currency,asOf)):null
   const isolated=isolateUnregisteredArticles(country.collection,catalog)
   const collection=collectionAtReviewCutoff({collection:isolated.collection,asOf})
+  const newOriginalIds=new Set(baseline?newMaterialCandidates(collection,[latestExplanation(publicationsByCurrency[currency],currency,asOf)]).map(o=>o.id):[])
   row.sources.push(...isolated.excluded)
   if(collection.currency!==currency)throw Error('collection_country_changed')
   if(country.acquisitionError){row.holds.push('source_acquisition_failed')
@@ -112,7 +116,7 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
    }catch{
     row.holds.push('saved_source_review_invalid');break
    }
-   const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter:policy.destination.provider==='azure/us'?'sol-us':'sol'})
+   const plan=prepareOriginalNewsCase({collection,card,sourceUse,eventBaseline:newOriginalIds.has(original.id)?baseline:null,sourceWriter:policy.destination.provider==='azure/us'?'sol-us':'sol'})
    if(plan.holds.length){row.sources.push({cardBinding:card.binding,status:'source_preparation_hold',holds:plan.holds});continue}
    plans.push(plan);row.sourceMaxNano+=Math.ceil(plan.maximumUsd*1e9);row.maxCalls+=2
    row.sources.push({cardBinding:card.binding,status:'request_prepared_not_dispatched',planBinding:plan.binding,
@@ -124,7 +128,7 @@ export function prepareOperatingBatch({policy,dataset,countries,asOf,publication
   if(row.status!=='planned'){row.maxCalls=0;row.sourceMaxNano=0}
   row.maximumUsd=row.status==='planned'?(row.sourceMaxNano+2*writerProfile('sol').perCallUsd*1e9)/1e9:0
   privateCountries.push({...structuredClone(country),collection,
-   preparation:{status:row.status,holds:[...row.holds],...(policy.destination.provider==='azure/us'?{sourceWriter:'sol-us'}:{})}})
+   preparation:{eventRule:EVENT_RULE,...(baseline?{eventBaseline:baseline,eventOriginalIds:[...newOriginalIds]}:{}),status:row.status,holds:[...row.holds],...(policy.destination.provider==='azure/us'?{sourceWriter:'sol-us'}:{})}})
   rows.push(row)
  }
  const writerCallAllowance=2*rows.filter(r=>r.status==='planned').length

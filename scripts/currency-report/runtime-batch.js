@@ -104,11 +104,12 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
    const publications=runtimePublications(await store.history(currency),currency)
    const supplyWith=onlySaved=>supplyRuntimeInput({dataset,currency,asOf,calendar:country.calendar,
     commentaryTarget:country.commentaryTarget,publications,handoff:country.handoff,
+    legacyFrozenPolicy:!!country.preparation&&!country.preparation.eventRule,
     claimTypingReview:country.claimTypingReview,periodicInput:country.periodicInput,eventCandidateIds:country.eventCandidateIds??[],sourcePlan,sourceRegister,processingRules,store:accountingStore,writer,reviewer,
     acquire:async()=>({collection:country.collection,officialBackground:country.officialBackground,sources:[...new Set(country.collection.reviewQueue.map(c=>c.sourceId))],networkCalls:0}),
     review:async args=>{
      const reviewed=await reviewRuntimeSources({...args,registry,processingRules,saved:country.savedSourceReviews??[],onlySaved,
-      dispatchCardBindings:country.preparation?.dispatchCardBindings,sourceWriter:country.preparation?.sourceWriter??'sol',
+      eventBaseline:country.preparation?.eventBaseline,eventOriginalIds:country.preparation?.eventOriginalIds,dispatchCardBindings:country.preparation?.dispatchCardBindings,sourceWriter:country.preparation?.sourceWriter??'sol',
       extract:sourceTransport.extract,compare:sourceTransport.compare})
      await checkpoint(currency,'source-review',reviewed)
      return reviewed

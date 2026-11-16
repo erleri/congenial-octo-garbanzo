@@ -46,8 +46,12 @@ for(const schema of [periodExtract,periodCompare]){schema.properties.marketPerio
 const contextCompare=structuredClone(periodCompare)
 contextCompare.properties.claims.items.properties.contextBlockPositions=positions
 contextCompare.properties.claims.items.required.push('contextBlockPositions')
+const eventCompare=structuredClone(contextCompare)
+eventCompare.properties.change=obj({verdict:str(['new_event','changed_explanation','repeat','uncertain']),claimId:str(),reason:str()})
+eventCompare.required.push('change')
 const legacyExtract=structuredClone(ORIGINAL_EXTRACT_SCHEMA);delete legacyExtract.properties.eventDateEvidence;legacyExtract.required=legacyExtract.required.filter(k=>k!=='eventDateEvidence')
 const ajv=new Ajv({allErrors:true}),extractSchema=ajv.compile(ORIGINAL_EXTRACT_SCHEMA),legacyExtractSchema=ajv.compile(legacyExtract),compareSchema=ajv.compile(ORIGINAL_COMPARE_SCHEMA),periodExtractSchema=ajv.compile(periodExtract),periodCompareSchema=ajv.compile(periodCompare),contextCompareSchema=ajv.compile(contextCompare)
+const eventCompareSchema=ajv.compile(eventCompare)
 const text=(v,min=10,max=480)=>typeof v==='string'&&v===v.trim()&&v.length>=min&&v.length<=max
 const unsafe=v=>unsafeSourceText(JSON.stringify(v))
 const normalize=s=>s.normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().replace(/\s+/g,' ')
@@ -64,13 +68,14 @@ const common=version=>[NOTE_AUTHORING_GUIDE,version==='original-news-pipeline/2'
 function request(job,stage,candidate,sourceCredits=[],version=ORIGINAL_NEWS_PIPELINE_VERSION,sourceWriter='sol') {
  if(!supportedVersions.includes(version))throw Error('unsupported_original_pipeline_version')
  const p=originalReviewPolicy(sourceWriter)
- const input={version,stage,currency:job.currency,
+ const assessChange=stage==='compare'&&!!job.eventBaseline
+ const input={version,stage,currency:job.currency,...(assessChange?{previousPublicExplanation:job.eventBaseline}:{}),
    time:job.time,publicationIdentity:new URL(job.url).hostname,requestedRoles:[...new Set(job.targets.map(t=>t.needId))],originHints:job.originHints,sourceCredits,blocks:job.blocks,
    ...(job.revalidation?{revalidation:job.revalidation}:{}),
    ...(job.analysisCoverage?{analysisCoverage:job.analysisCoverage}:{}),
    ...(candidate?{candidate:{role:candidate.role,eventDate:candidate.eventDate,priceKind:candidate.priceKind,...(candidate.eventDateEvidence?{eventDateEvidence:candidate.eventDateEvidence}:{}),claims:candidate.claims,...(candidate.marketPeriod?{marketPeriod:candidate.marketPeriod}:{})}}:{})}
  const body={model:p.model,stream:true,reasoning:{effort:'medium'},[p.outputField]:p.maxOutputTokens,
-   messages:[{role:'system',content:common(version)+(periodVersions.includes(version)?'\n'+NEWS_PERIOD_GUIDE:'')+(scopeVersions.includes(version)?'\n'+FX_EVIDENCE_SCOPE_INSTRUCTIONS:'')+(contextVersions.includes(version)&&stage==='compare'?'\ncontextBlockPositions는 읽고 대조한 후보 문맥 전체, blockPositions는 직접 지지, conditionBlockPositions는 필수 조건이다. 귀속·조건·기간 누락은 보류한다.':'')+(job.inputMode==='complete_capture'
+   messages:[{role:'system',content:common(version)+(assessChange?'\n직전 공개본의 설명과 원문의 검증된 현지 환율 해설을 의미로 비교한다. 새 사건 또는 시장 해석의 실질적 변화는 new_event 또는 changed_explanation, 같은 설명의 반복은 repeat, 판정 근거 부족은 uncertain이다. 새 매체·URL·거래일·가격 방향만으로 중요한 변화로 보지 않는다. change.reason에 달라진 내용과 환율과의 관계를 한 문장(240자 이내)으로 기록한다. 중요한 변화에는 이를 지지하는 현지 환율 귀속 견해 claimId를 지정하고, 나머지는 빈 문자열로 둔다. 이전 원고는 비교 자료로만 사용한다.':'')+(periodVersions.includes(version)?'\n'+NEWS_PERIOD_GUIDE:'')+(scopeVersions.includes(version)?'\n'+FX_EVIDENCE_SCOPE_INSTRUCTIONS:'')+(contextVersions.includes(version)&&stage==='compare'?'\ncontextBlockPositions는 읽고 대조한 후보 문맥 전체, blockPositions는 직접 지지, conditionBlockPositions는 필수 조건이다. 귀속·조건·기간 누락은 보류한다.':'')+(job.inputMode==='complete_capture'
      ?'\n수집한 본문 blocks를 앞에서 끝까지 읽는다. 뒤쪽의 발언·조건·반대 설명도 함께 대조하고 도입부나 키워드만으로 요지를 고르지 않는다. 본문이 짧다는 이유로 보류하지 않는다. 수집된 본문을 모두 받았다는 것과 출판사 페이지 전체를 빠짐없이 수집했다는 것은 다르다. 본문 추출 누락·접근 제한 흔적이나 주장에 필요한 맥락이 부족하면 구체적 공백을 반환한다. 공통 한계를 각 요지에서 반복하지 않는다.':'')+'\n'+(stage==='extract'
      ?'각 주장은 원문 blockPositions를 가리킨다. 최대 네 요지, 각각 최대 삼백 자다. ID는 n0부터 빈칸 없이 순서대로 붙인다. fact의 person/organization은 빈 문자열, attributed_view는 원문에서 확인되는 개인 발언자·기관이다. 기관 분석은 institutional_view(person 빈 문자열), 기사 자체 해설은 publication_view(person 빈 문자열, organization=publicationIdentity)로 귀속한다. 이들은 전문가의 확정 사실이 아니다. 사실의 causalScope는 none, 견해는 해당 통화에 대한 원문 연결이 있으면 local, 국제 배경만 있으면 global이다. 알 수 없으면 보류한다. candidate의 이유는 검토 지시나 정답이 아니다.'+(version==='original-news-pipeline/2'?'':' 발언이 다음 문단으로 이어지면 blockPositions에 발언자·기관 소개와 실제 발언·조건을 함께 포함한다. 성이나 대명사만 있는 문단에 완전한 인명을 연결한 근거를 빠뜨리지 않는다.')
      :'원문을 먼저 읽고 candidate의 각 문장을 별도로 대조한다. 추출자의 이유나 자기점수를 받지 않는다. 보류·반려일 때도 후보 ID마다 판단을 하나씩 반환한다. 문장의 모든 하위 주장·발언자·대상·기간·가격 종류·중요한 조건을 검사한다. eventDateEvidence의 구절이 실제 사건·거래일을 지칭하는지 확인한다. '+(version==='original-news-pipeline/2'
@@ -78,7 +83,7 @@ function request(job,stage,candidate,sourceCredits=[],version=ORIGINAL_NEWS_PIPE
       :'시장 역할에서 다른 사건·회고 기간·예정행사의 날짜를 거래일로 사용하면 period 보류다. policy_context는 그 정책 사건의 날짜와 예정/발표 구분을 검사하며 예정이라는 이유만으로 반려하지 않는다. 다른 날짜의 가격을 함께 같은 사건으로 묶으면 보류한다. 실제 가격 기준을 확인할 수 없는 여러 가격은 하나의 대표값으로 승인하지 않는다. 원문 내부에서 후보가 인용한 가격이 같은 기준의 장중 범위 등과 충돌하면 price_basis·blocking=true로 보류한다. 단순히 정확한 시각이 미기재된 경우와 구분한다. 원문을 그대로 옮겼다는 이유만으로 내부 모순이 있는 가격 주장을 통과시키지 않는다.')+' publication_view는 기사 자체 해설, institutional_view는 기관 견해로 확인하며 이름 있는 개인 전문가로 바꾸지 않는다. 누락/범위 초과는 보류한다. 공통 미상 정보와 실제 오류를 구분해 limitations.blocking을 결정한다. 개수는 채우지 않는다.')},
     {role:'user',content:JSON.stringify(input)}],
    response_format:{type:'json_schema',json_schema:{name:`original_news_${stage}`,strict:true,
-     schema:periodVersions.includes(version)?(stage==='extract'?periodExtract:contextVersions.includes(version)?contextCompare:periodCompare):(stage==='extract'?ORIGINAL_EXTRACT_SCHEMA:ORIGINAL_COMPARE_SCHEMA)}},
+     schema:assessChange?eventCompare:periodVersions.includes(version)?(stage==='extract'?periodExtract:contextVersions.includes(version)?contextCompare:periodCompare):(stage==='extract'?ORIGINAL_EXTRACT_SCHEMA:ORIGINAL_COMPARE_SCHEMA)}},
    provider:{only:[p.route],require_parameters:true,zdr:true,data_collection:'deny',allow_fallbacks:false,
      max_price:{prompt:p.prompt,completion:p.completion}}}
  const inputBound=requestTokenBound(body)
@@ -86,10 +91,11 @@ function request(job,stage,candidate,sourceCredits=[],version=ORIGINAL_NEWS_PIPE
    status:inputBound>p.maxInputTokens?'input_budget_hold':'prepared_not_called',timeoutMs:120000,retries:0}
 }
 
-export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGINAL_NEWS_PIPELINE_VERSION,sourceWriter='sol'}) {
+export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGINAL_NEWS_PIPELINE_VERSION,sourceWriter='sol',eventBaseline=null}) {
  if(!supportedVersions.includes(version))throw Error('unsupported_original_pipeline_version')
  const {original}=validateSelectedReviewCard(collection,card)
  let job=prepareSelectedNewsReview({collection,card})
+ if(eventBaseline){job={...job,eventBaseline};delete job.binding;job.binding=fingerprint(job)}
  const evaluatedOn=sourceUse?.evaluatedOn??collection.startedAt.slice(0,10)
  if(!validDate(evaluatedOn)||evaluatedOn<original.collectedAt.slice(0,10))throw new Error('original_use_evaluation_date_required')
  const reviews=(sourceUse?.reviews??[]).filter(r=>r.resourceId===original.id)
@@ -130,7 +136,7 @@ export function prepareOriginalNewsCase({collection,card,sourceUse,version=ORIGI
   const routing=inspectNewsPreselection(original,card,collection.currency)
   if(routing.status==='excluded')holds.push(routing.reason)
  }
- if(unsafe(job.blocks))holds.push('unsafe_original_material')
+ if(unsafe(job.blocks)||job.eventBaseline&&unsafe(job.eventBaseline))holds.push('unsafe_original_material')
  const sourceCredits=renderings.external_model??[]
  const extraction=request(job,'extract',undefined,sourceCredits,version,sourceWriter)
  if(extraction.status==='input_budget_hold')holds.push('complete_original_exceeds_budget')
@@ -207,10 +213,10 @@ export function prepareOriginalComparison(plan,candidate) {
 }
 
 export function completeOriginalNewsReview({collection,card,sourceUse,plan,candidate,comparison,checkedOn}) {
- const refreshed=prepareOriginalNewsCase({collection,card,sourceUse,version:plan.version,sourceWriter:plan.sourceWriter})
+ const refreshed=prepareOriginalNewsCase({collection,card,sourceUse,version:plan.version,sourceWriter:plan.sourceWriter,eventBaseline:plan.job.eventBaseline})
  if(plan.binding!==refreshed.binding||fingerprint(plan)!==fingerprint(refreshed)||plan.holds.length)throw new Error('original_pipeline_binding_or_use_changed')
  inspectExtractedNews(plan.job,candidate)
- if(candidate.decision!=='propose_notes'||!(contextVersions.includes(plan.version)?contextCompareSchema(comparison):Object.hasOwn(comparison??{},'marketPeriod')?periodCompareSchema(comparison):compareSchema(comparison))||unsafe(comparison)||!text(comparison.reason)
+ if(candidate.decision!=='propose_notes'||!(plan.job.eventBaseline?eventCompareSchema(comparison):contextVersions.includes(plan.version)?contextCompareSchema(comparison):Object.hasOwn(comparison??{},'marketPeriod')?periodCompareSchema(comparison):compareSchema(comparison))||unsafe(comparison)||!text(comparison.reason)
    ||comparison.claims.length!==candidate.claims.length||new Set(comparison.claims.map(c=>c.id)).size!==candidate.claims.length
    ||comparison.limitations.length>8||comparison.limitations.some(l=>!text(l.reason))
    ||comparison.claims.some(r=>!candidate.claims.some(c=>c.id===r.id)||!text(r.reason)||!pos(r.blockPositions,plan.job)
@@ -239,6 +245,15 @@ export function completeOriginalNewsReview({collection,card,sourceUse,plan,candi
  const countercontext=comparison.limitations.length?comparison.limitations.map(l=>l.reason).join(' '):'원문 대조 판단은 실제 인과의 입증이나 요인별 기여도 계산이 아니다.'
  if(countercontext.length>480)return {status:'original_support_hold',reason:'comparison_context_exceeds_note_scope',
    originalComparisonPerformed:true,originalSupportProven:false,publicationApproved:false}
+ let eventDecision=null
+ if(plan.job.eventBaseline){
+  const {verdict,claimId,reason}=comparison.change
+  const support=candidate.claims.find(c=>c.id===claimId&&c.kind!=='fact'&&c.causalScope==='local')
+  const canExplain=['new_event','changed_explanation'].includes(verdict)&&support&&candidate.role==='market_explanation'
+  eventDecision={baselineHash:fingerprint(plan.job.eventBaseline),verdict:canExplain?verdict:verdict==='repeat'?'repeat':'uncertain',
+   reason:text(reason,1,240)?reason:'',supportingText:canExplain?support.text:null}
+  if(!eventDecision.reason)eventDecision.verdict='uncertain'
+ }
  const receipt={cardBinding:card.binding,checkedChecks:[...card.requiredChecks],
    source:{id:`news-${original.id.slice(0,28)}`,country:collection.currency,publisher:new URL(original.url).hostname,
      author:'작성자 메타데이터 미확인',url:original.url,publishedAt:original.metadata.publishedAt,
@@ -255,7 +270,7 @@ export function completeOriginalNewsReview({collection,card,sourceUse,plan,candi
       ...(plan.job.inputMode==='complete_capture'?[{subject:'수집 본문 전체를 대조했으나 출판사 페이지의 수집 완전성은 별도 확인 대상이다.',status:'not_verified'}]:[])],crossSourceClaims:[]},
    scopeReview:{origin:'agent',status:'checked',reason:comparison.reason}}
  const evidence=reviewSelectedNewsMaterial({collection,card,receipt})
- return {status:'source_card_prepared',receipt,evidence,assessment:{role:comparison.role,eventDate:comparison.eventDate,priceKind:comparison.priceKind,
+ return {status:'source_card_prepared',receipt,evidence,assessment:{...(eventDecision?{eventDecision:{...eventDecision,evidenceId:receipt.source.id}}:{}),role:comparison.role,eventDate:comparison.eventDate,priceKind:comparison.priceKind,
    ...(candidate.marketPeriod?{marketPeriod:candidate.marketPeriod}:{}),
    claimScopes:candidate.claims.map(c=>({noteId:c.id,causalScope:c.causalScope})),
    localCauseSupport:comparison.role==='market_explanation'&&candidate.claims.some(c=>c.kind!=='fact'&&c.causalScope==='local'),priceObservationAt:null},
@@ -268,8 +283,8 @@ export function completeOriginalNewsReview({collection,card,sourceUse,plan,candi
 
 // Callbacks receive exact, bounded requests. They may be saved-response replay
 // or the explicitly budgeted adapter below; no model is called by default.
-export async function runOriginalNewsCase({collection,card,sourceUse,extract,compare,checkedOn,sourceWriter='sol'}) {
- const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter}),before=fingerprint(collection)
+export async function runOriginalNewsCase({collection,card,sourceUse,extract,compare,checkedOn,sourceWriter='sol',eventBaseline=null}) {
+ const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter,eventBaseline}),before=fingerprint(collection)
  if(plan.holds.length)return {...plan,status:'original_review_hold',stageInvocations:0}
  if(typeof extract!=='function'||typeof compare!=='function')return {...plan,status:'original_adapter_unavailable',stageInvocations:0}
  let stageInvocations=0

@@ -11,6 +11,7 @@ import {oneTimeOperatingPolicy,operatingConfigurationHolds,runtimeAccountingCapU
 import {prepareOperatingBatch} from './operating-batch-plan.js'
 import {fingerprint} from './research-harness.js'
 import {runtimeFixture} from './runtime-fixture.js'
+import {eventBaseline} from './event-materiality.js'
 import {prepareRuntimeTask} from './runtime.js'
 import {acquireOfficialBackground} from './runtime-official-supply.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
@@ -75,6 +76,35 @@ it('keeps a quiet day quiet after a publication while still checking sources, wi
  expect(f.store.drafts).toHaveLength(6);expect(f.state.posts).toHaveLength(24)
 })
 
+it.each(['changed_explanation','repeat','uncertain'])('checks a weekend event against the latest published text before spending on writing: %s',async verdict=>{
+ const history=await operatingFixture()
+ await runOperatingCycle({...history,execute:true})
+ const f=await operatingFixture({newsDate:'2026-10-31',nonce:'weekend'})
+ f.store.history=async currency=>{
+  const task=history.state.inputs.get(currency),report=history.store.drafts.find(r=>r.candidate.currency===currency).candidate
+  const context={task}
+  return [{baseDate:task.baseDate,publishedAt:'2026-10-29T12:00:00Z',report:{...report,testOnly:false,status:'approved'},
+   runtimeContext:{...context,serializedRuntimeContext:JSON.stringify(context)}}]
+ }
+ const send=async args=>{
+  const response=await f.send(args)
+  if(args.body.response_format.json_schema.name==='original_news_compare'){
+   expect(JSON.parse(args.body.messages[1].content).previousPublicExplanation.reportId).toBeTruthy()
+   const message=response.payload.choices[0].message,comparison=JSON.parse(message.content)
+   comparison.change={verdict,claimId:verdict==='changed_explanation'?'n1':'',reason:'합성 검증용 현지 환율 해석 비교 결과입니다.'}
+   message.content=JSON.stringify(comparison)
+  }
+  return response
+ }
+ const result=await runOperatingCycle({...f,send,execute:true})
+ const expected=verdict==='changed_explanation'?'pending_admin_review':verdict==='repeat'?'event_explanation_unchanged':'event_evidence_wait'
+ expect(result.rows.map(row=>row.status),JSON.stringify(result.rows)).toEqual(Array(6).fill(expected))
+ expect(f.state.posts.filter(name=>!name.startsWith('original_news_'))).toHaveLength(verdict==='changed_explanation'?12:0)
+ const posts=f.state.posts.length
+ await runOperatingCycle({...f,send,execute:true})
+ expect(f.state.posts).toHaveLength(posts)
+})
+
 it('resumes a paused frozen batch after midnight without changing its cutoff or repurchasing a request',async()=>{
  const f=await operatingFixture()
  const paused=await runOperatingCycle({...f,execute:true,clock:()=>1000,deadlineMs:125000})
@@ -93,8 +123,27 @@ it('treats an evidence update under a fixed reference price as context, with a s
  const publications=[{id:'actual-published-anchor',currency:f.currency,kind:'market',state:'published',origin:'published_record',
   publishedAt:'2026-10-28T10:00:00Z',stored:true,approved:true,priceReviewed:true,historical:false,editorialOnly:false,withdrawn:false,
   snapshot,report:{content:{summary:'전회 설명',drivers:[],implications:[]}}}]
- const task=prepareRuntimeTask({...f,publications,eventCandidateIds:['new-material-version']})
+ const args={...f,publications,eventCandidateIds:['new-material-version']}
+ expect(prepareRuntimeTask(args)).toMatchObject({status:'held',reason:'event_evidence_wait',modelCalls:0})
+ const items=f.task.plan.packet.evidence.filter(e=>e.sharedNotes.claims.some(c=>c.role==='attributed_fx_explanation'))
+ const decisions=items.map(e=>({baselineHash:fingerprint(eventBaseline(publications[0])),evidenceId:e.id,verdict:'repeat'}))
+ expect(prepareRuntimeTask({...args,eventDecisions:decisions})).toMatchObject({reason:'event_explanation_unchanged',modelCalls:0})
+ const proof={...decisions[0],verdict:'changed_explanation',reason:'직전 공개 해설과 달라진 현지 시장 반응',supportingText:items[0].sharedNotes.claims.find(c=>c.role==='attributed_fx_explanation').text}
+ const task=prepareRuntimeTask({...args,eventDecisions:[proof]})
+ expect(task.generationReason.change.previousReportId).toBe(publications[0].id)
+ expect(prepareRuntimeTask({...args,eventDecisions:[{...proof,baselineHash:'old'}]}).reason).toBe('event_evidence_wait')
  expect(task).toMatchObject({status:'prepared',purpose:'policy'})
+ const oldDate='2026-10-01'
+ const old={...publications[0],publishedAt:oldDate+'T12:00:00Z',snapshot:{...snapshot,baseDate:oldDate,current:{...snapshot.current,date:oldDate}}}
+ const dataset={...f.dataset,dailyRates:[old.snapshot.current,...f.dataset.dailyRates]}
+ const updated=buildSharedDashboardPriceSnapshot({...f,dataset})
+ const {binding:oldBinding,...connection}=f.handoff.materialConnection
+ expect(oldBinding).toBeTruthy()
+ connection.referenceSnapshotId=updated.snapshotId
+ const handoff={...f.handoff,reportPriceSnapshot:updated,materialConnection:{...connection,binding:fingerprint(connection)}}
+ const due=prepareRuntimeTask({...args,dataset,handoff,publications:[old]})
+ expect(due.cadence.triggers).toEqual(['periodic','event_research'])
+ expect(due).toMatchObject({status:'prepared',purpose:'periodic',generationReason:{purpose:'periodic'}})
  expect(task.plan.packet.sharedReference.edition).toMatchObject({kind:'context_update',priceCauseEstablished:false})
  expect(task.plan.body.messages[0].content).toContain('과거 가격의 원인으로 소급하지 않는다')
  expect(JSON.parse(task.plan.body.messages[1].content).writingCoverageRequirements.some(r=>r.id==='shared_evidence_after_reference')).toBe(true)

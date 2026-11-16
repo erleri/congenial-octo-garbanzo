@@ -206,7 +206,7 @@ export async function acquireRuntimeResearch({snapshot,asOf,commentaryTarget,sou
 // user-assigned manual selection. Cached judgments retain their original scope.
 export async function supplyRuntimeInput({dataset,currency,asOf,calendar,commentaryTarget,publications=[],
  handoff,claimTypingReview,sourcePlan,sourceRegister,acquire,review,store,writer='sol',reviewer,periodicInput,
- eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,connect=prepareCountryNewsPool,processingRules}) {
+ legacyFrozenPolicy=false,eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,connect=prepareCountryNewsPool,processingRules}) {
  if(!REPORT_CURRENCIES.includes(currency))throw Error('registered_supply_currency_required')
  const snapshot=buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calendar})
  const cadence=evaluatePublicationCadence({snapshot,asOf,publications,calendar,eventCandidateIds,correctionReportIds,previousChecks,openCase})
@@ -233,7 +233,7 @@ export async function supplyRuntimeInput({dataset,currency,asOf,calendar,comment
  if(processingRules)current=restrictCachedHandoff(current,processingRules,asOf.slice(0,10))
  // Existing exact cache is an optimization; acquisition is still attempted so
  // revisions and source exclusions can invalidate it before writing.
- const batches=[];let officialAdmission=null
+ const batches=[],eventDecisions=[];let officialAdmission=null
  if(acquire){
   try{
    const acquired=await acquire({snapshot,asOf,commentaryTarget,sourcePlan,sourceRegister})
@@ -256,6 +256,7 @@ export async function supplyRuntimeInput({dataset,currency,asOf,calendar,comment
     if(review)reviewed=await review({collection:reviewCollection,asOf})
     if(!(reviewed.modelCalls===null&&reviewed.newPaidCostUsd===null)&&(!Number.isInteger(reviewed.modelCalls)||reviewed.modelCalls<0)||reviewed.newPaidCostUsd!==null
      &&(!Number.isFinite(reviewed.newPaidCostUsd)||reviewed.newPaidCostUsd<0))throw Error('source_review_cost_receipt_required')
+    for(const item of reviewed.items??[]){if(item.assessment?.eventDecision)eventDecisions.push(item.assessment.eventDecision)}
     result.modelCalls=reviewed.modelCalls===null?null:result.modelCalls+reviewed.modelCalls
     result.newPaidCostUsd=reviewed.newPaidCostUsd===null?null:result.newPaidCostUsd===null?null:result.newPaidCostUsd+reviewed.newPaidCostUsd
     result.sourceReviewIssues=(reviewed.items??[]).map(i=>({sourceId:reviewCollection.reviewQueue.find(c=>c.binding===i.cardBinding)?.sourceId??null,
@@ -303,10 +304,13 @@ export async function supplyRuntimeInput({dataset,currency,asOf,calendar,comment
  result.cachedClaimsReused=Object.values(current.materialConnection.sections).flat().length
  let task
  try{task=prepareRuntimeTask({dataset,currency,asOf,calendar,publications,handoff:current,writer,reviewer,periodicInput,
-  eventCandidateIds,correctionReportIds,previousChecks,openCase})}
+  eventDecisions,legacyFrozenPolicy,eventCandidateIds,correctionReportIds,previousChecks,openCase})}
  catch(error){result.status='writer_preparation_hold';result.holds=[reason(error)];return finish()}
  if(task.status!=='prepared'){
   const issues=result.sourceReviewIssues??[]
+  if(['event_explanation_unchanged','event_evidence_wait'].includes(task.reason)){
+   result.status=task.reason;result.holds=task.reason==='event_evidence_wait'?[task.reason]:[];return finish()
+  }
   // An unusable outlet does not suppress a prepared alternative. Individual
   // holds remain visible; this status describes the next viable action.
   result.status=issues.some(i=>i.status==='source_review_budget_required')?'source_review_wait'
