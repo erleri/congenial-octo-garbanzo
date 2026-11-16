@@ -1,6 +1,7 @@
 // Server-only coordinator. It reuses the existing price, cadence, writer and
 // sentence-review contracts. No filesystem, credentials or network at import.
 import {inspectFxPriority,fxMaterialHolds,FX_REPORT_PRIORITY_INSTRUCTIONS} from './fx-report-priority.js'
+import {reportPurpose,eventBaseline,latestExplanation,assessEventChange} from './event-materiality.js'
 import {encodeReviewInput} from './review-transport.js'
 import {COMPACT_REVIEW_VERSION,compactReviewContract,decodeCompactReview} from './compact-review.js'
 import {withoutOptionalBackground} from './runtime-material-selection.js'
@@ -54,27 +55,26 @@ function assertPeriodicPlan(plan) {
  if(plan.requestHash!==fingerprint(plan.body)||!plan.packet.periodicCheck)throw Error('periodic_runtime_plan_changed')
 }
 export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calendar,handoff,periodicInput,
- writer='sol',reviewer:approvedReviewer,eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,claimTypingReview}) {
+ writer='sol',reviewer:approvedReviewer,eventCandidateIds=[],correctionReportIds=[],previousChecks=[],openCase=null,claimTypingReview,eventDecisions=[],legacyFrozenPolicy=false}) {
  const snapshot=buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calendar})
  const cadence=evaluatePublicationCadence({snapshot,asOf,publications,calendar,eventCandidateIds,correctionReportIds,previousChecks,openCase})
  if(cadence.status!=='research_candidate')return {version:RUNTIME_VERSION,status:'held',reason:cadence.status,cadence,modelCalls:0}
  if(cadence.dataHolds.length||cadence.comparisonHolds.length)return {version:RUNTIME_VERSION,status:'held',reason:'reference_data_hold',cadence,modelCalls:0}
- const purpose=cadence.triggers.includes('cumulative')?'market':cadence.triggers.includes('bootstrap')?'initial'
-  :cadence.triggers.includes('event_research')?'policy':'periodic'
+ const purpose=reportPurpose(legacyFrozenPolicy&&cadence.triggers.includes('event_research')?cadence.triggers.filter(t=>t!=='periodic'):cadence.triggers)
  const reviewer=approvedReviewer??(writer==='sol'?DEFAULT_RUNTIME_REVIEWER:writer)
- let plan
+ let plan,change
  if(purpose==='periodic'&&periodicInput)return {version:RUNTIME_VERSION,status:'held',reason:'legacy_periodic_input_requires_shared_fx_adapter',cadence,modelCalls:0}
  {
   if(handoff?.reportPriceSnapshot?.snapshotId!==snapshot.snapshotId||fingerprint(handoff.reportPriceSnapshot)!==fingerprint(snapshot))
    return {version:RUNTIME_VERSION,status:'held',reason:'current_dashboard_material_required',cadence,modelCalls:0}
   const anchor=purpose==='periodic'?publications.find(r=>r.id===cadence.anchorId):purpose==='policy'
-   ?[...publications].filter(r=>r.state==='published'&&r.approved&&!r.withdrawn&&r.report&&Date.parse(r.publishedAt)<=Date.parse(asOf))
-    .sort((a,b)=>Date.parse(b.publishedAt)-Date.parse(a.publishedAt))[0]:null
+   ?latestExplanation(publications,currency,asOf):null
   if(purpose==='periodic'&&!anchor?.report)return {version:RUNTIME_VERSION,status:'held',reason:'published_explanation_snapshot_required',cadence,modelCalls:0}
   const previous=anchor?{id:anchor.id,currency,origin:'published_record',observedDate:anchor.snapshot.current.date,
    value:anchor.snapshot.current.value,publishedAt:anchor.publishedAt,
    explanations:[anchor.report.content?.summary,...(anchor.report.content?.drivers??[]).map(d=>d.text),
     ...(anchor.report.content?.implications??[]).map(d=>d.text)].filter(s=>typeof s==='string').slice(0,8)}:undefined
+  if(purpose==='policy'&&!legacyFrozenPolicy&&!previous)return {version:RUNTIME_VERSION,status:'held',reason:'event_evidence_wait',cadence,modelCalls:0}
   const writerPurpose=purpose==='initial'?'initial_check':purpose==='periodic'?'periodic_check':purpose==='policy'?'context_update':'market'
   plan=prepareSharedWriter({handoff,writer,claimTypingReview,purpose:writerPurpose,previous})
   const reviewCapacity=plan.status==='prepared_not_called'?preflightRuntimeReview({plan,writer,reviewer,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION},{capacity:true}):null
@@ -83,8 +83,14 @@ export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calend
    if(smaller)plan=prepareSharedWriter({handoff:smaller,writer,purpose:writerPurpose,previous})
   }
   if(plan.status!=='prepared_not_called')return {version:RUNTIME_VERSION,status:'held',reason:'evidence_or_writer_hold',holds:plan.holds??[],cadence,modelCalls:0}
+  if(purpose==='policy'&&!legacyFrozenPolicy){
+   const result=assessEventChange(eventBaseline(anchor),eventDecisions,plan.packet.evidence)
+   if(result.status!=='material_change')return {version:RUNTIME_VERSION,status:'held',reason:result.status,cadence,modelCalls:0}
+   change=result.change
+  }
  }
- const task={version:RUNTIME_VERSION,status:'prepared',currency,baseDate:snapshot.baseDate,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,reviewCoverageGuideVersion:'coverage-targets/1',
+ const task={...(legacyFrozenPolicy?{}:{generationReason:{purpose,anchorBaseDate:cadence.anchorBaseDate,cumulativePct:cadence.cumulativePct,
+  thresholdPct:cadence.thresholdPct,periodicDueDate:cadence.periodicDueDate,...(change?{change}:{})}}),version:RUNTIME_VERSION,status:'prepared',currency,baseDate:snapshot.baseDate,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,reviewCoverageGuideVersion:'coverage-targets/1',
   materialEditions:[...new Map(Object.values(handoff?.materialConnection?.sections??{}).flat()
    .filter(r=>r.originalCapture?.contentIdentity).map(r=>[r.sourceUrl,{url:r.sourceUrl,identity:r.originalCapture.contentIdentity}])).values(),
    ...officialMaterialEditions(Object.values(handoff?.materialConnection?.sections??{}).flat().filter(r=>r.officialStatistic)
@@ -307,7 +313,7 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
  if(reviewing.status!=='received')validation={...validation,contentReview:'unverified'}
  if(testOnly)validation={...validation,synthetic:true,reviewOrigin:'synthetic'}
  let runId
- try{runId=await store.finish(reviewReceived?reviewing.id:writing.id,report,{...validation,review:reviewBody,
+ try{runId=await store.finish(reviewReceived?reviewing.id:writing.id,report,{...validation,...(task.generationReason?{generationReason:task.generationReason}:{}),review:reviewBody,
   sourceUseReview:publicSourceDelivery({task,report,evaluatedOn:asOf.slice(0,10)})},cost)}
  catch{return {status:'runtime_finalization_wait',waitingStage:'storage',modelCalls:calls,cost,publicationApproved:false}}
  return {status:validation.contentReview==='passed'?'pending_admin_review':'content_review_hold',runId,modelCalls:calls,cost,

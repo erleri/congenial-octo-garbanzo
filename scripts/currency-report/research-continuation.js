@@ -43,7 +43,7 @@ export function sourceContinuation(item) {
   category='output';action='find_other_evidence';resumeWhen='new_material_or_review_rules'
  }else if(match(reasons,/market_period_|publication_before_session_window|original_event_date_not_supported|event_date_|extraction_event_/)){
   category='period';action='find_period_matched_evidence';resumeWhen='new_material_or_review_rules'
- }else if(match(reasons,/non_economic_section|original_support_hold|original_claim_support_not_confirmed|insufficient_information|unrelated|writing_input_hold|selected_session_.*_missing|explicit_local_explanation_required|global_context_promoted_to_local|note_use_or_role_hold/)){
+ }else if(match(reasons,/non_economic_section|original_support_hold|original_claim_support_not_confirmed|insufficient_information|unrelated|event_evidence_wait|writing_input_hold|selected_session_.*_missing|explicit_local_explanation_required|global_context_promoted_to_local|note_use_or_role_hold/)){
   category='content';action='find_other_evidence';resumeWhen='new_material_or_review_rules'
  }
  return {version:RESEARCH_CONTINUATION_VERSION,category,action,resumeWhen,resumeExact,
@@ -88,7 +88,7 @@ export function countryContinuation(row) {
   resumeWhen:'new_material_or_review_rules',paidCallAuthorized:false,issues:diagnostics}
  if(row.status==='input_staged')return {version:RESEARCH_CONTINUATION_VERSION,action:'write_then_review',resumeExact:false,
   resumeWhen:'authorized_execution_with_exact_input',paidCallAuthorized:false,issues:diagnostics}
- if(row.status==='no_report_due')return {version:RESEARCH_CONTINUATION_VERSION,action:'wait_for_trigger',resumeExact:false,
+ if(['no_report_due','event_explanation_unchanged'].includes(row.status))return {version:RESEARCH_CONTINUATION_VERSION,action:'wait_for_trigger',resumeExact:false,
   resumeWhen:'new_material_price_trigger_or_periodic_due',paidCallAuthorized:false,issues:diagnostics}
  if(row.status==='pending_admin_review')return {version:RESEARCH_CONTINUATION_VERSION,action:'await_admin_review',resumeExact:false,
   resumeWhen:'admin_decision',paidCallAuthorized:false,issues:diagnostics}

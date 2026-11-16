@@ -10,7 +10,7 @@ import {savedSourceReview} from './operating-source-cache.js'
 import {sourceContinuation} from './research-continuation.js'
 import {inspectNewsPreselection} from './news-preselection.js'
 
-export async function reviewRuntimeSources({collection,asOf,registry,processingRules,saved=[],extract,compare,admitNotes,onlySaved=false,dispatchCardBindings,sourceWriter='sol'}) {
+export async function reviewRuntimeSources({collection,asOf,registry,processingRules,saved=[],extract,compare,admitNotes,onlySaved=false,dispatchCardBindings,sourceWriter='sol',eventBaseline:baseline=null,eventOriginalIds=[]}) {
  if(dispatchCardBindings!==undefined&&(!Array.isArray(dispatchCardBindings)
   ||new Set(dispatchCardBindings).size!==dispatchCardBindings.length
   ||dispatchCardBindings.some(b=>!collection.reviewQueue.some(c=>c.binding===b))))throw Error('bound_source_dispatch_required')
@@ -24,6 +24,7 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
  for(const card of collection.reviewQueue){
   try{
    const {original}=validateSelectedReviewCard(collection,card)
+   const eventBaseline=eventOriginalIds.includes(original.id)?baseline:null
    const identity=fingerprint({url:original.url,sha256:original.sha256})
    if(seen.has(identity)){items.push({cardBinding:card.binding,status:'duplicate_original'});continue}
    seen.add(identity)
@@ -41,7 +42,7 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
     receipts.push(cached.receipt)
     if(cached.materialInput)materialInputs.push({cardBinding:card.binding,input:processingRules
      ?restrictCachedNoteMaterial(cached.materialInput,processingRules,asOf.slice(0,10)):cached.materialInput})
-    items.push({cardBinding:card.binding,status:'exact_saved_review_reused_not_new_verification'});continue
+    items.push({cardBinding:card.binding,assessment:cached.assessment,status:'exact_saved_review_reused_not_new_verification'});continue
    }
    if(onlySaved){items.push({cardBinding:card.binding,status:'pending_original_review_not_admitted',modelCalls:0,costUsd:0});continue}
    if(dispatchCardBindings&&!dispatchCardBindings.includes(card.binding)){
@@ -54,7 +55,7 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
    if(materialDecision?.reason==='unsafe_original_material'){
     items.push({cardBinding:card.binding,status:'source_review_hold',holds:['unsafe_original_material']});continue
    }
-   const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter})
+   const plan=prepareOriginalNewsCase({collection,card,sourceUse,sourceWriter,eventBaseline})
    if(plan.holds.length){
     const decision=sourceUse.policyDecisions.find(d=>d.originalId===original.id)
     const budgetHold=plan.holds.some(h=>['complete_original_exceeds_budget','comparison_worst_case_exceeds_budget','source_two_stage_budget_exceeded'].includes(h))
@@ -91,7 +92,7 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
     if(newPaidCostUsd!==null)newPaidCostUsd+=r.costUsd
     return r
    }
-   const reviewed=await runOriginalNewsCase({collection,card,sourceUse,sourceWriter,extract:invoke(extract),compare:invoke(compare),checkedOn:asOf.slice(0,10)})
+   const reviewed=await runOriginalNewsCase({collection,card,sourceUse,sourceWriter,eventBaseline,extract:invoke(extract),compare:invoke(compare),checkedOn:asOf.slice(0,10)})
    if(newPaidCostUsd===null){items.push({cardBinding:card.binding,status:'source_cost_unresolved'});break}
    if(reviewed.status!=='source_card_prepared'){
     items.push({cardBinding:card.binding,status:reviewed.status,reason:reviewed.reason??null,
