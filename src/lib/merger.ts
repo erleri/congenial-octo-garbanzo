@@ -36,6 +36,7 @@ export interface ExcelMergeOptions {
 }
 
 export interface RemoteExchangeDataOptions {
+  hanaReference?: {effectiveFrom: string; quotes: {currency: CurrencyCode; date: string; value: number; source: FxPriceSource}[]}
   supplementalHistoryByCurrency?: Record<string, Record<string, number>>
   supplementalPriceSources?: Record<string, FxPriceSource>
   manualBackfillByDate?: Record<string, Record<string, number>>
@@ -456,6 +457,27 @@ export async function fetchRemoteExchangeData(
           provenance.select(date,currency,numeric,manualSource,'manual_backfill')
         }
       }
+    }
+  }
+
+  if (options.hanaReference) {
+    const {effectiveFrom, quotes} = options.hanaReference
+    const currencies = ['BRL','MXN','CLP','COP','PEN','ARS']
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(effectiveFrom) || !Number.isFinite(Date.parse(effectiveFrom))
+      || effectiveFrom > endDate) throw Error('hana_effective_date_invalid')
+    // The server supplies persisted Hana observations as well as this fetch.
+    // Missing bank observations use the existing FFILL path, with their real origin.
+    for (const [date, rates] of Object.entries(mergedRatesByDate)) {
+      if (date >= effectiveFrom) for (const currency of currencies) delete rates[currency]
+    }
+    for (const quote of quotes) {
+      if (!currencies.includes(quote.currency) || quote.source.provider !== 'hana_bank'
+        || quote.source.providerDate !== quote.date || !Number.isFinite(quote.value) || quote.value <= 0
+        || !/^\d{4}-\d{2}-\d{2}$/.test(quote.date) || !Number.isFinite(Date.parse(quote.date))
+        || quote.date > endDate) throw Error('hana_quote_invalid')
+      if (quote.date < effectiveFrom) continue
+      ;(mergedRatesByDate[quote.date] ??= {})[quote.currency] = quote.value
+      provenance.select(quote.date,quote.currency,quote.value,quote.source,'hana_reference')
     }
   }
 

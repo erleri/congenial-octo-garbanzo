@@ -32,6 +32,29 @@ beforeEach(()=>{
 afterEach(()=>{vi.useRealTimers();vi.unstubAllGlobals();vi.unstubAllEnvs()})
 
 describe('Operational price provenance (offline response fixtures)',()=>{
+ it('selects Hana from the effective date and carries the bank observation through an unavailable day',async()=>{
+  vi.stubGlobal('fetch',feed(false))
+  const currencies=['BRL','MXN','CLP','COP','PEN','ARS'] as const
+  const quotes=await Promise.all(currencies.map(async(currency,index)=>{
+   const initial=index<4,raw=initial?'0.2':'10.00000'
+   const source=await recordPriceResponse('hana_bank','https://www.kebhana.com/cms/rate/'+(initial?'wpfxd651_01i_01.do':'wpfxd651_10i_01.do'),{raw},
+    {providerUpdatedAt:null,providerDate:'2026-10-27',dateMeaning:'provider_payload_date',priceKind:'conversion_reference',providerTimeZone:'Asia/Seoul'})
+   source.bankQuote={kind:initial?'initial':'cross',rawValue:raw,unit:initial?'USD_per_local':'local_per_USD',bulletin:initial?1:null}
+   return {currency,date:'2026-10-27',value:initial?5:10,source}
+  }))
+  const {fetchRemoteExchangeData}=await import('../src/lib/merger')
+  const data=await fetchRemoteExchangeData(new Date(),{hanaReference:{effectiveFrom:'2026-10-27',quotes}})
+  for(const q of quotes){
+   const saved=data.dailyRates.find(r=>r.currency===q.currency&&r.date===q.date&&r.rateType==='LOCAL_PER_USD')!
+   expect(saved.value).toBe(q.value)
+   const id=data.priceProvenance!.quotesByDate[q.date][q.currency].sourceId
+   expect(data.priceProvenance!.sources[id].bankQuote).toEqual(q.source.bankQuote)
+   const carried=data.dailyRates.find(r=>r.currency===q.currency&&r.date==='2026-10-28'&&r.rateType==='LOCAL_PER_USD')!
+   expect(carried).toMatchObject({value:q.value,source:'IMPUTED',imputationMethod:'FFILL'})
+   expect(data.priceProvenance!.quotesByDate['2026-10-28']?.[q.currency]).toBeUndefined()
+  }
+  expect(data.dailyRates.find(r=>r.currency==='BRL'&&r.date==='2026-10-26'&&r.rateType==='LOCAL_PER_USD')!.value).toBe(200)
+ })
  it('records the real winning provider through every existing overwrite stage without changing selected or derived values',async()=>{
   const fetch=feed();vi.stubGlobal('fetch',fetch)
   const {fetchRemoteExchangeData}=await import('../src/lib/merger')

@@ -66,17 +66,18 @@ export function readDashboardPriceLineage(dataset,row) {
  if(!entry)return unknown('source_record_missing')
  if(!positive(row.value)||entry?.value!==row.value||!source)return unknown('source_record_price_mismatch')
  if(source.origin!=='response')return unknown('cached_or_injected_source_unverified')
- const providers=['frankfurter_v1','exchange_rate_api','open_er_api','currency_api','alpha_vantage']
+ const providers=['frankfurter_v1','exchange_rate_api','open_er_api','currency_api','alpha_vantage','hana_bank']
  const kinds=['conversion_reference','provider_daily_close']
  const meanings=['utc_update_date','collection_date_fallback','provider_payload_date','provider_series_date','requested_snapshot_date']
  let endpoint
  try{endpoint=new URL(source.endpoint)}catch{return unknown('source_record_invalid')}
  const endpoints=['https://api.frankfurter.dev/v1','https://api.frankfurter.app/',
   'https://v6.exchangerate-api.com/v6','https://open.er-api.com/v6',
-  'https://latest.currency-api.pages.dev/v1/currencies','https://www.alphavantage.co/query']
+  'https://latest.currency-api.pages.dev/v1/currencies','https://www.alphavantage.co/query',
+  'https://www.kebhana.com/cms/rate/wpfxd651_01i_01.do','https://www.kebhana.com/cms/rate/wpfxd651_10i_01.do']
  const snapshotEndpoint=/^https:\/\/cdn\.jsdelivr\.net\/npm\/@fawazahmed0\/currency-api@\d{4}-\d{2}-\d{2}\/v1\/currencies\/usd\.json$/
  const providerHosts={frankfurter_v1:['api.frankfurter.dev','api.frankfurter.app'],exchange_rate_api:['v6.exchangerate-api.com'],
-  open_er_api:['open.er-api.com'],currency_api:['latest.currency-api.pages.dev','cdn.jsdelivr.net'],alpha_vantage:['www.alphavantage.co']}
+  open_er_api:['open.er-api.com'],currency_api:['latest.currency-api.pages.dev','cdn.jsdelivr.net'],alpha_vantage:['www.alphavantage.co'],hana_bank:['www.kebhana.com']}
  if(!providers.includes(source.provider)||!kinds.includes(source.priceKind)||!meanings.includes(source.dateMeaning)
   ||!stamp(source.capturedAt)||Date.parse(source.capturedAt)>Date.parse(dataset.fetchedAt)
   ||source.providerUpdatedAt!==null&&(!stamp(source.providerUpdatedAt)||Date.parse(source.providerUpdatedAt)>Date.parse(source.capturedAt))
@@ -89,6 +90,17 @@ export function readDashboardPriceLineage(dataset,row) {
   ||!providerHosts[source.provider]?.includes(endpoint.hostname)
   ||(source.provider==='alpha_vantage')!==(source.priceKind==='provider_daily_close')
   ||endpoint.search||endpoint.hash||!endpoints.includes(endpoint.href)&&!snapshotEndpoint.test(endpoint.href))return unknown('source_record_invalid')
+ if(source.provider==='hana_bank'){
+  const bank=source.bankQuote,initial=['BRL','MXN','CLP','COP'].includes(row.currency)
+  const raw=bank?.rawValue
+  if(!bank||!['BRL','MXN','CLP','COP','PEN','ARS'].includes(row.currency)||typeof raw!=='string'
+   ||!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(raw))return unknown('source_record_invalid')
+  const n=Number(raw.replaceAll(',',''))
+  if(!positive(n)||row.value!==(initial?1/n:n)||source.providerDate!==row.date
+   ||bank.kind!==(initial?'initial':'cross')||bank.unit!==(initial?'USD_per_local':'local_per_USD')
+   ||bank.bulletin!==(initial?1:null)||source.providerTimeZone!=='Asia/Seoul'
+   ||endpoint.pathname!==(initial?'/cms/rate/wpfxd651_01i_01.do':'/cms/rate/wpfxd651_10i_01.do'))return unknown('source_record_invalid')
+ }
  if(source.providerTimeZone!==null){try{new Intl.DateTimeFormat('en',{timeZone:source.providerTimeZone})}catch{return unknown('source_record_invalid')}}
  return {status:'recorded',reason:'provider_recorded_market_session_unverified',provider:source.provider,
   providerUpdatedAt:source.providerUpdatedAt,providerDate:source.providerDate,dateMeaning:source.dateMeaning,

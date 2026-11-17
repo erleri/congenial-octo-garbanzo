@@ -6,7 +6,7 @@ export type {FreshnessCalendar} from './reference-freshness.js'
 const currencies = ['BRL','MXN','CLP','COP','PEN','ARS'] as const
 const providers: Record<FxPriceSource['provider'], string> = {
   frankfurter_v1:'Frankfurter', exchange_rate_api:'ExchangeRate-API', open_er_api:'Open ER',
-  currency_api:'Currency API', alpha_vantage:'Alpha Vantage', unverified_supplemental:'기존 보조 자료', manual_backfill:'수동 보완',
+  currency_api:'Currency API', alpha_vantage:'Alpha Vantage', hana_bank:'하나은행', unverified_supplemental:'기존 보조 자료', manual_backfill:'수동 보완',
 }
 export function datasetStatus(data: ExchangeRateDataset | null, now=Date.now(), calendar=DEFAULT_FRESHNESS_CALENDAR) {
   if(!data)return {state:'unknown' as const,label:'자료 확인 중',quotes:[]}

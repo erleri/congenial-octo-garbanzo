@@ -9,6 +9,7 @@ import { FULL_DATASET_PATH, STATIC_FALLBACK_PATH, writeDatasetFiles } from './da
 import type { FxPriceSource, DashboardReferenceRecovery } from '../src/types/exchangeRate'
 import {retainDashboardReferences} from './dashboard-reference-archive'
 import {verifyReferenceRecovery} from './dashboard-reference-recovery'
+import {fetchHanaRates, type HanaQuote} from './hana-rates'
 
 type RepoSupplementalCache = {
   fetchedAt: string
@@ -74,7 +75,31 @@ async function main() {
     }
   }
 
+  const effectiveFrom = process.env.FX_HANA_EFFECTIVE_FROM
+  let hanaReference: {effectiveFrom: string; quotes: HanaQuote[]} | undefined
+  if (effectiveFrom) {
+    const today = new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(effectiveFrom) || effectiveFrom > today) throw Error('hana_effective_date_invalid')
+    const legacySelection = previousDataset.dailyRates.some((row: {date:string;currency:string;rateType:string;source:string;imputationMethod:string}) => {
+      if (row.date < effectiveFrom || row.rateType !== 'LOCAL_PER_USD' || row.source !== 'API' || row.imputationMethod !== 'NONE'
+        || !['BRL','MXN','CLP','COP','PEN','ARS'].includes(row.currency)) return false
+      const quote = previousDataset.priceProvenance?.quotesByDate[row.date]?.[row.currency]
+      return previousDataset.priceProvenance?.sources[quote?.sourceId]?.provider !== 'hana_bank'
+    })
+    if (legacySelection) throw Error('hana_cutover_conflicts_with_adopted_history')
+    const quotes: HanaQuote[] = []
+    for (const row of previousDataset.dailyRates) {
+      if (row.rateType !== 'LOCAL_PER_USD' || row.source !== 'API' || row.imputationMethod !== 'NONE') continue
+      const quote = previousDataset.priceProvenance?.quotesByDate[row.date]?.[row.currency]
+      const source = quote && previousDataset.priceProvenance?.sources[quote.sourceId]
+      if (source?.provider === 'hana_bank' && quote.value === row.value) quotes.push({currency:row.currency,date:row.date,value:row.value,source})
+    }
+    quotes.push(...await fetchHanaRates(today))
+    hanaReference = {effectiveFrom,quotes}
+    console.log('Hana reference collection: '+JSON.stringify(quotes.slice(-6).map(q=>({currency:q.currency,date:q.date,value:q.value,kind:q.source.bankQuote?.kind}))))
+  }
   const incoming = await fetchRemoteExchangeData(new Date(), {
+    hanaReference,
     supplementalHistoryByCurrency: supplementalRates,
     supplementalPriceSources,
     manualBackfillByDate: repoBackfillCache?.ratesByDate,

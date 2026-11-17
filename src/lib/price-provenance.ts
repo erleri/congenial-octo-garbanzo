@@ -13,7 +13,8 @@ export async function recordPriceResponse(
   const url = new URL(endpoint)
   const allowedEndpoints=['https://api.frankfurter.dev/v1','https://api.frankfurter.app/',
     'https://v6.exchangerate-api.com/v6','https://open.er-api.com/v6',
-    'https://latest.currency-api.pages.dev/v1/currencies','https://www.alphavantage.co/query']
+    'https://latest.currency-api.pages.dev/v1/currencies','https://www.alphavantage.co/query',
+    'https://www.kebhana.com/cms/rate/wpfxd651_01i_01.do','https://www.kebhana.com/cms/rate/wpfxd651_10i_01.do']
   const datedSnapshot=/^https:\/\/cdn\.jsdelivr\.net\/npm\/@fawazahmed0\/currency-api@\d{4}-\d{2}-\d{2}\/v1\/currencies\/[a-z]{3}\.json$/
   if (url.protocol !== 'https:' || url.search || url.username || url.password || url.hash
     || !allowedEndpoints.includes(url.href)&&!datedSnapshot.test(url.href)) throw new Error('unsafe_price_source_endpoint')
