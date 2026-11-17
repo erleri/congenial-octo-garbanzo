@@ -6,15 +6,17 @@ export {HANA_EFFECTIVE_FROM} from '../src/lib/hana-comparison'
 // Only publicly released report dates are needed. Pagination must finish before collection.
 export async function publishedHanaComparisonDates(url:string,key:string,fetchImpl=fetch) {
  const dates=new Set<string>()
- for(let offset=0;;offset+=1000){
+ for(let offset=0;;){
   const target=new URL('/rest/v1/currency_reports',url)
   target.search=new URLSearchParams({select:'date:report->>observedDate',currency:'in.(BRL,MXN,CLP,COP,PEN,ARS)',withdrawn_at:'is.null',order:'currency,base_date',offset:String(offset),limit:'1000'}).toString()
-  const r=await fetchImpl(target,{headers:{apikey:key,Authorization:`Bearer ${key}`},signal:AbortSignal.timeout(20000)})
+  const r=await fetchImpl(target,{headers:{apikey:key,Authorization:`Bearer ${key}`,Prefer:'count=exact'},signal:AbortSignal.timeout(20000)})
   if(!r.ok)throw Error('hana_comparison_history_unavailable')
   const rows=await r.json() as {date:string}[]
   if(!Array.isArray(rows)||rows.some(row=>!/^\d{4}-\d{2}-\d{2}$/.test(row.date)))throw Error('hana_comparison_history_invalid')
   for(const row of rows)dates.add(row.date)
-  if(rows.length<1000)break
+  offset+=rows.length
+  const total=r.headers.get('content-range')?.match(/\/(\d+)$/)?.[1]
+  if(!rows.length||total!==undefined&&offset>=Number(total))break
  }
  return [...dates].sort()
 }

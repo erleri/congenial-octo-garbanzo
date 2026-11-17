@@ -59,10 +59,10 @@ it('holds a missing or changed comparison and resumes normal calculation for sam
 it('finishes public-history pagination and fails on a partial lookup',async()=>{
  const fetchImpl=vi.fn(async(target:URL)=>{
   expect(target.searchParams.get('order')).toBe('currency,base_date')
-  return new Response(JSON.stringify(target.searchParams.get('offset')==='0'?Array(1000).fill({date:'2026-11-02'}):[{date:'2026-11-13'}]))
+  return new Response(JSON.stringify(target.searchParams.get('offset')==='0'?Array(1000).fill({date:'2026-11-02'}):target.searchParams.get('offset')==='1000'?[{date:'2026-11-13'}]:[]))
  })
  expect(await publishedHanaComparisonDates('https://example.supabase.co','synthetic-key',fetchImpl)).toEqual(['2026-11-02','2026-11-13'])
- expect(fetchImpl).toHaveBeenCalledTimes(2)
+ expect(fetchImpl).toHaveBeenCalledTimes(3)
  await expect(publishedHanaComparisonDates('https://example.supabase.co','synthetic-key',async()=>new Response('',{status:500}))).rejects.toThrow('hana_comparison_history_unavailable')
 })
 it('preserves exact saved comparisons and cannot silently change the effective date',async()=>{
