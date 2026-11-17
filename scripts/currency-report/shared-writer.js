@@ -34,10 +34,10 @@ function packetFromBrief(brief,handoff,purpose,previous) {
    referencePolicy:material.referencePolicy,lineage:s.lineage,commentaryDate:material.commentaryDate,...(material.commentaryPeriod?{commentaryPeriod:material.commentaryPeriod}:{}),
    ...(s.carryForward?{carryForward:s.carryForward}:{} )},
   facts:[{id:'spot',label:`${fmt(s.current.value)} ${s.unit}`,value:s.current.value,date:s.current.date},
-   {id:'previous',label:`${fmt(s.previous.value)} ${s.unit}`,value:s.previous.value,date:s.previous.date},
+   {id:'previous',label:`${fmt(s.previousComparison?.value??s.previous.value)} ${s.unit}`,value:s.previousComparison?.value??s.previous.value,date:s.previous.date},
    {id:'day',label:`${s.changePct>=0?'+':''}${s.changePct.toFixed(2)}%`,value:s.changePct,date:s.baseDate}],
   series:structuredClone(s.series),evidence,limitations:[material.commentaryPeriod?'수치는 대시보드 기준환율입니다. 뉴스 해설은 별도로 표시한 기간의 시장 움직임을 다루며, 그 기간의 설명을 당일 기준환율 변화의 직접 원인으로 보지 않습니다.':SHARED_REFERENCE_LIMITATION],mechanismApplications:[],
-  sharedReference:{version:SHARED_WRITING_VERSION,inputPolicyVersion:SHARED_INPUT_POLICY_VERSION,ruleVersion:material.ruleVersion,referenceSnapshotId:s.snapshotId,
+  sharedReference:{...(s.hanaTransition?{hanaTransition:{...s.hanaTransition,quotes:s.hanaTransition.quotes.filter(q=>q.currency===s.currency&&[s.previous.date,previous?.observedDate].includes(q.requestedDate))}}:{}),version:SHARED_WRITING_VERSION,inputPolicyVersion:SHARED_INPUT_POLICY_VERSION,ruleVersion:material.ruleVersion,referenceSnapshotId:s.snapshotId,
    ...(handoff.materialConnection.asOf?{materialCutoff:{version:'independent-material-cutoff/1',asOf:handoff.materialConnection.asOf}}:{}),
    snapshotBinding:brief.referenceSnapshotBinding,materialBinding:brief.materialBinding,commentaryDate:material.commentaryDate,
    ...(material.commentaryPeriod?{commentaryPeriod:material.commentaryPeriod}:{}),
@@ -49,9 +49,14 @@ function packetFromBrief(brief,handoff,purpose,previous) {
     comparison:'previous_reference_observation_only',noPublishedAnchor:true}}:{}),
    ...(purpose==='periodic_check'?{edition:{version:'shared-periodic-check/1',kind:'periodic_check',previous,
     comparison:'published_reference_and_explanation',relation:'unverified_until_separate_review'}}:{})}}
+ if(s.previousComparison)packet.limitations.push('전일 비교는 이전 기준일에 조회한 하나은행 값으로 계산합니다. 이전 화면의 다른 공급자 값과 구분합니다.')
+ if(previous?.comparable){
+  packet.facts.push({id:'comparable_previous',label:`${fmt(previous.comparable.value)} ${s.unit} (하나은행 동일 기준일 비교값)`,value:previous.comparable.value,date:previous.observedDate})
+  packet.limitations.push('지난 공개 원고의 숫자는 발행 당시 값으로 보존합니다. 누적 변화는 같은 기준일의 하나은행 비교값을 분모로 계산합니다.')
+ }
  if(purpose==='periodic_check'){
   packet.facts.push({id:'published_previous',label:`${fmt(previous.value)} ${s.unit}`,value:previous.value,date:previous.observedDate},
-   {id:'published_change',label:`${((s.current.value/previous.value-1)*100).toFixed(2)}%`,value:(s.current.value/previous.value-1)*100,date:s.current.date})
+   {id:'published_change',label:`${((s.current.value/(previous.comparable?.value??previous.value)-1)*100).toFixed(2)}%`,value:(s.current.value/(previous.comparable?.value??previous.value)-1)*100,date:s.current.date})
  }
  for(const source of material.sources.filter(s=>s.officialStatistic))packet.facts.push(structuredClone(source.officialStatistic.fact))
  return sealSharedPacket(packet)
@@ -74,6 +79,7 @@ export function prepareSharedWriter({handoff,writer,claimTypingReview,purpose='m
   'availability.basis=captured_series_only이면 발표일이 미제공된 통계다. 수집일을 발표일로 쓰거나 오늘 발표·새 정책 사건·당일 환율 원인으로 바꾸지 않는다. governmentRedistribution이면 정부 재공급본으로 표시하며 mirror 기간과 원 기관의 발표를 구분한다. 금리 수준은 금리 상승·하락의 근거가 아니다.',
   'officialBackgroundCoverage는 이번 공식 숫자로 답할 수 있는 질문과 공백이다. 확인되지 않은 질문은 숫자를 추정하거나 다른 지표로 대체하지 않는다. 금융 상품만 확인했으면 그 금융 여건만 설명하며 소비 전체를 평가하지 않는다. 다른 검토 기사·정책 배경은 각자의 범위에서 사용할 수 있다.',
   ...brief.material.writingGuide,WRITING_CONTRACT_INSTRUCTIONS,
+  'previous.comparable가 있으면 published_previous는 옛 공개 원고의 원래 숫자, comparable_previous는 같은 기준일의 하나은행 비교값이다. published_change는 현재 하나은행 값과 comparable_previous 사이의 변화다. 원고에는 비교 기준 전환을 밝히고 옛 공개 숫자와 직접 나눈 변화로 서술하지 않는다.',
   'writingCoverageRequirements는 작성 후 별도 검토할 질문이다. 새 정보·기간·관련성으로 선별하고 같은 사건·경로를 합친다. relatedSourceGroups는 관련성 신호이며 독립 확인 수나 같은 사건을 확정하지 않는다.',
   '각 위치의 ruleLedger.claims에는 사용한 materialClaimIds를 함께 제출한다. evidenceIds는 그 카드들의 출처와 정확히 일치해야 한다. 배경 카드를 drivers에 사용하지 않는다. applicableMechanisms는 비어 있으므로 새 일반 원리를 승인하지 않는다.',
   outputInstructions({backgroundHeaders:true,marketHeaders:true})].join('\n')

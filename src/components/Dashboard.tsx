@@ -560,7 +560,7 @@ function Dashboard({ data, businessPlan, renderReportLink }: DashboardProps) {
       previous.value !== 0
         ? (current.value - previous.value) / previous.value
         : null
-    const dailyChange = getDashboardDailyChange(today, previousDaily)
+    const dailyChange = getDashboardDailyChange(today, previousDaily, data)
     const movingVs = calculatePlanDelta(businessPlan.moving[currency], cumulativeValue)
 
     return {

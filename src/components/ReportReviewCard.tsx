@@ -40,6 +40,7 @@ export default function ReportReviewCard({run,busy,reason,revision,focused,targe
         <p>전일 대비 {run.candidate.facts.find(f=>f.id==='day')?.label??'자료 없음'}
           {decision.cumulativePct!=null&&Number.isFinite(decision.cumulativePct)&&<> · {decision.anchorBaseDate} 대비 {decision.cumulativePct>0?'+':''}{decision.cumulativePct.toFixed(2)}% (기준 ±{decision.thresholdPct}%)</>}
           {decision.periodicDueDate&&<> · 정기 점검 예정 {decision.periodicDueDate}</>}</p>
+        {decision.comparison&&<p>누적 비교 기준 · {decision.comparison.date} 하나은행 {decision.comparison.value.toLocaleString('ko-KR',{maximumFractionDigits:6})} · 기존 공개 숫자는 발행 당시 값 보존</p>}
         {decision.change&&<p>{decision.change.reason} · {run.candidate.evidence.find(e=>e.id===decision.change?.evidenceId)?.publisher??'원고 근거 참조'}</p>}
       </div>}
       {[run.candidate.content.change,...run.candidate.content.drivers,...run.candidate.content.implications,...run.candidate.content.watch].filter(Boolean).map((claim,i)=>{

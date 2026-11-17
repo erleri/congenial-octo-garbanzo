@@ -150,6 +150,7 @@ export interface ExchangeRateDataset {
   movingComparison: MovingComparisonRow[]
   rawSheets?: RawSheet[]
   coverage?: DatasetCoverage
+  hanaTransition?: {version:'hana-transition/1';effectiveFrom:string;quotes:HanaComparisonQuote[]}
   priceProvenance?: FxPriceProvenance
   referenceArchive?: DashboardReferenceArchive
 }
@@ -218,7 +219,8 @@ export interface DashboardReferenceRecovery {
 
 // Optional for backward compatibility. Dataset dates are not local sessions.
 export interface FxPriceSource {
-  provider: 'frankfurter_v1' | 'exchange_rate_api' | 'open_er_api' | 'currency_api' | 'alpha_vantage' | 'unverified_supplemental' | 'manual_backfill'
+  provider: 'frankfurter_v1' | 'exchange_rate_api' | 'open_er_api' | 'currency_api' | 'alpha_vantage' | 'hana_bank' | 'unverified_supplemental' | 'manual_backfill'
+  bankQuote?: {kind: 'initial' | 'cross'; rawValue: string; unit: 'USD_per_local' | 'local_per_USD'; bulletin: 1 | null}
   endpoint: string | null
   capturedAt: string | null
   responseSha256: string | null
@@ -234,6 +236,8 @@ export interface FxPriceSource {
   origin: 'response' | 'cache_without_source_record' | 'injected_without_source_record' | 'manual_input'
   transport: 'direct' | 'corsproxy' | 'allorigins' | 'unknown'
 }
+
+export interface HanaComparisonQuote {currency:CurrencyCode;requestedDate:string;date:string;value:number;source:FxPriceSource}
 
 export interface FxPriceProvenance {
   version: 'fx-price-provenance/1'

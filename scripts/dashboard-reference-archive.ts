@@ -24,7 +24,7 @@ function rawSource(data:ExchangeRateDataset,row:DailyRate):FxPriceSource|null {
   const book=data.priceProvenance!,s=book.sources[book.quotesByDate[row.date][row.currency].sourceId]
   // Never copy arbitrary extensions or credentials into the durable archive.
   return Object.fromEntries(['provider','endpoint','capturedAt','responseSha256','digestMeaning','providerUpdatedAt','providerTimestampLocal',
-    'providerDate','dateMeaning','priceKind','providerTimeZone','observedAt','localSessionDate','origin','transport'].map(k=>[k,s[k as keyof FxPriceSource]])) as unknown as FxPriceSource
+    'providerDate','dateMeaning','priceKind','providerTimeZone','observedAt','localSessionDate','origin','transport','bankQuote'].map(k=>[k,s[k as keyof FxPriceSource]])) as unknown as FxPriceSource
 }
 function sourceId(archive:Archive,source:FxPriceSource|null){
   if(!source)return null

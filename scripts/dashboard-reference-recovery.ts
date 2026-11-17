@@ -69,7 +69,7 @@ export function prepareReferenceRecovery({raw,artifact,reports,preparedAt}:{raw:
   let provider:FxPriceSource|null=null
   if(readDashboardPriceLineage(data,origin).status==='recorded'){
    const book=data.priceProvenance!,s=book.sources[book.quotesByDate[origin.date][currency].sourceId]
-   provider=Object.fromEntries(['provider','endpoint','capturedAt','responseSha256','digestMeaning','providerUpdatedAt','providerTimestampLocal','providerDate','dateMeaning','priceKind','providerTimeZone','observedAt','localSessionDate','origin','transport'].map(k=>[k,s[k as keyof FxPriceSource]])) as unknown as FxPriceSource
+   provider=Object.fromEntries(['provider','endpoint','capturedAt','responseSha256','digestMeaning','providerUpdatedAt','providerTimestampLocal','providerDate','dateMeaning','priceKind','providerTimeZone','observedAt','localSessionDate','origin','transport','bankQuote'].map(k=>[k,s[k as keyof FxPriceSource]])) as unknown as FxPriceSource
   }
   return {currency:origin.currency,unit:currency+'_per_USD',reportId:r.id,reportSha256:referenceDigest(r),publishedAt:resolved.publishedAt,
    matchedChartPoints:r.series.length,selected:project(current!),origin:project(origin),conversion:conversion?project(conversion):null,

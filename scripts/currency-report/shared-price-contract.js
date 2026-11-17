@@ -4,13 +4,14 @@ import {createHash} from 'node:crypto'
 import {validDate} from './core.js'
 import {MARKET_ZONES} from './market-calendar.js'
 import {getDashboardDaily,getDashboardPreviousDaily,getDashboardDailyChange} from '../../src/lib/dashboard-price.js'
+import {hanaComparison} from '../../src/lib/hana-comparison.js'
 import {referenceRowOrigin} from './dashboard-reference-state.js'
 
 export const SHARED_REPORT_RULE_VERSION='shared-dashboard-report/3'
 // Semantic price edition, shared by case ownership and paid request identity.
 // Fetch clocks/response hashes do not turn unchanged reference values into new work.
 export function referenceEdition(snapshot) {
- return {currency:snapshot.currency,baseDate:snapshot.baseDate,series:snapshot.series,
+ return {currency:snapshot.currency,baseDate:snapshot.baseDate,series:snapshot.series,...(snapshot.hanaTransition?{hanaTransition:snapshot.hanaTransition}:{}),
   referencePolicy:snapshot.referenceBasis.version,
   providers:Object.fromEntries(Object.entries(snapshot.lineage).map(([key,value])=>[key,{
    provider:value.provider,providerDate:value.providerDate,providerUpdatedAt:value.providerUpdatedAt,
@@ -66,17 +67,18 @@ export function readDashboardPriceLineage(dataset,row) {
  if(!entry)return unknown('source_record_missing')
  if(!positive(row.value)||entry?.value!==row.value||!source)return unknown('source_record_price_mismatch')
  if(source.origin!=='response')return unknown('cached_or_injected_source_unverified')
- const providers=['frankfurter_v1','exchange_rate_api','open_er_api','currency_api','alpha_vantage']
+ const providers=['frankfurter_v1','exchange_rate_api','open_er_api','currency_api','alpha_vantage','hana_bank']
  const kinds=['conversion_reference','provider_daily_close']
  const meanings=['utc_update_date','collection_date_fallback','provider_payload_date','provider_series_date','requested_snapshot_date']
  let endpoint
  try{endpoint=new URL(source.endpoint)}catch{return unknown('source_record_invalid')}
  const endpoints=['https://api.frankfurter.dev/v1','https://api.frankfurter.app/',
   'https://v6.exchangerate-api.com/v6','https://open.er-api.com/v6',
-  'https://latest.currency-api.pages.dev/v1/currencies','https://www.alphavantage.co/query']
+  'https://latest.currency-api.pages.dev/v1/currencies','https://www.alphavantage.co/query',
+  'https://www.kebhana.com/cms/rate/wpfxd651_01i_01.do','https://www.kebhana.com/cms/rate/wpfxd651_10i_01.do']
  const snapshotEndpoint=/^https:\/\/cdn\.jsdelivr\.net\/npm\/@fawazahmed0\/currency-api@\d{4}-\d{2}-\d{2}\/v1\/currencies\/usd\.json$/
  const providerHosts={frankfurter_v1:['api.frankfurter.dev','api.frankfurter.app'],exchange_rate_api:['v6.exchangerate-api.com'],
-  open_er_api:['open.er-api.com'],currency_api:['latest.currency-api.pages.dev','cdn.jsdelivr.net'],alpha_vantage:['www.alphavantage.co']}
+  open_er_api:['open.er-api.com'],currency_api:['latest.currency-api.pages.dev','cdn.jsdelivr.net'],alpha_vantage:['www.alphavantage.co'],hana_bank:['www.kebhana.com']}
  if(!providers.includes(source.provider)||!kinds.includes(source.priceKind)||!meanings.includes(source.dateMeaning)
   ||!stamp(source.capturedAt)||Date.parse(source.capturedAt)>Date.parse(dataset.fetchedAt)
   ||source.providerUpdatedAt!==null&&(!stamp(source.providerUpdatedAt)||Date.parse(source.providerUpdatedAt)>Date.parse(source.capturedAt))
@@ -89,6 +91,17 @@ export function readDashboardPriceLineage(dataset,row) {
   ||!providerHosts[source.provider]?.includes(endpoint.hostname)
   ||(source.provider==='alpha_vantage')!==(source.priceKind==='provider_daily_close')
   ||endpoint.search||endpoint.hash||!endpoints.includes(endpoint.href)&&!snapshotEndpoint.test(endpoint.href))return unknown('source_record_invalid')
+ if(source.provider==='hana_bank'){
+  const bank=source.bankQuote,initial=['BRL','MXN','CLP','COP'].includes(row.currency)
+  const raw=bank?.rawValue
+  if(!bank||!['BRL','MXN','CLP','COP','PEN','ARS'].includes(row.currency)||typeof raw!=='string'
+   ||!/^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(raw))return unknown('source_record_invalid')
+  const n=Number(raw.replaceAll(',',''))
+  if(!positive(n)||row.value!==(initial?1/n:n)||source.providerDate!==row.date
+   ||bank.kind!==(initial?'initial':'cross')||bank.unit!==(initial?'USD_per_local':'local_per_USD')
+   ||bank.bulletin!==(initial?1:null)||source.providerTimeZone!=='Asia/Seoul'
+   ||endpoint.pathname!==(initial?'/cms/rate/wpfxd651_01i_01.do':'/cms/rate/wpfxd651_10i_01.do'))return unknown('source_record_invalid')
+ }
  if(source.providerTimeZone!==null){try{new Intl.DateTimeFormat('en',{timeZone:source.providerTimeZone})}catch{return unknown('source_record_invalid')}}
  return {status:'recorded',reason:'provider_recorded_market_session_unverified',provider:source.provider,
   providerUpdatedAt:source.providerUpdatedAt,providerDate:source.providerDate,dateMeaning:source.dateMeaning,
@@ -104,11 +117,11 @@ export function buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calenda
  const all=dataset.dailyRates.filter(r=>r.currency===currency&&r.rateType==='LOCAL_PER_USD')
  if(all.some(r=>!validDate(r.date)))throw new Error('invalid_stored_price_date')
  const current=getDashboardDaily(all,currency,dataset.baseDate),previous=getDashboardPreviousDaily(all,currency,dataset.baseDate)
- const change=getDashboardDailyChange(current,previous),holds=[]
+ const change=getDashboardDailyChange(current,previous,dataset),holds=[]
  const currentOrigin=referenceRowOrigin(all,current),previousOrigin=referenceRowOrigin(all,previous)
  const lineage={current:readDashboardPriceLineage(dataset,currentOrigin??current),previous:readDashboardPriceLineage(dataset,previousOrigin??previous)}
  const dataBinding=hash({baseDate:dataset.baseDate,fetchedAt:dataset.fetchedAt??null,
-  dataVersion:dataset.dataVersion??null,rows:all.map(project),lineage})
+  dataVersion:dataset.dataVersion??null,rows:all.map(project),lineage,...(dataset.hanaTransition?{hanaTransition:dataset.hanaTransition}:{} )})
  // Preserve first-row selection exactly as the dashboard does. Reject duplicates
  // for analysis rather than silently picking a different quote or merging prices.
  const counts=new Map();for(const r of all)counts.set(r.date,(counts.get(r.date)??0)+1)
@@ -123,6 +136,8 @@ export function buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calenda
  const expectedCurrent=calendar?.status==='confirmed'&&calendar.expectedReferenceDate===dataset.baseDate
   &&current?.date===dataset.baseDate
  if(dataset.baseDate<asOf.slice(0,10)&&!expectedCurrent)holds.push('older_saved_dataset_not_current_market')
+ const previousComparison=dataset.hanaTransition&&current?.date>=dataset.hanaTransition.effectiveFrom&&previous?hanaComparison(dataset,currency,previous.date):null
+ if(dataset.hanaTransition&&current?.date>=dataset.hanaTransition.effectiveFrom&&lineage.previous.provider!=='hana_bank'&&!previousComparison)holds.push('previous_source_comparison_missing')
  const series=all.filter(r=>r.date<=dataset.baseDate).map(project).sort((a,b)=>a.date.localeCompare(b.date))
  // Recorded response metadata is not a certification of a local market close.
  const recorded=lineage.current.status==='recorded'
@@ -144,6 +159,7 @@ export function buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calenda
   ruleVersion:SHARED_REPORT_RULE_VERSION,currency,unit:`${currency}_per_USD`,dataBinding,
   baseDate:dataset.baseDate,fetchedAt:dataset.fetchedAt??null,dataVersion:dataset.dataVersion??null,
   current:project(current),previous:project(previous),
+  ...(dataset.hanaTransition?{hanaTransition:dataset.hanaTransition}:{}),...(previousComparison?{previousComparison}:{}),
   ...(current?.imputationMethod==='FFILL'||previous?.imputationMethod==='FFILL'?{carryForward:{
    version:'dashboard-carry-forward/1',currentOrigin:project(currentOrigin),previousOrigin:project(previousOrigin),
    meaning:'same_dashboard_value_not_new_market_observation',holidayConfirmed:false}}:{}),

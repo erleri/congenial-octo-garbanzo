@@ -6,6 +6,7 @@ export interface GenerationReason {
   cumulativePct: number | null
   thresholdPct: number | null
   periodicDueDate: string | null
+  comparison?: {date:string;value:number}
   change?: { reason: string; evidenceId: string; previousReportId: string }
 }
 

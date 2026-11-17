@@ -15,6 +15,8 @@ import {
   saveMonthlyRatesToCache,
 } from './cache'
 import { fetchStaticDataset } from './staticDataset'
+import {attachReferenceContext} from './reference-context'
+import {HANA_EFFECTIVE_FROM} from './hana-comparison'
 import { isSupabaseConfigured, supabase } from './supabaseClient'
 
 type DashboardRpcPayload = {
@@ -169,12 +171,18 @@ async function performSupabaseInitialLoad(): Promise<InitialSupabaseDataset> {
       fetchDashboardSnapshot(),
       fetchAllMonthlyRates(),
     ])
-    const dataset: ExchangeRateDataset = {
+    let dataset: ExchangeRateDataset = {
       baseDate: dashboard.baseDate,
       fetchedAt: dashboard.fetchedAt,
       dailyRates: dashboard.dailyRates.map(normalizeDaily),
       monthlyRates,
       movingComparison: [],
+    }
+    if(dataset.baseDate>=HANA_EFFECTIVE_FROM){
+      if(dashboard.dataVersion!==metadata.dataVersion)throw Error('reference_context_version_mismatch')
+      const response=await fetch(`/fx-reference-context.json?v=${encodeURIComponent(metadata.dataVersion)}`,{cache:'no-store'})
+      if(!response.ok)throw Error('reference_context_unavailable')
+      dataset=attachReferenceContext(dataset,metadata.dataVersion,await response.json())
     }
     await Promise.all([
       saveFxMetadataToCache(metadata),
