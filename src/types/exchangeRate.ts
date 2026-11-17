@@ -150,6 +150,7 @@ export interface ExchangeRateDataset {
   movingComparison: MovingComparisonRow[]
   rawSheets?: RawSheet[]
   coverage?: DatasetCoverage
+  hanaTransition?: {version:'hana-transition/1';effectiveFrom:string;quotes:HanaComparisonQuote[]}
   priceProvenance?: FxPriceProvenance
   referenceArchive?: DashboardReferenceArchive
 }
@@ -235,6 +236,8 @@ export interface FxPriceSource {
   origin: 'response' | 'cache_without_source_record' | 'injected_without_source_record' | 'manual_input'
   transport: 'direct' | 'corsproxy' | 'allorigins' | 'unknown'
 }
+
+export interface HanaComparisonQuote {currency:CurrencyCode;requestedDate:string;date:string;value:number;source:FxPriceSource}
 
 export interface FxPriceProvenance {
   version: 'fx-price-provenance/1'

@@ -1,3 +1,4 @@
+import {HANA_EFFECTIVE_FROM} from '../src/lib/hana-comparison.js'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
@@ -66,7 +67,10 @@ async function loadSupabaseDashboardDataset() {
   if (!data?.baseDate) {
     throw new Error('Supabase dashboard dataset is empty.')
   }
+  const context=data.baseDate>=HANA_EFFECTIVE_FROM?await loadJsonDataset():null
+  if(context&&(context.baseDate!==data.baseDate||context.coverage?.dataVersion!==data.dataVersion))throw Error('reference_context_version_mismatch')
   return {
+    ...(context?{priceProvenance:context.priceProvenance,hanaTransition:context.hanaTransition}:{}),
     baseDate: data.baseDate,
     fetchedAt: data.fetchedAt,
     dailyRates: (data.dailyRates ?? []).map(normalizeDaily),

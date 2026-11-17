@@ -1,6 +1,7 @@
 // Server-only coordinator. It reuses the existing price, cadence, writer and
 // sentence-review contracts. No filesystem, credentials or network at import.
 import {inspectFxPriority,fxMaterialHolds,FX_REPORT_PRIORITY_INSTRUCTIONS} from './fx-report-priority.js'
+import {hanaComparison} from '../../src/lib/hana-comparison.js'
 import {reportPurpose,eventBaseline,latestExplanation,assessEventChange} from './event-materiality.js'
 import {encodeReviewInput} from './review-transport.js'
 import {COMPACT_REVIEW_VERSION,compactReviewContract,decodeCompactReview} from './compact-review.js'
@@ -72,6 +73,7 @@ export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calend
   if(purpose==='periodic'&&!anchor?.report)return {version:RUNTIME_VERSION,status:'held',reason:'published_explanation_snapshot_required',cadence,modelCalls:0}
   const previous=anchor?{id:anchor.id,currency,origin:'published_record',observedDate:anchor.snapshot.current.date,
    value:anchor.snapshot.current.value,publishedAt:anchor.publishedAt,
+   ...(snapshot.lineage.current.provider==='hana_bank'&&anchor.snapshot.lineage?.current?.provider!=='hana_bank'?{comparable:hanaComparison({hanaTransition:snapshot.hanaTransition,fetchedAt:snapshot.fetchedAt},currency,anchor.snapshot.current.date)}:{}),
    explanations:[anchor.report.content?.summary,...(anchor.report.content?.drivers??[]).map(d=>d.text),
     ...(anchor.report.content?.implications??[]).map(d=>d.text)].filter(s=>typeof s==='string').slice(0,8)}:undefined
   if(purpose==='policy'&&!legacyFrozenPolicy&&!previous)return {version:RUNTIME_VERSION,status:'held',reason:'event_evidence_wait',cadence,modelCalls:0}
@@ -90,7 +92,7 @@ export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calend
   }
  }
  const task={...(legacyFrozenPolicy?{}:{generationReason:{purpose,anchorBaseDate:cadence.anchorBaseDate,cumulativePct:cadence.cumulativePct,
-  thresholdPct:cadence.thresholdPct,periodicDueDate:cadence.periodicDueDate,...(change?{change}:{})}}),version:RUNTIME_VERSION,status:'prepared',currency,baseDate:snapshot.baseDate,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,reviewCoverageGuideVersion:'coverage-targets/1',
+  thresholdPct:cadence.thresholdPct,periodicDueDate:cadence.periodicDueDate,...(cadence.comparisonReference?{comparison:{date:cadence.anchorObservedDate,value:cadence.comparisonReference.value}}:{}),...(change?{change}:{})}}),version:RUNTIME_VERSION,status:'prepared',currency,baseDate:snapshot.baseDate,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,reviewCoverageGuideVersion:'coverage-targets/1',
   materialEditions:[...new Map(Object.values(handoff?.materialConnection?.sections??{}).flat()
    .filter(r=>r.originalCapture?.contentIdentity).map(r=>[r.sourceUrl,{url:r.sourceUrl,identity:r.originalCapture.contentIdentity}])).values(),
    ...officialMaterialEditions(Object.values(handoff?.materialConnection?.sections??{}).flat().filter(r=>r.officialStatistic)

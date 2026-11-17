@@ -4,13 +4,14 @@ import {createHash} from 'node:crypto'
 import {validDate} from './core.js'
 import {MARKET_ZONES} from './market-calendar.js'
 import {getDashboardDaily,getDashboardPreviousDaily,getDashboardDailyChange} from '../../src/lib/dashboard-price.js'
+import {hanaComparison} from '../../src/lib/hana-comparison.js'
 import {referenceRowOrigin} from './dashboard-reference-state.js'
 
 export const SHARED_REPORT_RULE_VERSION='shared-dashboard-report/3'
 // Semantic price edition, shared by case ownership and paid request identity.
 // Fetch clocks/response hashes do not turn unchanged reference values into new work.
 export function referenceEdition(snapshot) {
- return {currency:snapshot.currency,baseDate:snapshot.baseDate,series:snapshot.series,
+ return {currency:snapshot.currency,baseDate:snapshot.baseDate,series:snapshot.series,...(snapshot.hanaTransition?{hanaTransition:snapshot.hanaTransition}:{}),
   referencePolicy:snapshot.referenceBasis.version,
   providers:Object.fromEntries(Object.entries(snapshot.lineage).map(([key,value])=>[key,{
    provider:value.provider,providerDate:value.providerDate,providerUpdatedAt:value.providerUpdatedAt,
@@ -116,11 +117,11 @@ export function buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calenda
  const all=dataset.dailyRates.filter(r=>r.currency===currency&&r.rateType==='LOCAL_PER_USD')
  if(all.some(r=>!validDate(r.date)))throw new Error('invalid_stored_price_date')
  const current=getDashboardDaily(all,currency,dataset.baseDate),previous=getDashboardPreviousDaily(all,currency,dataset.baseDate)
- const change=getDashboardDailyChange(current,previous),holds=[]
+ const change=getDashboardDailyChange(current,previous,dataset),holds=[]
  const currentOrigin=referenceRowOrigin(all,current),previousOrigin=referenceRowOrigin(all,previous)
  const lineage={current:readDashboardPriceLineage(dataset,currentOrigin??current),previous:readDashboardPriceLineage(dataset,previousOrigin??previous)}
  const dataBinding=hash({baseDate:dataset.baseDate,fetchedAt:dataset.fetchedAt??null,
-  dataVersion:dataset.dataVersion??null,rows:all.map(project),lineage})
+  dataVersion:dataset.dataVersion??null,rows:all.map(project),lineage,...(dataset.hanaTransition?{hanaTransition:dataset.hanaTransition}:{} )})
  // Preserve first-row selection exactly as the dashboard does. Reject duplicates
  // for analysis rather than silently picking a different quote or merging prices.
  const counts=new Map();for(const r of all)counts.set(r.date,(counts.get(r.date)??0)+1)
@@ -135,6 +136,8 @@ export function buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calenda
  const expectedCurrent=calendar?.status==='confirmed'&&calendar.expectedReferenceDate===dataset.baseDate
   &&current?.date===dataset.baseDate
  if(dataset.baseDate<asOf.slice(0,10)&&!expectedCurrent)holds.push('older_saved_dataset_not_current_market')
+ const previousComparison=dataset.hanaTransition&&current?.date>=dataset.hanaTransition.effectiveFrom&&previous?hanaComparison(dataset,currency,previous.date):null
+ if(dataset.hanaTransition&&current?.date>=dataset.hanaTransition.effectiveFrom&&lineage.previous.provider!=='hana_bank'&&!previousComparison)holds.push('previous_source_comparison_missing')
  const series=all.filter(r=>r.date<=dataset.baseDate).map(project).sort((a,b)=>a.date.localeCompare(b.date))
  // Recorded response metadata is not a certification of a local market close.
  const recorded=lineage.current.status==='recorded'
@@ -156,6 +159,7 @@ export function buildSharedDashboardPriceSnapshot({dataset,currency,asOf,calenda
   ruleVersion:SHARED_REPORT_RULE_VERSION,currency,unit:`${currency}_per_USD`,dataBinding,
   baseDate:dataset.baseDate,fetchedAt:dataset.fetchedAt??null,dataVersion:dataset.dataVersion??null,
   current:project(current),previous:project(previous),
+  ...(dataset.hanaTransition?{hanaTransition:dataset.hanaTransition}:{}),...(previousComparison?{previousComparison}:{}),
   ...(current?.imputationMethod==='FFILL'||previous?.imputationMethod==='FFILL'?{carryForward:{
    version:'dashboard-carry-forward/1',currentOrigin:project(currentOrigin),previousOrigin:project(previousOrigin),
    meaning:'same_dashboard_value_not_new_market_observation',holidayConfirmed:false}}:{}),

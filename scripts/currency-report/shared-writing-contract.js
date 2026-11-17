@@ -1,6 +1,7 @@
 // Lossless projection of an already-bound reference/material packet. Hashes are
 // integrity checks, not new semantic review, publisher permission or approval.
 import {createHash} from 'node:crypto'
+import {hanaComparison} from '../../src/lib/hana-comparison.js'
 import {FX_REPORT_PRIORITY_VERSION,inspectFxPriority} from './fx-report-priority.js'
 import {isOfficialSnapshotBackground} from './official-statistic-availability.js'
 import {validMarketPeriod,samePeriod} from './news-period.js'
@@ -31,6 +32,11 @@ export function assertSharedPacket(packet) {
    ||Date.parse(e.publishedAt)>Date.parse(cutoff.asOf)||Date.parse(e.collectedAt)>Date.parse(cutoff.asOf)
    ||e.eventDate!=null&&e.eventDate>cutoff.asOf.slice(0,10))))throw Error('shared_material_cutoff_required')
  const edition=packet.sharedReference.edition
+ if(edition?.previous?.comparable){
+  const prior=edition.previous
+  const q=hanaComparison({hanaTransition:packet.sharedReference.hanaTransition,fetchedAt:packet.marketData?.fetchedAt},packet.currency,prior.observedDate)
+  if(!q||hash(q)!==hash(prior.comparable))throw Error('hana_published_comparison_required')
+ }
  if(edition?.kind==='periodic_check'){
   const p=edition.previous
   if(edition.version!=='shared-periodic-check/1'||edition.comparison!=='published_reference_and_explanation'

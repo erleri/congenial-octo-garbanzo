@@ -36,7 +36,7 @@ export interface ExcelMergeOptions {
 }
 
 export interface RemoteExchangeDataOptions {
-  hanaReference?: {effectiveFrom: string; quotes: {currency: CurrencyCode; date: string; value: number; source: FxPriceSource}[]}
+  hanaReference?: {transition?: ExchangeRateDataset['hanaTransition'];effectiveFrom: string; quotes: {currency: CurrencyCode; date: string; value: number; source: FxPriceSource}[]}
   supplementalHistoryByCurrency?: Record<string, Record<string, number>>
   supplementalPriceSources?: Record<string, FxPriceSource>
   manualBackfillByDate?: Record<string, Record<string, number>>
@@ -553,6 +553,7 @@ export async function fetchRemoteExchangeData(
     movingComparison: [],
     rawSheets: [],
     priceProvenance:provenance.finish(dailyRatesWithFill),
+    ...(options.hanaReference?.transition?{hanaTransition:options.hanaReference.transition}:{}),
   }
 
   const { year, month } = parseDateParts(endDate)

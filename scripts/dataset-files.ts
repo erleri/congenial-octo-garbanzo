@@ -4,6 +4,7 @@ import { dirname, resolve } from 'node:path'
 import type { DatasetCoverage, ExchangeRateDataset } from '../src/types/exchangeRate'
 import {prunePriceProvenance} from '../src/lib/price-provenance'
 import {validateReferenceArchive} from './dashboard-reference-archive'
+import {buildReferenceContext} from '../src/lib/reference-context'
 
 export const FULL_DATASET_PATH = resolve(process.cwd(), 'data', 'fx-full-history.json')
 export const STATIC_FALLBACK_PATH = resolve(process.cwd(), 'public', 'data.json')
@@ -88,6 +89,7 @@ export async function writeDatasetFiles(dataset: ExchangeRateDataset) {
   await Promise.all([
     writeFile(FULL_DATASET_PATH, `${JSON.stringify(fullDataset, null, 2)}\n`, 'utf8'),
     writeFile(STATIC_FALLBACK_PATH, `${JSON.stringify(staticFallback, null, 2)}\n`, 'utf8'),
+    writeFile(resolve(process.cwd(),'public','fx-reference-context.json'), JSON.stringify(buildReferenceContext(fullDataset,fullDataset.coverage!.dataVersion)), 'utf8'),
   ])
   return { fullDataset, staticFallback }
 }

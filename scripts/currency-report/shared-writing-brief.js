@@ -17,7 +17,7 @@ export function prepareSharedWritingBrief({handoff,writer='sol',purpose='market'
   ||c.ruleVersion!==s.ruleVersion||c.currency!==s.currency||c.referenceSnapshotId!==s.snapshotId||!Array.isArray(s.series))
   throw new Error('bound_shared_writing_material_required')
  const current=getDashboardDaily(s.series,s.currency,s.baseDate),previous=getDashboardPreviousDaily(s.series,s.currency,s.baseDate)
- const change=getDashboardDailyChange(current,previous),pct=Number.isFinite(change)?change*100:null
+ const change=getDashboardDailyChange(current,previous,{hanaTransition:s.hanaTransition,fetchedAt:s.fetchedAt}),pct=Number.isFinite(change)?change*100:null
  if(fingerprint(current??null)!==fingerprint(s.current)||fingerprint(previous??null)!==fingerprint(s.previous)
   ||pct!==s.changePct)throw new Error('shared_snapshot_numeric_projection_mismatch')
  const before=fingerprint(handoff),profile=writerProfile(writer),items=Object.values(c.sections).flat()
@@ -36,7 +36,7 @@ export function prepareSharedWritingBrief({handoff,writer='sol',purpose='market'
   currency:s.currency,referenceSnapshotId:s.snapshotId,referenceDate:s.baseDate,commentaryDate:c.commentaryDate,...(c.commentaryPeriod?{commentaryPeriod:periodIdentity(c.commentaryPeriod)}:{}),
   referencePolicy:{...s.referenceBasis},
   facts:[{factId:factId('current'),kind:'reference_rate',value:current.value,unit:s.unit,date:current.date},
-   {factId:factId('previous'),kind:'previous_reference_rate',value:previous.value,unit:s.unit,date:previous.date},
+   {factId:factId('previous'),kind:'previous_reference_rate',value:s.previousComparison?.value??previous.value,unit:s.unit,date:previous.date},
    {factId:factId('change'),kind:'reference_change_pct',value:s.changePct,unit:'percent',date:s.baseDate}],
   // Whitelist the prose contract. Acquisition bodies, judgments, historical
   // drafts/scores, approval and cost journals do not belong in writer input.

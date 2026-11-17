@@ -2,6 +2,7 @@
 import {validDate} from './core.js'
 import {fingerprint} from './research-harness.js'
 import {COUNTRY_REPORT_PROFILES,REPORT_REFERENCE_POLICY,SHARED_REPORT_RULE_VERSION,REPORT_CADENCE_POLICY_VERSION} from './shared-price-contract.js'
+import {hanaComparison} from '../../src/lib/hana-comparison.js'
 import {referenceRowOrigin} from './dashboard-reference-state.js'
 
 export const PUBLICATION_CADENCE_VERSION='publication-cadence/3'
@@ -59,13 +60,17 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
  if(!calendar||calendar.status!=='confirmed'||!validDate(calendar.expectedReferenceDate)||calendar.expectedReferenceDate>date)
   dataHolds.push('expected_reference_date_unverified')
  else if(snapshot.current?.date!==calendar.expectedReferenceDate)dataHolds.push('expected_reference_not_available')
- let cumulativePct=null
+ let cumulativePct=null,comparisonReference=null
  if(anchor&&!dataHolds.length){
   const old=anchor.snapshot
   if(snapshot.unit!==old.unit||snapshot.dateMeaning!==old.dateMeaning||snapshot.referenceBasis.version!==old.referenceBasis.version
    ||snapshot.ruleVersion!==old.ruleVersion)comparisonHolds.push('reference_definition_changed')
   const oldProvider=old.lineage?.current?.provider,currentProvider=snapshot.lineage?.current?.provider
-  if(oldProvider&&currentProvider&&oldProvider!==currentProvider)comparisonHolds.push('reference_provider_changed')
+  if(currentProvider==='hana_bank'&&oldProvider!=='hana_bank'){
+   comparisonReference=hanaComparison({hanaTransition:snapshot.hanaTransition,fetchedAt:snapshot.fetchedAt},currency,old.current.date)
+   if(!comparisonReference)comparisonHolds.push('reference_source_bridge_missing')
+   else comparisonDetails.push({reason:'same_date_hana_comparison',date:old.current.date,publishedValue:old.current.value,comparisonValue:comparisonReference.value,actualBankDate:comparisonReference.date,resolution:'preserve_publication_use_hana_comparator'})
+  }else if(oldProvider&&currentProvider&&oldProvider!==currentProvider)comparisonHolds.push('reference_provider_changed')
   const points=snapshot.series?.filter(r=>r.date===old.current.date&&r.currency===currency&&r.rateType==='LOCAL_PER_USD')??[]
   // Current history can be revised or rolled out of the retained window.
   // The approved publication's immutable snapshot remains the denominator.
@@ -74,7 +79,7 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
     currentHistoryValue:points[0].value,publishedProvider:oldProvider??null,currentProvider:currentProvider??null,
     resolution:'use_frozen_publication_value'})
   }
-  if(!comparisonHolds.length)cumulativePct=(snapshot.current.value/old.current.value-1)*100
+  if(!comparisonHolds.length)cumulativePct=(snapshot.current.value/(comparisonReference?.value??old.current.value)-1)*100
  }
  const correctionIds=correctionReportIds.filter(key=>publications.some(r=>r.id===key&&r.currency===currency
   &&r.state==='published'&&r.approved&&r.stored&&Date.parse(r.publishedAt)<=Date.parse(asOf)))
@@ -92,7 +97,7 @@ export function evaluatePublicationCadence({snapshot,asOf,publications=[],calend
  const status=duplicateCheck?'duplicate_check':correctionIds.length?'correction_required':policyStatus==='decision_pending'?'policy_pending'
   :hasPriceHold?'data_wait':!triggers.length?'no_active_trigger':openCase?'existing_case_update':'research_candidate'
  const result={version:PUBLICATION_CADENCE_VERSION,policyVersion:REPORT_CADENCE_POLICY_VERSION,currency,checkedOnKst:date,policyStatus,thresholdPct:threshold,
-  anchorId:anchor?.id??null,anchorBaseDate:anchor?reportBaseDate(anchor):null,anchorObservedDate:anchor?.snapshot.current.date??null,periodicDueDate:due,cumulativePct,
+  anchorId:anchor?.id??null,anchorBaseDate:anchor?reportBaseDate(anchor):null,anchorObservedDate:anchor?.snapshot.current.date??null,periodicDueDate:due,cumulativePct,...(comparisonReference?{comparisonReference}:{}),
   direction:cumulativePct===null?'unverified':cumulativePct>0?'local_currency_weaker':cumulativePct<0?'local_currency_stronger':'unchanged',
   status,triggers,caseId,checkId,duplicateCheck,dataHolds,comparisonHolds,comparisonDetails,correctionReportIds:correctionIds,
   researchAllowed:!duplicateCheck&&(correctionIds.length>0||eventCandidateIds.length>0||!hasPriceHold&&policyStatus!=='decision_pending'&&triggers.length>0),
