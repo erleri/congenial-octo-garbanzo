@@ -136,6 +136,10 @@ export function sharedMarketHeader(packet,draft,target) {
 }
 export function sharedOwnedChange(packet) {
  assertSharedPacket(packet)
+ if(packet.sharedReference.edition?.kind==='periodic_check'&&packet.sharedReference.edition.previous?.comparable)return {
+  title:'같은 하나은행 기준으로 비교한 환율 변화',
+  text:'기준환율은 {{spot}}이며, 전회 기준일의 하나은행 비교값은 {{comparable_previous}}, 같은 기준으로 계산한 누적 변화는 {{published_change}}입니다.',
+  kind:'fact',factIds:['spot','comparable_previous','published_change'],evidenceIds:[]}
  if(packet.sharedReference.edition?.kind==='periodic_check')return {title:'전회 발행 기준환율 대비 변화',
   text:'기준환율은 {{spot}}이며, 전회 발행 기준환율은 {{published_previous}}, 전회 대비 누적 변화는 {{published_change}}입니다.',
   kind:'fact',factIds:['spot','published_previous','published_change'],evidenceIds:[]}

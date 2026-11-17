@@ -6,6 +6,7 @@ import {runtimeFixture} from './currency-report/runtime-fixture.js'
 import {buildSharedDashboardPriceSnapshot} from './currency-report/shared-price-contract.js'
 import {evaluatePublicationCadence} from './currency-report/publication-cadence.js'
 import {prepareRuntimeTask} from './currency-report/runtime.js'
+import {sharedOwnedChange} from './currency-report/shared-writing-contract.js'
 import {fingerprint} from './currency-report/research-harness.js'
 import type {FxPriceSource,HanaComparisonQuote} from '../src/types/exchangeRate'
 import {buildReferenceContext,attachReferenceContext} from '../src/lib/reference-context'
@@ -47,6 +48,10 @@ it('preserves the report date and original value while comparing Hana against Ha
  expect(facts.find(f=>f.id==='published_previous').value).toBe(70)
  expect(facts.find(f=>f.id==='comparable_previous').value).toBe(100)
  expect(facts.find(f=>f.id==='published_change').value).toBeCloseTo(1.010101)
+ const owned=sharedOwnedChange(task.plan.packet)
+ expect(owned.factIds).toEqual(['spot','comparable_previous','published_change'])
+ expect(owned.text).toContain('전회 기준일의 하나은행 비교값은 {{comparable_previous}}')
+ expect(owned.text).not.toContain('{{published_previous}}')
 })
 it('holds a missing or changed comparison and resumes normal calculation for same-provider reports',()=>{
  const f=fixture()
