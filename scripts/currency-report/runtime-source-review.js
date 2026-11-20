@@ -76,7 +76,9 @@ export async function reviewRuntimeSources({collection,asOf,registry,processingR
    const invoke=fn=>async request=>{
     let r
     try{r=await fn(request,plan)}catch(error){
-     if(error.recordedGenerationCalls===1&&Number.isFinite(error.recordedCostUsd)&&error.recordedCostUsd>=0){
+     if(error.recordedGenerationCalls===1&&Number.isSafeInteger(error.reservedUnconfirmedNano)&&error.reservedUnconfirmedNano>0){
+      thisCalls++;modelCalls++;thisCost=null
+     }else if(error.recordedGenerationCalls===1&&Number.isFinite(error.recordedCostUsd)&&error.recordedCostUsd>=0){
       thisCalls++;modelCalls++;thisCost+=error.recordedCostUsd
       if(newPaidCostUsd!==null)newPaidCostUsd+=error.recordedCostUsd
      }else if(error.beforeDispatch!==true){modelCalls=null;newPaidCostUsd=null}

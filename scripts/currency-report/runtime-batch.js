@@ -13,6 +13,7 @@ import {countryContinuation} from './research-continuation.js'
 import {buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
 import {evaluatePublicationCadence} from './publication-cadence.js'
 import {admittedSourceCatalog} from './source-admission-catalog.js'
+import {fullyReservedReceipt} from './recovery-policy.js'
 
 // Scheduling hint only; supply still validates every date, use decision and
 // claim. Do not let an optional pending source precede ready initial drafts.
@@ -57,7 +58,8 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
   ||approval.countriesBinding!==fingerprint(countries)||approval.asOf!==asOf
   ||!Array.isArray(approval.sourcePlanBindings)||!Number.isFinite(approval.sourceBudgetUsd)
   ||approval.sourceBudgetUsd+writerUsd>approval.budgetUsd)throw Error('bound_operational_batch_budget_required')
- let calls=0,confirmedUsd=0,unknownCost=false
+ let calls=0,confirmedNano=0,reservedNano=0,unknownCost=false
+ const budgetNano=Math.round(approval.budgetUsd*1e9)
  const guardedSend=async args=>{
   if(unknownCost||calls>=approval.maxCalls)throw Error('batch_stopped_before_dispatch')
   calls++
@@ -68,13 +70,17 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
  const accountingStore={...store,
   reserve:async request=>{
    if(unknownCost||calls>=approval.maxCalls)return {reserved:false,reason:'batch_stopped_before_dispatch'}
-   if(confirmedUsd+request.reservedNano/1e9>approval.budgetUsd)return {reserved:false,reason:'batch_budget_hold'}
+   if(confirmedNano+reservedNano+request.reservedNano>budgetNano)return {reserved:false,reason:'batch_budget_hold'}
    return store.reserve(request)
   },
   receive:async(id,response,actual)=>{
-   try{await store.receive(id,response,actual)}catch(error){unknownCost=true;throw error}
-   if(actual===null){unknownCost=true;return}
-   confirmedUsd+=actual/1e9
+   let decision
+   try{decision=await store.receive(id,response,actual)}catch(error){unknownCost=true;throw error}
+   if(Number.isSafeInteger(actual)&&actual>=0)confirmedNano+=actual
+   else if(fullyReservedReceipt(decision))reservedNano+=decision.reservedNano
+   else unknownCost=true
+   if(decision?.scope==='global')unknownCost=true
+   return decision
   }}
  const sourceTransport=runtimeSourceTransport({store:accountingStore,env,
   approval:{version:'runtime-source-approval/1',planBindings:approval.sourcePlanBindings,
@@ -83,7 +89,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
  for(const {currency} of countryWorkOrder(REPORT_CURRENCIES.map(c=>countries.find(r=>r.currency===c)),retryCurrencies)){
   if(unknownCost){rows.push({currency,status:'batch_cost_unresolved_no_call',modelCalls:0});continue}
   if(excludedCountries.includes(currency)){rows.push({currency,status:'country_owned_by_prior_batch',modelCalls:0,publicationApproved:false});continue}
-  const country=countries.find(c=>c.currency===currency),beforeCalls=calls,beforeCost=confirmedUsd
+  const country=countries.find(c=>c.currency===currency),beforeCalls=calls,beforeCost=confirmedNano,beforeReserve=reservedNano
   // Preserve the bound planning decision before case claims, source calls or
   // cached-input staging. A valid old receipt cannot override a current hold.
   if(country.acquisitionError||country.preparation&&country.preparation.status!=='planned'){
@@ -128,7 +134,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
     generated={...generated,status:'source_dispatch_deferred'}
    await checkpoint(currency,'generation',generated)
    rows.push({currency,status:generated.status,sourceStatus:supply.status,purpose:supply.task?.purpose??null,
-    runId:generated.runId??null,modelCalls:calls-beforeCalls,confirmedUsd:confirmedUsd-beforeCost,
+    runId:generated.runId??null,modelCalls:calls-beforeCalls,confirmedUsd:(confirmedNano-beforeCost)/1e9,reservedUnconfirmedUsd:(reservedNano-beforeReserve)/1e9,
     reason:generated.reason??generated.cost?.reviewReason??null,waitingStage:generated.waitingStage??null,
     sourceHolds:supply.holds,sourceIssues:[...(supply.collectionIssues??[]),...(supply.sourceReviewIssues??[])],
     researchAssessment:supply.researchAssessment,sourceWorkMode:reusedInitial?'initial_from_independently_reviewed_evidence':'original_review_required',
@@ -137,15 +143,16 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
   }catch(error){
    if(isFatalRuntimeStoreError(error))throw error
    const reason=/^[a-z0-9_]+$/.test(error.message??'')?error.message:'runtime_batch_country_failed'
-   const row={currency,status:isTemporaryRuntimeStoreError(error)?'country_store_wait':'country_execution_hold',reason,runId:null,modelCalls:calls-beforeCalls,confirmedUsd:confirmedUsd-beforeCost,publicationApproved:false}
+   const row={currency,status:isTemporaryRuntimeStoreError(error)?'country_store_wait':'country_execution_hold',reason,runId:null,modelCalls:calls-beforeCalls,confirmedUsd:(confirmedNano-beforeCost)/1e9,reservedUnconfirmedUsd:(reservedNano-beforeReserve)/1e9,publicationApproved:false}
    rows.push(row);await checkpoint(currency,'failure',row)
   }
   rows.at(-1).continuation=countryContinuation(rows.at(-1))
   if(afterCountry)await afterCountry(country,rows.at(-1))
-  await checkpoint(currency,'progress',{rows,modelCalls:calls,confirmedUsd,unknownCost,publicationApproved:false})
+  await checkpoint(currency,'progress',{rows,modelCalls:calls,confirmedUsd:confirmedNano/1e9,reservedUnconfirmedUsd:reservedNano/1e9,unknownCost,publicationApproved:false})
  }
  return {version:'operational-report-batch/1',status:unknownCost?'batch_cost_unresolved':'completed_with_country_results',
   rows:[...rows].sort((a,b)=>REPORT_CURRENCIES.indexOf(a.currency)-REPORT_CURRENCIES.indexOf(b.currency)).map(row=>({...row,continuation:row.continuation??countryContinuation(row)})),
-  modelCalls:calls,confirmedUsd,costUsd:unknownCost?null:confirmedUsd,unknownCost,publicationApproved:false,manualEdits:0,
+  modelCalls:calls,confirmedUsd:confirmedNano/1e9,reservedUnconfirmedUsd:reservedNano/1e9,
+  costUsd:unknownCost||reservedNano>0?null:confirmedNano/1e9,unknownCost,publicationApproved:false,manualEdits:0,
   productionChanges:0,sourceReviewMeaning:'actual_original_extraction_and_comparison_then_bound_note_and_manuscript_review'}
 }

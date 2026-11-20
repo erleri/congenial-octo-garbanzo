@@ -11,6 +11,56 @@ import {NEWS_EVENT_DATE_VERSION} from './news-event-date.js'
 import {bindSelectedOriginalReview} from './selected-source-collection.js'
 import {buildSharedDashboardPriceSnapshot} from './shared-price-contract.js'
 
+it.each(['original_news_extract','original_news_compare','writer','currency_runtime_review'])(
+ 'isolates a terminal capacity receipt during %s and continues independent work',async stage=>{
+  const f=await operatingFixture(),send=f.send
+  const reservation={scope:'job',status:'cost_fully_reserved_unconfirmed',costConfirmed:false,reservedNano:193063750}
+  const recoveryJobs:object[]=[]
+  const receiveAccounted=vi.fn(async(id:string,response:object,actual:number|null)=>{
+   await f.store.receive(id,response,actual)
+   if(actual!==null)return null
+   const job=f.store.jobs.find(job=>job.id===id)
+   job.escrowed=true
+   return {...reservation,reservedNano:job.reservedNano}
+  })
+  const recordRecoveryLookup=vi.fn(async()=>{})
+  Object.assign(f.store,{receiveAccounted,recordRecoveryLookup,
+   recoveryPolicy:async()=>({enabled:true,terminalCostIsolation:true}),
+   recoveryCandidates:async()=>({items:recoveryJobs,nextCursor:null}),
+   decideRecovery:async()=>reservation})
+  let failed=0
+  f.send=async args=>{
+   const name=args.body.response_format.json_schema.name
+   const selected=stage==='writer'?!name.startsWith('original_news_')&&name!=='currency_runtime_review':stage===name
+   if(!failed&&selected){
+    failed++
+    return {valid:false,costUsd:null,responseId:'gen-synthetic-capacity',partialText:'',usage:null,
+     errors:['provider_stream_error'],httpStatus:200,providerError:{code:502,metadata:{error_type:'provider_unavailable'}}}
+   }
+   return send(args)
+  }
+  const reconcile=vi.fn(async()=>({costUsd:null,lookup:{reason:'record_not_found',httpStatus:404}}))
+  const result=await runOperatingCycle({...f,execute:true,reconcile})
+  expect(failed).toBe(1)
+  expect(result.rows.filter(row=>row.status==='pending_admin_review'),
+   JSON.stringify({statuses:result.rows.map(row=>[row.currency,row.status,row.reason]),reserved:result.reservedUnconfirmedUsd,
+    receive:receiveAccounted.mock.calls.map(row=>row[2])})).toHaveLength(5)
+  expect(result).toMatchObject({reservedUnconfirmedUsd:f.store.jobs.find(job=>job.escrowed).reservedNano/1e9,costUsd:null,unknownCost:false})
+  expect(operatingResultState(result)).toMatchObject({kind:'review_wait',exitCode:0})
+  const receiptCalls=receiveAccounted.mock.calls.length
+  recoveryJobs.push({id:'synthetic',currency:'BRL',state:'received',cost_state:'unknown',escrowed:true,
+   scope:'job',response_id:'gen-synthetic-capacity',lookupDue:true})
+  await runOperatingCycle({...f,execute:false,reconcile})
+  expect(recordRecoveryLookup).not.toHaveBeenCalled()
+  for(let i=0;i<2;i++){
+   const repeat=await runOperatingCycle({...f,execute:true,reconcile})
+   expect(repeat.recovery).toMatchObject({status:'clear',items:[{status:'cost_fully_reserved_unconfirmed'}]})
+   expect(repeat.modelCalls).toBe(0)
+  }
+  expect(recordRecoveryLookup).toHaveBeenCalledTimes(2)
+  expect(receiveAccounted).toHaveBeenCalledTimes(receiptCalls)
+ })
+
 it('uses the frozen published reference after a history update without blocking supply, rebasing or spending',async()=>{
  const f=await operatingFixture(),currency='BRL',calendar=f.calendarByCurrency[currency]
  const old=buildSharedDashboardPriceSnapshot({dataset:f.dataset,currency,asOf:f.asOf,calendar})

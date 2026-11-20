@@ -133,6 +133,8 @@ export function createRuntimeStore({url,key,mode,env={},client}) {
   begin:(id,hash)=>rpc('begin_currency_report_runtime',{p_id:id,p_request_hash:hash}),
   checkpoint:(id,checkpoint)=>rpc('checkpoint_currency_report_runtime',{p_id:id,p_checkpoint:checkpoint}),
   receive:(id,response,actual)=>rpc('receive_currency_report_runtime',{p_id:id,p_response:preserveOrder(response,'serializedRuntimeResponse'),p_actual_nano:actual}),
+  receiveAccounted:(id,response,actual,owner)=>rpc('receive_currency_report_runtime_accounted',{
+   p_id:id,p_response:preserveOrder(response,'serializedRuntimeResponse'),p_actual_nano:actual,p_owner:owner}),
   reconcile:(id,responseId,actual,receipt)=>rpc('reconcile_currency_report_runtime_cost',{p_id:id,p_response_id:responseId,p_actual_nano:actual,p_receipt:receipt}),
   finish:(id,candidate,validation,cost)=>rpc('finish_currency_report_runtime',{p_id:id,p_candidate:candidate,p_validation:validation,p_cost:cost}),
  }

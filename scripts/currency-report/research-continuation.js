@@ -15,6 +15,8 @@ export function sourceContinuation(item) {
   category='superseded';action='prepare_current_input';resumeWhen='next_cycle_with_current_input_and_original_budget_gates'
  }else if(match(reasons,/recovery_(?:next_execution_wait|route_wait|retry_wait)/)){
   category='temporary';action='resume_saved_stages';resumeWhen='next_authorized_execution_after_cooldown';resumeExact=true
+ }else if(match(reasons,/cost_fully_reserved_unconfirmed/)){
+  category='accounting_reserved';action='hold_failed_request';resumeWhen='different_eligible_request'
  }else if(match(reasons,/recovery_retry_exhausted|response_failed_no_automatic_retry/)){
   category='output';action='find_other_evidence';resumeWhen='new_material_or_operator_review'
  }else if(match(reasons,/cost_unresolved|cost_reconciliation|existing_source_call_not_reusable|unresolved_or_inflight|recovery_accounting_hold/)){

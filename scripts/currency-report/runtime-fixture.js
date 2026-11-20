@@ -42,7 +42,7 @@ export function memoryRuntimeStore() {
    actual_nano:j.actual,reserved_nano:j.reservedNano,request_hash:j.requestHash,context:j.context,response:j.response}):null},
   reserve:async r=>{
    if(jobs.some(j=>j.taskKey===r.taskKey))return {reserved:false,reason:'duplicate_task'}
-   if(jobs.some(j=>j.costState==='unknown'||['reserved','calling'].includes(j.state)))return {reserved:false,reason:'unresolved_or_inflight_call'}
+   if(jobs.some(j=>j.costState==='unknown'&&!j.escrowed||['reserved','calling'].includes(j.state)))return {reserved:false,reason:'unresolved_or_inflight_call'}
    const id=randomUUID();jobs.push({...structuredClone(r),id,state:'reserved',costState:'reserved'});return {reserved:true,id}
   },
   begin:async(id,hash)=>{const j=jobs.find(j=>j.id===id);if(j?.state!=='reserved'||j.requestHash!==hash||!config.enabled)return false;j.state='calling';j.costState='unknown';return true},

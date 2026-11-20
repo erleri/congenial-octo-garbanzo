@@ -152,6 +152,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(path.resolve(process.argv[1]
    `\n### Currency report execution\n\n${outcome.kind==='action_required'||outcome.kind==='failure'?'기술 장애':outcome.kind==='review_wait'?'관리자 검토 대기':outcome.kind==='waiting'?'자료 보류':result.status==='no_report_due'?'대상 없음':'준비 완료'} (${result.status}). Model calls: ${Number.isInteger(result.modelCalls)?result.modelCalls:'unconfirmed'}. Publication: administrator review required.\n`
    +(result.storage?`\nStorage: ${result.storage.rawBytes} raw bytes → ${result.storage.compressedBytes} gzip bytes. Manifest: ${result.storage.manifestBytes} bytes. New: ${result.storage.newBytes}; reusable: ${result.storage.reusedBytes}.\n`:'')
    +(result.recovery?.items?.length?'\nRecovery: '+result.recovery.items.map(i=>`${i.currency??'shared'}: ${i.status} (${i.scope??'unverified'})${i.lookupReason?' / '+i.lookupReason:''}`).join('; ')+'.\n':'')
+   +(result.reservedUnconfirmedUsd>0?`\n이번 실행의 미확정 예약 ${result.reservedUnconfirmedUsd.toFixed(9)} USD.\n`:'')
+   +(result.rows?.length?'\n통화별 결과: '+result.rows.map(r=>`${r.currency} ${r.status}${r.reservedUnconfirmedUsd>0?' (개별 보류·예약 유지)':''}`).join(' / ')+'.\n':'')
    +(result.incident?.recordFailure?'\nIncident record failed. Check report job logs; do not treat the workflow as healthy.\n':''))
   process.exitCode=outcome.exitCode
  })
