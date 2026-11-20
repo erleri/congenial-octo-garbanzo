@@ -7,6 +7,7 @@ import {encodeReviewInput} from './review-transport.js'
 import {COMPACT_REVIEW_VERSION,compactReviewContract,decodeCompactReview} from './compact-review.js'
 import {withoutOptionalBackground} from './runtime-material-selection.js'
 import {selectRuntimeAttempt,terminalRateLimit} from './runtime-retry.js'
+import {fullyReservedReceipt} from './recovery-policy.js'
 import {publicSourceDelivery} from './public-source-delivery.js'
 import {assertRuntimeDocumentCapacity} from './runtime-document.js'
 import {RUNTIME_ASSEMBLY_VERSION,DEFAULT_RUNTIME_REVIEWER} from './runtime-assembly.js'
@@ -239,6 +240,8 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   }
   const unsent=prior?.state==='cancelled'&&prior.actual_nano===0&&prior.checkpoint?.phase==='unsent_released_never_dispatched'
   if(prior&&!unsent){
+   if(prior.request_hash===hash&&prior.cost_state==='unknown'&&await store.costEscrow?.(prior.id))
+    return {status:'cost_fully_reserved_unconfirmed',waitingStage:stage, reservedUsd:prior.reserved_nano/1e9}
    if(attempt.policyActive&&prior.cost_state==='confirmed'&&prior.actual_nano<=prior.reserved_nano&&!prior.response?.valid)
     return {status:'response_failed_no_automatic_retry'}
    if(prior.request_hash!==hash||prior.cost_state!=='confirmed'||prior.actual_nano>prior.reserved_nano
@@ -267,7 +270,8 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
    if(response.costUsd===null&&response.responseId)response={...response,...await reconcile({responseId:response.responseId})}
   } catch {response={valid:false,costUsd:null,errors:['transport_or_checkpoint_failure'],generationCalls:1}}
   // Failure here deliberately leaves a durable unknown reservation. No retry.
-  await store.receive(reservation.id,safe(response),typeof response.costUsd==='number'?runtimeNano(response.costUsd):null)
+  const receipt=await store.receive(reservation.id,safe(response),typeof response.costUsd==='number'?runtimeNano(response.costUsd):null)
+  if(fullyReservedReceipt(receipt))return {status:'cost_fully_reserved_unconfirmed',waitingStage:stage,reservedUsd:receipt.reservedNano/1e9}
   const costKnown=typeof response.costUsd==='number'&&Number.isFinite(response.costUsd)&&response.costUsd>=0
   const correctModel=response.actualModel===selected.body.model||response.actualModel?.startsWith(selected.body.model+'-20')
   const terminal=attempt.policyActive&&terminalRateLimit({state:'received',response})
@@ -297,6 +301,8 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
    validation=assessRuntimeReview(compiled,reviewBody,{model:reviewing.response.actualModel,route:selected.profile.route}).validation
   }
  } catch(error) {reviewing={...reviewing,status:'review_output_hold',reason:/^[a-z_]+$/.test(error.message??'')?error.message:'review_validation_failed'}}
+ if(reviewing.status==='cost_fully_reserved_unconfirmed')
+  return {status:reviewing.status,waitingStage:'reviewer',modelCalls:calls,reservedUsd:reviewing.reservedUsd,publicationApproved:false}
  const reviewReceived=reviewing.id&&reviewing.response
  const unknownCost=Boolean(reviewReceived&&reviewing.response.costUsd===null)
  const confirmedUsd=writing.response.costUsd+(reviewReceived&&typeof reviewing.response.costUsd==='number'?reviewing.response.costUsd:0)

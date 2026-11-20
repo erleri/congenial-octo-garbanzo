@@ -13,12 +13,12 @@ const continuation=c=>c?{...scalar(c,['category','action','resumeExact','status'
 // batch checkpoint or change the original case/job records to make it fit.
 export function operatingCheckpoint(result,batchKey) {
  if(Buffer.byteLength(JSON.stringify(result),'utf8')<24000)return result
- const compact={...scalar(result,['status','reason','modelCalls','costUsd','newPaidCostUsd','confirmedUsd','unknownCost','manualEdits','publicationApproved']),
+ const compact={...scalar(result,['status','reason','modelCalls','costUsd','newPaidCostUsd','confirmedUsd','reservedUnconfirmedUsd','unknownCost','manualEdits','publicationApproved']),
   version:'operating-checkpoint/1',batchKey,detailDigest:fingerprint(result),checkpointOutcome:operatingResultState(result),
   detailStorage:{countryResults:'app_private.currency_report_operating_cases',
    inputEditions:'app_private.currency_report_operating_batches.payload',lookup:'batch_key',
    collectionDiagnostics:'full_execution_return_digest_only'},
-  holds:codes(result.holds),rows:(result.rows??[]).map(r=>({...scalar(r,['currency','status','sourceStatus','purpose','caseId','runId','modelCalls','costUsd','confirmedUsd','newPaidCostUsd','unknownCost']),
+  holds:codes(result.holds),rows:(result.rows??[]).map(r=>({...scalar(r,['currency','status','sourceStatus','purpose','caseId','runId','modelCalls','costUsd','confirmedUsd','newPaidCostUsd','reservedUnconfirmedUsd','unknownCost']),
    holds:codes([...(r.holds??[]),...(r.sourceHolds??[])]),continuation:continuation(r.continuation),detailDigest:fingerprint(r)})),
   collectionResults:(result.collectionResults??[]).map(r=>({...scalar(r,['currency','status','referenceStatus','candidates']),
    lookupFailures:r.lookupFailures?.length?[{status:'see_execution_diagnostics',count:r.lookupFailures.length}]:[],detailDigest:fingerprint(r)}))}

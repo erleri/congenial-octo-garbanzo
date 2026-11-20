@@ -8,6 +8,7 @@ import {endpointDiagnostic} from './endpoint-metadata.js'
 import {runtimeNano,runtimeMode} from './runtime.js'
 import {selectRuntimeAttempt} from './runtime-retry.js'
 import {terminalRateLimit} from './runtime-retry.js'
+import {fullyReservedReceipt} from './recovery-policy.js'
 
 export function runtimeSourceTransport({store,env,approval,preflight,send,reconcile=async()=>({costUsd:null})}) {
  let calls=0,committed=0,stopped=false,stoppedReason='source_runtime_stopped'
@@ -30,6 +31,8 @@ export function runtimeSourceTransport({store,env,approval,preflight,send,reconc
   const reuse=cached?.state==='received'||cached?.state==='held'
   const unsent=cached?.state==='cancelled'&&cached.actual_nano===0&&cached.checkpoint?.phase==='unsent_released_never_dispatched'
   if(cached&&!unsent){
+   if(cached.request_hash===request.requestHash&&cached.cost_state==='unknown'&&await store.costEscrow?.(cached.id))
+    before('cost_fully_reserved_unconfirmed')
    if(policyActive&&cached.cost_state==='confirmed'&&cached.actual_nano<=cached.reserved_nano&&!cached.response?.valid)
     before('response_failed_no_automatic_retry')
    if(!reuse||cached.cost_state!=='confirmed'||cached.actual_nano>cached.reserved_nano
@@ -70,9 +73,18 @@ export function runtimeSourceTransport({store,env,approval,preflight,send,reconc
    }})
    if(response.costUsd===null&&response.responseId)response={...response,...await reconcile({responseId:response.responseId})}
   }catch{response={valid:false,costUsd:null,generationCalls:1,errors:['source_transport_or_storage_checkpoint_failure']}}
-  await store.receive(reservation.id,response,typeof response.costUsd==='number'?runtimeNano(response.costUsd):null)
+  const receipt=await store.receive(reservation.id,response,typeof response.costUsd==='number'?runtimeNano(response.costUsd):null)
+  if(fullyReservedReceipt(receipt)){
+   committed+=receipt.reservedNano/1e9
+   const failure=Error('cost_fully_reserved_unconfirmed')
+   failure.recordedGenerationCalls=1
+   failure.reservedUnconfirmedNano=receipt.reservedNano
+   throw failure
+  }
   if(typeof response.costUsd!=='number'||response.costUsd<0){stopped=true;committed+=request.maximumUsd;throw Error('source_cost_unresolved')}
   committed+=response.costUsd
+  if(receipt?.scope==='job'&&receipt.status==='response_failed_no_automatic_retry')
+   knownFailure(receipt.status,response.costUsd)
   if(terminalRateLimit({state:'received',response})&&(await store.recoveryPolicy?.())?.enabled){
    stopped=true;stoppedReason='recovery_retry_wait';knownFailure(stoppedReason,response.costUsd)
   }

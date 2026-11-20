@@ -5,6 +5,11 @@ const reasons=new Set(['confirmed','record_not_found','authentication_error','pe
  'provider_error','http_error','timeout','network_error','invalid_json','identity_mismatch','completion_not_confirmed','cost_missing','lookup_error'])
 export const recoveryLookup=cost=>({version:'generation-cost-lookup/1',reason:reasons.has(cost?.lookup?.reason)?cost.lookup.reason:'lookup_error',
  httpStatus:Number.isInteger(cost?.lookup?.httpStatus)?cost.lookup.httpStatus:null})
+export function fullyReservedReceipt(decision) {
+ return decision?.status==='cost_fully_reserved_unconfirmed'&&decision.scope==='job'&&decision.costConfirmed===false
+  &&Number.isSafeInteger(decision.reservedNano)&&decision.reservedNano>0&&decision.reservedNano<=250000000
+}
+
 async function recoveryJobs(store){
  const jobs=[];let cursor=null
  do{const page=await store.recoveryCandidates(cursor);jobs.push(...page.items);cursor=page.nextCursor}while(cursor)
@@ -40,5 +45,6 @@ export async function recoverWithPolicy({store,reconcile,executionId=randomUUID(
    items.push({id:job.id,currency:job.currency,...decision,...(cost?.lookup?{lookupReason:recoveryLookup(cost).reason}:{})})
    if(decision.scope==='global')globalHold=true
   }
- return {status:globalHold?'action_required':'clear',version:'runtime-recovery/1',items,modelCalls:0,executionId}
+ return {status:globalHold?'action_required':'clear',version:'runtime-recovery/1',items,modelCalls:0,executionId,
+  terminalCostIsolation:policy?.terminalCostIsolation===true&&!diagnosticOnly}
 }

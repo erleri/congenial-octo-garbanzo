@@ -11,7 +11,7 @@ import {restoreOperatingPayload,runtimePublications,assertStagedRuntimeInput,isT
 import {buildSharedDashboardPriceSnapshot,referenceEdition} from './shared-price-contract.js'
 import {evaluatePublicationCadence} from './publication-cadence.js'
 import {recoverOperatingCalls} from './operating-recovery.js'
-import {inspectRecoveryPolicy} from './recovery-policy.js'
+import {fullyReservedReceipt,inspectRecoveryPolicy} from './recovery-policy.js'
 import {runtimeMode} from './runtime.js'
 import {acquireRuntimeResearch} from './runtime-supply.js'
 import {reuseOperatingSources,operatingSourceRecords,operatingMaterialHash,persistDeferredSources} from './operating-source-cache.js'
@@ -125,17 +125,24 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  }
  // A single invocation keeps one shared spending/call ceiling across original
  // accounting envelopes. DB monthly, per-envelope and one-time gates still apply.
- const spending={calls:0,confirmedNano:0,unknown:false}
+ const spending={calls:0,confirmedNano:0,reservedNano:0,unknown:false}
+ const receive=recovery?.terminalCostIsolation&&store.receiveAccounted
+  ?(id,response,actual)=>store.receiveAccounted(id,response,actual,owner)
+  :(...args)=>store.receive(...args)
  const budgetedStore={...store,reserve:async request=>{
   if(spending.unknown)return {reserved:false,reason:'unresolved_or_inflight_call'}
-  if(spending.calls>=policy.limits.maxCalls||spending.confirmedNano+request.reservedNano>Math.round(policy.limits.batchUsd*1e9))
+if(spending.calls>=policy.limits.maxCalls||spending.confirmedNano+spending.reservedNano+request.reservedNano>Math.round(policy.limits.batchUsd*1e9))
    return {reserved:false,reason:'batch_budget_hold'}
   return store.reserve(request)
  },receive:async(...args)=>{
-  try{await store.receive(...args)}catch(error){spending.unknown=true;throw error}
+  let decision
+  try{decision=await receive(...args)}catch(error){spending.unknown=true;throw error}
   const actual=args[2]
-  if(!Number.isSafeInteger(actual)||actual<0)spending.unknown=true
-  else spending.confirmedNano+=actual
+  if(Number.isSafeInteger(actual)&&actual>=0)spending.confirmedNano+=actual
+  else if(fullyReservedReceipt(decision))spending.reservedNano+=decision.reservedNano
+  else spending.unknown=true
+  if(decision?.scope==='global')spending.unknown=true
+  return decision
  }}
  const guardedSend=typeof send==='function'?async args=>{
   spending.calls++
@@ -172,7 +179,8 @@ export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,s
  return {version:'operational-report-cycle/2',status:recoveryRequired?'cost_or_execution_recovery_required':results.some(r=>r.status==='paused')?'paused':'completed_with_country_results',
   batchKey:results[0]?.batchKey??freshKey,rows:[...rows.values()],executionBatches:results,
   collectionResults:prepared.collectionResults,modelCalls:spending.calls,confirmedUsd:spending.confirmedNano/1e9,
-  costUsd:spending.unknown?null:spending.confirmedNano/1e9,unknownCost:spending.unknown,
+  reservedUnconfirmedUsd:spending.reservedNano/1e9,
+  costUsd:spending.unknown||spending.reservedNano>0?null:spending.confirmedNano/1e9,unknownCost:spending.unknown,
   publicationApproved:false,manualEdits:0,productionChanges:0}
 }
 

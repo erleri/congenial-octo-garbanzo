@@ -29,7 +29,9 @@ export default function ReportRecoveryStatus(){
 }
 export function ReportRecoveryView({value}:{value:Recovery}){
  return <section aria-label="공통 복구 상태"><h4>공통 복구</h4><p>자동 복구 정책 {value.policy.enabled?'활성':'비활성'} · 추가 재시도 최대 1회</p>
- {value.globalBlocked&&<p>새 유료 처리 공통 보류 · 기존 공개 리포트와 환율은 유지됩니다.</p>}
+ {value.globalBlocked&&<p>새 유료 처리 공통 보류 · 보호 중지</p>}
+ {!value.globalBlocked&&value.items.some(i=>i.scope==='job'&&i.costState==='unknown')&&
+  <p>미확정 예약을 예산에 포함합니다. 다른 적격 작업은 남은 예산과 경로 상태에 따라 처리합니다.</p>}
  {(value.totalItems??0)>value.items.length&&<p className="table-help">전체 {value.totalItems}건 중 최근 {value.items.length}건 표시 · 공통 차단 여부는 전체 기록 기준입니다.</p>}
  {value.items.length>0&&<p className="table-help">미확정 예약은 확정 청구액이 아닙니다. 원고 승인으로 정산하지 않으며 자동 비용 조회와 복구 기록을 유지합니다. 개별 분리 상태는 다른 적격 작업을 막지 않습니다.</p>}
  {!value.items.length?<p className="table-help">저장된 복구 판정이 없습니다.</p>:<ul>{value.items.map(i=><li key={i.id}>
