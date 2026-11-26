@@ -2,6 +2,7 @@
 // they are not current advertised prices or execution/endpoint authorization.
 import {generationWire,GENERATION_WIRE_INSTRUCTIONS,assertGenerationWireRequest} from './generation-wire.js'
 import {requestTokenBound} from './request-budget.js'
+import {endpointError} from './endpoint-metadata.js'
 
 export const WRITER_POLICY_VERSION='local-writer-policy/2'
 export const DEFAULT_WRITER='sol'
@@ -64,16 +65,24 @@ export function writerReservation(body,profile) {
 // The caller supplies saved catalogs for offline tests or verified live catalogs
 // immediately before a separately approved call. No network or keys here.
 export function inspectWriterEndpoint(body,record,catalog,zdr) {
- const p=assertWriterPolicy(body,record),input=requestTokenBound(body)
+ let profile
+ try{profile=assertWriterPolicy(body,record)}catch{throw endpointError('request_configuration')}
+ return inspectWriterEndpointProfile(profile,catalog,zdr,body)
+}
+export function inspectWriterEndpointProfile(p,catalog,zdr,body=null) {
+ const input=body?requestTokenBound(body):0
  const e=catalog?.data?.endpoints?.find(e=>e.tag===p.route)
  const price=(v,max)=>v!=null&&Number.isFinite(Number(v))&&Number(v)>=0&&Number(v)<=max/1e6
- if(!e||e.model_id!==p.model||e.status!==0||!zdr?.data?.some(x=>x.model_id===p.model&&x.tag===p.route)
-  ||!['reasoning','response_format','structured_outputs',p.outputField].every(x=>e.supported_parameters?.includes(x))
-  ||Object.keys(body).some(k=>!['model','messages','provider','stream'].includes(k)&&!e.supported_parameters?.includes(k))
-  ||input>p.inputTokens||e.context_length<input+p.outputTokens||e.max_completion_tokens<p.outputTokens
+ if(!e||e.model_id!==p.model||e.status!==0)throw endpointError('route_unavailable')
+ if(!zdr?.data?.some(x=>x.model_id===p.model&&x.tag===p.route))throw endpointError('processing_conditions')
+ if(!['reasoning','response_format','structured_outputs',p.outputField].every(x=>e.supported_parameters?.includes(x))
+  ||Object.keys(body??{}).some(k=>!['model','messages','provider','stream'].includes(k)&&!e.supported_parameters?.includes(k)))
+  throw endpointError('unsupported_parameters')
+ if(input>p.inputTokens||!Number.isFinite(e.context_length)||e.context_length<input+p.outputTokens
+  ||!Number.isFinite(e.max_completion_tokens)||e.max_completion_tokens<p.outputTokens
   ||!price(e.pricing?.prompt,p.prompt)||!price(e.pricing?.completion,p.completion)
   ||!price(e.pricing?.internal_reasoning??e.pricing?.completion,p.completion)
   ||['input_cache_read','input_cache_write','input_cache_write_1h'].some(k=>e.pricing[k]!==undefined&&!price(e.pricing[k],p.inputReservation))
-  ||Number(e.pricing?.request??0)!==0||e.pricing?.overrides?.some(x=>x.min_prompt_tokens<=input))throw new Error('writer_endpoint_privacy_support_or_price_hold')
+  ||Number(e.pricing?.request??0)!==0||e.pricing?.overrides?.some(x=>x.min_prompt_tokens<=input))throw endpointError('price_or_input_limit')
  return {model:p.model,route:p.route,zdr:true,dataCollection:'deny',pricing:e.pricing,modelCalls:0}
 }

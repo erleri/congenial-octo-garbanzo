@@ -261,6 +261,7 @@ export async function supplyRuntimeInput({dataset,currency,asOf,calendar,comment
     result.newPaidCostUsd=reviewed.newPaidCostUsd===null?null:result.newPaidCostUsd===null?null:result.newPaidCostUsd+reviewed.newPaidCostUsd
     result.sourceReviewIssues=(reviewed.items??[]).map(i=>({sourceId:reviewCollection.reviewQueue.find(c=>c.binding===i.cardBinding)?.sourceId??null,
      status:i.status,reason:i.reason??null,continuation:i.continuation??null,
+     ...(i.diagnostic?{diagnostic:i.diagnostic}:{}),
      holds:[...new Set([...(i.holds??[]),...(i.reason?[i.reason]:[])])]}))
     log.push({stage:'source_review',status:reviewed.status??'returned',modelCalls:reviewed.modelCalls,costUsd:reviewed.newPaidCostUsd})
     const reviewedSession=latestReviewedMarketSession({materialInputs:reviewed.materialInputs,currency,asOf,

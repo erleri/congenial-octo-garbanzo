@@ -13,7 +13,7 @@ import {fingerprint} from './research-harness.js'
 import {koreaDate} from './publication-cadence.js'
 
 export async function runRuntimeWorker({env=process.env,currency,store,loadDataset=loadOperationalFxDataset,
- asOf=new Date().toISOString(),preflight,send,reconcile,supplyInput,testOnly=false}={}) {
+ asOf=new Date().toISOString(),preflight,preflightWriterProfile,send,reconcile,supplyInput,testOnly=false}={}) {
  const mode=runtimeMode(env)
  if(mode!=='currency')return {status:mode,modelCalls:0,publicationApproved:false}
  if(!REPORT_CURRENCIES.includes(currency))throw Error('one_registered_runtime_currency_required')
@@ -43,7 +43,7 @@ export async function runRuntimeWorker({env=process.env,currency,store,loadDatas
   const apiKey=env.OPENROUTER_API_KEY
   const result=await runCurrencyRuntime({task,dataset,asOf,publications,env,store,testOnly,
    preflight:preflight??((body,profile)=>eventTrialEndpointPreflight(body,fetch,profile)),
-   send:send??(args=>callOpenRouterStream({...args,apiKey,timeoutMs:120000,maxBytes:250000})),
+   preflightWriterProfile,send:send??(args=>callOpenRouterStream({...args,apiKey,timeoutMs:120000,maxBytes:250000})),
    reconcile:reconcile??(args=>reconcileGenerationCost({...args,apiKey}))})
   return record(result,dataset.baseDate)
  } catch {

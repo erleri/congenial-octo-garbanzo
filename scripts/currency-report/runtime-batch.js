@@ -33,7 +33,7 @@ export function countryWorkOrder(countries,retryCurrencies=[]){
 }
 
 export async function runOperationalReportBatch({dataset,countries,asOf,store,env,approval,sourcePlan,sourceRegister,registry,processingRules,
- preflightSource,preflightWriter,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],retryCurrencies=[],testOnly=false,writer='sol',reviewer,sourceAdmissionState}) {
+ preflightSource,preflightWriter,preflightWriterProfile,checkWriterProfiles,send,reconcile,checkpoint=async()=>{},beforeCountry,afterCountry,excludedCountries=[],retryCurrencies=[],testOnly=false,writer='sol',reviewer,sourceAdmissionState}) {
  if(sourceAdmissionState){
   const expanded=admittedSourceCatalog({sourcePlan,sourceRegister,state:sourceAdmissionState,asOf})
   if(expanded.binding!==approval?.sourceAdmissionBinding)throw Error('source_admission_snapshot_changed')
@@ -84,7 +84,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
   }}
  const sourceTransport=runtimeSourceTransport({store:accountingStore,env,
   approval:{version:'runtime-source-approval/1',planBindings:approval.sourcePlanBindings,
-   budgetUsd:approval.sourceBudgetUsd,maxCalls:sourceCalls},preflight:preflightSource,send:guardedSend,reconcile})
+   budgetUsd:approval.sourceBudgetUsd,maxCalls:sourceCalls},preflight:preflightSource,checkWriterProfiles,send:guardedSend,reconcile})
  const rows=[]
  for(const {currency} of countryWorkOrder(REPORT_CURRENCIES.map(c=>countries.find(r=>r.currency===c)),retryCurrencies)){
   if(unknownCost){rows.push({currency,status:'batch_cost_unresolved_no_call',modelCalls:0});continue}
@@ -128,14 +128,18 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
    await checkpoint(currency,'supply',supply)
    let generated={status:supply.status,modelCalls:0,publicationApproved:false}
    if(supply.staged&&!unknownCost)generated=await runRuntimeWorker({env,currency,asOf,store:accountingStore,
-    loadDataset:async()=>dataset,preflight:preflightWriter,send:guardedSend,reconcile,testOnly})
+    loadDataset:async()=>dataset,preflight:preflightWriter,preflightWriterProfile,send:guardedSend,reconcile,testOnly})
    if(!supply.staged&&!unknownCost&&(supply.sourceReviewIssues?.some(i=>i.status==='source_budget_deferred')
     ||country.collection.retainedResearch?.omitted?.length))
     generated={...generated,status:'source_dispatch_deferred'}
+   const downstreamHold=supply.sourceReviewIssues?.find(i=>i.reason?.startsWith('writer_endpoint_'))
+   if(!supply.staged&&downstreamHold)generated={...generated,status:'runtime_endpoint_preflight_wait',
+    reason:downstreamHold.reason,endpointDiagnostic:downstreamHold.diagnostic,waitingStage:downstreamHold.diagnostic?.stage}
    await checkpoint(currency,'generation',generated)
    rows.push({currency,status:generated.status,sourceStatus:supply.status,purpose:supply.task?.purpose??null,
     runId:generated.runId??null,modelCalls:calls-beforeCalls,confirmedUsd:(confirmedNano-beforeCost)/1e9,reservedUnconfirmedUsd:(reservedNano-beforeReserve)/1e9,
     reason:generated.reason??generated.cost?.reviewReason??null,waitingStage:generated.waitingStage??null,
+    ...(generated.endpointDiagnostic?{endpointDiagnostic:generated.endpointDiagnostic}:{}),
     sourceHolds:supply.holds,sourceIssues:[...(supply.collectionIssues??[]),...(supply.sourceReviewIssues??[])],
     researchAssessment:supply.researchAssessment,sourceWorkMode:reusedInitial?'initial_from_independently_reviewed_evidence':'original_review_required',
     pendingOriginalReviews:(supply.sourceReviewIssues??[]).filter(i=>i.status==='pending_original_review_not_admitted').length,

@@ -39,10 +39,11 @@ describe('local common writer selection',()=>{
    max_completion_tokens:9000,context_length:100000,pricing:{prompt:'0.000002',completion:'0.00001',input_cache_write:'0.0000025'}}
   const catalog={data:{endpoints:[endpoint]}},zdr={data:[endpoint]}
   expect(inspectWriterEndpoint(a.body,p,catalog,zdr).modelCalls).toBe(0)
-  for(const e of [{...endpoint,supported_parameters:[]},{...endpoint,pricing:{...endpoint.pricing,input_cache_write:'0.000003'}},
+  expect(()=>inspectWriterEndpoint(a.body,p,{data:{endpoints:[{...endpoint,supported_parameters:[]}]}},zdr)).toThrow('source_endpoint_unsupported_parameters')
+  for(const e of [{...endpoint,pricing:{...endpoint.pricing,input_cache_write:'0.000003'}},
     {...endpoint,pricing:{...endpoint.pricing,internal_reasoning:'0.000011'}},{...endpoint,pricing:{...endpoint.pricing,request:'.01'}}])
-   expect(()=>inspectWriterEndpoint(a.body,p,{data:{endpoints:[e]}},zdr)).toThrow('writer_endpoint_privacy_support_or_price_hold')
-  expect(()=>inspectWriterEndpoint(a.body,p,catalog,{data:[]})).toThrow('writer_endpoint_privacy_support_or_price_hold')
+   expect(()=>inspectWriterEndpoint(a.body,p,{data:{endpoints:[e]}},zdr)).toThrow('source_endpoint_price_or_input_limit')
+  expect(()=>inspectWriterEndpoint(a.body,p,catalog,{data:[]})).toThrow('source_endpoint_processing_conditions')
   const big=structuredClone(x.request);big.messages[0].content+='x'.repeat(180000)
   expect(applyWriterPolicy(big).status).toBe('request_budget_hold')
  })

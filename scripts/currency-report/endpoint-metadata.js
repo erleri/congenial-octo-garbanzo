@@ -45,3 +45,10 @@ export function endpointDiagnostic(error,request,metadata,clock=Date.now) {
   model:request?.body?.model,route:request?.body?.provider?.only?.[0],
   checkedAt:metadata?.checkedAt??new Date(clock()).toISOString(),metadataHash:metadata?.metadataHash??null}
 }
+
+export function writerEndpointFailure(error,profile,stage) {
+ const category=categories.has(error?.endpointCategory)?error.endpointCategory:'metadata_unavailable'
+ return {reason:`writer_endpoint_${category}`,diagnostic:{stage,category,model:profile.model,route:profile.route,
+  checkedAt:error?.endpointMetadata?.checkedAt??new Date().toISOString(),
+  metadataHash:/^[a-f0-9]{64}$/.test(error?.endpointMetadata?.metadataHash??'')?error.endpointMetadata.metadataHash:null}}
+}

@@ -1,0 +1,20 @@
+begin;
+set local search_path=public,extensions,pg_catalog;
+select plan(12);
+
+select ok(not has_function_privilege('anon','public.observe_currency_report_writer_endpoint(text,text,text,text,text)','execute'),'anonymous cannot record diagnostics');
+select ok(not has_function_privilege('authenticated','public.observe_currency_report_writer_endpoint(text,text,text,text,text)','execute'),'ordinary login cannot record diagnostics');
+set local role service_role;
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_route_unavailable','writer','openai/gpt-6.1-sol','azure/us','1100'),false,'first scheduled hold is visible without alert');
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_route_unavailable','reviewer','openai/gpt-6.1-sol','azure/us','1100'),false,'same schedule retry is still one hold');
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_route_unavailable','writer','openai/gpt-6.1-sol','azure/us',null),false,'manual check does not advance scheduled hold');
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_route_unavailable','writer','openai/gpt-6.1-sol','azure/us','1101'),true,'next matching scheduled hold raises alert');
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_route_unavailable','writer','openai/gpt-6.1-sol','azure/us','1102'),true,'ongoing hold keeps the alert');
+select is((select count(*) from app_private.currency_report_storage_incidents where active and stage='runtime' and left(reason,16)='writer_endpoint_'),1::bigint,'ongoing failure uses one alert');
+select is((select revision from app_private.currency_report_storage_incidents where active and stage='runtime' and left(reason,16)='writer_endpoint_'),1,'ongoing failure keeps one notification revision');
+select is(public.observe_currency_report_writer_endpoint(null,null,null,null,'1103'),false,'successful new scheduled run resets the streak');
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_route_unavailable','writer','openai/gpt-6.1-sol','azure/us','1104'),false,'next outage starts a new streak');
+select is(public.observe_currency_report_writer_endpoint('writer_endpoint_processing_conditions','reviewer','openai/gpt-6.1-sol','azure/us',null),true,'configuration error alerts immediately');
+reset role;
+select * from finish();
+rollback;

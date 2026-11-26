@@ -2,7 +2,9 @@
 // requires service-owned policy and costs; publishing remains administrator-only.
 import {randomUUID} from 'node:crypto'
 import {inspectOriginalPlanEndpoint,inspectNewsModelEndpoint} from './news-model-review.js'
-import {endpointDiagnostic} from './endpoint-metadata.js'
+import {endpointDiagnostic,writerEndpointFailure} from './endpoint-metadata.js'
+import {writerProfile} from './writer-policy.js'
+import {writerEndpointRequiresAction} from './operating-result.js'
 import {fingerprint} from './research-harness.js'
 import {assertOperatingPolicy,operatingConfigurationHolds} from './operating-policy.js'
 import {planAutomaticSupply} from './automatic-supply-plan.js'
@@ -45,7 +47,7 @@ export function operatingReferenceIdentity(dataset,countries,asOf) {
 }
 // A new fetch timestamp is not new material. Edition/content/period changes are.
 export async function runOperatingCycle({dataset,asOf,calendarByCurrency,store,sourcePlan,sourceRegister,registry,processingRules,
- env={},mode='saved',capturesByCurrency={},acquire,execute=false,verifyStorage=false,preflightSource,preflightWriter,send,reconcile,dispatchHolds=[],
+ env={},mode='saved',capturesByCurrency={},acquire,execute=false,verifyStorage=false,preflightSource,preflightWriter,preflightWriterProfile,send,reconcile,dispatchHolds=[],
  clock=()=>Date.now(),deadlineMs=Date.now()+138*60*1000,owner=store?.recoveryExecutionId??randomUUID(),testOnly=false}={}) {
  const configured=await store.operatingPolicy()
  if(!configured)return {status:'operating_configuration_missing',modelCalls:0,publicationApproved:false}
@@ -148,10 +150,23 @@ if(spending.calls>=policy.limits.maxCalls||spending.confirmedNano+spending.reser
   spending.calls++
   try{return await send(args)}catch(error){spending.unknown=true;throw error}
  }:send
+ const writerEndpoint={profilesVerified:false}
  const common={dataset,asOf,freshKey,refreshed:prepared,policy,configured,configurationHolds,correctionHolds,recovery,
   store:budgetedStore,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,verifyStorage,preflightSource,preflightWriter,
-  send:guardedSend,reconcile,dispatchHolds,clock,deadlineMs,owner,testOnly}
+  preflightWriterProfile,writerEndpoint,send:guardedSend,reconcile,dispatchHolds,clock,deadlineMs,owner,testOnly}
  const results=[],owned=new Map(),freshCandidates=new Set(recoveredCountries)
+ const reportWriterOutcome=async result=>{
+  if(!execute||testOnly||!store.writerEndpointObservation)return result
+  const failures=results.flatMap(batch=>(batch.rows??[]).filter(row=>row.endpointDiagnostic))
+  const failure=failures.find(row=>writerEndpointRequiresAction(row.reason))??failures[0]
+  if(!failure&&!writerEndpoint.profilesVerified)return result
+  const {stage,model,route}=failure?.endpointDiagnostic??{}
+  try{
+   const writerEndpointAlert=await store.writerEndpointObservation({reason:failure?.reason??null,stage,model,route,
+    scheduledRun:env.GITHUB_EVENT_NAME==='schedule'?env.GITHUB_RUN_ID:undefined})
+   return {...result,writerEndpointAlert}
+  }catch{return {...result,holds:[...(result.holds??[]),'operating_storage_failure'],writerEndpointObservation:'record_failed'}}
+ }
  for(const previous of queue){
   const result=await executeOperatingEnvelope({...common,key:previous.batch_key,previous,owned})
   results.push(result)
@@ -169,23 +184,23 @@ if(spending.calls>=policy.limits.maxCalls||spending.confirmedNano+spending.reser
  if(!results.length||execute&&hasWaiting&&availableFresh&&!seen.has(freshKey)&&!unresolved&&policy.state==='operator_configured'){
   results.push(await executeOperatingEnvelope({...common,key:freshKey,previous:current,owned}))
  }
- if(results.length===1)return {...results[0],recovery,collectionResults:prepared.collectionResults}
+ if(results.length===1)return reportWriterOutcome({...results[0],recovery,collectionResults:prepared.collectionResults})
  const rows=new Map()
  for(const result of results)for(const row of executionRows(result)){
   if(rows.has(row.currency)&&(row.status==='country_owned_by_prior_batch'||owned.has(row.currency)&&owned.get(row.currency)!==result.batchKey))continue
   rows.set(row.currency,row)
  }
  const recoveryRequired=spending.unknown||results.some(stopsCycle)
- return {version:'operational-report-cycle/2',status:recoveryRequired?'cost_or_execution_recovery_required':results.some(r=>r.status==='paused')?'paused':'completed_with_country_results',
+ return reportWriterOutcome({version:'operational-report-cycle/2',status:recoveryRequired?'cost_or_execution_recovery_required':results.some(r=>r.status==='paused')?'paused':'completed_with_country_results',
   batchKey:results[0]?.batchKey??freshKey,rows:[...rows.values()],executionBatches:results,
   collectionResults:prepared.collectionResults,modelCalls:spending.calls,confirmedUsd:spending.confirmedNano/1e9,
   reservedUnconfirmedUsd:spending.reservedNano/1e9,
   costUsd:spending.unknown||spending.reservedNano>0?null:spending.confirmedNano/1e9,unknownCost:spending.unknown,
-  publicationApproved:false,manualEdits:0,productionChanges:0}
+  publicationApproved:false,manualEdits:0,productionChanges:0})
 }
 
 async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,configured,configurationHolds,correctionHolds,recovery,
- store,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,verifyStorage,preflightSource,preflightWriter,send,reconcile,
+ store,spending,sourcePlan,sourceRegister,registry,processingRules,env,execute,verifyStorage,preflightSource,preflightWriter,preflightWriterProfile,writerEndpoint,send,reconcile,
  dispatchHolds,clock,deadlineMs,owner,testOnly,key,previous,owned}) {
  let prepared=refreshed,executionDataset=dataset
  const deferredFreshMaterial=!!previous&&key!==freshKey
@@ -233,6 +248,23 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
    return {...summary,status:'operating_storage_failure',stage:'preflight',reason:safeReason(error),storage:stats,
     incident:await storageState(store,'preflight',error,stats,execute||verifyStorage)}}
  summary.storage=storage
+ const reviewer=policy.destination.reviewProvider==='azure'?'sol':'sol-us'
+ const writerStages=[['writer',writerProfile(policy.writer)],['reviewer',writerProfile(reviewer)]]
+ const checkWriterProfiles=typeof preflightWriterProfile==='function'?async()=>{
+  for(const [stage,profile] of writerStages){
+   try{await preflightWriterProfile(profile)}catch(error){
+    const failure=writerEndpointFailure(error,profile,stage)
+    throw Object.assign(Error(failure.reason),{diagnostic:failure.diagnostic,beforeDispatch:true})
+   }
+  }
+  writerEndpoint.profilesVerified=true
+ }:undefined
+ if(!execute&&!verifyStorage&&!holds.length&&checkWriterProfiles&&prepared.rows.some(r=>r.status==='planned')){
+  try{await checkWriterProfiles()}catch(error){
+   return {...summary,status:'runtime_endpoint_preflight_wait',reason:error.message,
+    endpointChecks:[{status:'held',...error.diagnostic}]}
+  }
+ }
  // Inspect the immutable source requests, before claims/reservations. A failed
  // common endpoint is a technical hold, not six independent evidence failures.
  // A resumed envelope must first consult durable stage receipts. Its transport
@@ -313,9 +345,9 @@ async function executeOperatingEnvelope({dataset,asOf,freshKey,refreshed,policy,
   return metadata
  }
  try{
-  const result=await runOperationalReportBatch({dataset:executionDataset,countries:prepared.privateCountries,asOf:prepared.asOf,store:scoped,env,approval,writer:policy.writer,reviewer:policy.destination.reviewProvider==='azure'?'sol':'sol-us',
+  const result=await runOperationalReportBatch({dataset:executionDataset,countries:prepared.privateCountries,asOf:prepared.asOf,store:scoped,env,approval,writer:policy.writer,reviewer,
    retryCurrencies:(recovery?.items??[]).filter(i=>i.status==='recovery_retry_wait').map(i=>i.currency),
-   sourcePlan,sourceRegister,registry,processingRules,preflightSource:checkedSource,preflightWriter,send,reconcile,testOnly,sourceAdmissionState:prepared.sourceAdmissionState,
+   sourcePlan,sourceRegister,registry,processingRules,preflightSource:checkedSource,preflightWriter,preflightWriterProfile,checkWriterProfiles,send,reconcile,testOnly,sourceAdmissionState:prepared.sourceAdmissionState,
    excludedCountries:[...owned].filter(([,batchKey])=>batchKey!==key).map(([currency])=>currency),
    beforeCountry:async country=>{
     if(owned.has(country.currency)&&owned.get(country.currency)!==key)return {claimed:false,reason:'country_owned_by_prior_batch'}
