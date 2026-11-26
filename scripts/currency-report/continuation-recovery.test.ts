@@ -8,6 +8,33 @@ import {operatingSourceRecords,reuseOperatingSources} from './operating-source-c
 import {fingerprint} from './research-harness.js'
 import {REPORT_CURRENCIES} from './shared-price-contract.js'
 
+it('holds new source requests when the approved writer route is unavailable',async()=>{
+ const f=await operatingFixture()
+ const observations=[]
+ f.store.writerEndpointObservation=async observation=>{observations.push(observation);return observations.length>1}
+ const preflightWriterProfile=async()=>{throw Object.assign(Error('route unavailable'),{endpointCategory:'route_unavailable'})}
+ const inputs={...f,preflightWriterProfile}
+ const plan=await runOperatingCycle({...inputs,execute:false})
+ expect(plan.endpointChecks).toContainEqual(expect.objectContaining({stage:'writer',category:'route_unavailable'}))
+ const execution=await runOperatingCycle({...inputs,execute:true,testOnly:false})
+ expect(execution.modelCalls).toBe(0)
+ expect(f.store.jobs).toHaveLength(0)
+ expect(execution.rows.every(r=>r.continuation.resumeExact)).toBe(true)
+ expect(observations).toHaveLength(1)
+ expect(observations[0]).toMatchObject({reason:'writer_endpoint_route_unavailable',stage:'writer'})
+ const repeated=await runOperatingCycle({...inputs,execute:true,testOnly:false})
+ expect(operatingResultState(repeated)).toMatchObject({kind:'action_required',exitCode:2})
+ expect(f.store.jobs).toHaveLength(0)
+ const recovered=await runOperatingCycle({...f,execute:true,testOnly:false})
+ expect(recovered.batchKey).toBe(execution.batchKey)
+ expect(recovered.rows.filter(r=>r.status==='pending_admin_review')).toHaveLength(6)
+})
+
+it.each(['request_budget','extraction_claim_support_required'])('keeps isolated %s out of the pipeline repair outcome',reason=>{
+ const input={status:'runtime_endpoint_preflight_wait',sourceIssues:[{status:'original_pipeline_failed',reason}]}
+ expect(operatingResultState({rows:[{...input,continuation:countryContinuation(input)}]})).toMatchObject({kind:'waiting',exitCode:0})
+})
+
 function anotherArticle(collection) {
  const prior=collection.originals[0],record=structuredClone(prior)
  record.url+='-another-article';delete record.id;delete record.sourceId

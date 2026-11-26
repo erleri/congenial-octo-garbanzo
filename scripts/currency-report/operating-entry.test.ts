@@ -17,7 +17,7 @@ it('plans through the workflow entry using the shared FX loader without a local 
  expect(result.modelCalls).toBe(0)
  expect(result.referenceReadiness).toMatchObject({ready:true,failures:[],contentQualityEvaluated:false})
  expect(f.state.posts).toEqual([])
- expect(fetchImpl).toHaveBeenCalled();expect(result).toMatchObject({status:'source_endpoint_preflight_hold',modelCalls:0})
+ expect(fetchImpl).toHaveBeenCalled();expect(result).toMatchObject({status:'runtime_endpoint_preflight_wait',reason:'writer_endpoint_metadata_unavailable',modelCalls:0})
  expect(fetchImpl.mock.calls.every(([,options])=>!options?.method||options.method==='GET')).toBe(true)
  expect(acquire.mock.calls.every(([args])=>args.mode==='live')).toBe(true)
 })

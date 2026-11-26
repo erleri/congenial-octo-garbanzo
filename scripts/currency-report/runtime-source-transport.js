@@ -10,7 +10,7 @@ import {selectRuntimeAttempt} from './runtime-retry.js'
 import {terminalRateLimit} from './runtime-retry.js'
 import {fullyReservedReceipt} from './recovery-policy.js'
 
-export function runtimeSourceTransport({store,env,approval,preflight,send,reconcile=async()=>({costUsd:null})}) {
+export function runtimeSourceTransport({store,env,approval,preflight,checkWriterProfiles,send,reconcile=async()=>({costUsd:null})}) {
  let calls=0,committed=0,stopped=false,stoppedReason='source_runtime_stopped'
  const parents=new Map()
  const before=message=>{const error=Error(message);error.beforeDispatch=true;throw error}
@@ -51,6 +51,8 @@ export function runtimeSourceTransport({store,env,approval,preflight,send,reconc
   if(calls>=approval.maxCalls||committed+request.maximumUsd>approval.budgetUsd)before('source_budget_not_approved')
   const config=await store.control()
   if(!config.enabled||!config.review_enabled||!['sol','sol-us'].includes(config.writer))before('source_runtime_disabled')
+  // A reusable receipt above can still progress while a downstream route is down.
+  await checkWriterProfiles?.()
   let metadata
   try{
    metadata=await preflight(request)

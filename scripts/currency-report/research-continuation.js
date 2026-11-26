@@ -23,11 +23,11 @@ export function sourceContinuation(item) {
   category='accounting';action='stop_paid_work';resumeWhen='confirmed_accounting_recovery'
  }else if(match(reasons,/unsafe_or_oversized_runtime_payload|runtime_document_|unsafe_supply_payload/)){
   category='technical';action='await_pipeline_repair';resumeWhen='verified_runtime_storage_repair';resumeExact=true
- }else if(match(reasons,/source_endpoint_(?:preflight_hold|metadata_unavailable|route_unavailable|unsupported_parameters|processing_conditions|price_or_input_limit|request_configuration)/)){
+ }else if(match(reasons,/source_endpoint_(?:preflight_hold|metadata_unavailable|route_unavailable|unsupported_parameters|processing_conditions|price_or_input_limit|request_configuration)|^writer_endpoint_/)){
   category='temporary';action='resume_saved_stages';resumeWhen='endpoint_control_or_execution_window_recovered';resumeExact=true
  }else if(match(reasons,/published_history_unavailable|correction_storage_failed|correction_history_unavailable|supply_status_storage_failed/)){
   category='temporary';action='wait_for_country_storage';resumeWhen='next_cycle_rechecks_country_history_and_storage'
- }else if(match(reasons,/source_budget_deferred|source_dispatch_deferred/)){
+ }else if(reasons.includes('request_budget')||match(reasons,/source_budget_deferred|source_dispatch_deferred/)){
   category='budget';action='continue_next_budgeted_cycle';resumeWhen='next_cycle_reuses_reviews_and_allocates_remaining_sources'
  }else if(match(reasons,/country_runtime_read_wait|country_store_wait|frozen_(?:source|reference)_refresh_wait|execution_time_budget_wait|source_endpoint_(?:preflight_hold|metadata_unavailable|route_unavailable|unsupported_parameters|processing_conditions|price_or_input_limit|request_configuration)|runtime_endpoint_preflight_wait|runtime_finalization_wait|runtime_store_.*_failed|runtime_stopped_before_call|runtime_disabled|source_runtime_stopped_before_post/)){
   category='temporary';action='resume_saved_stages';resumeWhen='endpoint_control_or_execution_window_recovered';resumeExact=true
@@ -41,7 +41,7 @@ export function sourceContinuation(item) {
   category='capture';action='use_other_registered_source';resumeWhen='source_revision_or_adapter_changed'
  }else if(match(reasons,/cadence_hold|cadence_or_reference_hold|shared_reference_price_held|dashboard_reference|new_publication_superseded_frozen_input|frozen_reference_superseded/)){
   category='reference';action='wait_for_reference_or_trigger';resumeWhen='valid_reference_or_current_publication'
- }else if(match(reasons,/invalid_original_|held_extraction_has_claims|event_date_evidence_required|extraction_attribution_not_in_original|comparison_dropped_candidate_context|source_json_hold|source_response_or_cost_hold|content_review_hold|structure_hold|output_hold|review_input_preflight_hold|source_review_conflict|source_review_revalidation_required/)){
+ }else if(match(reasons,/invalid_original_|held_extraction_has_claims|event_date_evidence_required|extraction_claim_support_required|extraction_attribution_not_in_original|comparison_dropped_candidate_context|source_json_hold|source_response_or_cost_hold|content_review_hold|structure_hold|output_hold|review_input_preflight_hold|source_review_conflict|source_review_revalidation_required/)){
   category='output';action='find_other_evidence';resumeWhen='new_material_or_review_rules'
  }else if(match(reasons,/market_period_|publication_before_session_window|original_event_date_not_supported|event_date_|extraction_event_/)){
   category='period';action='find_period_matched_evidence';resumeWhen='new_material_or_review_rules'

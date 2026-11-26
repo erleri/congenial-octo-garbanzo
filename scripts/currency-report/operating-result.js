@@ -1,5 +1,6 @@
 // Job outcome is independent from publication approval and content quality.
 import {REPORT_CURRENCIES,COUNTRY_REPORT_PROFILES} from './shared-price-contract.js'
+export const writerEndpointRequiresAction=reason=>/^writer_endpoint_(?:request_configuration|processing_conditions|unsupported_parameters|price_or_input_limit)$/.test(reason??'')
 export function referenceReadiness(result) {
  const rows=result.collectionResults??[],failures=[]
  if(result.modelCalls!==0||result.publicationApproved!==false)failures.push('non_free_readiness_result')
@@ -26,7 +27,10 @@ export function operatingResultState(result) {
  const collections=result.collectionResults??results.flatMap(r=>r.collectionResults??[])
  const statuses=[...results.flatMap(r=>[r.status,...(r.holds??[])]),...rows.map(r=>r.status),...collections.map(r=>r.status)]
  const recorded=results.filter(r=>r.version==='operating-checkpoint/1').map(r=>r.checkpointOutcome)
+ const writerChecks=[...results,...rows].map(r=>r.reason)
+ const writerConfigurationHold=writerChecks.some(writerEndpointRequiresAction)
  const attention=recorded.some(r=>r?.kind==='action_required')||statuses.some(s=>/source_endpoint_|operating_storage_failure|cost_(?:unresolved|reconciliation|exceeded|or_execution_recovery)|unresolved_or_inflight|execution_hold|lease_expired|batch_busy|payload_capacity_hold|queue_capacity_hold|correction_recording_required/.test(s??''))
+  ||writerConfigurationHold||result.writerEndpointAlert===true
   ||rows.some(r=>[r.continuation,...(r.continuation?.issues??[])].some(i=>['await_pipeline_repair','stop_paid_work'].includes(i?.action)))
  const failed=result.referenceReadiness?.ready===false||recorded.some(r=>r?.kind==='failure')||statuses.some(s=>/collection_or_history_failed|country_execution_hold|operating_model_key_missing|collection_failed/.test(s??''))
   ||collections.some(r=>r.acquisitionError||r.referenceStatus==='upstream_fx_refresh_not_confirmed'||r.candidates===0&&r.lookupFailures?.length)

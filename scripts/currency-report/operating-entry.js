@@ -14,7 +14,7 @@ import {runOperatingCycle} from './operating-cycle.js'
 import {REPORT_CURRENCIES} from './shared-price-contract.js'
 import {dashboardReferenceState} from './dashboard-reference-state.js'
 import {createEndpointMetadata} from './endpoint-metadata.js'
-import {inspectWriterEndpoint} from './writer-policy.js'
+import {inspectWriterEndpoint,inspectWriterEndpointProfile} from './writer-policy.js'
 import {callOpenRouterStream,reconcileGenerationCost} from './openrouter-stream.js'
 import {NEWS_REVIEW_POLICY} from './news-model-review.js'
 import {operatingResultState,referenceReadiness} from './operating-result.js'
@@ -121,9 +121,16 @@ export async function operatingEntry({action='inspect',input,requireReady=false,
   review:async({currency,inputs,asOf})=>(await acquireOfficialBackground({...inputs,snapshot:{currency},asOf,sourcePlan,sourceRegister,mode:'saved',
    fetchImpl:()=>{throw Error('official_cache_review_network_forbidden')}})).admission})
  const metadata=createEndpointMetadata({fetchImpl})
- let adapters={preflightSource:request=>metadata(request.body),preflightWriter:async(body,profile)=>{
-  const data=await metadata(body);return {...inspectWriterEndpoint(body,profile,data.catalog,data.zdr),checkedAt:data.checkedAt,metadataHash:data.metadataHash}
- }}
+ const checkWriter=async(profile,body)=>{
+  const data=await metadata(body??{model:profile.model,provider:{only:[profile.route]}})
+  const {checkedAt,metadataHash}=data
+  try{
+   const verified=body?inspectWriterEndpoint(body,profile,data.catalog,data.zdr):inspectWriterEndpointProfile(profile,data.catalog,data.zdr)
+   return {...verified,checkedAt,metadataHash}
+  }catch(error){error.endpointMetadata={checkedAt,metadataHash};throw error}
+ }
+ let adapters={preflightSource:request=>metadata(request.body),preflightWriter:(body,profile)=>checkWriter(profile,body),
+  preflightWriterProfile:profile=>checkWriter(profile)}
  if(action==='execute'){
   // No key is loaded for plan/inspect. Disabled or unconfigured execution stops
   // inside the coordinator before preflight/POST; a missing key fails there.

@@ -20,10 +20,11 @@ import {buildSharedDashboardPriceSnapshot,REPORT_CURRENCIES,SHARED_REPORT_RULE_V
 import {evaluatePublicationCadence,koreaDate} from './publication-cadence.js'
 import {prepareSharedWriter,assertSharedWriterPlan,compileSharedWriterOutput} from './shared-writer.js'
 import {composeDraft,draftSchemaForPacket} from './openrouter.js'
-import {applyReviewWriterPolicy,assertWriterPolicy,writerReservation} from './writer-policy.js'
+import {applyReviewWriterPolicy,assertWriterPolicy,writerReservation,writerProfile} from './writer-policy.js'
 import {decodeGenerationOutput,assertGenerationWireRequest} from './generation-wire.js'
 import {claimReviewContract,assessClaimReview,prepareClaimReview} from './claim-review.js'
 import {projectPublicReport} from './storage.js'
+import {endpointError,writerEndpointFailure} from './endpoint-metadata.js'
 
 export const RUNTIME_VERSION='currency-report-runtime/1'
 const ajv=new Ajv({allErrors:true})
@@ -211,7 +212,7 @@ function candidate(task,compiled,now,writerJobId) {
 }
 // Store and transport are injected. A test transport never opens a connection.
 // Concrete CLI uses the existing one-POST stream transport and service RPCs.
-export async function runCurrencyRuntime({task,dataset,asOf,publications,env,store,preflight,send,reconcile=async()=>({costUsd:null}),testOnly=false}) {
+export async function runCurrencyRuntime({task,dataset,asOf,publications,env,store,preflight,preflightWriterProfile,send,reconcile=async()=>({costUsd:null}),testOnly=false}) {
  const mode=runtimeMode(env)
  if(mode!=='currency')return {status:mode,modelCalls:0,publicationApproved:false}
  if(testOnly&&store.environment!=='local')throw Error('isolated_runtime_fixture_required')
@@ -252,10 +253,22 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   }
   // No provider metadata is required to finalize exact, already paid responses.
   // Current control, input binding, cost and model checks still precede reuse.
-  let verified
-  try{verified=await preflight(selected.body,selected.profile??selected.writerProfile)}
-  catch{return {status:'runtime_endpoint_preflight_wait'}}
-  if(verified.model!==selected.body.model||verified.route!==(selected.profile??selected.writerProfile).route||verified.zdr!==true||verified.dataCollection!=='deny')throw Error('runtime_endpoint_required')
+  const profile=selected.profile??selected.writerProfile
+  if(stage==='writer'&&preflightWriterProfile){
+   const reviewer=writerProfile(task.reviewer??task.writer)
+   try{await preflightWriterProfile(reviewer)}catch(error){
+    const {reason,diagnostic}=writerEndpointFailure(error,reviewer,'reviewer')
+    return {status:'runtime_endpoint_preflight_wait',reason,endpointDiagnostic:diagnostic,waitingStage:'reviewer'}
+   }
+  }
+  try{
+   const verified=await preflight(selected.body,profile)
+   if(verified.model!==selected.body.model||verified.route!==profile.route||verified.zdr!==true||verified.dataCollection!=='deny')
+    throw endpointError('request_configuration')
+  }catch(error){
+   const {reason,diagnostic}=writerEndpointFailure(error,profile,stage)
+   return {status:'runtime_endpoint_preflight_wait',reason,endpointDiagnostic:diagnostic,waitingStage:stage}
+  }
   const reservation=await store.reserve({taskKey,currency:task.currency,baseDate:task.baseDate,stage,
    parentId,requestHash:hash,reservedNano:runtimeNano(selected.maximumUsd),revision:config.revision,
    context:assertRuntimeDocumentCapacity({writer:task.writer,model:selected.body.model,provider:selected.body.provider.only[0],ruleVersion:SHARED_REPORT_RULE_VERSION,packet:task.plan.packet,task,request:selected.body,...attempt.retry,...(testOnly?{testOnly:true}:{})},'context')})
@@ -317,7 +330,7 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
  // received so the exact response can be reused when review becomes available.
  if(/^recovery_/.test(reviewing.status)||['runtime_endpoint_preflight_wait','runtime_disabled','runtime_stopped_before_call','execution_time_budget_wait',
   'monthly_budget_hold','operating_batch_budget_hold','batch_budget_hold','batch_stopped_before_dispatch'].includes(reviewing.status))
-  return {status:reviewing.status,waitingStage:'reviewer',modelCalls:calls,cost,publicationApproved:false}
+  return {status:reviewing.status,reason:reviewing.reason,endpointDiagnostic:reviewing.endpointDiagnostic,waitingStage:'reviewer',modelCalls:calls,cost,publicationApproved:false}
  if(reviewing.status!=='received')validation={...validation,contentReview:'unverified'}
  if(testOnly)validation={...validation,synthetic:true,reviewOrigin:'synthetic'}
  let runId
