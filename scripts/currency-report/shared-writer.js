@@ -82,7 +82,9 @@ export function prepareSharedWriter({handoff,writer,claimTypingReview,purpose='m
   'previous.comparable가 있으면 published_previous는 옛 공개 원고의 원래 숫자, comparable_previous는 같은 기준일의 하나은행 비교값이다. published_change는 현재 하나은행 값과 comparable_previous 사이의 변화다. 원고에는 비교 기준 전환을 밝히고 옛 공개 숫자와 직접 나눈 변화로 서술하지 않는다.',
   'writingCoverageRequirements는 작성 후 별도 검토할 질문이다. 새 정보·기간·관련성으로 선별하고 같은 사건·경로를 합친다. relatedSourceGroups는 관련성 신호이며 독립 확인 수나 같은 사건을 확정하지 않는다.',
   '각 위치의 ruleLedger.claims에는 사용한 materialClaimIds를 함께 제출한다. evidenceIds는 그 카드들의 출처와 정확히 일치해야 한다. 배경 카드를 drivers에 사용하지 않는다. applicableMechanisms는 비어 있으므로 새 일반 원리를 승인하지 않는다.',
-  outputInstructions({backgroundHeaders:true,marketHeaders:true})].join('\n')
+  outputInstructions({backgroundHeaders:true,marketHeaders:true}),
+  '본문의 숫자 금지는 소제목과 단계·차수·기간에도 적용한다. 필요한 숫자를 한글로 바꾸지 말고 근거 있는 다른 설명을 고른다. JSON 식별자·날짜는 스키마 그대로 반환한다.'
+ ].join('\n')
  const schema=draftSchemaForPacket(packet,true,true,true)
  schema.properties.drivers.minItems=1
  schema.properties.implications.maxItems=1

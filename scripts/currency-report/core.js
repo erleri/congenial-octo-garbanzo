@@ -163,12 +163,25 @@ export function validateContent(candidate, packet) {
   if ([candidate.title, candidate.summary, ...candidate.limitations, ...claims.map(c => c.title)].some(s => /[{}]/.test(s))) errors.add('placeholder_outside_claim')
   for (const c of claims) if (/[{}]/.test(c.text.replace(/\{\{[a-z_]+\}\}/g, ''))) errors.add('malformed_placeholder')
   if (hasDirectionalText(candidate.change.text.replace(/\{\{[a-z_]+\}\}/g, ''))) errors.add('direction_must_use_fact')
-  const strings = [candidate.title, candidate.summary].map(text=>({text,codeDigits:false,evidenceIds:[]}))
-    .concat(claims.flatMap(c=>[c.title,c.text].map(text=>({text,codeDigits:false,evidenceIds:c.evidenceIds}))))
-    .concat(candidate.limitations.map(text => ({text, codeDigits: isCodeOwnedPriceLimitation(text, packet)||isCodeOwnedBusinessLimitation(text,packet)})))
-  for (const {text, codeDigits, evidenceIds} of strings) {
+  const qualityIssues = []
+  const strings = ['title', 'summary'].map(target => ({ target, text: candidate[target], codeDigits: false, evidenceIds: [] }))
+  const blocks = [['change', candidate.change], ...['drivers', 'implications', 'watch'].flatMap(section =>
+    candidate[section].map((block, index) => [`${section}.${index}`, block]))]
+  for (const [target, block] of blocks) {
+    for (const field of ['title', 'text']) strings.push({
+      target: `${target}.${field}`, text: block[field], codeDigits: false, evidenceIds: block.evidenceIds,
+    })
+  }
+  for (const [index, text] of candidate.limitations.entries()) strings.push({
+    target: `limitations.${index}`, text, codeDigits: isCodeOwnedPriceLimitation(text, packet) || isCodeOwnedBusinessLimitation(text, packet),
+  })
+  for (const {target, text, codeDigits, evidenceIds} of strings) {
     const plain = text.replace(/\{\{[a-z_]+\}\}/g, '')
-    if ((!codeDigits && /\d/.test(plain)) || /https?:|www\.|@|<|>|\[|\]|\]\(|system prompt|ignore previous/i.test(plain)) errors.add('untrusted_text')
+    if (!codeDigits && /\d/.test(plain)) {
+      errors.add('untrusted_text')
+      qualityIssues.push({target, code: 'writer_literal_number'})
+    }
+    if (/https?:|www\.|@|<|>|\[|\]|\]\(|system prompt|ignore previous/i.test(plain)) errors.add('untrusted_text')
     if (hasWorkInstruction(plain)) errors.add('advice_or_instruction')
     if (/(당사|우리 회사|LG전자|삼성전자).*(셀아웃|마진|매출|재고)/.test(plain)) errors.add('company_claim')
     if (/원화|KRW/i.test(plain) && !facts.has('usdkrw')) errors.add('unsupported_krw_link')
@@ -185,7 +198,7 @@ export function validateContent(candidate, packet) {
     }else if (foreignCurrency?.test(plain) && !reviewedCrossCountryContext(plain,evidenceIds,packet,foreignCurrency)) errors.add('currency_mismatch')
     if (/(반드시|확실히).*(오른|내린|상승|하락)|환율.*(전망치|도달할|기록할)|금리를?\s*예측/.test(plain)) errors.add('forecast')
   }
-  return { valid: errors.size === 0, errors: [...errors] }
+  return { valid: errors.size === 0, errors: [...errors], ...(qualityIssues.length ? {qualityIssues} : {}) }
 }
 
 function reviewedCrossCountryContext(text,ids,packet,foreignPattern) {
