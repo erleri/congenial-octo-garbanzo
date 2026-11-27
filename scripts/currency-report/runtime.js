@@ -27,6 +27,10 @@ import {projectPublicReport} from './storage.js'
 import {endpointError,writerEndpointFailure} from './endpoint-metadata.js'
 
 export const RUNTIME_VERSION='currency-report-runtime/1'
+const REVIEW_COVERAGE_GUIDE_VERSION='coverage-targets/2'
+ const supportIssueCodes=new Set(['invalid_original_anchor','original_support_missing','subclaim_support_missing',
+ 'subclaim_coverage_missing','subclaim_support_overstated','relation_original_support_missing',
+ 'unknown_mechanism_application','mechanism_conditions_missing'])
 const ajv=new Ajv({allErrors:true})
 export const runtimeNano=value=>{
  if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1000)throw Error('invalid_runtime_amount')
@@ -81,7 +85,8 @@ export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calend
   if(purpose==='policy'&&!legacyFrozenPolicy&&!previous)return {version:RUNTIME_VERSION,status:'held',reason:'event_evidence_wait',cadence,modelCalls:0}
   const writerPurpose=purpose==='initial'?'initial_check':purpose==='periodic'?'periodic_check':purpose==='policy'?'context_update':'market'
   plan=prepareSharedWriter({handoff,writer,claimTypingReview,purpose:writerPurpose,previous})
-  const reviewCapacity=plan.status==='prepared_not_called'?preflightRuntimeReview({plan,writer,reviewer,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION},{capacity:true}):null
+  const reviewCapacity=plan.status==='prepared_not_called'?preflightRuntimeReview({plan,writer,reviewer,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,
+   reviewCoverageGuideVersion:REVIEW_COVERAGE_GUIDE_VERSION},{capacity:true}):null
   if(plan.status==='request_budget_hold'||reviewCapacity?.reason==='runtime_review_budget_hold'){
    const smaller=withoutOptionalBackground(applySharedClaimTyping(handoff,claimTypingReview))
    if(smaller)plan=prepareSharedWriter({handoff:smaller,writer,purpose:writerPurpose,previous})
@@ -94,7 +99,7 @@ export function prepareRuntimeTask({dataset,currency,asOf,publications=[],calend
   }
  }
  const task={...(legacyFrozenPolicy?{}:{generationReason:{purpose,anchorBaseDate:cadence.anchorBaseDate,cumulativePct:cadence.cumulativePct,
-  thresholdPct:cadence.thresholdPct,periodicDueDate:cadence.periodicDueDate,...(cadence.comparisonReference?{comparison:{date:cadence.anchorObservedDate,value:cadence.comparisonReference.value}}:{}),...(change?{change}:{})}}),version:RUNTIME_VERSION,status:'prepared',currency,baseDate:snapshot.baseDate,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,reviewCoverageGuideVersion:'coverage-targets/1',
+  thresholdPct:cadence.thresholdPct,periodicDueDate:cadence.periodicDueDate,...(cadence.comparisonReference?{comparison:{date:cadence.anchorObservedDate,value:cadence.comparisonReference.value}}:{}),...(change?{change}:{})}}),version:RUNTIME_VERSION,status:'prepared',currency,baseDate:snapshot.baseDate,purpose,reviewTransportVersion:COMPACT_REVIEW_VERSION,reviewCoverageGuideVersion:REVIEW_COVERAGE_GUIDE_VERSION,
   materialEditions:[...new Map(Object.values(handoff?.materialConnection?.sections??{}).flat()
    .filter(r=>r.originalCapture?.contentIdentity).map(r=>[r.sourceUrl,{url:r.sourceUrl,identity:r.originalCapture.contentIdentity}])).values(),
    ...officialMaterialEditions(Object.values(handoff?.materialConnection?.sections??{}).flat().filter(r=>r.officialStatistic)
@@ -172,10 +177,20 @@ export function prepareRuntimeReview(task,compiled) {
    properties:{cause:score,change:score,business:score,readability:score,evidence:score}},criticalErrors:{type:'integer',minimum:0,maximum:100}}}
  const messages=contract.messages.map(m=>({...m}))
  const input=JSON.parse(messages[1].content)
- if(task.reviewCoverageGuideVersion==='coverage-targets/1'){
+ if(['coverage-targets/1',REVIEW_COVERAGE_GUIDE_VERSION].includes(task.reviewCoverageGuideVersion)){
   input.eligibleCoverageTargets=Object.fromEntries((compiled.claimReview.writingCoverageRequirements??[]).map(r=>[r.id,
    compiled.claimReview.sharedClaimLinks?.filter(l=>l.materialClaimIds?.some(id=>r.materialClaimIds?.includes(id))).map(l=>l.target)??[]]))
   messages[0].content+='\nwritingCoverage.targets는 해당 항목의 eligibleCoverageTargets에 있는 위치만 고른다. 같은 출처라도 다른 주장 ID만 연결된 위치를 넣지 않는다. 실제로 사용한 위치만 선택하며 빈틈을 메우려고 연결을 만들지 않는다.'
+ }
+ // Old frozen tasks must reconstruct the same reviewer wire and request hash.
+ if(compact&&task.reviewCoverageGuideVersion===REVIEW_COVERAGE_GUIDE_VERSION){
+  // Every input claim has the same unverified status; omit the repeated defaults.
+  for(const claim of input.claims){
+   delete claim.referenceStatus
+   delete claim.support
+   claim.eligibleAnchorRefs=contract.transport.anchors.filter(anchor=>claim.evidenceIds.includes(anchor.evidenceId)).map(anchor=>anchor.ref)
+  }
+  messages[0].content+='\n모든 입력 주장은 미확인이다. 제목·요약·본문의 supported/limited 문장과 세부 주장 각각에 eligibleAnchorRefs에서 직접 지지하는 ref 또는 조건에 맞는 승인 원리 ID를 붙인다. 판단 근거가 없으면 세부 주장은 unverified, 문장은 unverified/keep/verification_gap이다.'
  }
  messages[1].content=JSON.stringify(encodeReviewInput(compact?{...input,anchorTable:contract.transport.anchors}:input))
  messages[0].content+=compact?'\n입력의 review-text-dictionary/1에서 {textRef:tN}은 strings[tN]의 정확한 문자열이다. 키 이름과 모든 문장·근거·조건은 유지한다.\n'+contract.instructions
@@ -200,7 +215,17 @@ export function assessRuntimeReview(compiled,body,identity) {
  const average=validScores?scores.reduce((n,v)=>n+v,0)/5:null
  const pass=verdict.status==='reviewed'&&verdict.requiredCorrections?.length===0&&verdict.verificationPending?.length===0
   &&!priority?.holds.length&&validScores&&average>=4&&body.scores.cause>=4&&body.scores.evidence>=4&&body.criticalErrors===0
- return {verdict,validation:{structureValid:structurallyValid(compiled),contentReview:pass?'passed':'unverified',
+ const supportErrors=(verdict.errors??[]).flatMap(error=>{
+  const [target,sentence,...parts]=error.split(':')
+  const code=parts.pop()
+  if(!supportIssueCodes.has(code))return []
+  return [{target,sentence:Number(sentence),...(parts.length?{subclaim:Number(parts[0])}:{}),code}]
+ })
+ const pendingSupport=verdict.rows.filter(row=>row.disposition==='verification_pending').map(row=>({
+  target:row.target,sentence:Number(row.id.split(':').at(-1)),code:'review_evidence_unverified',
+ }))
+ const qualityIssues=[...supportErrors,...pendingSupport].slice(0,8)
+ return {verdict,...(qualityIssues.length?{qualityIssues}:{}),validation:{structureValid:structurallyValid(compiled),contentReview:pass?'passed':'unverified',
   fxPriority:priority,reviewerIdentity:identity??null,criticalErrors:Number.isInteger(body.criticalErrors)&&body.criticalErrors>=0?body.criticalErrors:null,
   qualityAverage:average,evidenceScore:validScores?body.scores.evidence:null,publicationApproved:false,reviewOrigin:'agent'}}
 }
@@ -298,10 +323,14 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
  if(writing.status!=='received')return {...writing,response:undefined,modelCalls:calls,publicationApproved:false}
  let compiled
  try{compiled=compile(task,writing.response)}catch{await store.finish(writing.id,null,null,null);return {status:'output_hold',modelCalls:calls,publicationApproved:false}}
- if(!structurallyValid(compiled)){await store.finish(writing.id,null,null,null);return {status:'structure_hold',modelCalls:calls,publicationApproved:false}}
+ if(!structurallyValid(compiled)){
+  await store.finish(writing.id,null,null,null)
+  const qualityIssues=compiled.validation?.qualityIssues?.slice(0,8)
+  return {status:'structure_hold',modelCalls:calls,publicationApproved:false,...(qualityIssues?.length?{qualityIssues}:{})}
+ }
  const report={...candidate({...task,taskKey:writing.candidateTaskKey??task.taskKey},compiled,asOf,writing.id),...(testOnly?{testOnly:true}:{})}
  let validation={structureValid:true,contentReview:'unverified',criticalErrors:null,qualityAverage:null,evidenceScore:null,publicationApproved:false}
- let reviewing={status:'review_not_run'},reviewBody=null
+ let reviewing={status:'review_not_run'},reviewBody=null,qualityIssues
  try {
   const selected=prepareRuntimeReview(task,compiled)
   reviewing=await perform('reviewer',selected,writing.id)
@@ -311,7 +340,9 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
    const wireBody=decodeGenerationOutput(decoded,selected.outputContract)
    if(!ajv.validate(selected.localSchema,wireBody))throw Error('runtime_review_schema_hold')
    reviewBody=selected.reviewTransport?decodeCompactReview(compiled.claimReview,wireBody,selected.reviewTransport):wireBody
-   validation=assessRuntimeReview(compiled,reviewBody,{model:reviewing.response.actualModel,route:selected.profile.route}).validation
+   const assessed=assessRuntimeReview(compiled,reviewBody,{model:reviewing.response.actualModel,route:selected.profile.route})
+   validation=assessed.validation
+   qualityIssues=assessed.qualityIssues
   }
  } catch(error) {reviewing={...reviewing,status:'review_output_hold',reason:/^[a-z_]+$/.test(error.message??'')?error.message:'review_validation_failed'}}
  if(reviewing.status==='cost_fully_reserved_unconfirmed')
@@ -338,5 +369,6 @@ export async function runCurrencyRuntime({task,dataset,asOf,publications,env,sto
   sourceUseReview:publicSourceDelivery({task,report,evaluatedOn:asOf.slice(0,10)})},cost)}
  catch{return {status:'runtime_finalization_wait',waitingStage:'storage',modelCalls:calls,cost,publicationApproved:false}}
  return {status:validation.contentReview==='passed'?'pending_admin_review':'content_review_hold',runId,modelCalls:calls,cost,
+  ...(qualityIssues?.length?{qualityIssues}:{}),
   publicationApproved:false,sourceReview:'bound_fact_and_attributed_note_review_not_original_article_verification'}
 }

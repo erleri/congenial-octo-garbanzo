@@ -140,6 +140,7 @@ export async function runOperationalReportBatch({dataset,countries,asOf,store,en
     runId:generated.runId??null,modelCalls:calls-beforeCalls,confirmedUsd:(confirmedNano-beforeCost)/1e9,reservedUnconfirmedUsd:(reservedNano-beforeReserve)/1e9,
     reason:generated.reason??generated.cost?.reviewReason??null,waitingStage:generated.waitingStage??null,
     ...(generated.endpointDiagnostic?{endpointDiagnostic:generated.endpointDiagnostic}:{}),
+    ...(generated.qualityIssues?{qualityIssues:generated.qualityIssues}:{}),
     sourceHolds:supply.holds,sourceIssues:[...(supply.collectionIssues??[]),...(supply.sourceReviewIssues??[])],
     researchAssessment:supply.researchAssessment,sourceWorkMode:reusedInitial?'initial_from_independently_reviewed_evidence':'original_review_required',
     pendingOriginalReviews:(supply.sourceReviewIssues??[]).filter(i=>i.status==='pending_original_review_not_admitted').length,

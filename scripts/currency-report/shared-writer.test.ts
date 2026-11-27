@@ -20,6 +20,7 @@ it('compiles all six currencies with unchanged dashboard numbers, separate comme
   const sent=JSON.parse(plan.body.messages[1].content)
   expect(sent).toMatchObject({baseDate:'2026-10-28',commentaryDate:'2026-10-27',referenceContext:{observationAt:null,referenceRateCausalityEstablished:false}})
   expect(compiled.validation).toMatchObject({valid:true});expect(compiled.rules.automaticStatus).toBe('pass')
+  expect(compiled.validation).not.toHaveProperty('qualityIssues')
   expect(compiled.rules.semanticStatus).toBe('unverified');expect(compiled.claimReview.status).toBe('unverified')
   expect(compiled.claimReview.sources[0].sourceContext.sourceVersion).toBe('reviewer_authored_notes')
   expect(compiled.claimReview.sharedClaimLinks).toEqual(raw.ruleLedger.claims)
@@ -78,9 +79,12 @@ it('rejects forged packet/request/contract links and never uses an article-price
 })
 it('preserves rejected outputs and distinguishes structural, safety and separate semantic review without rewriting or retrying',()=>{
  const plan=prepareSharedWriter({handoff:sharedWriterFixture('PEN',false)}),base=sharedDraftFixture(plan)
- const number=structuredClone(base);number.drivers.slot_0.text='현지 환율은 5% 변했습니다.'
+ const number=structuredClone(base);number.drivers.slot_0.text='출처는 세제 개편 3단계 계획에 주목했습니다.'
  const before=structuredClone(number),compiled=compileSharedWriterOutput({plan,draft:number})
  expect(compiled.validation).toMatchObject({valid:false});expect(compiled.validation.errors).toContain('untrusted_text');expect(number).toEqual(before)
+ expect(compiled.validation.qualityIssues).toEqual([{target:'drivers.0.text',code:'writer_literal_number'}])
+ expect(plan.body.messages[0].content).toContain('단계·차수·기간에도 적용한다')
+ expect(plan.body.messages[0].content).toContain('식별자·날짜는 스키마 그대로 반환한다')
  const instruction=structuredClone(base);instruction.drivers.slot_0.text='가격을 인상하세요.'
  expect(compileSharedWriterOutput({plan,draft:instruction}).validation.errors).toContain('advice_or_instruction')
  const extra=structuredClone(base);extra.drivers.slot_3={...extra.drivers.slot_0}
